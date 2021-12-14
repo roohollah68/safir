@@ -3,6 +3,8 @@
 /public/receipt
 /public/product_photo
 /storage/*.key
+.idea
+.git
 .env
 .env.backup
 .phpunit.result.cache
