@@ -210,8 +210,7 @@ class TelegramController extends Controller
 
     public static function createOrderMessage($order)
     {
-
-//        date_default_timezone_set('UTC');
+$payment_type = $order->fromCredit? 'اعتباری':'فیش واریز';
         return "
 نام و نام خانوادگی: {$order->name}
 شماره همراه: {$order->phone}
@@ -219,6 +218,8 @@ class TelegramController extends Controller
 سفارشات: {$order->orders}
 کدپستی: {$order->zip_code}
 توضیحات: {$order->desc}
+مبلغ کل: {$order->total}
+نحوه پرداخت: {$payment_type}
 زمان ثبت: {$order->created_at->timezone('Asia/tehran')}
 سفیر: {$order->user()->first()->name}
             ";
