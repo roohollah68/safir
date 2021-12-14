@@ -104,7 +104,7 @@ class TelegramController extends Controller
 
     public function see_orders($count, $user)
     {
-        if($this->isAdmin()){
+        if($user->role == 'admin'){
             $orders = Order::orderBy('id', 'desc')->limit($count)->get();
         }else{
             $orders = $user->orders()->orderBy('id', 'desc')->limit($count)->get();
