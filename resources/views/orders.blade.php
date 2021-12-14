@@ -15,15 +15,15 @@
                                                                      onclick="prepare_data()">
     <br>
     @if($admin)
-    <div>
-        <div class="form-group input-group col-lg-3">
-            <div class="input-group-append">
-                <label for="user" class="input-group-text">سفیر:</label>
+        <div>
+            <div class="form-group input-group col-lg-3">
+                <div class="input-group-append">
+                    <label for="user" class="input-group-text">سفیر:</label>
+                </div>
+                <select class="form-control" id="user" onchange="prepare_data()">
+                </select>
             </div>
-            <select class="form-control" id="user" onchange="prepare_data()">
-            </select>
         </div>
-    </div>
     @endif
     <table class="stripe">
     </table>
