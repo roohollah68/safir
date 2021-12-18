@@ -28,5 +28,22 @@ class SettingSeeder extends Seeder
             'name'=>'negative',
             'value'=>'500'
         ]);
+
+        Setting::create([
+            'name'=>'peykCost',
+            'value'=>'25'
+        ]);
+
+        Setting::create([
+            'name'=>'postCost',
+            'value'=>'20'
+        ]);
+
+        Setting::create([
+            'name'=>'freeDelivery',
+            'value'=>'500'
+        ]);
+
+
     }
 }

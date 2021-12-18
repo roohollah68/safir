@@ -9,27 +9,25 @@ class SettingController extends Controller
 {
     public function showSettings()
     {
-        return view('settings',['loadOrders'=> $this->loadOrders(), 'minCoupon'=>$this->minCoupon() , 'negative'=>$this->negative()]);
+        $setting = $this->settings();
+        return view('settings',
+            [
+                'loadOrders' => $setting->loadOrders,
+                'minCoupon' => $setting->minCoupon,
+                'negative' => $setting->negative,
+                'peykCost' => $setting->peykCost,
+                'postCost' => $setting->postCost,
+                'freeDelivery' => $setting->freeDelivery,
+            ]);
     }
 
     public function editSettings(Request $req)
     {
-        request()->validate([
-            'loadOrders' => 'required|numeric|min:1',
-            'minCoupon' => 'required|numeric|min:0|max:99',
-        ]);
-
-        Setting::where('name', 'minCoupon')->update([
-            'value' => $req->minCoupon
-        ]);
-
-        Setting::where('name', 'loadOrders')->update([
-            'value' => $req->loadOrders
-        ]);
-
-        Setting::where('name', 'negative')->update([
-            'value' => $req->negative
-        ]);
+        foreach ($req->all() as $name => $value) {
+            Setting::where('name', $name)->update([
+                'value' => $value
+            ]);
+        }
         return redirect(route('settings'));
     }
 }

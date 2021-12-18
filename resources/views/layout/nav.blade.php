@@ -1,15 +1,16 @@
-
 <div class="topnav" id="myTopnav">
     <a href="javascript:void(0);" class="icon" onclick="myFunction()">
         <i class="fa fa-bars"></i>
     </a>
-    <a href="{{route('DepositList')}}" class="active">اعتبار <span dir="ltr">{{$balance}}</span> هزار تومن</a>
+    @if(!$admin)
+        <a href="{{route('DepositList')}}" class="active">اعتبار <span dir="ltr">{{$balance}}</span> هزار تومن</a>
+    @endif
     <a href="{{route('newOrder')}}">ایجاد سفارش</a>
     <a href="{{route('listOrders')}}">مشاهده سفارشات @if($admin) ({{$orderCount}}) @endif</a>
     <a href="{{route('CustomerList')}}">مشتریان </a>
     <a href="{{route('DepositList')}}">واریزی ها @if($admin) ({{$depositCount}}) @endif</a>
     @if($admin)
-        <a href="{{route('manageUsers')}}">مدیریت کاربران  ({{$userCount}}) </a>
+        <a href="{{route('manageUsers')}}">مدیریت کاربران ({{$userCount}}) </a>
         <a href="{{route('couponList')}}">تخفیف ها</a>
         <a href="{{route('productList')}}">محصولات</a>
         <a href="{{route('settings')}}">تنظیمات</a>
@@ -92,6 +93,7 @@
             display: block;
             text-align: right;
         }
+
         .topnav.responsive a.active {
             text-align: left;
         }

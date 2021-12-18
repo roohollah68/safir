@@ -27,12 +27,15 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        View::composer(['orders','layout.nav','depositList','addEditOrder'], function ($view) {
-            $view->with('admin', auth()->user()->role =='admin');
+        View::composer('*', function ($view) {
+            if (auth()->user())
+                $view->with('admin', auth()->user()->role == 'admin');
+            else
+                return $view;
         });
         View::composer(['layout.nav'], function ($view) {
-            $view->with('balance',auth()->user()->balance)->with('depositCount', Deposit::where('confirmed' , false)->get()->count())
-                ->with('userCount',User::where('verified',false)->get()->count())->with('orderCount',Order::where('state','0')->get()->count());
+            $view->with('balance', auth()->user()->balance)->with('depositCount', Deposit::where('confirmed', false)->get()->count())
+                ->with('userCount', User::where('verified', false)->get()->count())->with('orderCount', Order::where('state', '0')->get()->count());
         });
     }
 }

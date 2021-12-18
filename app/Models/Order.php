@@ -23,6 +23,9 @@ class Order extends Model
         'state',
         'total',
         'fromCredit',
+        'paymentMethod',
+        'customerDiscount',
+        'deliveryMethod',
     ];
 
     public function user()

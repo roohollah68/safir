@@ -29,22 +29,14 @@ class Controller extends BaseController
         }
     }
 
-    public function minCoupon()
+    public function settings()
     {
-        $minCoupon = Setting::where('name', 'minCoupon')->get();
-        return $minCoupon[0]->value;
-    }
-
-    public function loadOrders()
-    {
-        $loadOrders = Setting::where('name', 'loadOrders')->get();
-        return $loadOrders[0]->value;
-    }
-
-    public function negative()
-    {
-        $negative = Setting::where('name', 'negative')->get();
-        return $negative[0]->value;
+        $sets = Setting::all();
+        $res = [];
+        foreach ($sets as $set){
+            $res[$set->name] = $set->value;
+        }
+        return (object)$res;
     }
 
 }

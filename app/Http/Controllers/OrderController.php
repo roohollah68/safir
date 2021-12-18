@@ -19,7 +19,7 @@ class OrderController extends Controller
     {
         if ($this->isAdmin()) {
             $users = User::withTrashed()->get();
-            $orders = Order::withTrashed()->orderBy('id', 'desc')->limit($this->loadOrders())->get();
+            $orders = Order::withTrashed()->orderBy('id', 'desc')->limit($this->settings()->loadOrders)->get();
         } else {
             $users = [auth()->user()];
             $orders = auth()->user()->orders()->withTrashed()->orderBy('id', 'desc')->limit($this->loadOrders())->get();
@@ -56,60 +56,71 @@ class OrderController extends Controller
 
     public function newForm(Request $request)
     {
-        $products = Product::all()->keyBy('name');
-        foreach ($products as $ii => $product) {
-            $products[$ii]->coupon = $this->calculateDis($product->id);
-            $products[$ii]->price2 = round((100 - $products[$ii]->coupon) * $product->price / 100);
+        $products = Product::all()->keyBy('id');
+        foreach ($products as $id => $product) {
+            $products[$id]->coupon = $this->calculateDis($id);
+            $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
         }
         $customers = auth()->user()->customers()->get()->keyBy('name');
-        return view('addEditOrder', ['req' => $request->all(), 'order' => false, 'customers' => $customers, 'products' => $products]);
+        return view('addEditOrder', [
+            'req' => $request->all(),
+            'order' => false,
+            'customers' => $customers,
+            'products' => $products,
+            'settings'=> $this->settings()
+        ]);
     }
 
     public function insertOrder(Request $request)
     {
+        $request->phone = $this->number_Fa_En($request->phone);
+        $request->zip_code = $this->number_Fa_En($request->zip_code);
         request()->validate([
             'receipt' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'required|string|min:3',
             'address' => 'required|string|min:3',
-            'phone' => 'required|digits:11',
+            'phone' => 'required|string|min:11,max:11',
         ]);
         $user = auth()->user();
         $products = Product::where('available', true)->get()->keyBy('name');
         $request->orders = '';
         $total = 0;
-        foreach ($products as $name2 => $product) {
-            $name = str_replace(' ', '_', $name2);
-            if (($request[$name]) > 0) {
-                $request->orders = $request->orders . $name2 . ' ' . $request[$name] . ' عدد|';
-                $coupon = $this->calculateDis($product->id);
-                $total += round((100 - $coupon) * $product->price * $request[$name] / 100);
-            }
-        }
-        if ($total == 0) {
-            return redirect()->back()->withInput()->withErrors(['محصولی انتخاب نشده است!']);
-        }
-        $request->orders = substr($request->orders, 0, -1);
-        if ($request->credit) {
-            if ($total > ($user->balance + $this->negative())) {
-                return redirect()->back()->withInput()->withErrors(['اعتبار شما کافی نیست!']);
-            } else {
-                $user->update([
-                    'balance' => $user->balance - $total
-                ]);
-            }
+        if ($this->isAdmin() && $request->factor) {
+            $request->orders = 'طبق فاکتور';
         } else {
-            if ($request->file("receipt")) {
-                $request->receipt = $request->file("receipt")->store("", 'public');
-            } elseif ($request->file) {
-                $request->receipt = $request->file;
-            } else {
-                return redirect()->back()->withInput()->withErrors(['باید عکس رسید بانکی بارگذاری شود!']);
+            foreach ($products as $name2 => $product) {
+                $name = str_replace(' ', '_', $name2);
+                if (($request[$name]) > 0) {
+                    $request->orders = $request->orders . $name2 . ' ' . $request[$name] . ' عدد|';
+                    $coupon = $this->calculateDis($product->id);
+                    $total += round((100 - $coupon) * $product->price * $request[$name] / 100);
+                }
             }
+            if ($total == 0) {
+                return redirect()->back()->withInput()->withErrors(['محصولی انتخاب نشده است!']);
+            }
+            $request->orders = substr($request->orders, 0, -1);
+            if (!$this->isAdmin())
+                if ($request->credit) {
+                    if ($total > ($user->balance + $this->settings()->negative)) {
+                        return redirect()->back()->withInput()->withErrors(['اعتبار شما کافی نیست!']);
+                    } else {
+                        $user->update([
+                            'balance' => $user->balance - $total
+                        ]);
+                    }
+                } else {
+                    if ($request->file("receipt")) {
+                        $request->receipt = $request->file("receipt")->store("", 'public');
+                    } elseif ($request->file) {
+                        $request->receipt = $request->file;
+                    } else {
+                        return redirect()->back()->withInput()->withErrors(['باید عکس رسید بانکی بارگذاری شود!']);
+                    }
+                }
         }
 
 
-        $request->phone = $this->number_Fa_En($request->phone);
-        $request->zip_code = $this->number_Fa_En($request->zip_code);
         $order = $user->orders()->create([
             'name' => $request->name,
             'phone' => $request->phone,
@@ -232,7 +243,7 @@ class OrderController extends Controller
             return 'سفارش نمی تواند حذف شود، چون پردازش شده است!';
 
         if ($order->delete()) {
-            if ($order->fromCredit) {
+            if ($order->fromCredit && !$this->isAdmin()) {
                 $user = $order->user()->first();
                 $user->update([
                     'balance' => $user->balance + $order->total,
@@ -245,7 +256,7 @@ class OrderController extends Controller
 
     public function calculateDis($product_id)
     {
-        $dis = $this->minCoupon();
+        $dis = $this->settings()->minCoupon;
         $user_id = auth()->user()->id;
         $couponLinks = CouponLink::where('product_id', $product_id)->where('user_id', $user_id)->get();
         foreach ($couponLinks as $couponLink) {
