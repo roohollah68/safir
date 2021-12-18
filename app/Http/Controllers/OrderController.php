@@ -255,7 +255,7 @@ class OrderController extends Controller
             return 'سفارش نمی تواند حذف شود، چون پردازش شده است!';
 
         if ($order->delete()) {
-            if ($order->fromCredit && !$this->isAdmin()) {
+            if ($order->paymentMethod == 'credit' && !$this->isAdmin()) {
                 $user = $order->user()->first();
                 $user->update([
                     'balance' => $user->balance + $order->total,
