@@ -39,4 +39,18 @@ class Controller extends BaseController
         return (object)$res;
     }
 
+    public function errorBack($error)
+    {
+        return redirect()->back()->withInput()->withErrors([$error]);
+    }
+
+    public function deliveryCost($deliveryMethod)
+    {
+        $deliveryCosts = [
+            'peyk' => $this->settings()->peykCost,
+            'post' => $this->settings()->postCost,
+            'paskerayeh' => 0,
+        ];
+        return $deliveryCosts[$deliveryMethod];
+    }
 }

@@ -42,6 +42,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'receipt' => [
+            'driver' => 'local',
+            'root' => public_path('receipt'),
+            'url' => env('APP_URL').'',
+            'visibility' => 'public',
+        ],
+
         'deposit' => [
             'driver' => 'local',
             'root' => public_path('deposit'),

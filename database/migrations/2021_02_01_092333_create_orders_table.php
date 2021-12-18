@@ -24,10 +24,9 @@ class CreateOrdersTable extends Migration
             $table->string('desc',300)->nullable();
             $table->string('receipt')->nullable();
             $table->decimal('total',10,0);
-//            $table->boolean('fromCredit');
-            $table->enum('paymentMethod',['credit','receipt','onDelivery','admin'])->default('credit');
-            $table->decimal('customerDiscount',3,0)->default(0);
-            $table->enum('deliveryMethod',['peyk','post','paskerayeh','admin'])->default('peyk');
+            $table->enum('paymentMethod',['credit','receipt','onDelivery','admin']);
+            $table->decimal('customerCost',3,0);
+            $table->enum('deliveryMethod',['peyk','post','paskerayeh','admin']);
             $table->enum('state',['0','1','2','3'])->default('0');
             $table->softDeletes();
             $table->timestamps();

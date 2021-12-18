@@ -22,7 +22,7 @@ class OrderController extends Controller
             $orders = Order::withTrashed()->orderBy('id', 'desc')->limit($this->settings()->loadOrders)->get();
         } else {
             $users = [auth()->user()];
-            $orders = auth()->user()->orders()->withTrashed()->orderBy('id', 'desc')->limit($this->loadOrders())->get();
+            $orders = auth()->user()->orders()->withTrashed()->orderBy('id', 'desc')->limit($this->settings()->loadOrders)->get();
         }
 
         include('../app/jdf.php');
@@ -67,59 +67,69 @@ class OrderController extends Controller
             'order' => false,
             'customers' => $customers,
             'products' => $products,
-            'settings'=> $this->settings()
+            'settings' => $this->settings()
         ]);
     }
 
     public function insertOrder(Request $request)
     {
-        $request->phone = $this->number_Fa_En($request->phone);
-        $request->zip_code = $this->number_Fa_En($request->zip_code);
+//        dd($request->all());
         request()->validate([
             'receipt' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'required|string|min:3',
             'address' => 'required|string|min:3',
             'phone' => 'required|string|min:11,max:11',
         ]);
+        $request->phone = $this->number_Fa_En($request->phone);
+        $request->zip_code = $this->number_Fa_En($request->zip_code);
+
         $user = auth()->user();
-        $products = Product::where('available', true)->get()->keyBy('name');
+        $products = Product::where('available', true)->get()->keyBy('id');
         $request->orders = '';
+        $Total = 0;
         $total = 0;
-        if ($this->isAdmin() && $request->factor) {
+        $customerCost = 0;
+        if ($this->isAdmin() && $request->factor)
             $request->orders = 'طبق فاکتور';
-        } else {
-            foreach ($products as $name2 => $product) {
-                $name = str_replace(' ', '_', $name2);
-                if (($request[$name]) > 0) {
-                    $request->orders = $request->orders . $name2 . ' ' . $request[$name] . ' عدد|';
-                    $coupon = $this->calculateDis($product->id);
-                    $total += round((100 - $coupon) * $product->price * $request[$name] / 100);
+        else {
+            $deliveryCost = $this->deliveryCost($request->deliveryMethod);
+            foreach ($products as $id => $product) {
+                $number = $request['product_' . $id];
+                if ($number > 0) {
+                    $request->orders = $request->orders . $product->name . ' ' . $number . ' عدد|';
+                    $coupon = $this->calculateDis($id);
+                    $total += round((100 - $coupon) * $product->price * $number / 100);
+                    $Total += $product->price * $number;
                 }
             }
-            if ($total == 0) {
-                return redirect()->back()->withInput()->withErrors(['محصولی انتخاب نشده است!']);
+            $total += $deliveryCost;
+            if ($Total == 0) {
+                return $this->errorBack('محصولی انتخاب نشده است!');
             }
             $request->orders = substr($request->orders, 0, -1);
             if (!$this->isAdmin())
-                if ($request->credit) {
+                if ($request->paymentMethod == 'credit') {
                     if ($total > ($user->balance + $this->settings()->negative)) {
-                        return redirect()->back()->withInput()->withErrors(['اعتبار شما کافی نیست!']);
+                        return $this->errorBack('اعتبار شما کافی نیست!');
                     } else {
                         $user->update([
                             'balance' => $user->balance - $total
                         ]);
                     }
-                } else {
+                } elseif ($request->paymentMethod == 'receipt') {
                     if ($request->file("receipt")) {
-                        $request->receipt = $request->file("receipt")->store("", 'public');
+                        $request->receipt = $request->file("receipt")->store("", 'receipt');
                     } elseif ($request->file) {
                         $request->receipt = $request->file;
                     } else {
-                        return redirect()->back()->withInput()->withErrors(['باید عکس رسید بانکی بارگذاری شود!']);
+                        return $this->errorBack('باید عکس رسید بانکی بارگذاری شود!');
                     }
-                }
+                } elseif ($request->paymentMethod == 'onDelivery') {
+                    $request->desc  = $request->desc . '- پرداخت در محل';
+                    $customerCost = round($Total * (100 - $request->customerDiscount) / 100 + $deliveryCost);
+                } else
+                    return $this->errorBack('مشکلی پیش آمده!');
         }
-
 
         $order = $user->orders()->create([
             'name' => $request->name,
@@ -130,7 +140,9 @@ class OrderController extends Controller
             'desc' => $request->desc,
             'receipt' => $request->receipt,
             'total' => $total,
-            'fromCredit' => true && $request->credit,
+            'customerCost' => $customerCost,
+            'paymentMethod'=>$request->paymentMethod,
+            'deliveryMethod'=>$request->deliveryMethod,
         ]);
 
         foreach ($products as $name => $product) {
@@ -226,7 +238,7 @@ class OrderController extends Controller
     {
         if ($this->isAdmin()) {
             $order = Order::findOrFail($id);
-            $order->state = '' . (($order->state + 1) % 7);
+            $order->state = '' . (($order->state + 1) % 4);
             $order->save();
             return $order->state;
         }

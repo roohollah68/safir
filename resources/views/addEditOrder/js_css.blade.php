@@ -72,14 +72,12 @@
         refreshProducts();
     }
 
-    let addButton = `<p class="btn btn-info" onclick="productMode()">برای انتخاب محصول اینجا کلیک کنید</p><br>`;
-
     function refreshProducts() {
         $('.product-number').each(function () {
             cart[$(this).attr('product_id')] = $(this).val();
         });
         $('#order-list').html('')
-        $('#orders').html(addButton);
+        $('#orders').html('');
         let total = 0, Total = 0;
         $.each(cart, (id, number) => {
             if (number > 0) {
@@ -107,14 +105,24 @@
         if (paymentMethod == 'onDelivery') {
             let customerDiscount = $('#customerDiscount').val()
             $('#onDeliveryMode').show();
-            let customerTotal =Math.round(Total*(100-customerDiscount)/100 + deliveryCost)
+            let customerTotal = Math.round(Total * (100 - customerDiscount) / 100 + deliveryCost)
             $('#customerTotal').html(customerTotal);
             let safirShare = customerTotal - total - deliveryCost;
             $('#safirShare').html(safirShare);
         }
+        if (total == 0)
+            $('#paymentDetails').hide();
+        else
+            $('#paymentDetails').show();
+
     }
 
     function productMode() {
+        @if($admin)
+        if ($('#factor').prop('checked'))
+            return;
+        @endif
+
         $('#products').show();
         $('#formElements').hide();
     }

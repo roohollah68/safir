@@ -83,8 +83,8 @@ class TelegramController extends Controller
 
     public function register_user($phone)
     {
-        $first_name = (isset($this->req->message->contact->first_name))?$this->req->message->contact->first_name:"";
-        $last_name = (isset($this->req->message->contact->last_name))?$this->req->message->contact->last_name:"";
+        $first_name = (isset($this->req->message->contact->first_name)) ? $this->req->message->contact->first_name : "";
+        $last_name = (isset($this->req->message->contact->last_name)) ? $this->req->message->contact->last_name : "";
         $name = $last_name . ' ' . $first_name;
         $url = env('APP_URL') . "register-from-telegram?name={$name}&phone={$phone}&telegram_id={$this->chat_id}";
         $keyboard = new IKM(Keyboard::register_user($url, "ثبت نام"));
@@ -104,9 +104,9 @@ class TelegramController extends Controller
 
     public function see_orders($count, $user)
     {
-        if($user->role == 'admin'){
+        if ($user->role == 'admin') {
             $orders = Order::orderBy('id', 'desc')->limit($count)->get();
-        }else{
+        } else {
             $orders = $user->orders()->orderBy('id', 'desc')->limit($count)->get();
         }
 
@@ -163,7 +163,7 @@ class TelegramController extends Controller
         if (!$user)
             $user = $order->user()->first();
         $message = self::createOrderMessage($order);
-        if($user->telegram_id) {
+        if ($user->telegram_id) {
             if ($order->receipt) {
                 $bot->sendPhoto($user->telegram_id, env('APP_URL') . "receipt/{$order->receipt}", $message);
             } else {
@@ -179,7 +179,7 @@ class TelegramController extends Controller
         $user = auth()->user();
         $bot = new BotApi(env('TelegramToken'));
         $message = self::createOrderMessage($order);
-        if($user->telegram_id) {
+        if ($user->telegram_id) {
             if ($order->receipt) {
                 $bot->sendPhoto($user->telegram_id, env('APP_URL') . "receipt/{$order->receipt}", $message);
             } else {
@@ -210,7 +210,18 @@ class TelegramController extends Controller
 
     public static function createOrderMessage($order)
     {
-$payment_type = $order->fromCredit? 'اعتباری':'فیش واریز';
+        $paymentMethods = [
+            'credit' => 'اعتباری',
+            'receipt' => 'رسید واریز',
+            'onDelivery' => 'پرداخت در محل',
+            'admin' => 'ادمین',
+        ];
+        $deliveryMethods = [
+            'peyk' => 'پیک',
+            'post' => 'پست',
+            'paskerayeh' => 'پسکرایه',
+            'admin' => 'ادمین',
+        ];
         return "
 نام و نام خانوادگی: {$order->name}
 شماره همراه: {$order->phone}
@@ -219,7 +230,9 @@ $payment_type = $order->fromCredit? 'اعتباری':'فیش واریز';
 کدپستی: {$order->zip_code}
 توضیحات: {$order->desc}
 مبلغ کل: {$order->total}
-نحوه پرداخت: {$payment_type}
+پرداختی مشتری: {$order->customerCost}
+نحوه پرداخت: {$paymentMethods[$order->paymentMethod]}
+نحوه ارسال: {$deliveryMethods[$order->deliveryMethod]}
 زمان ثبت: {$order->created_at->timezone('Asia/tehran')}
 سفیر: {$order->user()->first()->name}
             ";

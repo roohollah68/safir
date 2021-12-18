@@ -20,5 +20,19 @@ class ProductSeeder extends Seeder
             'available'=>true,
             'photo' => 'wf52FOD7MCRQHRTmVPmIKinHGIp3Sp8p6kQaxFJh.png'
         ]);
+
+        Product::create([
+            'name'=>'ماچا تشریفاتی 40 گرمی',
+            'price'=>'250',
+            'available'=>true,
+            'photo' => 'wf52FOD7MCRQHRTmVPmIKinHGIp3Sp8p6kQaxFJh.png'
+        ]);
+
+        Product::create([
+            'name'=>'پودر کلاژن بیوتی 100 گرمی',
+            'price'=>'500',
+            'available'=>false,
+            'photo' => 'wf52FOD7MCRQHRTmVPmIKinHGIp3Sp8p6kQaxFJh.png'
+        ]);
     }
 }

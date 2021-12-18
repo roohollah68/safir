@@ -24,7 +24,7 @@ class Order extends Model
         'total',
         'fromCredit',
         'paymentMethod',
-        'customerDiscount',
+        'customerCost',
         'deliveryMethod',
     ];
 

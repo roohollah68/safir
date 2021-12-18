@@ -44,13 +44,19 @@
                 <div class="input-group-append w-25" style="/*min-width: 160px">
                     <label for="orders" class="input-group-text w-100">سفارشات:</label>
                 </div>
-                <div class="w-75 border" id="orders">{{$orders}}</div>
+                <div class="w-75 border">
+                    <p class="btn btn-info" onclick="productMode()">برای انتخاب محصول اینجا کلیک کنید</p><br>
+                    @if($admin && !$order)
+                        <input type="checkbox" id="factor" name="factor" checked
+                               onchange="this.checked?$('#orders').hide():$('#orders').show()">
+                        <label for="factor">طبق فاکتور</label>
+                    @endif
+                    <div id="orders">{{$orders}}</div>
+                </div>
+
 
             </div>
-            @if($admin && !$order)
-                <input type="checkbox" id="factor" name="factor" checked>
-                <label for="factor">طبق فاکتور</label>
-            @endif
+
         </div>
         <div class="col-md-6">
             <div class="form-group input-group ">
@@ -129,7 +135,7 @@
             @endif
         </div>
 
-        <div class="p-3 m-2 border">
+        <div class="p-3 m-2 border" id="paymentDetails">
             <h4>فاکتور</h4>
             <ol id="order-list">
             </ol>
@@ -157,7 +163,7 @@
     @if($order)
         <input type="submit" class="btn btn-success" value="ویرایش">&nbsp;
     @else
-        <input type="submit" class="btn btn-success" value="افزودن">&nbsp;
+        <input type="submit" class="btn btn-success" value="ثبت">&nbsp;
     @endif
     <a class="btn btn-danger" href="{{route('listOrders')}}">بازگشت</a>
 

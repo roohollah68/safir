@@ -174,26 +174,39 @@ function all_ids(box) {
 }
 
 function view_order(id) {
-    let row = orders[id]
-
+    let order = orders[id]
+    let paymentMethods ={
+        credit: 'اعتباری',
+        receipt: 'رسید واریز',
+        onDelivery: 'پرداخت در محل',
+        admin: 'ادمین',
+    }
+    let deliveryMethods ={
+        peyk: 'پیک',
+        post: 'پست',
+        paskerayeh: 'پسکرایه',
+        admin: 'ادمین',
+    }
     let dialog = `
     <div title="مشاهده سفارش" class="dialogs">` +
-        (row.receipt ?
-            `<a href="receipt/${row.receipt}" target="_blank"><img style="width: 300px" src="receipt/${row.receipt}"></a>`
+        (order.receipt ?
+            `<a href="receipt/${order.receipt}" target="_blank"><img style="width: 300px" src="receipt/${order.receipt}"></a>`
             :
             "")
-        + `<span>نام و نام خانوادگی:</span> <b>${row.name}</b> <br>
-    <span>شماره تماس:</span> <b>${row.phone}</b> <br>
-    <span>آدرس:</span> <b>${row.address}</b> <br>
-    <span>کد پستی:</span> <b>${row.zip_code ? row.zip_code : ''}</b> <br>
-    <span>سفارشات:</span> <b>${row.orders}</b> <br>
-    <span>قیمت کل:</span> <b>${row.total}</b> <b>هزار تومان</b> <br>
-    <span>نحوه پرداخت:</span> <b>${row.fromCredit ? 'اعتباری' : 'واریز مستقیم'}</b> <br>
-    <span>توضیحات:</span> <b>${row.desc ? row.desc : ''}</b> <br>
-    <span>زمان ثبت:</span> <b>${row.created_at_p}</b> <br>
-    <span>زمان آخرین ویرایش:</span> <b>${row.updated_at_p}</b> <br>` +
-        (row.deleted_at_p ?
-                `<span>زمان حذف:</span> <b>${row.deleted_at_p}</b> <br>`
+        + `<span>نام و نام خانوادگی:</span> <b>${order.name}</b> <br>
+    <span>شماره تماس:</span> <b>${order.phone}</b> <br>
+    <span>آدرس:</span> <b>${order.address}</b> <br>
+    <span>کد پستی:</span> <b>${order.zip_code ? order.zip_code : ''}</b> <br>
+    <span>سفارشات:</span> <b>${order.orders}</b> <br>
+    <span>مبلغ کل:</span> <b>${order.total}</b> <b>هزار تومان</b> <br>
+    <span>پرداختی مشتری:</span> <b>${order.customerCost}</b> <b>هزار تومان</b> <br>
+    <span>نحوه پرداخت:</span> <b>${paymentMethods[order.paymentMethod]}</b> <br>
+    <span>نحوه ارسال:</span> <b>${deliveryMethods[order.deliveryMethod]}</b> <br>
+    <span>توضیحات:</span> <b>${order.desc ? order.desc : ''}</b> <br>
+    <span>زمان ثبت:</span> <b>${order.created_at_p}</b> <br>
+    <span>زمان آخرین ویرایش:</span> <b>${order.updated_at_p}</b> <br>` +
+        (order.deleted_at_p ?
+                `<span>زمان حذف:</span> <b>${order.deleted_at_p}</b> <br>`
                 :
                 ""
         ) + `
@@ -213,12 +226,12 @@ function view_order(id) {
 }
 
 function generatePDF(id) {
-    let row = orders[id];
-    let dialog = label_text(row);
+    let order = orders[id];
+    let dialog = label_text(order);
     let opt = {
         margin: 1.2,
         image: {type: 'jpeg', quality: 1},
-        filename: row.name + '_' + row.id + '.pdf',
+        filename: order.name + '_' + order.id + '.pdf',
         jsPDF: {format: [60, 30], unit: 'cm', orientation: 'l'}
     };
     html2pdf()
@@ -234,8 +247,8 @@ function generatePDFs() {
     }
     let dialog = [];
     ids.forEach(id => {
-        let row = orders[id]
-        dialog.push(label_text(row));
+        let order = orders[id]
+        dialog.push(label_text(order));
     })
     dialog = dialog.join('<i class="breakhere"></i>')//
     let opt = {
@@ -281,23 +294,23 @@ function fix_persian(text) {
     return text
 }
 
-function label_text(row) {
+function label_text(order) {
     let text = `
 <div class="printed">
-    <span>نام و نام خانوادگی </span>: <b>${fix_persian(row.name)}</b> <br>
-    <span>شماره تماس </span>: <b>${row.phone}</b>&nbsp;&nbsp;&nbsp; ` +
-        (row.zip_code ? `<span>کد پستی </span>: <b>${row.zip_code}</b>` : '')
+    <span>نام و نام خانوادگی </span>: <b>${fix_persian(order.name)}</b> <br>
+    <span>شماره تماس </span>: <b>${order.phone}</b>&nbsp;&nbsp;&nbsp; ` +
+        (order.zip_code ? `<span>کد پستی </span>: <b>${order.zip_code}</b>` : '')
         + `<br>
-    <span>آدرس </span>: <b>${fix_persian(row.address)}</b> <br>
-    <span>سفارشات </span>: <b>${fix_persian(row.orders)}</b> <br>` +
-        (row.desc ? `<span>توضیحات </span>: <b>${fix_persian(row.desc)}</b>
+    <span>آدرس </span>: <b>${fix_persian(order.address)}</b> <br>
+    <span>سفارشات </span>: <b>${fix_persian(order.orders)}</b> <br>` +
+        (order.desc ? `<span>توضیحات </span>: <b>${fix_persian(order.desc)}</b>
 </div>` : '')
     ;
-    if ((row.address.length + row.orders.length + (row.desc ? row.desc.length : 0)) > 260) {
+    if ((order.address.length + order.orders.length + (order.desc ? order.desc.length : 0)) > 260) {
         return `<div class="long-text">${text}</div>`;
     }
 
-    if ((row.address.length + row.orders.length + (row.desc ? row.desc.length : 0)) < 170) {
+    if ((order.address.length + order.orders.length + (order.desc ? order.desc.length : 0)) < 170) {
         return `<div class="short-text">${text}</div>`;
     }
     return text;
@@ -310,8 +323,8 @@ function sendToTelegram(id) {
         })
 }
 
-function createdTime(row) {
-    let timestamp = new Date(row.created_at);
+function createdTime(order) {
+    let timestamp = new Date(order.created_at);
     timestamp = timestamp.getTime() + 1000 * 3600 * 4.5;
     let diff = (Date.now() - timestamp) / 1000;
     let res = `<span class="d-none">${timestamp}</span>`
@@ -332,12 +345,12 @@ function createdTime(row) {
         let month = Math.floor(diff / (3600 * 24 * 30));
         res += `<span>${month} ماه قبل </span>`
     }
-    if (row.state == 0) {
-        res = `<span class="btn btn-secondary" onclick="change_state(${row.id})">${res} <i id="row-state-${row.id}"></i></span>`
-    } else if (row.state == 1) {
-        res = `<span class="btn btn-info" onclick="change_state(${row.id})">${res} <i id="row-state-${row.id}" class="fas fa-check"></i></span>`
-    } else if (row.state > 1) {
-        res = `<span class="btn btn-success" onclick="change_state(${row.id})">${res} <i id="row-state-${row.id}" class="fas fa-check-double"></i></span>`
+    if (order.state == 0) {
+        res = `<span class="btn btn-secondary" onclick="change_state(${order.id})">${res} <i id="row-state-${order.id}"></i></span>`
+    } else if (order.state == 1) {
+        res = `<span class="btn btn-info" onclick="change_state(${order.id})">${res} <i id="row-state-${order.id}" class="fas fa-check"></i></span>`
+    } else if (order.state > 1) {
+        res = `<span class="btn btn-success" onclick="change_state(${order.id})">${res} <i id="row-state-${order.id}" class="fas fa-check-double"></i></span>`
     }
 
     return res;
