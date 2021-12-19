@@ -34,7 +34,7 @@ class CouponController extends Controller
         $products = Product::all();
         foreach ($users as $user) {
             foreach ($products as $product) {
-                if ($req[$user->username] && $req[$product->name]) {
+                if ($req['user_'.$user->id] && $req['product_'.$product->id]) {
                     $coupon->couponLinks()->create([
                         'user_id' => $user->id,
                         'product_id' => $product->id,
@@ -67,7 +67,7 @@ class CouponController extends Controller
         $products = Product::all();
         foreach ($users as $user) {
             foreach ($products as $product) {
-                if ($req[$user->username] && $req[$product->name]) {
+                if ($req['user_'.$user->id] && $req['product_'.$product->id]) {
                     $coupon->couponLinks()->create([
                         'user_id' => $user->id,
                         'product_id' => $product->id,

@@ -50,6 +50,7 @@ class Controller extends BaseController
             'peyk' => $this->settings()->peykCost,
             'post' => $this->settings()->postCost,
             'paskerayeh' => 0,
+            'admin' => 0,
         ];
         return $deliveryCosts[$deliveryMethod];
     }

@@ -73,7 +73,7 @@ class OrderController extends Controller
 
     public function insertOrder(Request $request)
     {
-//        dd($request->all());
+
         request()->validate([
             'receipt' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'required|string|min:3',
@@ -96,7 +96,7 @@ class OrderController extends Controller
             foreach ($products as $id => $product) {
                 $number = $request['product_' . $id];
                 if ($number > 0) {
-                    $request->orders = $request->orders . $product->name . ' ' . $number . ' عدد|';
+                    $request->orders = $request->orders .'*'. $product->name . ' ' . $number . 'عدد'.'*';
                     $coupon = $this->calculateDis($id);
                     $total += round((100 - $coupon) * $product->price * $number / 100);
                     $Total += $product->price * $number;
@@ -106,7 +106,7 @@ class OrderController extends Controller
             if ($Total == 0) {
                 return $this->errorBack('محصولی انتخاب نشده است!');
             }
-            $request->orders = substr($request->orders, 0, -1);
+//            $request->orders = substr($request->orders, 0, -1);
             if (!$this->isAdmin())
                 if ($request->paymentMethod == 'credit') {
                     if ($total > ($user->balance + $this->settings()->negative)) {

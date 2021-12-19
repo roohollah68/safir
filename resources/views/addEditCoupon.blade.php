@@ -60,8 +60,8 @@
                 <span onclick="selectNoUsers()" class="btn btn-secondary">هیچ</span>
                 <br>
                 @foreach($users as $user)
-                    <label for="{{$user->username}}">{{$user->name}}({{$user->username}})</label>
-                    <input id="{{$user->username}}" type="checkbox" name="{{$user->username}}"
+                    <label for="user_{{$user->id}}">{{$user->name}}({{$user->username}})</label>
+                    <input id="user_{{$user->id}}" type="checkbox" name="user_{{$user->id}}"
                            @if($coupon && isset($user_ids[$user->id])) checked @endif >
                     <br>
                 @endforeach
@@ -73,8 +73,8 @@
                 <span onclick="selectNoProducts()" class="btn btn-secondary">هیچ</span>
                 <br>
                 @foreach($products as $product)
-                    <label for="{{$product->name}}">{{$product->name}}({{$product->price}})</label>
-                    <input id="{{$product->name}}" type="checkbox" name="{{$product->name}}"
+                    <label for="product_{{$product->id}}">{{$product->name}}({{$product->price}})</label>
+                    <input id="product_{{$product->id}}" type="checkbox" name="product_{{$product->id}}"
                            @if($coupon && isset($product_ids[$product->id])) checked @endif>
                     <br>
                 @endforeach

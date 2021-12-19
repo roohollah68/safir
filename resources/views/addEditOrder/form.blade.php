@@ -111,14 +111,13 @@
             <h4>شیوه ارسال</h4>
             @if(!$order)
                 <input type="radio" name="deliveryMethod" value="peyk" id="peyk" checked>
-                <label for="peyk">ارسال با پیک</label> <span
-                    id="peykMessage"> <span>{{$settings->peykCost}}</span> هزار تومان</span><br>
+                <label for="peyk">ارسال با پیک</label> <span class="deliveryDesc"> <span>{{$settings->peykCost}}</span > هزار تومان</span><br>
 
                 <input type="radio" name="deliveryMethod" value="post" id="post">
-                <label for="post">ارسال با پست</label><span> {{$settings->postCost}} هزار تومان</span><br>
+                <label for="post">ارسال با پست</label><span class="deliveryDesc"> {{$settings->postCost}} هزار تومان</span><br>
 
                 <input type="radio" name="deliveryMethod" value="paskerayeh" id="paskerayeh">
-                <label for="paskerayeh">پس کرایه</label><span>هزینه ارسال به عهده مشتری</span><br>
+                <label for="paskerayeh">پس کرایه</label><span class="deliveryDesc">هزینه ارسال به عهده مشتری</span><br>
 
             @else
                 @switch($order->deliveryMethod)

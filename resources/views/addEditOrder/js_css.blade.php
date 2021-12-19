@@ -66,7 +66,7 @@
     }
 
     function deliveryAction() {
-        $('input[name="deliveryMethod"]').next().next().hide();
+        $('.deliveryDesc').hide();
         deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
         $('#' + deliveryMethod).next().next().show();
         refreshProducts();
