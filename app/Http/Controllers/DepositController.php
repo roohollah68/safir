@@ -26,9 +26,9 @@ class DepositController extends Controller
         }
     }
 
-    public function newForm()
+    public function newForm(Request $req)
     {
-        return view('addEditDeposit', ['deposit' => false]);
+        return view('addEditDeposit', ['deposit' => false,'req' => $req->all()]);
     }
 
     public function storeNew(Request $req)
