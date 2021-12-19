@@ -34,7 +34,7 @@ class TelegramController extends Controller
                 if ($text == Keyboard::$user_option[0][0])
                     $this->see_orders(1, $user);
                 if ($text == Keyboard::$user_option[0][1])
-                    $this->see_orders(5, $user);
+                    $message = 'برای افزایش اعتبار به ربات @safir_deposit_bot بروید.';
                 if ($text == Keyboard::$user_option[1][0])
                     $this->list_orders($user);
                 if ($text == Keyboard::$user_option[1][1])
