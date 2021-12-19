@@ -114,12 +114,13 @@ class DepositController extends Controller
         }
     }
 
-    public function receive(Request $request)
+    public function receive()
     {
         $this->bot = new BotApi(env('TelegramDeposit'));
 
         $this->req = json_decode(file_get_contents('php://input'));
         $this->chat_id = $this->req->message->from->id;
+        $this->bot->sendMessage($this->chat_id, 'hi');
         $user = User::where('telegram_id', $this->chat_id)->first();
         if ($user) {
             $type = $this->detect_type();
@@ -131,9 +132,6 @@ class DepositController extends Controller
                 $message = 'برای ثبت واریزی تصویر رسید بانکی را به همین ربات بفرستید.';
                 $this->bot->sendMessage($this->chat_id, $message);
             }
-
-            $message = 'برای ثبت واریزی تصویر رسید بانکی را به همین ربات بفرستید.';
-            $this->bot->sendMessage($this->chat_id, $message, null, false, null, $keyboard);
 
         } else {
             $message = 'حساب تلگرام شما ثبت نشده است، لطفا ابتدا در ربات @Safir_sefaresh_bot ثبت نام کنید.';
