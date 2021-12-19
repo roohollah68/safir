@@ -89,7 +89,7 @@ Route::get('new-order/{id}/{pass}',[OrderController::class , 'newOrderTelegram']
 Route::get('new-order-receipt/{id}/{pass}/{file_id}',[OrderController::class , 'newOrderWithPhotoTelegram']);
 
 Route::post('/deposit/telegram' , [DepositController::class , 'receive']);
-Route::get('/deposit/add/{id}/{pass}/{file_id}' , [DepositController::class , 'storeNew']);
+Route::get('/deposit/add/{id}/{pass}/{file_id}' , [DepositController::class , 'newDepositWithPhotoTelegram']);
 
 
 

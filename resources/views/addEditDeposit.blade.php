@@ -26,7 +26,8 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="amount" class="input-group-text w-100">میزان واریزی:</label>
                     </div>
-                    <input value="{{$amount}}" type="text" id="amount" class="form-control" name="amount" pattern="^[0-9]*$" required>
+                    <input value="{{$amount}}" type="text" id="amount" class="form-control" name="amount"
+                           pattern="^[0-9]*$" required>
                     <div class="input-group-prepend" style="min-width: 120px">
                         <label for="amount" class="input-group-text w-100">هزار تومن</label>
                     </div>
@@ -41,15 +42,21 @@
                     <textarea name="desc" id="desc" class="form-control" rows="2">{{$desc}}</textarea>
                 </div>
             </div>
-
-            <div class="col-md-6">
-                <div class="form-group input-group ">
-                    <div class="input-group-append" style="width: 160px">
-                        <label for="photo" class="input-group-text w-100">تصویر رسید بانکی:</label>
+            @if(isset($req['file']))
+                <a href="/deposit/{{$req['file']}}.jpg" target="_blank">
+                    <img style="max-width: 200px; max-height: 200px" src="/deposit/{{$req['file']}}.jpg">
+                </a>
+                <input type="hidden" name="file" value="{{$req['file']}}.jpg">
+            @else
+                <div class="col-md-6">
+                    <div class="form-group input-group ">
+                        <div class="input-group-append" style="width: 160px">
+                            <label for="photo" class="input-group-text w-100">تصویر رسید بانکی:</label>
+                        </div>
+                        <input type="file" id="photo" class="" name="photo">
                     </div>
-                    <input type="file" id="photo" class="" name="photo">
                 </div>
-            </div>
+            @endif
         </div>
 
 
