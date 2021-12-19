@@ -21,7 +21,6 @@ Route::group(['middleware'=>['auth' , 'verify'] ],function (){
 
     Route::get('edit_order/{id}',[OrderController::class , 'editForm']);
     Route::post('edit_order/{id}',[OrderController::class , 'editOrder']);
-    Route::post('increase_state/{id}',[OrderController::class , 'increaseState']);
 
     Route::post('get_orders',[OrderController::class , 'getOrders']);
     Route::get('orders',[OrderController::class , 'showOrders'])->name('listOrders');
@@ -78,6 +77,8 @@ Route::group(['middleware'=>['auth','admin']],function (){
     Route::get('coupon/edit/{id}' , [CouponController::class , 'editForm']);
     Route::post('coupon/edit/{id}' , [CouponController::class , 'update']);
     Route::post('coupon/delete/{id}', [CouponController::class , 'deleteCoupon']);
+
+    Route::post('increase_state/{id}',[OrderController::class , 'increaseState']);
 
 });
 

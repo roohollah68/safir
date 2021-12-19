@@ -73,7 +73,6 @@ class OrderController extends Controller
 
     public function insertOrder(Request $request)
     {
-
         request()->validate([
             'receipt' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'required|string|min:3',
@@ -96,7 +95,7 @@ class OrderController extends Controller
             foreach ($products as $id => $product) {
                 $number = $request['product_' . $id];
                 if ($number > 0) {
-                    $request->orders = $request->orders .'*'. $product->name . ' ' . $number . 'عدد'.'*';
+                    $request->orders = $request->orders . '*' . $product->name . ' ' . $number . 'عدد' . '*';
                     $coupon = $this->calculateDis($id);
                     $total += round((100 - $coupon) * $product->price * $number / 100);
                     $Total += $product->price * $number;
@@ -125,7 +124,7 @@ class OrderController extends Controller
                         return $this->errorBack('باید عکس رسید بانکی بارگذاری شود!');
                     }
                 } elseif ($request->paymentMethod == 'onDelivery') {
-                    $request->desc  = $request->desc . '- پرداخت در محل';
+                    $request->desc = $request->desc . '- پرداخت در محل';
                     $customerCost = round($Total * (100 - $request->customerDiscount) / 100 + $deliveryCost);
                 } else
                     return $this->errorBack('مشکلی پیش آمده!');
@@ -141,8 +140,8 @@ class OrderController extends Controller
             'receipt' => $request->receipt,
             'total' => $total,
             'customerCost' => $customerCost,
-            'paymentMethod'=>$request->paymentMethod,
-            'deliveryMethod'=>$request->deliveryMethod,
+            'paymentMethod' => $request->paymentMethod,
+            'deliveryMethod' => $request->deliveryMethod,
         ]);
 
         foreach ($products as $name => $product) {
@@ -236,12 +235,20 @@ class OrderController extends Controller
 
     public function increaseState($id)
     {
-        if ($this->isAdmin()) {
-            $order = Order::findOrFail($id);
-            $order->state = '' . (($order->state + 1) % 4);
-            $order->save();
-            return $order->state;
+        $order = Order::findOrFail($id);
+        $user = User::find($order->user_id);
+        $order->state = '' . (($order->state + 1) % 4);
+        if($order->paymentMethod == 'onDelivery'){
+            if($order->state == '1'){
+                $user->balance += $order->customerCost - $order->total;
+            }elseif($order->state == '0'){
+                $user->balance -= $order->customerCost - $order->total;
+            }
         }
+        $order->save();
+        $user->save();
+        return $order->state;
+
     }
 
     public function deleteOrder($id, Request $request)

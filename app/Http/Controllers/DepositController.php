@@ -83,7 +83,7 @@ class DepositController extends Controller
         } else {
             $deposit = auth()->user()->deposits()->where('confirmed', 'false')->findOrFail($id);
         }
-        $photo = $deposit->photo ? $deposit->photo : '';
+        $photo = $deposit->photo;
         if ($req->file("photo")) {
             $photo = $req->file("photo")->store("", 'deposit');
         }
