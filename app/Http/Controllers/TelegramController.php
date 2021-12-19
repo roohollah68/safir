@@ -89,7 +89,7 @@ class TelegramController extends Controller
         $url = env('APP_URL') . "register-from-telegram?name={$name}&phone={$phone}&telegram_id={$this->chat_id}";
         $keyboard = new IKM(Keyboard::register_user($url, "ثبت نام"));
         $message = "
-متاسفانه با این شماره تلفن حسابی وجود ندارد
+ با این شماره تلفن حسابی وجود ندارد
 برای ایجاد حساب به لینک زیر بروید:";
         $this->bot->sendMessage($this->chat_id, $message, null, false, null, $keyboard);
     }
