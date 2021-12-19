@@ -40,6 +40,8 @@ class DepositController extends Controller
         $photo = '';
         if ($req->file("photo")) {
             $photo = $req->file("photo")->store("", 'deposit');
+        } elseif ($req->file) {
+            $photo = $req->file;
         }
 
         auth()->user()->deposits()->create([
