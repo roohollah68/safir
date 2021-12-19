@@ -35,6 +35,13 @@ Route::get('/new-user-message', [RegisteredUserController::class, 'newUserMessag
                 ->middleware('guest')
                 ->name('newUserMessage');
 
+Route::get('not-verified',function (){
+    return "حساب کاربری شما فعال نمی باشد.
+    با ادمین تماس بگیرید:
+    09330204650
+    021-66176396";
+})->name('not-verify');
+
 //Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
 //                ->middleware('guest')
 //                ->name('password.email');

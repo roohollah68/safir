@@ -137,17 +137,19 @@
 
         <div class="p-3 m-2 border" id="paymentDetails">
             <h4>فاکتور</h4>
-            <ol id="order-list">
-            </ol>
-            <hr>
-            <span>جمع اقلام: </span><span id="cartSum"></span><span>هزار تومان</span><br>
-            <span>هزینه حمل: <span id="deliveryCost"></span> هزار تومان </span><br><br>
+            @if(!$order)
+                <ol id="order-list">
+                </ol>
+                <hr>
+                <span>جمع اقلام: </span><span id="cartSum"></span><span>هزار تومان</span><br>
+                <span>هزینه حمل: <span id="deliveryCost"></span> هزار تومان </span><br><br>
+            @endif
             <span class="font-weight-bold">مبلغ کل: </span><span id="total">{{$total}}</span></span> هزار تومان </span>
             <br><br>
 
             <span id="onDeliveryMode">
-                <span>پرداختی مشتری: </span><span id="customerTotal"></span><span>هزار تومان </span><br>
-                <span>سهم سفیر: </span><span id="safirShare"></span><span> هزار تومان </span><br>
+                <span>پرداختی مشتری: </span><span id="customerTotal">{{$order?$order->customerCost:''}}</span><span>هزار تومان </span><br>
+                <span>سهم سفیر: </span><span id="safirShare">{{$order?$order->customerCost-$order->total:''}}</span><span> هزار تومان </span><br>
             </span>
         </div>
 

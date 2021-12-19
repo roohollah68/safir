@@ -83,20 +83,13 @@ Route::group(['middleware'=>['auth','admin']],function (){
 
 
 Route::post('/telegram',[TelegramController::class , 'receive']);
-
 Route::get('register-from-telegram',[RegisteredUserController::class , 'fromTelegram']);
-
 Route::get('list-orders/{id}/{pass}',[OrderController::class , 'listOrderTelegram']);
-
 Route::get('new-order/{id}/{pass}',[OrderController::class , 'newOrderTelegram']);
 Route::get('new-order-receipt/{id}/{pass}/{file_id}',[OrderController::class , 'newOrderWithPhotoTelegram']);
 
-Route::get('not-verified',function (){
-    return "حساب کاربری شما فعال نمی باشد.
-    با ادمین تماس بگیرید:
-    09330204650
-    021-66176396";
-})->name('not-verify');
+Route::get('/deposit/telegram' , [DepositController::class , 'receive']);
+Route::get('/deposit/add/{id}/{pass}/{file_id}' , [DepositController::class , 'storeNew']);
 
 
 
