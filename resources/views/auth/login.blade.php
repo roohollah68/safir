@@ -40,16 +40,12 @@
 
             <div class="flex items-center justify-end mt-4">
                 @if (Route::has('password.request'))
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900"
-                       href="{{ route('password.request') }}">
-                        {{ __('رمز عبور خود را فراموش کرده اید؟') }}
-                    </a>
-                    &nbsp;&nbsp;&nbsp;
+                                        &nbsp;&nbsp;&nbsp;
                     <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('register') }}">
                         {{ __('حساب کاربری ندارید؟') }}
                     </a>
                     &nbsp;&nbsp;&nbsp;
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="https://t.me/safir_order_bot">
+                    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="https://t.me/Safir_sefaresh_bot">
                         {{ __('ورود با تلگرام') }}
                     </a>
                     &nbsp;&nbsp;&nbsp;
