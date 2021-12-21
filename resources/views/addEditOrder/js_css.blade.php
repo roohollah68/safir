@@ -30,7 +30,7 @@
         $("input[type=radio]").checkboxradio();
         $('#product-table').DataTable({
             "autoWidth": false,
-            "lengthMenu": [[ 50, -1], [ 50, "All"]]
+            "paging":   false,
         });
 
         $('.plusOne').click(function () {
