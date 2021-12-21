@@ -26,11 +26,11 @@
     $(function () {
         refreshProducts()
         $('#' + paymentMethod).click();
-        //$('#' + deliveryMethod).click();
         $("#factor").checkboxradio();
         $("input[type=radio]").checkboxradio();
         $('#product-table').DataTable({
             "autoWidth": false,
+            "lengthMenu": [[ 50, -1], [ 50, "All"]]
         });
 
         $('.plusOne').click(function () {
