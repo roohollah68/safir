@@ -34,6 +34,16 @@
 @endsection
 
 @section('content')
+    @if($coupon)
+        <input type="submit" class="btn btn-success" value="ویرایش">
+    @else
+        <input type="submit" class="btn btn-success" value="افزودن">
+    @endif
+    &nbsp;
+    <a href="{{route('couponList')}}" class="btn btn-danger">بازگشت</a>
+    <br>
+    <br>
+
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
     <form action="" method="post">
         @csrf
