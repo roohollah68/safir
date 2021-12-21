@@ -275,13 +275,13 @@ class OrderController extends Controller
 
     public function calculateDis($product_id)
     {
-        $dis = $this->settings()->minCoupon;
+        $dis =  0 ;
         $user_id = auth()->user()->id;
         $couponLinks = CouponLink::where('product_id', $product_id)->where('user_id', $user_id)->get();
         foreach ($couponLinks as $couponLink) {
             $dis = max($dis, $couponLink->coupon()->first()->percent);
         }
-        return $dis;
+        return $dis + $this->settings()->minCoupon;
     }
 
     private function addToCustomers($request)

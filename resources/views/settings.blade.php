@@ -13,7 +13,7 @@
 
         <br>
 
-        <label for="minCoupon">حداقل تخفیف کل سامانه(درصد):</label>
+        <label for="minCoupon"> تخفیف مازاد کل سامانه(درصد) این عدد به کل تخفیف ها افزوده میشود:</label>
         <input id="minCoupon" name="minCoupon" type="number" value="{{$minCoupon}}">
 
         <br>
