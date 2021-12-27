@@ -56,7 +56,11 @@ class OrderController extends Controller
 
     public function newForm(Request $request)
     {
-        $products = Product::all()->keyBy('id');
+        $user = auth()->user();
+        if ($this->isAdmin() || $user->id == 10)
+            $products = Product::all()->keyBy('id');
+        else
+            $products = Product::where('price', '>', '0')->get()->keyBy('id');
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
@@ -238,10 +242,10 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $user = User::find($order->user_id);
         $order->state = '' . (($order->state + 1) % 4);
-        if($order->paymentMethod == 'onDelivery'){
-            if($order->state == '1'){
+        if ($order->paymentMethod == 'onDelivery') {
+            if ($order->state == '1') {
                 $user->balance += $order->customerCost - $order->total;
-            }elseif($order->state == '0'){
+            } elseif ($order->state == '0') {
                 $user->balance -= $order->customerCost - $order->total;
             }
         }
@@ -275,7 +279,7 @@ class OrderController extends Controller
 
     public function calculateDis($product_id)
     {
-        $dis =  0 ;
+        $dis = 0;
         $user_id = auth()->user()->id;
         $couponLinks = CouponLink::where('product_id', $product_id)->where('user_id', $user_id)->get();
         foreach ($couponLinks as $couponLink) {
