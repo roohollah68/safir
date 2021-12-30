@@ -109,7 +109,6 @@ class OrderController extends Controller
             if ($Total == 0) {
                 return $this->errorBack('محصولی انتخاب نشده است!');
             }
-//            $request->orders = substr($request->orders, 0, -1);
             if (!$this->isAdmin())
                 if ($request->paymentMethod == 'credit') {
                     if ($total > ($user->balance + $this->settings()->negative)) {

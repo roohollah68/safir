@@ -20,7 +20,7 @@
     let paymentMethod = `{{old('paymentMethod')?old('paymentMethod'):"credit"}}`;
 
     let deliveryMethod = `{{old('deliveryMethod')?old('deliveryMethod'):"peyk"}}`;
-
+    let product_table;
     let cart = {};
     let products = {!!json_encode($products)!!};
     $(function () {
@@ -28,7 +28,8 @@
         $('#' + paymentMethod).click();
         $("#factor").checkboxradio();
         $("input[type=radio]").checkboxradio();
-        $('#product-table').DataTable({
+
+        product_table = $('#product-table').DataTable({
             "autoWidth": false,
             "paging":   false,
         });
@@ -128,6 +129,10 @@
     }
 
     function formMode() {
+        product_table
+            .search( '' )
+            .columns().search( '' )
+            .draw();
         $('#products').hide();
         $('#formElements').show();
     }

@@ -106,7 +106,9 @@
                 @endif
             @endif
         </div>
-
+    @else
+        <input type="hidden" name="paymentMethod" value="credit">
+    @endif
         <div class="p-3 m-2 border">
             <h4>شیوه ارسال</h4>
             @if(!$order)
@@ -152,10 +154,10 @@
             </span>
         </div>
 
-    @else
-        <input type="hidden" name="paymentMethod" value="admin">
-        <input type="hidden" name="deliveryMethod" value="admin">
-    @endif
+{{--    @else--}}
+{{--        <input type="hidden" name="paymentMethod" value="admin">--}}
+{{--        <input type="hidden" name="deliveryMethod" value="admin">--}}
+{{--    @endif--}}
 
     <input type="checkbox" name="addToCustomers" id="addToCustomers">
     <label for="addToCustomers">افزودن به لیست مشتریان</label><br>
