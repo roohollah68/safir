@@ -224,6 +224,7 @@ class TelegramController extends Controller
         ];
         $total = number_format($order->total);
         $customerCost = number_format($order->customerCost);
+        $time = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
         return "
 نام و نام خانوادگی: {$order->name}
 شماره همراه: {$order->phone}
@@ -235,10 +236,10 @@ class TelegramController extends Controller
 پرداختی مشتری: {$customerCost} تومان
 نحوه پرداخت: {$paymentMethods[$order->paymentMethod]}
 نحوه ارسال: {$deliveryMethods[$order->deliveryMethod]}
-زمان ثبت: {$order->created_at->timezone('Asia/tehran')}
+زمان ثبت: {$time}
 سفیر: {$order->user()->first()->name}
             ";
-//زمان ثبت: ".jdate('Y/m/d H:i' , $order->created_at->getTimestamp())."
+//زمان ثبت: {$order->created_at->timezone('Asia/tehran')}
 
     }
 }
