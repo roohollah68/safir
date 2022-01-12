@@ -198,8 +198,8 @@ function view_order(id) {
     <span>آدرس:</span> <b>${order.address}</b> <br>
     <span>کد پستی:</span> <b>${order.zip_code ? order.zip_code : ''}</b> <br>
     <span>سفارشات:</span> <b>${order.orders}</b> <br>
-    <span>مبلغ کل:</span> <b>${order.total}</b> <b>هزار تومان</b> <br>
-    <span>پرداختی مشتری:</span> <b>${order.customerCost}</b> <b>هزار تومان</b> <br>
+    <span>مبلغ کل:</span> <b>${num(order.total)}</b> <b> تومان</b> <br>
+    <span>پرداختی مشتری:</span> <b>${num(order.customerCost)}</b> <b> تومان</b> <br>
     <span>نحوه پرداخت:</span> <b>${paymentMethods[order.paymentMethod]}</b> <br>
     <span>نحوه ارسال:</span> <b>${deliveryMethods[order.deliveryMethod]}</b> <br>
     <span>توضیحات:</span> <b>${order.desc ? order.desc : ''}</b> <br>

@@ -86,7 +86,7 @@
                 let Price = products[id].price * number;
 
                 $('#orders').append(products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + '| ');
-                $('#order-list').append('<li>' + products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + ': ' + price + '</li>')
+                $('#order-list').append('<li>' + products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + ': ' + num(price) + '</li>')
 
                 total += price;
                 Total += Price;
@@ -98,18 +98,18 @@
                 deliveryCost = {{$settings->peykCost}};
             else if (deliveryMethod == 'post')
                 deliveryCost = {{$settings->postCost}};
-        $('#deliveryCost').html(deliveryCost);
-        $('#cartSum').html(total);
-        $('#total').html(total + deliveryCost);
+        $('#deliveryCost').html(num(deliveryCost));
+        $('#cartSum').html(num(total));
+        $('#total').html(num(total + deliveryCost));
         $('#onDeliveryMode').hide();
 
         if (paymentMethod == 'onDelivery') {
             let customerDiscount = $('#customerDiscount').val()
             $('#onDeliveryMode').show();
             let customerTotal = Math.round(Total * (100 - customerDiscount) / 100 + deliveryCost)
-            $('#customerTotal').html(customerTotal);
+            $('#customerTotal').html(num(customerTotal));
             let safirShare = customerTotal - total - deliveryCost;
-            $('#safirShare').html(safirShare);
+            $('#safirShare').html(num(safirShare));
         }
         if (total == 0)
             $('#paymentDetails').hide();
@@ -141,6 +141,7 @@
         return '<span class="btn btn-danger mx-1" ' +
             'onclick="$(`#product_' + id + '`).val(0);refreshProducts()">X</span>'
     }
+
     @endif
 </script>
 <style>

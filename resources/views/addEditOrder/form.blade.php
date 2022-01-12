@@ -113,10 +113,10 @@
             <h4>شیوه ارسال</h4>
             @if(!$order)
                 <input type="radio" name="deliveryMethod" value="peyk" id="peyk" checked>
-                <label for="peyk">ارسال با پیک</label> <span class="deliveryDesc"> <span>{{$settings->peykCost}}</span > هزار تومان</span><br>
+                <label for="peyk">ارسال با پیک</label> <span class="deliveryDesc"> <span>{{number_format($settings->peykCost)}}</span > تومان</span><br>
 
                 <input type="radio" name="deliveryMethod" value="post" id="post">
-                <label for="post">ارسال با پست</label><span class="deliveryDesc"> {{$settings->postCost}} هزار تومان</span><br>
+                <label for="post">ارسال با پست</label><span class="deliveryDesc"> {{number_format($settings->postCost)}} تومان</span><br>
 
                 <input type="radio" name="deliveryMethod" value="paskerayeh" id="paskerayeh">
                 <label for="paskerayeh">پس کرایه</label><span class="deliveryDesc">هزینه ارسال به عهده مشتری</span><br>
@@ -142,15 +142,15 @@
                 <ol id="order-list">
                 </ol>
                 <hr>
-                <span>جمع اقلام: </span><span id="cartSum"></span><span>هزار تومان</span><br>
-                <span>هزینه حمل: <span id="deliveryCost"></span> هزار تومان </span><br><br>
+                <span>جمع اقلام: </span><span id="cartSum"></span><span> تومان</span><br>
+                <span>هزینه حمل: <span id="deliveryCost"></span>  تومان </span><br><br>
             @endif
-            <span class="font-weight-bold">مبلغ کل: </span><span id="total">{{$total}}</span></span> هزار تومان </span>
+            <span class="font-weight-bold">مبلغ کل: </span><span id="total">{{$total}}</span></span>  تومان </span>
             <br><br>
 
             <span id="onDeliveryMode">
-                <span>پرداختی مشتری: </span><span id="customerTotal">{{$order?$order->customerCost:''}}</span><span>هزار تومان </span><br>
-                <span>سهم سفیر: </span><span id="safirShare">{{$order?$order->customerCost-$order->total:''}}</span><span> هزار تومان </span><br>
+                <span>پرداختی مشتری: </span><span id="customerTotal">{{$order?$order->customerCost:''}}</span><span> تومان </span><br>
+                <span>سهم سفیر: </span><span id="safirShare">{{$order?$order->customerCost-$order->total:''}}</span><span>  تومان </span><br>
             </span>
         </div>
 

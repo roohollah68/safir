@@ -16,7 +16,7 @@
                 <th>نام سفیر</th>
             @endif
             <th>تاریخ ثبت</th>
-            <th>مبلغ (هزار تومن)</th>
+            <th>مبلغ (تومن)</th>
             @if($admin)
                 <th>توضیحات</th>
                 <th>تصویر</th>
@@ -36,7 +36,7 @@
                     <th>{{$users[$deposit->user_id]->username}}</th>
                 @endif
                 <td>{{verta($deposit->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
-                <td>{{number_format($deposit->amount,0,'.',',')}}</td>
+                <td>{{number_format($deposit->amount)}}</td>
                 @if($admin)
                     <td>{{$deposit->desc}}</td>
                     <td>

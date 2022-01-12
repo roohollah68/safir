@@ -13,7 +13,7 @@
         <tr>
             <th>تصویر</th>
             <th>نام</th>
-            <th>قیمت</th>
+            <th>قیمت(تومان)</th>
             <th>وضعیت</th>
             <th>عملیات</th>
         </tr>
@@ -27,7 +27,7 @@
                     </a>
                 </td>
                 <td>{{$product->name}}</td>
-                <td>{{$product->price}}</td>
+                <td>{{number_format($product->price)}}</td>
                 <td>
                     @if($product->available)
                         <p class="btn btn-success">موجود</p>

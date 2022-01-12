@@ -57,7 +57,7 @@
                            value="{{old('price')}}"
                            @endif pattern="^[0-9]*$" required>
                     <div class="input-group-append" style="min-width: 120px">
-                        <label for="price" class="input-group-text w-100">هزار تومان</label>
+                        <label for="price" class="input-group-text w-100">تومان</label>
                     </div>
                 </div>
             </div>

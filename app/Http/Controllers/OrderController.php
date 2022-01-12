@@ -201,7 +201,7 @@ class OrderController extends Controller
 
         if ($order->state > 0)
             return 'سفارش قابل ویرایش نیست چون پردازش شده است.';
-
+//        $products = Product::all()->keyBy('id');
         $customers = auth()->user()->customers()->get()->keyBy('name');
         return view('addEditOrder')->with(['order' => $order, 'customers' => $customers]);
     }

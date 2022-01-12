@@ -29,7 +29,7 @@
                     <input value="{{$amount}}" type="text" id="amount" class="form-control" name="amount"
                            pattern="^[0-9]*$" required>
                     <div class="input-group-prepend" style="min-width: 120px">
-                        <label for="amount" class="input-group-text w-100">هزار تومن</label>
+                        <label for="amount" class="input-group-text w-100"> تومن</label>
                     </div>
                 </div>
             </div>

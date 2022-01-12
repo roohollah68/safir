@@ -32,7 +32,7 @@
                     <thead>
                     <tr>
                         <th>محصول</th>
-                        <th>قیمت</th>
+                        <th>قیمت(تومان)</th>
                         <th>تعداد</th>
                     </tr>
                     </thead>
@@ -43,8 +43,15 @@
                                 <td>{{$product->name}}({{$product->coupon}}%)</td>
                                 <td>
                                     <span class="text-danger"
-                                          style="text-decoration: line-through">{{$product->price}}</span>
-                                    <span class="text-success">{{$product->priceWithDiscount}} </span>
+                                          @if($product->priceWithDiscount!=$product->price)
+                                          style='text-decoration: line-through'
+                                          @endif
+                                    >
+                                        {{number_format($product->price)}}
+                                    </span>
+                                    <span class="text-success">
+                                        {{$product->priceWithDiscount!=$product->price?number_format($product->priceWithDiscount):''}}
+                                    </span>
                                 </td>
                                 <td>
                                     <span class="btn btn-primary plusOne">+</span>
