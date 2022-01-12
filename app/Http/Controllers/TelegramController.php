@@ -222,6 +222,8 @@ class TelegramController extends Controller
             'paskerayeh' => 'پسکرایه',
             'admin' => 'ادمین',
         ];
+        $total = number_format($order->total);
+        $customerCost = number_format($order->customerCost);
         return "
 نام و نام خانوادگی: {$order->name}
 شماره همراه: {$order->phone}
@@ -229,8 +231,8 @@ class TelegramController extends Controller
 سفارشات: {$order->orders}
 کدپستی: {$order->zip_code}
 توضیحات: {$order->desc}
-مبلغ کل: {$order->total}
-پرداختی مشتری: {$order->customerCost}
+مبلغ کل: {$total}
+پرداختی مشتری: {$customerCost}
 نحوه پرداخت: {$paymentMethods[$order->paymentMethod]}
 نحوه ارسال: {$deliveryMethods[$order->deliveryMethod]}
 زمان ثبت: {$order->created_at->timezone('Asia/tehran')}
