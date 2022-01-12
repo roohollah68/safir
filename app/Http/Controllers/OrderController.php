@@ -105,7 +105,8 @@ class OrderController extends Controller
                     $Total += $product->price * $number;
                 }
             }
-            $total += $deliveryCost;
+            if ($Total < $this->settings()->freeDelivery)
+                $total += $deliveryCost;
             if ($Total == 0) {
                 return $this->errorBack('محصولی انتخاب نشده است!');
             }
