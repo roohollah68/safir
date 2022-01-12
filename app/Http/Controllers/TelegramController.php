@@ -231,8 +231,8 @@ class TelegramController extends Controller
 سفارشات: {$order->orders}
 کدپستی: {$order->zip_code}
 توضیحات: {$order->desc}
-مبلغ کل: {$total}
-پرداختی مشتری: {$customerCost}
+مبلغ کل: {$total} تومان
+پرداختی مشتری: {$customerCost} تومان
 نحوه پرداخت: {$paymentMethods[$order->paymentMethod]}
 نحوه ارسال: {$deliveryMethods[$order->deliveryMethod]}
 زمان ثبت: {$order->created_at->timezone('Asia/tehran')}
