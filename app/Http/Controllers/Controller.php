@@ -20,6 +20,14 @@ class Controller extends BaseController
         return $Number;
     }
 
+    public function number_En_Fa($Number)
+    {
+        foreach (['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'] as $en => $fa) {
+            $Number = str_replace($en, '' . $fa, $Number);
+        }
+        return $Number;
+    }
+
     public function isAdmin()
     {
         if (auth()->user()->role == 'admin') {
@@ -33,7 +41,7 @@ class Controller extends BaseController
     {
         $sets = Setting::all();
         $res = [];
-        foreach ($sets as $set){
+        foreach ($sets as $set) {
             $res[$set->name] = $set->value;
         }
         return (object)$res;
