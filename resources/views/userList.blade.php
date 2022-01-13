@@ -43,7 +43,7 @@
             <th>نام و نام خانوادگی</th>
             <th>نام کاربری</th>
             <th>شماره تماس</th>
-            <th>اعتبار</th>
+            <th>اعتبار(تومان)</th>
             <th>عملیات</th>
         </tr>
         </thead>
@@ -54,7 +54,7 @@
                     <td>{{$user->name}} @if($user->role == 'admin')( ادمین )@endif</td>
                     <td>{{$user->username}}</td>
                     <td>{{$user->phone}}</td>
-                    <td>{{$user->balance}}</td>
+                    <td>{{number_format($user->balance)}}</td>
                     <td>
                         <a class="btn btn-warning" href="/suspend_user/{{$user->id}})">تعلیق</a>
                         <a class="btn btn-info" href="edit_user/{{$user->id}}">ویرایش</a>
