@@ -54,7 +54,7 @@
                     <td>{{$user->name}} @if($user->role == 'admin')( ادمین )@endif</td>
                     <td>{{$user->username}}</td>
                     <td>{{$user->phone}}</td>
-                    <td>{{number_format($user->balance)}}</td>
+                    <td dir="ltr">{{number_format($user->balance)}}</td>
                     <td>
                         <a class="btn btn-warning" href="/suspend_user/{{$user->id}})">تعلیق</a>
                         <a class="btn btn-info" href="edit_user/{{$user->id}}">ویرایش</a>
