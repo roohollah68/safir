@@ -83,67 +83,72 @@ function prepare_data() {
 }
 
 function create_table(data) {
-    if (table)
-        table.destroy();
-    let hideRows = isAdmin ? [1, 7, 8, 9, 10, 11, 12] : [0 ,1, 3, 7, 8, 9, 10, 11, 12]
-    table = $('table').DataTable({
-        columns: [
-            {title: '<input type="checkbox" onclick="all_ids(this)" class="main_check">'},
-            {title: "#"},
-            {title: "نام"},
-            {title: "سفیر"},
-            {title: "سفارش"},
-            {title: "زمان ثبت"},
-            {title: "عملیات"},
-            {title: "آدرس"},
-            {title: "توضیحات"},
-            {title: "سفارشات"},
-            {title: "همراه"},
-            {title: "کدپستی"},
-            {title: "آیدی"},
-        ],
-        "columnDefs": [
-            {
-                "targets": [0, 1, 5, 6],
-                "searchable": false
-            },
-            {
-                targets: [0, 4, 6],
-                orderable: false
-            },
+    if (table){
+        table.clear();
+        table.rows.add(data);
+        table.draw();
+        // table.destroy();
+    }else{
+        let hideRows = isAdmin ? [1, 7, 8, 9, 10, 11, 12] : [0 ,1, 3, 7, 8, 9, 10, 11, 12]
+        table = $('table').DataTable({
+            columns: [
+                {title: '<input type="checkbox" onclick="all_ids(this)" class="main_check">'},
+                {title: "#"},
+                {title: "نام"},
+                {title: "سفیر"},
+                {title: "سفارش"},
+                {title: "زمان ثبت"},
+                {title: "عملیات"},
+                {title: "آدرس"},
+                {title: "توضیحات"},
+                {title: "سفارشات"},
+                {title: "همراه"},
+                {title: "کدپستی"},
+                {title: "آیدی"},
+            ],
+            "columnDefs": [
+                {
+                    "targets": [0, 1, 5, 6],
+                    "searchable": false
+                },
+                {
+                    targets: [0, 4, 6],
+                    orderable: false
+                },
 
-            {
-                targets: hideRows,
-                visible: false
+                {
+                    targets: hideRows,
+                    visible: false
+                }
+            ],
+            data: data,
+            order: [[12, "desc"]],
+            language: {
+                "decimal": "",
+                "emptyTable": "هیچ سفارشی موجود نیست",
+                "info": "نمایش _START_ تا _END_ از _TOTAL_ مورد",
+                "infoEmpty": "نمایش  0 تا 0 از 0 مورد",
+                "infoFiltered": "(فیلتر شده از مجموع _MAX_ داده)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "نمایش _MENU_ مورد",
+                "loadingRecords": "در حال بارگذاری...",
+                "processing": "در حال پردازش...",
+                "search": "جستجو:",
+                "zeroRecords": "هیچ مورد منطبقی یافت نشد",
+                "paginate": {
+                    "first": "اولین",
+                    "last": "آخرین",
+                    "next": "بعدی",
+                    "previous": "قبلی"
+                },
+                "aria": {
+                    "sortAscending": ": activate to sort column ascending",
+                    "sortDescending": ": activate to sort column descending"
+                }
             }
-        ],
-        data: data,
-        order: [[12, "desc"]],
-        language: {
-            "decimal": "",
-            "emptyTable": "هیچ سفارشی موجود نیست",
-            "info": "نمایش _START_ تا _END_ از _TOTAL_ مورد",
-            "infoEmpty": "نمایش  0 تا 0 از 0 مورد",
-            "infoFiltered": "(فیلتر شده از مجموع _MAX_ داده)",
-            "infoPostFix": "",
-            "thousands": ",",
-            "lengthMenu": "نمایش _MENU_ مورد",
-            "loadingRecords": "در حال بارگذاری...",
-            "processing": "در حال پردازش...",
-            "search": "جستجو:",
-            "zeroRecords": "هیچ مورد منطبقی یافت نشد",
-            "paginate": {
-                "first": "اولین",
-                "last": "آخرین",
-                "next": "بعدی",
-                "previous": "قبلی"
-            },
-            "aria": {
-                "sortAscending": ": activate to sort column ascending",
-                "sortDescending": ": activate to sort column descending"
-            }
-        }
-    });
+        });
+    }
 
 }
 
