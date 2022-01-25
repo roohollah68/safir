@@ -163,7 +163,9 @@ class OrderController extends Controller
                 ]);
             }
         }
-        TelegramController::sendOrderToTelegram($order);
+        if (!$this->isAdmin())
+            TelegramController::sendOrderToTelegram($order);
+        
         TelegramController::sendOrderToTelegramAdmins($order);
 
         $this->addToCustomers($request);
