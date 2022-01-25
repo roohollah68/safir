@@ -80,6 +80,7 @@
         $('#order-list').html('')
         $('#orders').html('');
         let total = 0, Total = 0;
+        let hasProduct = false;
         $.each(cart, (id, number) => {
             if (number > 0) {
                 let price = products[id].priceWithDiscount * number;
@@ -90,6 +91,7 @@
 
                 total += price;
                 Total += Price;
+                hasProduct = true;
             }
         })
         let deliveryCost = 0;
@@ -111,7 +113,7 @@
             let safirShare = customerTotal - total - deliveryCost;
             $('#safirShare').html(num(safirShare));
         }
-        if (total == 0)
+        if (!hasProduct)
             $('#paymentDetails').hide();
         else
             $('#paymentDetails').show();

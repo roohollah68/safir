@@ -96,6 +96,7 @@ class OrderController extends Controller
             $request->orders = 'طبق فاکتور';
         else {
             $deliveryCost = $this->deliveryCost($request->deliveryMethod);
+            $hasProduct = false;
             foreach ($products as $id => $product) {
                 $number = $request['product_' . $id];
                 if ($number > 0) {
@@ -103,11 +104,12 @@ class OrderController extends Controller
                     $coupon = $this->calculateDis($id);
                     $total += round((100 - $coupon) * $product->price * $number / 100);
                     $Total += $product->price * $number;
+                    $hasProduct = true;
                 }
             }
             if ($Total < $this->settings()->freeDelivery)
                 $total += $deliveryCost;
-            if ($Total == 0) {
+            if (!$hasProduct) {
                 return $this->errorBack('محصولی انتخاب نشده است!');
             }
             if (!$this->isAdmin())
