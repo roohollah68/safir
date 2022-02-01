@@ -95,7 +95,7 @@
             }
         })
         let deliveryCost = 0;
-        if (Total < {{$settings->freeDelivery}})
+        if (Total < {{$settings->freeDelivery}} || {{$id}} == 10) //استثنا خانوم موسوی
             if (deliveryMethod == 'peyk')
                 deliveryCost = {{$settings->peykCost}};
             else if (deliveryMethod == 'post')

@@ -57,7 +57,7 @@ class OrderController extends Controller
     public function newForm(Request $request)
     {
         $user = auth()->user();
-        if ($this->isAdmin() || $user->id == 10)
+        if ($this->isAdmin() || $user->id == 10) // استثنا خانوم موسوی
             $products = Product::all()->keyBy('id');
         else
             $products = Product::where('price', '>', '0')->get()->keyBy('id');
@@ -71,7 +71,8 @@ class OrderController extends Controller
             'order' => false,
             'customers' => $customers,
             'products' => $products,
-            'settings' => $this->settings()
+            'settings' => $this->settings(),
+            'id' => $user->id
         ]);
     }
 
@@ -107,7 +108,7 @@ class OrderController extends Controller
                     $hasProduct = true;
                 }
             }
-            if ($Total < $this->settings()->freeDelivery)
+            if ($Total < $this->settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
                 $total += $deliveryCost;
             if (!$hasProduct) {
                 return $this->errorBack('محصولی انتخاب نشده است!');
@@ -165,7 +166,7 @@ class OrderController extends Controller
         }
         if (!$this->isAdmin())
             TelegramController::sendOrderToTelegram($order);
-        
+
         TelegramController::sendOrderToTelegramAdmins($order);
 
         $this->addToCustomers($request);
@@ -205,8 +206,7 @@ class OrderController extends Controller
             $order = auth()->user()->orders()->findOrFail($id);
 
         if ($order->state > 0)
-            return 'سفارش قابل ویرایش نیست چون پردازش شده است.';
-//        $products = Product::all()->keyBy('id');
+            return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);;
         $customers = auth()->user()->customers()->get()->keyBy('name');
         return view('addEditOrder')->with(['order' => $order, 'customers' => $customers]);
     }

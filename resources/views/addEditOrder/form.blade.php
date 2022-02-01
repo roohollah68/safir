@@ -154,10 +154,6 @@
             </span>
         </div>
 
-{{--    @else--}}
-{{--        <input type="hidden" name="paymentMethod" value="admin">--}}
-{{--        <input type="hidden" name="deliveryMethod" value="admin">--}}
-{{--    @endif--}}
 
     <input type="checkbox" name="addToCustomers" id="addToCustomers">
     <label for="addToCustomers">افزودن به لیست مشتریان</label><br>
