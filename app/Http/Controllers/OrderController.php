@@ -80,6 +80,8 @@ class OrderController extends Controller
 
     public function insertOrder(Request $request)
     {
+        DB::beginTransaction();
+
         request()->validate([
             'receipt' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'required|string|min:3',
@@ -95,91 +97,85 @@ class OrderController extends Controller
         $Total = 0;
         $total = 0;
         $customerCost = 0;
-
-        DB::beginTransaction();
-        try {
-            if ($this->isAdmin() && $request->factor)
-                $request->orders = 'طبق فاکتور';
-            else {
-                $deliveryCost = $this->deliveryCost($request->deliveryMethod);
-                $hasProduct = false;
-                foreach ($products as $id => $product) {
-                    $number = $request['product_' . $id];
-                    if ($number > 0) {
-                        $request->orders = $request->orders . '*' . $product->name . ' ' . $number . 'عدد' . '*';
-                        $coupon = $this->calculateDis($id);
-                        $total += round((100 - $coupon) * $product->price * $number / 100);
-                        $Total += $product->price * $number;
-                        $hasProduct = true;
+        
+        if ($this->isAdmin() && $request->factor)
+            $request->orders = 'طبق فاکتور';
+        else {
+            $deliveryCost = $this->deliveryCost($request->deliveryMethod);
+            $hasProduct = false;
+            foreach ($products as $id => $product) {
+                $number = $request['product_' . $id];
+                if ($number > 0) {
+                    $request->orders = $request->orders . '*' . $product->name . ' ' . $number . 'عدد' . '*';
+                    $coupon = $this->calculateDis($id);
+                    $total += round((100 - $coupon) * $product->price * $number / 100);
+                    $Total += $product->price * $number;
+                    $hasProduct = true;
+                }
+            }
+            if ($Total < $this->settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
+                $total += $deliveryCost;
+            if (!$hasProduct) {
+                return $this->errorBack('محصولی انتخاب نشده است!');
+            }
+            if (!$this->isAdmin())
+                if ($request->paymentMethod == 'credit') {
+                    if ($total > ($user->balance + $this->settings()->negative)) {
+                        return $this->errorBack('اعتبار شما کافی نیست!');
+                    } else {
+                        $user->update([
+                            'balance' => $user->balance - $total
+                        ]);
                     }
-                }
-                if ($Total < $this->settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
-                    $total += $deliveryCost;
-                if (!$hasProduct) {
-                    return $this->errorBack('محصولی انتخاب نشده است!');
-                }
-                if (!$this->isAdmin())
-                    if ($request->paymentMethod == 'credit') {
-                        if ($total > ($user->balance + $this->settings()->negative)) {
-                            return $this->errorBack('اعتبار شما کافی نیست!');
-                        } else {
-                            $user->update([
-                                'balance' => $user->balance - $total
-                            ]);
-                        }
-                    } elseif ($request->paymentMethod == 'receipt') {
-                        if ($request->file("receipt")) {
-                            $request->receipt = $request->file("receipt")->store("", 'receipt');
-                        } elseif ($request->file) {
-                            $request->receipt = $request->file;
-                        } else {
-                            return $this->errorBack('باید عکس رسید بانکی بارگذاری شود!');
-                        }
-                    } elseif ($request->paymentMethod == 'onDelivery') {
-                        $request->desc = $request->desc . '- پرداخت در محل';
-                        $customerCost = round($Total * (100 - $request->customerDiscount) / 100 + $deliveryCost);
-                    } else
-                        return $this->errorBack('مشکلی پیش آمده!');
-            }
-
-            $order = $user->orders()->create([
-                'name' => $request->name,
-                'phone' => $request->phone,
-                'address' => $request->address,
-                'zip_code' => $request->zip_code,
-                'orders' => $request->orders,
-                'desc' => $request->desc,
-                'receipt' => $request->receipt,
-                'total' => $total,
-                'customerCost' => $customerCost,
-                'paymentMethod' => $request->paymentMethod,
-                'deliveryMethod' => $request->deliveryMethod,
-            ]);
-
-            foreach ($products as $name => $product) {
-                if (($request[$name]) > 0) {
-                    $coupon = $this->calculateDis($product->id);
-                    $price = round((100 - $coupon) * $product->price / 100);
-                    $order->orderProducts()->create([
-                        'name' => $name,
-                        'price' => $price,
-                        'photo' => $product->photo,
-                        'product_id' => $product->id,
-                        'number' => $request[$name],
-                    ]);
-                }
-            }
-//            if (!$this->isAdmin())
-//                TelegramController::sendOrderToTelegram($order);
-//
-//            TelegramController::sendOrderToTelegramAdmins($order);
-
-            $this->addToCustomers($request);
-            DB::commit();
-
-        } catch (Exception $e) {
-            DB::rollBack();
+                } elseif ($request->paymentMethod == 'receipt') {
+                    if ($request->file("receipt")) {
+                        $request->receipt = $request->file("receipt")->store("", 'receipt');
+                    } elseif ($request->file) {
+                        $request->receipt = $request->file;
+                    } else {
+                        return $this->errorBack('باید عکس رسید بانکی بارگذاری شود!');
+                    }
+                } elseif ($request->paymentMethod == 'onDelivery') {
+                    $request->desc = $request->desc . '- پرداخت در محل';
+                    $customerCost = round($Total * (100 - $request->customerDiscount) / 100 + $deliveryCost);
+                } else
+                    return $this->errorBack('مشکلی پیش آمده!');
         }
+
+        $order = $user->orders()->create([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'zip_code' => $request->zip_code,
+            'orders' => $request->orders,
+            'desc' => $request->desc,
+            'receipt' => $request->receipt,
+            'total' => $total,
+            'customerCost' => $customerCost,
+            'paymentMethod' => $request->paymentMethod,
+            'deliveryMethod' => $request->deliveryMethod,
+        ]);
+
+        foreach ($products as $name => $product) {
+            if (($request[$name]) > 0) {
+                $coupon = $this->calculateDis($product->id);
+                $price = round((100 - $coupon) * $product->price / 100);
+                $order->orderProducts()->create([
+                    'name' => $name,
+                    'price' => $price,
+                    'photo' => $product->photo,
+                    'product_id' => $product->id,
+                    'number' => $request[$name],
+                ]);
+            }
+        }
+        if (!$this->isAdmin())
+            TelegramController::sendOrderToTelegram($order);
+
+        TelegramController::sendOrderToTelegramAdmins($order);
+
+        $this->addToCustomers($request);
+        DB::commit();
         return redirect()->route('listOrders');
     }
 
