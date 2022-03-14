@@ -14,8 +14,10 @@
         <a href="{{route('couponList')}}">تخفیف ها</a>
         <a href="{{route('productList')}}">محصولات</a>
         <a href="{{route('settings')}}">تنظیمات</a>
+        <a href="{{route('statistic')}}">آمار</a>
     @else
         <a href="{{route('editUser')}}">ویرایش حساب کاربری</a>
+        <a href="{{route('transactions')}}">تراکنش ها</a>
     @endif
     <a href="{{route('logout')}}">خروج</a>
 

@@ -108,9 +108,23 @@ class DepositController extends Controller
                 $user->update([
                     'balance' => $user->balance + $deposit->amount
                 ]);
+                $deposit->transactions()->create([
+                    'user_id' => $user->id,
+                    'amount' => $deposit->amount,
+                    'balance' => $user->balance,
+                    'type' => true,
+                    'description' => 'ثبت واریزی',
+                ]);
             } else {
                 $user->update([
                     'balance' => $user->balance - $deposit->amount
+                ]);
+                $deposit->transactions()->create([
+                    'user_id' => $user->id,
+                    'amount' => $deposit->amount,
+                    'balance' => $user->balance,
+                    'type' => false,
+                    'description' => 'حذف واریزی',
                 ]);
             }
             return $deposit->confirmed;

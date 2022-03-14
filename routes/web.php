@@ -4,7 +4,9 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DepositController;
+use App\Http\Controllers\OrderProductController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
@@ -13,7 +15,6 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::group(['middleware'=>['auth' , 'verify'] ],function (){
-
 
 //  Order
     Route::get('add_order',[OrderController::class , 'newForm'])->name('newOrder');
@@ -55,6 +56,9 @@ Route::group(['middleware'=>['auth' , 'verify'] ],function (){
     Route::get('/deposit/edit/{id}' , [DepositController::class , 'editDeposit']);
     Route::post('/deposit/edit/{id}' , [DepositController::class , 'updateDeposit']);
     Route::post('/deposit/changeConfirm/{id}' , [DepositController::class , 'changeConfirm']);
+
+//  Transaction
+    Route::get('/transactions' , [TransactionController::class , 'show'])->name('transactions');
 });
 
 Route::group(['middleware'=>['auth','admin']],function (){
@@ -80,6 +84,7 @@ Route::group(['middleware'=>['auth','admin']],function (){
 
     Route::post('increase_state/{id}',[OrderController::class , 'increaseState']);
 
+    Route::get('statistic' , [OrderProductController::class , 'show'])->name('statistic');
 });
 
 

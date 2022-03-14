@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\CouponLink;
 use App\Models\Order;
+use App\Models\OrderProduct;
 use App\Models\Product;
+use App\Models\Transaction;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -97,7 +99,7 @@ class OrderController extends Controller
         $Total = 0;
         $total = 0;
         $customerCost = 0;
-        
+
         if ($this->isAdmin() && $request->factor)
             $request->orders = 'طبق فاکتور';
         else {
@@ -157,22 +159,31 @@ class OrderController extends Controller
         ]);
 
         foreach ($products as $name => $product) {
-            if (($request[$name]) > 0) {
+            if (($request['product_' . $name]) > 0) {
                 $coupon = $this->calculateDis($product->id);
                 $price = round((100 - $coupon) * $product->price / 100);
                 $order->orderProducts()->create([
-                    'name' => $name,
+                    'name' => $product->name,
                     'price' => $price,
                     'photo' => $product->photo,
                     'product_id' => $product->id,
-                    'number' => $request[$name],
+                    'number' => $request['product_' . $name],
                 ]);
             }
         }
-        if (!$this->isAdmin())
-            TelegramController::sendOrderToTelegram($order);
+        if (!$this->isAdmin() && $request->paymentMethod == 'credit')
+            $order->transactions()->create([
+                'user_id' => $user->id,
+                'amount' => $total,
+                'balance' => $user->balance,
+                'type' => false,
+                'description' => 'ثبت سفارش',
+            ]);
 
-        TelegramController::sendOrderToTelegramAdmins($order);
+//        if (!$this->isAdmin())
+//            TelegramController::sendOrderToTelegram($order);
+
+//        TelegramController::sendOrderToTelegramAdmins($order);
 
         $this->addToCustomers($request);
         DB::commit();
@@ -249,13 +260,27 @@ class OrderController extends Controller
     public function increaseState($id)
     {
         $order = Order::findOrFail($id);
-        $user = User::find($order->user_id);
+        $user = User::findOrFail($order->user_id);
         $order->state = '' . (($order->state + 1) % 4);
         if ($order->paymentMethod == 'onDelivery') {
             if ($order->state == '1') {
                 $user->balance += $order->customerCost - $order->total;
+                $order->transactions()->create([
+                    'user_id' => $user->id,
+                    'amount' => $order->customerCost - $order->total,
+                    'balance' => $user->balance,
+                    'type' => true,
+                    'description' => 'سهم سفیر(پرداخت در محل)',
+                ]);
             } elseif ($order->state == '0') {
                 $user->balance -= $order->customerCost - $order->total;
+                $order->transactions()->create([
+                    'user_id' => $user->id,
+                    'amount' => $order->customerCost - $order->total,
+                    'balance' => $user->balance,
+                    'type' => false,
+                    'description' => 'حذف سهم سفیر(پرداخت در محل)',
+                ]);
             }
         }
         $order->save();
@@ -266,6 +291,7 @@ class OrderController extends Controller
 
     public function deleteOrder($id, Request $request)
     {
+        DB::beginTransaction();
         if ($this->isAdmin())
             $order = Order::findOrFail($id);
         else
@@ -275,12 +301,21 @@ class OrderController extends Controller
             return 'سفارش نمی تواند حذف شود، چون پردازش شده است!';
 
         if ($order->delete()) {
-            if ($order->paymentMethod == 'credit' && !$this->isAdmin()) {
+            OrderProduct::where('order_id', $id)->delete();
+            if ($order->paymentMethod == 'credit' && !$order->user()->first()->isAdmin()) {
                 $user = $order->user()->first();
                 $user->update([
                     'balance' => $user->balance + $order->total,
                 ]);
+                $order->transactions()->create([
+                    'user_id' => $user->id,
+                    'amount' => $order->total,
+                    'balance' => $user->balance,
+                    'type' => true,
+                    'description' => 'حذف سفارش',
+                ]);
             }
+            DB::commit();
             return 'با موفقیت حذف شد';
         };
         return 'مشکلی به وجود آمده!';
