@@ -7,7 +7,11 @@
 @section('content')
     <form action="">
 
-
+        <span>از </span></span><input type="number" name="start" value="{{$start}}" min="1"><span>روز قبل</span>
+        <br><br>
+        <span>تا </span><input type="number" name="end" value="{{$end}}" min="0"><span>روز قبل</span>
+        <br><br>
+        <input type="submit" value="اعمال">
     </form>
     <br>
     <br>
