@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class OrderProductController extends Controller
 {
-    public function show($start = 30, $end = 0)
+    public function show($start = 1000, $end = 0)
     {
         $products = Product::all()->keyBy('id');
 
