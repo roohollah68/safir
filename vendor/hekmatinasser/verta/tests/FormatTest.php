@@ -2,7 +2,6 @@
 
 namespace Hekmatinasser\Verta\Tests;
 
-use DateTime;
 use Hekmatinasser\Verta\Verta;
 use PHPUnit\Framework\TestCase;
 
@@ -20,7 +19,6 @@ class FormatTest extends TestCase
         $datetime = (string) Verta::parse('1398-10-10 22:30:50');
 
         $this->assertEquals('1398-10-10 22:30:50', $datetime);
-
     }
 
     public function testFormat()
@@ -111,7 +109,6 @@ class FormatTest extends TestCase
         $difference = $target->formatDifference($datetime);
 
         $this->assertEquals('1 سال بعد', $difference);
-
     }
 
     public function testFormatWord()
@@ -119,5 +116,12 @@ class FormatTest extends TestCase
         $datetime = Verta::parse('1398-10-11 21:32:35')->formatWord('l d S F');
 
         $this->assertEquals('چهارشنبه یازده ام دی', $datetime);
+    }
+
+    public function testFormatQuarter()
+    {
+        $datetime = Verta::parse('1398-10-10 21:30:50')->formatWord('q');
+
+        $this->assertEquals('زمستان', $datetime);
     }
 }

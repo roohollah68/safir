@@ -44,7 +44,7 @@ return [
         'week' => 'هفته',
         'month' => 'ماه',
         'yaer' => 'سال',
-        'century' => 'قرن'
+        'century' => 'قرن',
     ],
     'phrase' => [
         'am' => 'ق ظ',
@@ -71,6 +71,11 @@ return [
         'jdate_before_equal' => ':attribute' . ' تاریخ شمسی باید قبل یا برابر از ' . ':date' . ' باشد.',
         'jdatetime_before' => ':attribute' . ' تاریخ و زمان شمسی باید قبل از ' . ':date' . ' باشد.',
         'jdatetime_before_equal' => ':attribute' . ' تاریخ و زمان شمسی باید قبل یا برابر از ' . ':date' . ' باشد.',
-    ]
+    ],
+    'quarters' => [
+        '1' => 'بهار',
+        '2' => 'تابستان',
+        '3' => 'پاییز',
+        '4' => 'زمستان',
+    ],
 ];
-
