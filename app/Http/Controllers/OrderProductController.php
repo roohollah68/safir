@@ -4,25 +4,40 @@ namespace App\Http\Controllers;
 
 use App\Models\OrderProduct;
 use App\Models\Product;
+use Carbon\Carbon;
+use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
 
 class OrderProductController extends Controller
 {
     public function show(Request $request)
     {
-        $start = isset($request->start)?$request->start:30;
-        $end = isset($request->end)?$request->end:0;
-        echo $start;
+        if(isset($request->start)) {
+            $start = $request->start;
+        }else{
+            $start = $this->number_En_Fa(verta("-1 month")->format('Y/m/d'));
+        }
+        $v = Verta::parse($this->number_Fa_En($start));
+        $from = Carbon::createFromTimestamp($v->timestamp);
+
+        if(isset($request->end)){
+            $end = $request->end;
+        }else{
+            $end = $this->number_En_Fa(verta()->format('Y/m/d'));
+        }
+        $v = Verta::parse($this->number_Fa_En($end));
+        $to = Carbon::createFromTimestamp($v->timestamp);
+
         $products = Product::all()->keyBy('id');
 
         foreach ($products as $id => $product) {
-            $orderProducts = OrderProduct::where('created_at', '>', now()->subDays($start))->
-            where('created_at', '<', now()->subDays($end))->where('product_id', $id)->get();
+            $orderProducts = OrderProduct::where('created_at', '>', $from)->
+            where('created_at', '<', $to)->where('product_id', $id)->get();
             $products[$id]->number = 0;
             $products[$id]->total = 0;
             foreach ($orderProducts as $orderProduct) {
                 $products[$id]->number += $orderProduct->number;
-                $products[$id]->total += $orderProduct->number * $products[$id]->price;
+                $products[$id]->total += $orderProduct->number * $orderProduct->price;
             }
         }
         return view('statistic', ['products' => $products, 'start' => $start, 'end' => $end]);
