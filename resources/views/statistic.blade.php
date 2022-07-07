@@ -77,6 +77,9 @@
             font-family: 'Segoe UI', Tahoma;
             font-size: 14px;
         }
+        th {
+            text-align: right;
+        }
     </style>
 
 @endsection
