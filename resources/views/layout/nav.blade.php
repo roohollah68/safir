@@ -3,7 +3,7 @@
         <i class="fa fa-bars"></i>
     </a>
     @if(!$admin)
-        <a href="{{route('DepositList')}}" class="active">اعتبار <span dir="ltr">{{$balance}}</span>  تومن</a>
+        <a href="{{route('DepositList')}}" class="active">اعتبار <span dir="ltr">{{$balance}}</span>  تومان</a>
     @endif
     <a href="{{route('newOrder')}}">ایجاد سفارش</a>
     <a href="{{route('listOrders')}}">مشاهده سفارشات @if($admin) ({{$orderCount}}) @endif</a>
