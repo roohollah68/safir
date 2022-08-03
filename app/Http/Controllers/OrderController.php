@@ -61,10 +61,17 @@ class OrderController extends Controller
     public function newForm(Request $request)
     {
         $user = auth()->user();
-        if ($this->isAdmin() || $user->id == 10) // استثنا خانوم موسوی
+        if ($this->isAdmin()) // استثنا  ادمین
             $products = Product::all()->keyBy('id');
+
+        elseif ($user->id == 10) // استثنا خانوم موسوی
+            $products = Product::where('price', '<>', '1')->get()->keyBy('id');
+
+        elseif ($user->id == 29) // استثنا شرکت برادر حامد
+            $products = Product::where('price', '=', '1')->get()->keyBy('id');
+
         else
-            $products = Product::where('price', '>', '0')->get()->keyBy('id');
+            $products = Product::where('price', '>', '1')->get()->keyBy('id');
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
