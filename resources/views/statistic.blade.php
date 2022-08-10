@@ -22,12 +22,13 @@
                 <input type="text" name="end" value="{{$end}}" class="form-control" id="toDate2" placeholder="تا تاریخ" data-mddatetimepicker="true" data-trigger="click" data-targetselector="#toDate2" data-groupid="group2" data-todate="true" data-enabletimepicker="false" data-placement="right" />
             </div>
         </div>
-
-
-
       <br>
         <input class="btn btn-success" type="submit" value="اعمال">
     </form>
+
+
+    <br>
+    <h4>کل مبلغ آمار فروش در این دوره :   <span>{{number_format($totalSale)}}</span> تومان </h4>
     <br>
     <p>نمایش آمار از <span>{{$start}}</span> تا <span>{{$end}}</span></p>
     <table class="stripe" id="statistic-table">

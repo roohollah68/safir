@@ -29,6 +29,7 @@ class OrderProductController extends Controller
         $to = Carbon::createFromTimestamp($v->timestamp);
 
         $products = Product::all()->keyBy('id');
+        $totalSale = 0;
 
         foreach ($products as $id => $product) {
             $orderProducts = OrderProduct::where('created_at', '>', $from)->
@@ -39,7 +40,8 @@ class OrderProductController extends Controller
                 $products[$id]->number += $orderProduct->number;
                 $products[$id]->total += $orderProduct->number * $orderProduct->price;
             }
+            $totalSale += $products[$id]->total;
         }
-        return view('statistic', ['products' => $products, 'start' => $start, 'end' => $end]);
+        return view('statistic', ['products' => $products, 'start' => $start, 'end' => $end , 'totalSale' => $totalSale]);
     }
 }
