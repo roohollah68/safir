@@ -45,9 +45,9 @@
                         {{ __('حساب کاربری ندارید؟') }}
                     </a>
                     &nbsp;&nbsp;&nbsp;
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="https://t.me/Safir_sefaresh_bot">
-                        {{ __('ورود با تلگرام') }}
-                    </a>
+{{--                    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="https://t.me/Safir_sefaresh_bot">--}}
+{{--                        {{ __('ورود با تلگرام') }}--}}
+{{--                    </a>--}}
                     &nbsp;&nbsp;&nbsp;
                 @endif
                 <x-button class="ml-3">

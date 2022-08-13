@@ -92,7 +92,7 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         request()->validate([
-            'receipt' => 'mimes:jpeg,jpg,png,bmp|max:2048',
+            'receipt' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
             'name' => 'required|string|min:3',
             'address' => 'required|string|min:3',
             'phone' => 'required|string|min:11,max:11',
