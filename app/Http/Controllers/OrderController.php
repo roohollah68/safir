@@ -124,7 +124,7 @@ class OrderController extends Controller
             }
             if ($Total < $this->settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
                 $total += $deliveryCost;
-            if (!$hasProduct) {
+            if (!$hasProduct && $user->id != 29) {
                 return $this->errorBack('محصولی انتخاب نشده است!');
             }
             if (!$this->isAdmin())

@@ -63,7 +63,7 @@ function prepare_data() {
             createdTime(row),
 
 
-            viewOrder + (deleted ? '' : (row.state > 0 ? '' : deleteOrder + editOrder) + sendToTelegram +(isAdmin?generatePDF:'') ),
+            viewOrder + (deleted ? '' : (row.state > 0 ? '' : deleteOrder + editOrder) + /*sendToTelegram +*/ (isAdmin?generatePDF:'') ),
 
             row.address,
 
@@ -303,13 +303,15 @@ function label_text(order) {
     let text = `
 <div class="printed">
     <span>نام و نام خانوادگی </span>: <b>${fix_persian(order.name)}</b> <br>
-    <span>شماره تماس </span>: <b>${order.phone}</b>&nbsp;&nbsp;&nbsp; ` +
-        (order.zip_code ? `<span>کد پستی </span>: <b>${order.zip_code}</b>` : '')
-        + `<br>
-    <span>آدرس </span>: <b>${fix_persian(order.address)}</b> <br>
-    <span>سفارشات </span>: <b>${fix_persian(order.orders)}</b> <br>` +
-        (order.desc ? `<span>توضیحات </span>: <b>${fix_persian(order.desc)}</b>
-</div>` : '')
+    <span>شماره تماس </span>: <b>${order.phone}</b>&nbsp;&nbsp;&nbsp; `
+        +
+        (order.zip_code ? `<span>کد پستی </span>: <b>${order.zip_code}</b><br>` : '<br>')
+        +
+    `<span>آدرس </span>: <b>${fix_persian(order.address)}</b> <br>`
+        +
+        (order.orders ? `<span>سفارشات </span>: <b>${fix_persian(order.orders)}</b>` : '')
+        +
+        (order.desc ? `<span>توضیحات </span>: <b>${fix_persian(order.desc)}</b></div>` : '</div>')
     ;
     if ((order.address.length + order.orders.length + (order.desc ? order.desc.length : 0)) > 260) {
         return `<div class="long-text">${text}</div>`;
