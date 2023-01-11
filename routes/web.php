@@ -20,6 +20,8 @@ Route::group(['middleware'=>['auth' , 'verify'] ],function (){
     Route::get('add_order',[OrderController::class , 'newForm'])->name('newOrder');
     Route::post('add_order',[OrderController::class , 'insertOrder']);
 
+
+
     Route::get('edit_order/{id}',[OrderController::class , 'editForm']);
     Route::post('edit_order/{id}',[OrderController::class , 'editOrder']);
 

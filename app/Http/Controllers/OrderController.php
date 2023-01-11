@@ -191,6 +191,7 @@ class OrderController extends Controller
 //            TelegramController::sendOrderToTelegram($order);
 
 //        TelegramController::sendOrderToTelegramAdmins($order);
+        TelegramController::sendOrderToBale($order);
 
         $this->addToCustomers($request);
         DB::commit();

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup as IKM;
 use TelegramBot\Api\Types\ReplyKeyboardMarkup as RKM;
+use App\BaleAPIv2;
 
 class TelegramController extends Controller
 {
@@ -208,6 +209,19 @@ class TelegramController extends Controller
 
     }
 
+    public static function sendOrderToBale($order)
+    {
+        $bot=new BaleAPIv2('1178558676:8AZxUiEoWQ87iphneHtGH8exWMyEumV7NujHl7iY');
+        $chat_id=env('GroupId');
+        $message = self::createOrderMessage($order);
+        $content=array("chat_id" =>4521394649,"text" =>$message,"photo"=>env('APP_URL') . "receipt/{$order->receipt}");
+        if ($order->receipt) {
+            $bot->sendPhoto($content);
+        } else {
+            $bot->sendText($content);
+        }
+    }
+
     public static function createOrderMessage($order)
     {
         $This  = new Controller();
@@ -227,8 +241,7 @@ class TelegramController extends Controller
         $customerCost = number_format($order->customerCost);
         $time = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
         $time = $This->number_En_Fa($time);
-        return "
-نام و نام خانوادگی: {$order->name}
+        return "نام و نام خانوادگی: {$order->name}
 شماره همراه: {$order->phone}
 آدرس: {$order->address}
 سفارشات: {$order->orders}
@@ -239,8 +252,7 @@ class TelegramController extends Controller
 نحوه پرداخت: {$paymentMethods[$order->paymentMethod]}
 نحوه ارسال: {$deliveryMethods[$order->deliveryMethod]}
 زمان ثبت: {$time}
-سفیر: {$order->user()->first()->name}
-            ";
+سفیر: {$order->user()->first()->name}";
 
     }
 }
