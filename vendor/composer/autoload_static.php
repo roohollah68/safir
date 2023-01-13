@@ -177,6 +177,7 @@ class ComposerStaticInitc50c57f8749005a128a17433b3c77404
         ),
         'A' => 
         array (
+            'Automattic\\WooCommerce\\' => 23,
             'Asm89\\Stack\\' => 12,
             'App\\' => 4,
         ),
@@ -505,6 +506,10 @@ class ComposerStaticInitc50c57f8749005a128a17433b3c77404
         array (
             0 => __DIR__ . '/..' . '/brick/math/src',
         ),
+        'Automattic\\WooCommerce\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/automattic/woocommerce/src/WooCommerce',
+        ),
         'Asm89\\Stack\\' => 
         array (
             0 => __DIR__ . '/..' . '/asm89/stack-cors/src',
@@ -549,6 +554,7 @@ class ComposerStaticInitc50c57f8749005a128a17433b3c77404
         'App\\Http\\Controllers\\TelegramController' => __DIR__ . '/../..' . '/app/Http/Controllers/TelegramController.php',
         'App\\Http\\Controllers\\TransactionController' => __DIR__ . '/../..' . '/app/Http/Controllers/TransactionController.php',
         'App\\Http\\Controllers\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserController.php',
+        'App\\Http\\Controllers\\WoocommerceController' => __DIR__ . '/../..' . '/app/Http/Controllers/WoocommerceController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',
@@ -583,6 +589,14 @@ class ComposerStaticInitc50c57f8749005a128a17433b3c77404
         'Asm89\\Stack\\Cors' => __DIR__ . '/..' . '/asm89/stack-cors/src/Cors.php',
         'Asm89\\Stack\\CorsService' => __DIR__ . '/..' . '/asm89/stack-cors/src/CorsService.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
+        'Automattic\\WooCommerce\\Client' => __DIR__ . '/..' . '/automattic/woocommerce/src/WooCommerce/Client.php',
+        'Automattic\\WooCommerce\\HttpClient\\BasicAuth' => __DIR__ . '/..' . '/automattic/woocommerce/src/WooCommerce/HttpClient/BasicAuth.php',
+        'Automattic\\WooCommerce\\HttpClient\\HttpClient' => __DIR__ . '/..' . '/automattic/woocommerce/src/WooCommerce/HttpClient/HttpClient.php',
+        'Automattic\\WooCommerce\\HttpClient\\HttpClientException' => __DIR__ . '/..' . '/automattic/woocommerce/src/WooCommerce/HttpClient/HttpClientException.php',
+        'Automattic\\WooCommerce\\HttpClient\\OAuth' => __DIR__ . '/..' . '/automattic/woocommerce/src/WooCommerce/HttpClient/OAuth.php',
+        'Automattic\\WooCommerce\\HttpClient\\Options' => __DIR__ . '/..' . '/automattic/woocommerce/src/WooCommerce/HttpClient/Options.php',
+        'Automattic\\WooCommerce\\HttpClient\\Request' => __DIR__ . '/..' . '/automattic/woocommerce/src/WooCommerce/HttpClient/Request.php',
+        'Automattic\\WooCommerce\\HttpClient\\Response' => __DIR__ . '/..' . '/automattic/woocommerce/src/WooCommerce/HttpClient/Response.php',
         'Brick\\Math\\BigDecimal' => __DIR__ . '/..' . '/brick/math/src/BigDecimal.php',
         'Brick\\Math\\BigInteger' => __DIR__ . '/..' . '/brick/math/src/BigInteger.php',
         'Brick\\Math\\BigNumber' => __DIR__ . '/..' . '/brick/math/src/BigNumber.php',

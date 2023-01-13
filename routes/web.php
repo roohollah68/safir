@@ -12,7 +12,10 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TelegramController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\WoocommerceController;
 
+
+Route::get('/woocommerce' , [WoocommerceController::class , 'addPeptinaOrder']);
 
 Route::group(['middleware'=>['auth' , 'verify'] ],function (){
 
