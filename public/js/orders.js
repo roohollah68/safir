@@ -311,7 +311,7 @@ function label_text(order) {
         +
         (order.orders ? `<span>سفارشات </span>: <b>${fix_persian(order.orders)}</b>` : '')
         +
-        (order.desc ? `<span>توضیحات </span>: <b>${fix_persian(order.desc)}</b></div>` : '</div>')
+        (order.desc ? `<br><span>توضیحات </span>: <b>${fix_persian(order.desc)}</b></div>` : '</div>')
     ;
     if ((order.address.length + order.orders.length + (order.desc ? order.desc.length : 0)) > 260) {
         return `<div class="long-text">${text}</div>`;
