@@ -13,6 +13,7 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'telegram',
-        'deposit/telegram'
+        'deposit/telegram',
+        'woocommerce/*'
     ];
 }
