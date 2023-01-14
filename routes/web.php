@@ -101,7 +101,7 @@ Route::get('new-order-receipt/{id}/{pass}/{file_id}',[OrderController::class , '
 Route::post('/deposit/telegram' , [DepositController::class , 'receive']);
 Route::get('/deposit/add/{id}/{pass}/{file_id}' , [DepositController::class , 'newDepositWithPhotoTelegram']);
 
-Route::get('/woocommerce/{website}' , [WoocommerceController::class , 'addPeptinaOrder']);
+Route::post('/woocommerce/{website}' , [WoocommerceController::class , 'addPeptinaOrder']);
 
 
 
