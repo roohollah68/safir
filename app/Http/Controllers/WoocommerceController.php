@@ -21,7 +21,7 @@ class WoocommerceController extends Controller
             $orders = $orders . '*' . $item->name . ' ' . $item->quantity . 'عدد' . '*';
         }
 
-        $user = User::where('username', 'peptina')->first();
+        $user = User::where('username', $website)->first();
         $order = $user->orders()->create([
             'name' => $request->billing->first_name,
             'phone' => $request->billing->phone,
