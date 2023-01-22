@@ -108,7 +108,7 @@ class OrderController extends Controller
         $customerCost = 0;
 
         if ($this->isAdmin() && $request->factor)
-            $request->orders = 'طبق فاکتور';
+            $request->orders = '*طبق فاکتور*';
         else {
             $deliveryCost = $this->deliveryCost($request->deliveryMethod);
             $hasProduct = false;

@@ -20,15 +20,6 @@
       ),
       'reference' => '73e5b88775c64ccc0b84fb60836b30dc9d92ac4a',
     ),
-    'automattic/woocommerce' => 
-    array (
-      'pretty_version' => '3.1.0',
-      'version' => '3.1.0.0',
-      'aliases' => 
-      array (
-      ),
-      'reference' => 'd3b292f04c0b3b21dced691ebad8be073a83b4ad',
-    ),
     'brick/math' => 
     array (
       'pretty_version' => '0.9.3',
