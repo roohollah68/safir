@@ -35,7 +35,7 @@ class ViewServiceProvider extends ServiceProvider
         });
         View::composer(['layout.nav'], function ($view) {
             $view->with('balance', auth()->user()->balance)->with('depositCount', Deposit::where('confirmed', false)->get()->count())
-                ->with('userCount', User::where('verified', false)->get()->count())->with('orderCount', Order::where('deleted_at', NULL)->where('state', '0')->get()->count());
+                ->with('userCount', User::where('verified', false)->get()->count())->with('orderCount', Order::where('state', '0')->get()->count());
         });
     }
 }

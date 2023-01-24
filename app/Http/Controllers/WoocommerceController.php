@@ -12,10 +12,6 @@ class WoocommerceController extends Controller
     {
 
         $request = json_decode(file_get_contents('php://input'));
-//        $woocommerce = new Client('https://peptina.com',
-//            'ck_b434203ee938bfbaa214a8ba4dfe772b9d164971',
-//            'cs_acc8f1e49db9e14688bfd60e731239fdcf521f69',);
-//        $request = $woocommerce->get('orders/7290');
         $orders = '';
         foreach ($request->line_items as $item) {
             $orders = $orders . '*' . $item->name . ' ' . $item->quantity . 'عدد' . '*';
@@ -23,12 +19,12 @@ class WoocommerceController extends Controller
 
         $user = User::where('username', $website)->first();
         $order = $user->orders()->create([
-            'name' => $request->billing->first_name,
+            'name' => $request->billing->first_name. ' ' .$request->billing->last_name,
             'phone' => $request->billing->phone,
             'address' => $request->billing->city . ' ' . $request->billing->address_1,
             'zip_code' => $request->billing->postcode,
             'orders' => $orders,
-            'desc' => $request->customer_note . ' - ' . $request->payment_method_title. ' - ' . $request->total,
+            'desc' => $request->customer_note . ' - ' . $request->payment_method_title. ' - ' . $request->total . $request->currency_symbol,
 //            'receipt' => $request->receipt,
             'total' => $request->total,
             'customerCost' => 0,
