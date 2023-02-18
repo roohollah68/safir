@@ -7,6 +7,8 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use App\BaleAPIv2;
+
 
 class Controller extends BaseController
 {
@@ -61,5 +63,19 @@ class Controller extends BaseController
             'admin' => 0,
         ];
         return $deliveryCosts[$deliveryMethod];
+    }
+
+    public function sendMessageToBale($array, $chatId)
+    {
+        $bot = new BaleAPIv2(env('BaleToken'));
+        $array["chat_id"] =  $chatId;
+        $bot->sendText($array);
+    }
+
+    public function sendPhotoToBale($array, $chatId)
+    {
+        $bot = new BaleAPIv2(env('BaleToken'));
+        $array["chat_id"] =  $chatId;
+        $bot->sendPhoto($array);
     }
 }
