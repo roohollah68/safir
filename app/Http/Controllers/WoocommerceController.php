@@ -5,14 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Automattic\WooCommerce\Client;
+use App\Http\Controllers\TelegramController as Telegram;
+use Illuminate\Support\Facades\DB;
 
 class WoocommerceController extends Controller
 {
     public function addPeptinaOrder($website)
     {
 
-        $this->sendMessageToBale(["text" =>json_encode(json_decode(file_get_contents('php://input')))],'1444566712');
-        die();
+        DB::beginTransaction();
+
+//        $this->sendMessageToBale(["text" =>json_encode(json_decode(file_get_contents('php://input')))],'1444566712');
+//        die();
         $request = json_decode(file_get_contents('php://input'));
         $orders = '';
         foreach ($request->line_items as $item) {
@@ -40,8 +44,10 @@ class WoocommerceController extends Controller
             'deliveryMethod' => 'admin',
         ]);
 
-
-        TelegramController::sendOrderToBale($order);
+        app('Telegram')->sendOrderToBale($order);
+        $order->delete();
+//        TelegramController::sendOrderToBale($order);
+        DB::commit();
         return 'hi';
     }
 }
