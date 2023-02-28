@@ -6,9 +6,7 @@ use App\Models\CouponLink;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
-use App\Models\Transaction;
 use App\Models\User;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -191,7 +189,7 @@ class OrderController extends Controller
 //            TelegramController::sendOrderToTelegram($order);
 
 //        TelegramController::sendOrderToTelegramAdmins($order);
-        TelegramController::sendOrderToBale($order);
+        app('App\Http\Controllers\TelegramController')->sendOrderToBale($order , '1444566712');
 
         $this->addToCustomers($request);
         DB::commit();

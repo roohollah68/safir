@@ -209,15 +209,14 @@ class TelegramController extends Controller
 
     }
 
-    public static function sendOrderToBale($order)
+    public function sendOrderToBale($order , $chatId)
     {
-        $bot=new BaleAPIv2('1178558676:8AZxUiEoWQ87iphneHtGH8exWMyEumV7NujHl7iY');
         $message = self::createOrderMessage($order);
-        $content=array("chat_id" =>4521394649,"caption" =>$message,"text" =>$message,"photo"=>env('APP_URL') . "receipt/{$order->receipt}");
+        $content=array("caption" =>$message,"text" =>$message,"photo"=>env('APP_URL') . "receipt/{$order->receipt}");
         if ($order->receipt) {
-            $bot->sendPhoto($content);
+            $this->sendPhotoToBale($content, $chatId);
         } else {
-            $bot->sendText($content);
+            $this->sendMessageToBale($content, $chatId);
         }
     }
 

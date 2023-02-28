@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Automattic\WooCommerce\Client;
-use App\Http\Controllers\TelegramController as Telegram;
 use Illuminate\Support\Facades\DB;
 
 class WoocommerceController extends Controller
@@ -44,10 +43,8 @@ class WoocommerceController extends Controller
             'deliveryMethod' => 'admin',
         ]);
 
-        app('Telegram')->sendOrderToBale($order);
-        $order->delete();
-//        TelegramController::sendOrderToBale($order);
+        app('App\Http\Controllers\TelegramController')->sendOrderToBale($order,'5742084958');
         DB::commit();
-        return 'hi';
+        return 'order saved!';
     }
 }
