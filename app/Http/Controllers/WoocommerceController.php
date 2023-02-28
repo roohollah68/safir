@@ -41,10 +41,10 @@ class WoocommerceController extends Controller
         ]);
 
         if($request->status != 'completed'){
-            app('App\Http\Controllers\TelegramController')->sendOrderToBale($order,'1444566712');
-        }else{
             app('App\Http\Controllers\TelegramController')->sendOrderToBale($order,'5742084958');
             $order->forceDelete();
+        }else{
+            app('App\Http\Controllers\TelegramController')->sendOrderToBale($order,'1444566712');
         }
         DB::commit();
         return 'order saved!';
