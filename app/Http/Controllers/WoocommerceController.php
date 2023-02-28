@@ -10,7 +10,7 @@ class WoocommerceController extends Controller
 {
     public function addPeptinaOrder($website)
     {
-        $this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
+        $this->sendMessageToBale(["text" =>utf8_encode(file_get_contents('php://input'))],'1444566712');
         die();
         $request = json_decode(file_get_contents('php://input'));
         $orders = '';
