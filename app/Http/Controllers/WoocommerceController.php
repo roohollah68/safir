@@ -21,12 +21,9 @@ class WoocommerceController extends Controller
         foreach ($request->line_items as $item) {
             $orders = $orders . '*' . $item->name . ' ' . $item->quantity . 'عدد' . '*';
         }
-//        if()
         $desc = '';
         if($request->payment_method == 'cod'){
             $desc = ' - ' . $request->payment_method_title. ' - ' . number_format($request->total) . ' ' . $request->currency_symbol;
-        }else if($request->status != 'completed'){
-            return 'not completed';
         }
         $user = User::where('username', $website)->first();
         $order = $user->orders()->create([
@@ -43,7 +40,12 @@ class WoocommerceController extends Controller
             'deliveryMethod' => 'admin',
         ]);
 
-        app('App\Http\Controllers\TelegramController')->sendOrderToBale($order,'5742084958');
+        if($request->status != 'completed'){
+            app('App\Http\Controllers\TelegramController')->sendOrderToBale($order,'1444566712');
+        }else{
+            app('App\Http\Controllers\TelegramController')->sendOrderToBale($order,'5742084958');
+            $order->forceDelete();
+        }
         DB::commit();
         return 'order saved!';
     }
