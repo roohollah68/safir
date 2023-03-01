@@ -40,7 +40,7 @@ class WoocommerceController extends Controller
             'deliveryMethod' => 'admin',
         ]);
 
-        if($request->status != 'completed'){
+        if($request->status != 'processing'){
             app('App\Http\Controllers\TelegramController')->sendOrderToBale($order,'5742084958');
             $order->forceDelete();
         }else{
