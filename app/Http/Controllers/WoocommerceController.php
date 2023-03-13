@@ -23,7 +23,15 @@ class WoocommerceController extends Controller
         }
         $desc = '';
         if($request->payment_method == 'cod'){
-            $desc = ' - ' . $request->payment_method_title. ' - ' . number_format($request->total) . ' ' . $request->currency_symbol;
+            if($website == 'matchano'){
+                $desc = ' - ' . $request->payment_method_title. ' - ' . number_format($request->total*10000 , 0 , '.' , '/') . ' ریال';
+            }
+            elseif($website == 'peptina' || $website == 'berrynocom'){
+                $desc = ' - ' . $request->payment_method_title. ' - ' . number_format($request->total*10, 0 , '.' , '/') .  ' ریال';
+            }
+            else{
+                $desc = ' - ' . $request->payment_method_title. ' - ' . number_format($request->total) . ' ' . $request->currency_symbol;
+            }
         }
         $user = User::where('username', $website)->first();
         $order = $user->orders()->create([
