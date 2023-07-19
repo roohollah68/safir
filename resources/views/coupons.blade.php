@@ -22,6 +22,7 @@
             @php
                 $user_names = [];
                 $product_names = [];
+                dd($coupons);
             @endphp
             @foreach($coupon->couponLinks as $couponLink)
                 @php
