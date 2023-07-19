@@ -25,8 +25,10 @@
             @endphp
             @foreach($coupon->couponLinks as $couponLink)
                 @php
-                    $user_names[$couponLink->user_id] = $users[$couponLink->user_id]->name;
-                    $product_names[$couponLink->product_id] = $products[$couponLink->product_id]->name;
+                    if(array_key_exists($couponLink->user_id , $users) && array_key_exists($couponLink->product_id , $products )){
+                        $user_names[$couponLink->user_id] = $users[$couponLink->user_id]->name;
+                        $product_names[$couponLink->product_id] = $products[$couponLink->product_id]->name;
+                        }
                 @endphp
             @endforeach
             <tr>
