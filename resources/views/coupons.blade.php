@@ -22,14 +22,14 @@
             @php
                 $user_names = [];
                 $product_names = [];
-                dd($coupons);
             @endphp
             @foreach($coupon->couponLinks as $couponLink)
                 @php
-                    if($users[$couponLink->user_id] && $products[$couponLink->product_id]){
+                    if(isset($users[$couponLink->user_id]) && isset($products[$couponLink->product_id])){
                         $user_names[$couponLink->user_id] = $users[$couponLink->user_id]->name;
                         $product_names[$couponLink->product_id] = $products[$couponLink->product_id]->name;
-                        }
+                    }
+
                 @endphp
             @endforeach
             <tr>
