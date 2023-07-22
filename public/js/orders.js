@@ -187,7 +187,7 @@ function view_order(id) {
         admin: 'ادمین',
     }
     let deliveryMethods ={
-        peyk: 'پیک',
+        peyk: 'تیپاکس',
         post: 'پست',
         paskerayeh: 'پسکرایه',
         admin: 'ادمین',

@@ -23,7 +23,7 @@
 
         <br>
 
-        <label for="peykCost">هزینه ارسال با پیک(تومان):</label>
+        <label for="peykCost">هزینه ارسال با تیپاکس(تومان):</label>
         <input id="peykCost" name="peykCost" type="number" value="{{$peykCost}}">
 
         <br>
