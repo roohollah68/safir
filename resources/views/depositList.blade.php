@@ -40,9 +40,11 @@
                 @if($admin)
                     <td>{{$deposit->desc}}</td>
                     <td>
-                        <a target="_blank" href="/deposit/{{$deposit->photo?$deposit->photo:'empty.jpg'}}">
-                            <img src="/deposit/{{$deposit->photo?$deposit->photo:'empty.jpg'}}" height="60">
+                        @if($deposit->photo)
+                        <a target="_blank" href="/deposit/{{$deposit->photo}}">
+                            <p>مشاهده سند</p>
                         </a>
+                        @endif
                     </td>
                 @endif
                 <td>
