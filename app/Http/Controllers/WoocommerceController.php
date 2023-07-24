@@ -21,7 +21,7 @@ class WoocommerceController extends Controller
         foreach ($request->line_items as $item) {
             $orders = $orders . '*' . $item->name . ' ' . $item->quantity . 'عدد' . '*';
         }
-        $desc = '';
+        $desc = $request->shipping_lines[0]->method_title . ' | ';
         if($request->payment_method == 'cod'){
             if($website == 'matchano'){
                 $desc = ' - ' . $request->payment_method_title. ' - ' . number_format($request->total*10000 , 0 , '.' , '/') . ' ریال';
