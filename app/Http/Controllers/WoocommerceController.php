@@ -13,7 +13,7 @@ class WoocommerceController extends Controller
     {
 
         DB::beginTransaction();
-
+        file_put_contents('woo.txt' , file_get_contents('php://input'));
 //        $this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
 //        die();
         $request = json_decode(file_get_contents('php://input'));
