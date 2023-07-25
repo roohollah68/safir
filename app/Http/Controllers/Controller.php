@@ -39,6 +39,11 @@ class Controller extends BaseController
         }
     }
 
+    public function userId()
+    {
+        return auth()->user()->id;
+    }
+
     public function settings()
     {
         $sets = Setting::all();

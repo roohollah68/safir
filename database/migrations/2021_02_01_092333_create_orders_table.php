@@ -30,6 +30,11 @@ class CreateOrdersTable extends Migration
             $table->enum('state',['0','1','2','3'])->default('0');
             $table->softDeletes();
             $table->timestamps();
+            $table->UnsignedBigInteger('admin')->nullable();
+            $table->foreign('admin')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
     }
 

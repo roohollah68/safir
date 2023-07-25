@@ -18,14 +18,15 @@ class Order extends Model
         'zip_code',
         'orders',
         'desc',
-        'printed',
+        //'printed',
         'receipt',
         'state',
         'total',
-        'fromCredit',
+       // 'fromCredit',
         'paymentMethod',
         'customerCost',
         'deliveryMethod',
+        'admin'
     ];
 
     public function user()
@@ -41,5 +42,10 @@ class Order extends Model
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(User::class,'admin');
     }
 }

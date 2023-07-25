@@ -43,7 +43,7 @@ class OrderController extends Controller
                 $order->deleted_at_p = null;
             $orders[$key] = $order;
         }
-        return [$orders, $users, $this->isAdmin()];
+        return [$orders, $users, $this->isAdmin(), $this->userId()];
     }
 
     public function listOrderTelegram($id, $pass)
@@ -266,8 +266,14 @@ class OrderController extends Controller
     public function increaseState($id)
     {
         $order = Order::findOrFail($id);
+        if($order->admin != $this->userId() && $order->admin)
+            return $order->state;
         $user = User::findOrFail($order->user_id);
         $order->state = '' . (($order->state + 1) % 4);
+        if($order->state < 1 )
+            $order->admin = null;
+        else
+            $order->admin = $this->userId();
         if ($order->paymentMethod == 'onDelivery') {
             if ($order->state == '1') {
                 $user->balance += $order->customerCost - $order->total;
@@ -291,7 +297,7 @@ class OrderController extends Controller
         }
         $order->save();
         $user->save();
-        return $order->state;
+        return [$order->state , $order->admin];
 
     }
 

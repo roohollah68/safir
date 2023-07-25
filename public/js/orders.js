@@ -1,6 +1,6 @@
 let token;
 let table;
-let orders, users, isAdmin;
+let orders, users, isAdmin, userId;
 let ids = [];
 $(() => {
     token = $('input[name=_token]').val();
@@ -24,6 +24,7 @@ function get_data() {
             })
             isAdmin = res[2];
             ids = [];
+            userId = res[3];
             prepare_data();
             $('.main_check').prop('checked', false);
         })
@@ -63,7 +64,7 @@ function prepare_data() {
             createdTime(row),
 
 
-            viewOrder + (deleted ? '' : (row.state > 0 ? '' : deleteOrder + editOrder) + /*sendToTelegram +*/ (isAdmin?generatePDF:'') ),
+            viewOrder + (((deleted || row.state > 0) ? '' :  deleteOrder + editOrder) +  ((isAdmin && row.admin === userId )?generatePDF:'') ),
 
             row.address,
 
@@ -232,6 +233,8 @@ function view_order(id) {
 
 function generatePDF(id) {
     let order = orders[id];
+    if (order.admin !== userId)
+        return
     let dialog = label_text(order);
     let opt = {
         margin: 1.2,
@@ -253,6 +256,8 @@ function generatePDFs() {
     let dialog = [];
     ids.forEach(id => {
         let order = orders[id]
+        if (order.admin !== userId)
+            return;
         dialog.push(label_text(order));
     })
     dialog = dialog.join('<i class="breakhere"></i>')//
@@ -352,30 +357,26 @@ function createdTime(order) {
         let month = Math.floor(diff / (3600 * 24 * 30));
         res += `<span>${month} ماه قبل </span>`
     }
-    if (order.state == 0) {
+    if (order.state < 1) {
         res = `<span class="btn btn-secondary" onclick="change_state(${order.id})">${res} <i id="row-state-${order.id}"></i></span>`
-    } else if (order.state == 1) {
-        res = `<span class="btn btn-info" onclick="change_state(${order.id})">${res} <i id="row-state-${order.id}" class="fas fa-check"></i></span>`
-    } else if (order.state > 1) {
-        res = `<span class="btn btn-success" onclick="change_state(${order.id})">${res} <i id="row-state-${order.id}" class="fas fa-check-double"></i></span>`
+    } else if (order.state > 0) {
+        if(order.admin !== userId){
+            res = `<span class="btn btn-info" onclick="change_state(${order.id})">${res} <i id="row-state-${order.id}" class="fas fa-check"></i></span>`
+        }else{
+            res = `<span class="btn btn-success" onclick="change_state(${order.id})">${res} <i id="row-state-${order.id}" class="fas fa-check-double"></i></span>`
+        }
     }
 
     return res;
 }
 
 function change_state(id) {
-    if(!isAdmin)
+    if(!isAdmin || (orders[id].admin !== userId && orders[id].state > 0))
         return
     $.post('increase_state/' + id, {_token: token})
         .done(res => {
-            orders[id].state = res;
-            if (res == 0) {
-                $('#row-state-' + id).removeClass().parent().removeClass().addClass('btn btn-secondary')
-            } else if (res == 1) {
-                $('#row-state-' + id).removeClass().addClass('fas fa-check').parent().removeClass().addClass('btn btn-info')
-            } else if (res > 1) {
-                $('#row-state-' + id).removeClass().addClass('fas fa-check-double').parent().removeClass().addClass('btn btn-success')
-            }
+            orders[id].state = res[0];
+            orders[id].admin = res[1]
             prepare_data();
         })
 }
