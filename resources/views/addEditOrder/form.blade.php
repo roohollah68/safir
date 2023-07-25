@@ -45,11 +45,13 @@
                     <label for="orders" class="input-group-text w-100">سفارشات:</label>
                 </div>
                 <div class="w-75 border">
-                    <p class="btn btn-info" onclick="productMode()">برای انتخاب محصول اینجا کلیک کنید</p><br>
-                    @if($admin && !$order)
-                        <input type="checkbox" id="factor" name="factor" checked
-                               onchange="this.checked?$('#orders').hide():$('#orders').show()">
-                        <label for="factor">طبق فاکتور</label>
+                    @if(!$order)
+                        <p class="btn btn-info" onclick="productMode()">برای انتخاب محصول اینجا کلیک کنید</p><br>
+                        @if($admin)
+                            <input type="checkbox" id="factor" name="factor" checked
+                                   onchange="this.checked?$('#orders').hide():$('#orders').show()">
+                            <label for="factor">طبق فاکتور</label>
+                        @endif
                     @endif
                     <div id="orders">{{$orders}}</div>
                 </div>
@@ -109,50 +111,54 @@
     @else
         <input type="hidden" name="paymentMethod" value="credit">
     @endif
-        <div class="p-3 m-2 border">
-            <h4>شیوه ارسال</h4>
-            @if(!$order)
-                <input type="radio" name="deliveryMethod" value="peyk" id="peyk" checked>
-                <label for="peyk">ارسال با تیپاکس</label> <span class="deliveryDesc"> <span>{{number_format($settings->peykCost)}}</span > تومان</span><br>
+    <div class="p-3 m-2 border">
+        <h4>شیوه ارسال</h4>
+        @if(!$order)
+            <input type="radio" name="deliveryMethod" value="peyk" id="peyk" checked>
+            <label for="peyk">ارسال با تیپاکس</label> <span
+                class="deliveryDesc"> <span>{{number_format($settings->peykCost)}}</span> تومان</span><br>
 
-                <input type="radio" name="deliveryMethod" value="post" id="post">
-                <label for="post">ارسال با پست</label><span class="deliveryDesc"> {{number_format($settings->postCost)}} تومان</span><br>
+            <input type="radio" name="deliveryMethod" value="post" id="post">
+            <label for="post">ارسال با پست</label><span class="deliveryDesc"> {{number_format($settings->postCost)}} تومان</span>
+            <br>
 
-                <input type="radio" name="deliveryMethod" value="paskerayeh" id="paskerayeh">
-                <label for="paskerayeh">ارسال پس کرایه(ویژه تهران)</label><span class="deliveryDesc">هزینه ارسال به عهده مشتری</span><br>
+            <input type="radio" name="deliveryMethod" value="paskerayeh" id="paskerayeh">
+            <label for="paskerayeh">ارسال پس کرایه(ویژه تهران)</label><span class="deliveryDesc">هزینه ارسال به عهده مشتری</span>
+            <br>
 
-            @else
-                @switch($order->deliveryMethod)
-                    @case('peyk')
-                    <p>ارسال با پیک</p>
-                    @break
-                    @case('post')
-                    <p>ارسال با پست</p>
-                    @break
-                    @case('paskerayeh')
-                    <p> پس کرایه</p>
-                    @break
-                @endswitch
-            @endif
-        </div>
+        @else
+            @switch($order->deliveryMethod)
+                @case('peyk')
+                <p>ارسال با پیک</p>
+                @break
+                @case('post')
+                <p>ارسال با پست</p>
+                @break
+                @case('paskerayeh')
+                <p> پس کرایه</p>
+                @break
+            @endswitch
+        @endif
+    </div>
 
-        <div class="p-3 m-2 border" id="paymentDetails">
-            <h4>فاکتور</h4>
-            @if(!$order)
-                <ol id="order-list">
-                </ol>
-                <hr>
-                <span>جمع اقلام: </span><span id="cartSum"></span><span> تومان</span><br>
-                <span>هزینه حمل: <span id="deliveryCost"></span>  تومان </span><br><br>
-            @endif
-            <span class="font-weight-bold">مبلغ کل: </span><span id="total">{{$total}}</span></span>  تومان </span>
-            <br><br>
+    <div class="p-3 m-2 border" id="paymentDetails">
+        <h4>فاکتور</h4>
+        @if(!$order)
+            <ol id="order-list">
+            </ol>
+            <hr>
+            <span>جمع اقلام: </span><span id="cartSum"></span><span> تومان</span><br>
+            <span>هزینه حمل: <span id="deliveryCost"></span>  تومان </span><br><br>
+        @endif
+        <span class="font-weight-bold">مبلغ کل: </span><span id="total">{{$total}}</span></span>  تومان </span>
+        <br><br>
 
-            <span id="onDeliveryMode">
+        <span id="onDeliveryMode">
                 <span>پرداختی مشتری: </span><span id="customerTotal">{{$order?$order->customerCost:''}}</span><span> تومان </span><br>
-                <span>سهم سفیر: </span><span id="safirShare">{{$order?$order->customerCost-$order->total:''}}</span><span>  تومان </span><br>
+                <span>سهم سفیر: </span><span
+                id="safirShare">{{$order?$order->customerCost-$order->total:''}}</span><span>  تومان </span><br>
             </span>
-        </div>
+    </div>
 
 
     <input type="checkbox" name="addToCustomers" id="addToCustomers">

@@ -22,9 +22,11 @@
         @foreach($products as $product)
             <tr>
                 <td>
-                    <a target="_blank" href="/product_photo/{{$product->photo?$product->photo:'empty.jpg'}}">
-                        <img src="/product_photo/{{$product->photo?$product->photo:'empty.jpg'}}" height="60">
+                    @if($product->photo)
+                    <a target="_blank" href="/product_photo/{{$product->photo}}">
+                        <p>مشاهده</p>
                     </a>
+                        @endif
                 </td>
                 <td>{{$product->name}}</td>
                 <td>{{number_format($product->price)}}</td>
