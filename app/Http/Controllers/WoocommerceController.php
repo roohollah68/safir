@@ -21,16 +21,16 @@ class WoocommerceController extends Controller
         foreach ($request->line_items as $item) {
             $orders = $orders . '*' . $item->name . ' ' . $item->quantity . 'عدد' . '*';
         }
-        $desc = $request->shipping_lines[0]->method_title;
+        $desc = '';
         if($request->payment_method == 'cod'){
             if($website == 'matchano'){
-                $desc = $request->shipping_lines[0]->method_title . ' - ' . $request->payment_method_title. ' - ' . number_format($request->total*10000 , 0 , '.' , '/') . ' ریال';
+                $desc = $request->payment_method_title. ' - ' . number_format($request->total*10000 , 0 , '.' , '/') . ' ریال';
             }
             elseif($website == 'peptina' || $website == 'berrynocom'){
-                $desc = $request->shipping_lines[0]->method_title . ' - ' . $request->payment_method_title. ' - ' . number_format($request->total*10, 0 , '.' , '/') .  ' ریال';
+                $desc = $request->payment_method_title. ' - ' . number_format($request->total*10, 0 , '.' , '/') .  ' ریال';
             }
             else{
-                $desc = $request->shipping_lines[0]->method_title . ' - ' . $request->payment_method_title. ' - ' . number_format($request->total) . ' ' . $request->currency_symbol;
+                $desc = $request->payment_method_title. ' - ' . number_format($request->total) . ' ' . $request->currency_symbol;
             }
         }
         $user = User::where('username', $website)->first();
@@ -40,7 +40,7 @@ class WoocommerceController extends Controller
             'address' => $request->billing->city . ' ' . $request->billing->address_1,
             'zip_code' => $request->billing->postcode,
             'orders' => $orders,
-            'desc' => $request->customer_note . $desc,
+            'desc' => $request->customer_note .' - '.$request->shipping_lines[0]->method_title . ' - ' . $desc,
 //            'receipt' => $request->receipt,
             'total' => $request->total,
             'customerCost' => 0,
