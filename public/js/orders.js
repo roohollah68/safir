@@ -46,6 +46,7 @@ function prepare_data() {
         let editOrder = `<a class="fa fa-edit btn btn-primary" href="edit_order/${id}" title="ویرایش سفارش"></a> `;
         let sendToTelegram = `<i class="fab fa-telegram-plane btn btn-info" onclick="sendToTelegram(${id})" title="ارسال به تلگرام"></i> `;
         let generatePDF = `<i class="fa fa-file-pdf btn btn-secondary" onclick="generatePDF(${id})" title="مشاهده PDF"></i> `;
+        let invoice = `<i class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title=" فاکتور"></i> `;
         counter++;
         res.push([
             `<input type="checkbox" class="orders_checkbox" onclick="list_ids()" order_id="${id}">`,
@@ -64,7 +65,7 @@ function prepare_data() {
             createdTime(row),
 
 
-            viewOrder + (((deleted || row.state > 0) ? '' :  deleteOrder + editOrder) +  ((isAdmin && row.admin === userId )?generatePDF:'') ),
+            viewOrder + (((deleted || row.state > 0) ? '' :  deleteOrder + editOrder) +  ((isAdmin && row.admin === userId )?generatePDF + invoice:'') ),
 
             row.address,
 
@@ -232,6 +233,13 @@ function view_order(id) {
 }
 
 function generatePDF(id) {
+    $.post('pdf/' + id, {_token: token})
+        .done(res => {
+
+        })
+    return;
+
+
     let order = orders[id];
     if (order.admin !== userId)
         return
@@ -253,6 +261,16 @@ function generatePDFs() {
         $.notify('ابتدا باید سفارشات مورد نظر را انتخاب کنید', 'error')
         return
     }
+    // $.post('pdfs/', {
+    //     _token: token,
+    //     ids: ids
+    // })
+    //     .done(res => {
+    //
+    //     })
+    // return;
+
+
     let dialog = [];
     ids.forEach(id => {
         let order = orders[id]
@@ -379,4 +397,12 @@ function change_state(id) {
             orders[id].admin = res[1]
             prepare_data();
         })
+}
+
+function invoice(id){
+    $.post('invoice/' + id, {_token: token})
+        .done(res => {
+
+        })
+    return;
 }

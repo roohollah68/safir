@@ -87,7 +87,9 @@ Route::group(['middleware'=>['auth','admin']],function (){
     Route::post('coupon/delete/{id}', [CouponController::class , 'deleteCoupon']);
 
     Route::post('increase_state/{id}',[OrderController::class , 'increaseState']);
-
+    Route::post('pdf/{id}',[OrderController::class , 'pdf']);
+    Route::post('pdfs',[OrderController::class , 'pdfs']);
+    Route::post('invoice/{id}',[OrderController::class , 'invoice']);
     Route::get('statistic' , [OrderProductController::class , 'show'])->name('statistic');
 });
 

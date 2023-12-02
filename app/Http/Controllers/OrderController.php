@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PDF;
 
 class OrderController extends Controller
 {
@@ -189,7 +190,7 @@ class OrderController extends Controller
 //            TelegramController::sendOrderToTelegram($order);
 
 //        TelegramController::sendOrderToTelegramAdmins($order);
-        app('App\Http\Controllers\TelegramController')->sendOrderToBale($order , '4521394649');
+        app('App\Http\Controllers\TelegramController')->sendOrderToBale($order, '4521394649');
 
         $this->addToCustomers($request);
         DB::commit();
@@ -266,11 +267,11 @@ class OrderController extends Controller
     public function increaseState($id)
     {
         $order = Order::findOrFail($id);
-        if($order->admin != $this->userId() && $order->admin)
+        if ($order->admin != $this->userId() && $order->admin)
             return $order->state;
         $user = User::findOrFail($order->user_id);
         $order->state = '' . (($order->state + 1) % 4);
-        if($order->state < 1 )
+        if ($order->state < 1)
             $order->admin = null;
         else
             $order->admin = $this->userId();
@@ -297,7 +298,115 @@ class OrderController extends Controller
         }
         $order->save();
         $user->save();
-        return [$order->state , $order->admin];
+        return [$order->state, $order->admin];
+
+    }
+
+    public function pdf($id)
+    {
+        $order = Order::findOrFail($id);
+        if ($order->admin != $this->userId() && $order->admin)
+            abort(405);
+        $font = 40;
+        do {
+            $pdf = PDF::loadView('pdf', ['order' => $order], [], [
+                'format' => [200, 100],
+                'default_font' => 'iransans',
+                'default_font_size' => $font,
+                'margin_left' => 2,
+                'margin_right' => 2,
+                'margin_top' => 2,
+                'margin_bottom' => 2,
+            ]);
+            $font = $font - 1;
+        } while ($pdf->getMpdf()->page > 1);
+        return $pdf->stream($order->name . '.pdf');
+    }
+//
+//    public function pdfs(Request $request)
+//    {
+//        $req = $request->all();
+////        $pdf = null;
+//        $ii = 1;
+//        foreach ($req['ids'] as $index => $id) {
+//            dd($id);
+//            $order = Order::findOrFail($id);
+//            if ($order->admin != $this->userId() && $order->admin)
+//                abort(405);
+//
+//            if ($index = 0) {
+//                $font = 40;
+//                do {
+//                    $pdf = PDF::loadView('pdf', ['order' => $order], [], [
+//                        'format' => [200, 100],
+//                        'default_font' => 'iransans',
+//                        'default_font_size' => $font,
+//                        'margin_left' => 2,
+//                        'margin_right' => 2,
+//                        'margin_top' => 2,
+//                        'margin_bottom' => 2,
+//                    ]);
+//                    $mpdf = $pdf->getMpdf();
+//                    $font = $font - 1;
+//                } while ($mpdf->page > $ii);
+//                continue;
+//            }
+//
+//            $font = 40;
+//            do {
+//                $pdf->getMpdf()->AddPage();
+//
+//                $pdf->getMpdf()->WriteHTML((string)view('pdf', ['order' => $order]))
+//                    ->setOption('default_font_size', $font);
+////                $pdf::loadHTML((string)view('pdf',['order' => $order]));
+////                $pdf::loadView('pdf', ['order' => $order], [], [
+////                    'format' => [200, 100],
+////                    'default_font' => 'iransans',
+////                    'default_font_size' => $font,
+////                    'margin_left' => 2,
+////                    'margin_right' => 2,
+////                    'margin_top' => 2,
+////                    'margin_bottom' => 2,
+////                ]);
+//                $font = $font - 1;
+//            } while ($pdf->getMpdf()->page > $ii);
+//            $ii++;
+//        }
+//        return $pdf->stream($ii . '.pdf');
+//    }
+
+    public function createPdf($id)
+    {
+        $order = Order::findOrFail($id);
+        if ($order->admin != $this->userId() && $order->admin)
+            abort(405);
+        $font = 40;
+        do {
+            $pdf = PDF::loadView('pdf', ['order' => $order], [], [
+                'format' => [200, 100],
+                'default_font' => 'iransans',
+                'default_font_size' => $font,
+                'margin_left' => 2,
+                'margin_right' => 2,
+                'margin_top' => 2,
+                'margin_bottom' => 2,
+            ]);
+            $mpdf = $pdf->getMpdf();
+            $font = $font - 1;
+        } while ($mpdf->page > 1);
+        return $pdf;
+    }
+
+    public function invoice($id)
+    {
+        $order = Order::findOrFail($id);
+        include('../app/jdf.php');
+        if ($order->admin != $this->userId() && $order->admin)
+            return 'not allowed request';
+        $orderProducts = OrderProduct::where('order_id', $id)->get();
+        $order->created_at_p = jdate('H:i Y/m/d ', $order->created_at->getTimestamp());
+        $pdf = PDF::loadHTML((string)view('invoice', ['order' => $order, 'orderProducts' => $orderProducts]));
+        $pdf->stream('فاکتور_'.$order->name . '.pdf');
 
     }
 
