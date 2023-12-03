@@ -26,7 +26,7 @@ class OrderProductController extends Controller
             $end = $this->number_En_Fa(verta()->format('Y/m/d'));
         }
         $v = Verta::parse($this->number_Fa_En($end));
-        $to = Carbon::createFromTimestamp($v->timestamp);
+        $to = Carbon::createFromTimestamp($v->timestamp+24*3600);
 
         $products = Product::all()->keyBy('id');
         $totalSale = 0;
