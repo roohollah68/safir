@@ -327,6 +327,7 @@ class OrderController extends Controller
     public function pdfs(Request $request)
     {
         $ids = $request->all()['ids'];
+        return 'ok';
         $fonts = array();
         $orders = array();
         foreach ($ids as $id) {
