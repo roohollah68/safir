@@ -52,7 +52,7 @@
                 <td>{{$orderProduct->number}}</td>
                 <td>عدد</td>
                 <td>{{number_format($orderProduct->price,0,'/',',')}}</td>
-                <td>30%</td>
+                <td>{{$orderProduct->discount}}</td>
                 <td>{{number_format($orderProduct->price * $orderProduct->number,0,'/',',')}}</td>
             </tr>
                 @php

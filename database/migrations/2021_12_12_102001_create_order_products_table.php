@@ -19,6 +19,7 @@ class CreateOrderProductsTable extends Migration
             $table->foreignId('product_id');
             $table->string('name');
             $table->integer('number');
+            $table->integer('discount')->default(0);
             $table->decimal('price',10,0);
             $table->string('photo')->nullable();
             $table->timestamps();
