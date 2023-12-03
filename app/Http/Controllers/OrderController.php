@@ -114,7 +114,7 @@ class OrderController extends Controller
             foreach ($products as $id => $product) {
                 $number = $request['product_' . $id];
                 if ($number > 0) {
-                    $request->orders = $request->orders . '*' . $product->name . ' ' . $number . 'عدد' . '*';
+                    $request->orders = $request->orders . ' ' . $product->name . ' ' . $number . 'عدد' . '،';
                     $coupon = $this->calculateDis($id);
                     $total += round((100 - $coupon) * $product->price * $number / 100);
                     $Total += $product->price * $number;
@@ -174,6 +174,7 @@ class OrderController extends Controller
                     'photo' => $product->photo,
                     'product_id' => $product->id,
                     'number' => $request['product_' . $name],
+                    'discount'=>$coupon,
                 ]);
             }
         }

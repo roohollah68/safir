@@ -22,15 +22,15 @@
             </tr>
             <tr>
                 <th colspan="2" class="tar">آدرس: {{$order->address}}
-                @if($order->zip_code)
-                    ،کدپستی:&nbsp;{{$order->zip_code}}
-                @endif
+                    @if($order->zip_code)
+                        ،کدپستی:&nbsp;{{$order->zip_code}}
+                    @endif
                 </th>
                 <td class="text-center">{{$order->created_at_p}}</td>
             </tr>
         </table>
         <table class="border w-100 table2 round">
-            <tr class="w-100" >
+            <tr class="w-100">
                 <th class="w-5 border-left" style="font-size:12px;">ردیف</th>
                 <th class="w-35 border-left">شرح کالا/خدمات</th>
                 <th class="w-8 border-left">مقدار</th>
@@ -42,32 +42,33 @@
             </tr>
 
             @php
-            $ii = 1;
-            $total = 0;
+                $ii = 1;
+                $total = 0;
             @endphp
             @foreach($orderProducts as $orderProduct)
-            <tr class="" >
-                <td>{{$ii++}}</td>
-                <td>{{$orderProduct->name}}</td>
-                <td>{{$orderProduct->number}}</td>
-                <td>عدد</td>
-                <td>{{number_format($orderProduct->price,0,'/',',')}}</td>
-                <td>{{$orderProduct->discount}}</td>
-                <td>{{number_format($orderProduct->price * $orderProduct->number,0,'/',',')}}</td>
-            </tr>
                 @php
-                    $total = $total + ($orderProduct->price * $orderProduct->number);
+                    $t= ($orderProduct->price * $orderProduct->number);
+                    $total = $total + $t;
                 @endphp
+                <tr class="">
+                    <td>{{$ii++}}</td>
+                    <td>{{$orderProduct->name}}</td>
+                    <td>{{$orderProduct->number}}</td>
+                    <td>عدد</td>
+                    <td>{{number_format($orderProduct->price)}}</td>
+                    <td>{{$orderProduct->discount}}</td>
+                    <td>{{number_format($t)}}</td>
+                </tr>
             @endforeach
-            <tr >
+            <tr>
                 <td colspan="6"><br><br><br><br></td>
                 <td></td>
             </tr>
 
-            <tr class="" >
+            <tr class="">
                 <th colspan="4"></th>
                 <th colspan="2">مبلغ قابل پرداخت</th>
-                <th>{{number_format($total,0,'/',',')}}</th>
+                <th>{{number_format($total)}}</th>
             </tr>
 
         </table>
@@ -79,10 +80,12 @@
     <br>
     <div class="w-100">
         &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
-        <span >امضای خریدار</span>
-        &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+        <span>امضای خریدار</span>
+        &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;
+        &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
         <span class="w-30">تایید حسابداری</span>
-        &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
+        &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;
+        &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
         <span class="w-30">امضای فروشنده</span>
     </div>
 
@@ -102,29 +105,36 @@
         text-align: right !important;
     }
 
-    .table2 td{
+    .table2 td {
         border-bottom: 1px solid #000000 !important;
         border-left: 1px solid #000000 !important;
     }
+
     .table2 th {
         background: #eee;
     }
-    .border , .table2 th {
+
+    .border, .table2 th {
         border: 1px solid #000000 !important;
     }
-    .border-top{
+
+    .border-top {
         border-top: 1px solid #000000 !important;
     }
-    .border-bottom{
+
+    .border-bottom {
         border-bottom: 1px solid #000000 !important;
     }
-    .border-left{
+
+    .border-left {
         border-left: 1px solid #000000 !important;
     }
-    .border-right{
+
+    .border-right {
         border-right: 1px solid #000000 !important;
     }
-    .round{
+
+    .round {
         border-radius: 5px;
     }
 
