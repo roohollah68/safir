@@ -261,14 +261,15 @@ function generatePDFs() {
         $.notify('ابتدا باید سفارشات مورد نظر را انتخاب کنید', 'error')
         return
     }
-    // $.post('pdfs/', {
-    //     _token: token,
-    //     ids: ids
-    // })
-    //     .done(res => {
-    //
-    //     })
-    // return;
+    $.post('pdfs/', {
+        _token: token,
+        ids: ids
+    })
+        .done(res => {
+
+        })
+
+    return;
 
 
     let dialog = [];

@@ -174,7 +174,7 @@ class OrderController extends Controller
                     'photo' => $product->photo,
                     'product_id' => $product->id,
                     'number' => $request['product_' . $name],
-                    'discount'=>$coupon,
+                    'discount' => $coupon,
                 ]);
             }
         }
@@ -323,58 +323,45 @@ class OrderController extends Controller
         } while ($pdf->getMpdf()->page > 1);
         return $pdf->stream($order->name . '.pdf');
     }
-//
-//    public function pdfs(Request $request)
-//    {
-//        $req = $request->all();
-////        $pdf = null;
-//        $ii = 1;
-//        foreach ($req['ids'] as $index => $id) {
-//            dd($id);
-//            $order = Order::findOrFail($id);
-//            if ($order->admin != $this->userId() && $order->admin)
-//                abort(405);
-//
-//            if ($index = 0) {
-//                $font = 40;
-//                do {
-//                    $pdf = PDF::loadView('pdf', ['order' => $order], [], [
-//                        'format' => [200, 100],
-//                        'default_font' => 'iransans',
-//                        'default_font_size' => $font,
-//                        'margin_left' => 2,
-//                        'margin_right' => 2,
-//                        'margin_top' => 2,
-//                        'margin_bottom' => 2,
-//                    ]);
-//                    $mpdf = $pdf->getMpdf();
-//                    $font = $font - 1;
-//                } while ($mpdf->page > $ii);
-//                continue;
-//            }
-//
-//            $font = 40;
-//            do {
-//                $pdf->getMpdf()->AddPage();
-//
-//                $pdf->getMpdf()->WriteHTML((string)view('pdf', ['order' => $order]))
-//                    ->setOption('default_font_size', $font);
-////                $pdf::loadHTML((string)view('pdf',['order' => $order]));
-////                $pdf::loadView('pdf', ['order' => $order], [], [
-////                    'format' => [200, 100],
-////                    'default_font' => 'iransans',
-////                    'default_font_size' => $font,
-////                    'margin_left' => 2,
-////                    'margin_right' => 2,
-////                    'margin_top' => 2,
-////                    'margin_bottom' => 2,
-////                ]);
-//                $font = $font - 1;
-//            } while ($pdf->getMpdf()->page > $ii);
-//            $ii++;
-//        }
-//        return $pdf->stream($ii . '.pdf');
-//    }
+
+    public function pdfs(Request $request)
+    {
+        $ids = $request->all()['ids'];
+        $fonts = array();
+        $orders = array();
+        foreach ($ids as $id) {
+            $order = Order::findOrFail($id);
+            if ($order->admin != $this->userId() && $order->admin)
+                abort(405);
+            $font = 32;
+            do {
+                $font = $font - 1;
+                $pdf = PDF::loadView('pdf', ['order' => $order], [], [
+                    'format' => [200, 100],
+                    'default_font' => 'iransans',
+                    'default_font_size' => $font,
+                    'margin_left' => 2,
+                    'margin_right' => 2,
+                    'margin_top' => 2,
+                    'margin_bottom' => 2,
+                ]);
+                $mpdf = $pdf->getMpdf();
+
+            } while ($mpdf->page > 1);
+            array_push($fonts, $font);
+            array_push($orders, $order);
+        }
+
+        $pdfs = PDF::loadView('pdfs', ['orders' => $orders, 'fonts' => $fonts], [], [
+            'format' => [200, 100],
+            'default_font' => 'iransans',
+            'margin_left' => 2,
+            'margin_right' => 2,
+            'margin_top' => 2,
+            'margin_bottom' => 2,
+        ]);
+        return $pdfs->stream(sizeof($ids)."_".$order->name . '.pdf');
+    }
 
     public function createPdf($id)
     {
@@ -406,8 +393,8 @@ class OrderController extends Controller
             return 'not allowed request';
         $orderProducts = OrderProduct::where('order_id', $id)->get();
         $order->created_at_p = jdate('H:i Y/m/d ', $order->created_at->getTimestamp());
-        $pdf = PDF::loadHTML((string)view('invoice', ['order' => $order, 'orderProducts' => $orderProducts]));
-        $pdf->stream('فاکتور_'.$order->name . '.pdf');
+        $pdf = PDF::loadHTML('test' . (string)view('invoice', ['order' => $order, 'orderProducts' => $orderProducts]));
+        $pdf->stream('فاکتور_' . $order->name . '.pdf');
 
     }
 

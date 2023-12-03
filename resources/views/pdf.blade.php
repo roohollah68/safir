@@ -18,7 +18,5 @@
     @if($order->desc)
         <br><span>توضیحات </span>: <b>{{$order->desc}}</b>
     @endif
-
 </div>
-
 </html>

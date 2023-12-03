@@ -1,6 +1,5 @@
 <html lang="fa" dir="rtl">
 
-
 <body>
 <div>
     <h4 style="text-align: center; ">فاکتور فروش</h4>
@@ -34,39 +33,46 @@
                 <th class="w-5 border-left" style="font-size:12px;">ردیف</th>
                 <th class="w-35 border-left">شرح کالا/خدمات</th>
                 <th class="w-8 border-left">مقدار</th>
-                <th class="w-9 border-left">واحد</th>
-                <th class="w-12 border-left">فی (ریال)</th>
+                <th class="w-12 border-left">قیمت (ریال)</th>
                 <th class="w-8 border-left" style="font-size:12px;">درصد تخفیف</th>
+                <th class="w-9 border-left" style="font-size:12px;">قیمت بعد تخفیف</th>
                 <th class="w-23 border-left">جمع (ریال)</th>
 
             </tr>
 
             @php
-                $ii = 1;
+                $counter = 1;
                 $total = 0;
+                $total_original=0;
             @endphp
             @foreach($orderProducts as $orderProduct)
                 @php
-                    $t= ($orderProduct->price * $orderProduct->number);
+                    $t= ($orderProduct->price * $orderProduct->number); //قیمت * تعداد
+                    $original = round((100/(100-$orderProduct->discount))*$orderProduct->price);
+                    $total_original = $total_original + $original;
                     $total = $total + $t;
                 @endphp
                 <tr class="">
-                    <td>{{$ii++}}</td>
+                    <td>{{$counter++}}</td>
                     <td>{{$orderProduct->name}}</td>
                     <td>{{$orderProduct->number}}</td>
-                    <td>عدد</td>
-                    <td>{{number_format($orderProduct->price)}}</td>
+                    <td>{{number_format($original)}}</td>
                     <td>{{$orderProduct->discount}}</td>
+                    <td>{{number_format($orderProduct->price)}}</td>
                     <td>{{number_format($t)}}</td>
                 </tr>
             @endforeach
             <tr>
-                <td colspan="6"><br><br><br><br></td>
+                <td colspan="6" style="border-bottom: none;"><br><br><br><br></td>
                 <td></td>
             </tr>
-
             <tr class="">
-                <th colspan="4"></th>
+                <td colspan="4" style="border: none;"></td>
+                <td colspan="2" >مبلغ کل بدون تخفیف</td>
+                <td>{{number_format($total_original)}}</td>
+            </tr>
+            <tr class="">
+                <th colspan="4"> شما از این خرید {{number_format($total_original-$total)}} ریال تخفیف گرفتید</th>
                 <th colspan="2">مبلغ قابل پرداخت</th>
                 <th>{{number_format($total)}}</th>
             </tr>
@@ -93,8 +99,8 @@
 
 <style>
     body {
-        width: 210mm;
-        height: 297mm;
+        /*width: 210mm;*/
+        /*height: 297mm;*/
         padding: 1rem;
     }
 

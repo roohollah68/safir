@@ -28,6 +28,6 @@
     <table class="stripe">
     </table>
     @if($admin)
-{{--        <button class="btn btn-secondary m-2" onclick="generatePDFs()"> فایل PDF انتخابی ها</button>--}}
+        <button class="btn btn-secondary m-2" onclick="generatePDFs()"> فایل PDF انتخابی ها</button>
     @endif
 @endsection
