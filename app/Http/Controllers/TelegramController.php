@@ -209,10 +209,10 @@ class TelegramController extends Controller
 
     }
 
-    public function sendOrderToBale($order , $chatId)
+    public function sendOrderToBale($order, $chatId)
     {
         $message = self::createOrderMessage($order);
-        $content=array("caption" =>$message,"text" =>$message,"photo"=>env('APP_URL') . "receipt/{$order->receipt}");
+        $content = array("caption" => $message, "text" => $message, "photo" => env('APP_URL') . "receipt/{$order->receipt}");
         if ($order->receipt) {
             $this->sendPhotoToBale($content, $chatId);
         } else {
@@ -222,7 +222,7 @@ class TelegramController extends Controller
 
     public static function createOrderMessage($order)
     {
-        $This  = new Controller();
+        $This = new Controller();
         $paymentMethods = [
             'credit' => 'اعتباری',
             'receipt' => 'رسید واریز',
@@ -239,7 +239,7 @@ class TelegramController extends Controller
         $customerCost = number_format($order->customerCost);
         $time = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
         $time = $This->number_En_Fa($time);
-        return"
+        return "
 نام و نام خانوادگی: *{$order->name}*
 شماره همراه: {$order->phone}
 آدرس: {$order->address}
@@ -253,5 +253,12 @@ class TelegramController extends Controller
 زمان ثبت: {$time}
 سفیر: {$order->user()->first()->name}";
 
+    }
+
+    public function backUpDatabase()
+    {
+        $content = array("caption" => 'backup' , "document" => "https://matchano.ir/safir_database_backup/safir.sql.gz");
+        $chatId = '1444566712';
+        print_r($this->sendDocumentToBale($content, $chatId));
     }
 }

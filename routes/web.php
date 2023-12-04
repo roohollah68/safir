@@ -94,6 +94,7 @@ Route::group(['middleware'=>['auth','admin']],function (){
     Route::post('invoice/{id}',[OrderController::class , 'invoice']);
     Route::get('statistic' , [OrderProductController::class , 'show'])->name('statistic');
     Route::get('/clear/route', [SettingController::class , 'clearRoute']);
+    Route::get('/backup', [TelegramController::class , 'backUpDatabase']);
 });
 
 

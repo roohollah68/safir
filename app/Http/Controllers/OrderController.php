@@ -308,7 +308,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         if ($order->admin != $this->userId() && $order->admin)
             abort(405);
-        $font = 40;
+        $font = 28;
         do {
             $pdf = PDF::loadView('pdf', ['order' => $order], [], [
                 'format' => [200, 100],
