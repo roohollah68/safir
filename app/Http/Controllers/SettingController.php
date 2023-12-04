@@ -30,6 +30,13 @@ class SettingController extends Controller
         }
         return redirect(route('settings'));
     }
+
+    public function clearRoute()
+    {
+        \Artisan::call('route:clear');
+    }
+
+
 }
 
 
