@@ -65,7 +65,7 @@ function prepare_data() {
             createdTime(row),
 
 
-            viewOrder + (((deleted || row.state > 0) ? '' :  deleteOrder + editOrder) +  ((isAdmin && row.admin === userId )?generatePDF + invoice:'') ),
+            viewOrder + (((deleted || row.state > 0) ? '' : deleteOrder + editOrder) + ((isAdmin && row.admin === userId) ? generatePDF + invoice : '')),
 
             row.address,
 
@@ -85,13 +85,13 @@ function prepare_data() {
 }
 
 function create_table(data) {
-    if (table){
+    if (table) {
         table.clear();
         table.rows.add(data);
         table.draw();
         // table.destroy();
-    }else{
-        let hideRows = isAdmin ? [1, 7, 8, 9, 10, 11, 12] : [0 ,1, 3, 7, 8, 9, 10, 11, 12]
+    } else {
+        let hideRows = isAdmin ? [1, 7, 8, 9, 10, 11, 12] : [0, 1, 3, 7, 8, 9, 10, 11, 12]
         table = $('table').DataTable({
             columns: [
                 {title: '<input type="checkbox" onclick="all_ids(this)" class="main_check">'},
@@ -182,13 +182,13 @@ function all_ids(box) {
 
 function view_order(id) {
     let order = orders[id]
-    let paymentMethods ={
+    let paymentMethods = {
         credit: 'اعتباری',
         receipt: 'رسید واریز',
         onDelivery: 'پرداخت در محل',
         admin: 'ادمین',
     }
-    let deliveryMethods ={
+    let deliveryMethods = {
         peyk: 'تیپاکس',
         post: 'پست',
         paskerayeh: 'پسکرایه',
@@ -261,6 +261,28 @@ function generatePDFs() {
         $.notify('ابتدا باید سفارشات مورد نظر را انتخاب کنید', 'error')
         return
     }
+    let data = {
+        _token: token,
+        ids: ids
+    };
+    fetch('pdfs/', {
+        method: "POST", // *GET, POST, PUT, DELETE, etc.
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "same-origin", // include, *same-origin, omit
+        headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: "follow", // manual, *follow, error
+        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: JSON.stringify(data), // body data type must match "Content-Type" header
+    });
+    // return response.json(); // parses JSON response into native JavaScript objects
+
+
+    return;
+
     $.post('pdfs/', {
         _token: token,
         ids: ids
@@ -331,7 +353,7 @@ function label_text(order) {
         +
         (order.zip_code ? `<span>کد پستی </span>: <b>${order.zip_code}</b><br>` : '<br>')
         +
-    `<span>آدرس </span>: <b>${fix_persian(order.address)}</b> <br>`
+        `<span>آدرس </span>: <b>${fix_persian(order.address)}</b> <br>`
         +
         (order.orders ? `<span>سفارشات </span>: <b>${fix_persian(order.orders)}</b>` : '')
         +
@@ -379,9 +401,9 @@ function createdTime(order) {
     if (order.state < 1) {
         res = `<span class="btn btn-secondary" onclick="change_state(${order.id})">${res} <i id="row-state-${order.id}"></i></span>`
     } else if (order.state > 0) {
-        if(order.admin !== userId){
+        if (order.admin !== userId) {
             res = `<span class="btn btn-info" onclick="change_state(${order.id})">${res} <i id="row-state-${order.id}" class="fas fa-check"></i></span>`
-        }else{
+        } else {
             res = `<span class="btn btn-success" onclick="change_state(${order.id})">${res} <i id="row-state-${order.id}" class="fas fa-check-double"></i></span>`
         }
     }
@@ -390,7 +412,7 @@ function createdTime(order) {
 }
 
 function change_state(id) {
-    if(!isAdmin || (orders[id].admin !== userId && orders[id].state > 0))
+    if (!isAdmin || (orders[id].admin !== userId && orders[id].state > 0))
         return
     $.post('increase_state/' + id, {_token: token})
         .done(res => {
@@ -400,7 +422,7 @@ function change_state(id) {
         })
 }
 
-function invoice(id){
+function invoice(id) {
     $.post('invoice/' + id, {_token: token})
         .done(res => {
 
