@@ -282,7 +282,7 @@ function generatePDFs() {
     //
     // return;
     //
-    $.post('pdfs/', {
+    $.post('pdfs2/', {
         _token: token,
         ids: ids
     })
