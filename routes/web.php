@@ -108,7 +108,7 @@ Route::get('/deposit/add/{id}/{pass}/{file_id}' , [DepositController::class , 'n
 
 Route::post('/woocommerce/{website}' , [WoocommerceController::class , 'addPeptinaOrder']);
 
-Route::post('pdfs2',function (){
+Route::get('pdfs2',function (){
     return 'ok';
 });
 
