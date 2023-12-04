@@ -94,7 +94,7 @@ Route::group(['middleware'=>['auth','admin']],function (){
     Route::post('invoice/{id}',[OrderController::class , 'invoice']);
     Route::get('statistic' , [OrderProductController::class , 'show'])->name('statistic');
     Route::get('/clear/route', [SettingController::class , 'clearRoute']);
-    Route::get('/backup', [TelegramController::class , 'backUpDatabase']);
+
 });
 
 
@@ -108,6 +108,6 @@ Route::post('/deposit/telegram' , [DepositController::class , 'receive']);
 Route::get('/deposit/add/{id}/{pass}/{file_id}' , [DepositController::class , 'newDepositWithPhotoTelegram']);
 
 Route::post('/woocommerce/{website}' , [WoocommerceController::class , 'addPeptinaOrder']);
-
+Route::get('/backup', [TelegramController::class , 'backUpDatabase']);
 
 require __DIR__.'/auth.php';
