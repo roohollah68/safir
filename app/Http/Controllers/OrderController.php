@@ -332,8 +332,8 @@ class OrderController extends Controller
         $orders = array();
         foreach ($ids as $id) {
             $order = Order::findOrFail($id);
-//            if ($order->admin != $this->userId() && $order->admin)
-//                abort(405);
+            if ($order->admin != $this->userId() && $order->admin)
+                abort(405);
             $font = 32;
             do {
                 $font = $font - 1;
