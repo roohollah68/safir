@@ -239,7 +239,6 @@ function generatePDF(id) {
         })
     return;
 
-
     let order = orders[id];
     if (order.admin !== userId)
         return
@@ -283,15 +282,15 @@ function generatePDFs() {
     //
     // return;
     //
-    // $.post('pdfs/', {
-    //     _token: token,
-    //     ids: ids
-    // })
-    //     .done(res => {
-    //
-    //     })
-    //
-    // return;
+    $.post('pdfs/', {
+        _token: token,
+        ids: ids
+    })
+        .done(res => {
+
+        })
+
+    return;
 
 
     let dialog = [];
