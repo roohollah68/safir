@@ -324,17 +324,16 @@ class OrderController extends Controller
         return $pdf->stream($order->name . '.pdf');
     }
 
-    public function pdfs(Request $request)
+    public function pdfs($ids)
     {
-        $ids = $request->all()['ids'];
-//        return 'ok';
+        $ids = explode(",",$ids);
         $fonts = array();
         $orders = array();
         foreach ($ids as $id) {
             $order = Order::findOrFail($id);
             if ($order->admin != $this->userId() && $order->admin)
                 abort(405);
-            $font = 32;
+            $font = 28;
             do {
                 $font = $font - 1;
                 $pdf = PDF::loadView('pdf', ['order' => $order], [], [

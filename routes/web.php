@@ -89,7 +89,7 @@ Route::group(['middleware'=>['auth','admin']],function (){
     Route::post('increase_state/{id}',[OrderController::class , 'increaseState']);
     Route::post('pdf/{id}',[OrderController::class , 'pdf']);
 //    Route::get('pdf/{id}',[OrderController::class , 'pdf']);
-//    Route::post('pdfs2',[OrderController::class , 'pdfs']);
+    Route::get('pdfs/{ids}',[OrderController::class , 'pdfs']);
 
     Route::post('invoice/{id}',[OrderController::class , 'invoice']);
     Route::get('statistic' , [OrderProductController::class , 'show'])->name('statistic');
@@ -108,8 +108,5 @@ Route::get('/deposit/add/{id}/{pass}/{file_id}' , [DepositController::class , 'n
 
 Route::post('/woocommerce/{website}' , [WoocommerceController::class , 'addPeptinaOrder']);
 
-Route::get('pdfs2',function (){
-    return 'ok';
-});
 
 require __DIR__.'/auth.php';
