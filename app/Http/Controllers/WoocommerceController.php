@@ -13,10 +13,11 @@ class WoocommerceController extends Controller
     {
 
         DB::beginTransaction();
-        //file_put_contents('woo'.rand(100000,1000000).'.txt' , file_get_contents('php://input'));
-//        $this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
+
+        $this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
 //        die();
         $request = json_decode(file_get_contents('php://input'));
+        //file_put_contents('woo'.rand(100000,1000000).'.html' , file_get_contents('php://input'));
         $orders = '';
         foreach ($request->line_items as $item) {
             $orders = $orders . ' ' . $item->name . ' ' . $item->quantity . 'عدد' . '،';
