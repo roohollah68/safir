@@ -107,7 +107,7 @@ class OrderController extends Controller
         $customerCost = 0;
 
         if ($this->isAdmin() && $request->factor)
-            $request->orders = '*طبق فاکتور*';
+            $request->orders = 'طبق فاکتور';
         else {
             $deliveryCost = $this->deliveryCost($request->deliveryMethod);
             $hasProduct = false;
@@ -362,28 +362,6 @@ class OrderController extends Controller
             'margin_bottom' => 2,
         ]);
         return $pdfs->stream(sizeof($ids)."_".$order->name . '.pdf');
-    }
-
-    public function createPdf($id)
-    {
-        $order = Order::findOrFail($id);
-        if ($order->admin != $this->userId() && $order->admin)
-            abort(405);
-        $font = 40;
-        do {
-            $pdf = PDF::loadView('pdf', ['order' => $order], [], [
-                'format' => [200, 100],
-                'default_font' => 'iransans',
-                'default_font_size' => $font,
-                'margin_left' => 2,
-                'margin_right' => 2,
-                'margin_top' => 2,
-                'margin_bottom' => 2,
-            ]);
-            $mpdf = $pdf->getMpdf();
-            $font = $font - 1;
-        } while ($mpdf->page > 1);
-        return $pdf;
     }
 
     public function invoice($id)

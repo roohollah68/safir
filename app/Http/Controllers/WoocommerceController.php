@@ -19,7 +19,7 @@ class WoocommerceController extends Controller
         $request = json_decode(file_get_contents('php://input'));
         $orders = '';
         foreach ($request->line_items as $item) {
-            $orders = $orders . '*' . $item->name . ' ' . $item->quantity . 'عدد' . '*';
+            $orders = $orders . ' ' . $item->name . ' ' . $item->quantity . 'عدد' . '،';
         }
         $desc = '';
         if($request->payment_method == 'cod'){
