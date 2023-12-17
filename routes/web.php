@@ -88,12 +88,20 @@ Route::group(['middleware'=>['auth','admin']],function (){
 
     Route::post('increase_state/{id}',[OrderController::class , 'increaseState']);
     Route::post('pdf/{id}',[OrderController::class , 'pdf']);
-//    Route::get('pdf/{id}',[OrderController::class , 'pdf']);
     Route::get('pdfs/{ids}',[OrderController::class , 'pdfs']);
 
     Route::post('invoice/{id}',[OrderController::class , 'invoice']);
+    Route::get('invoice/{id}',[OrderController::class , 'invoice']);
     Route::get('statistic' , [OrderProductController::class , 'show'])->name('statistic');
+
     Route::get('/clear/route', [SettingController::class , 'clearRoute']);
+
+    Route::get('/customer/transaction/{id}',[CustomerController::class , 'customersTransactionList'])
+        ->name('customersTransactionList');
+
+    Route::get('/customerDeposit/add/{id}' , [CustomerController::class , 'newForm']);
+    Route::post('/customerDeposit/add/{id}' , [CustomerController::class , 'storeNew']);
+    Route::post('/customerDeposit/delete/{id}' , [CustomerController::class , 'deleteDeposit']);
 
 });
 

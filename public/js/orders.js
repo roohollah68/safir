@@ -46,7 +46,7 @@ function prepare_data() {
         let editOrder = `<a class="fa fa-edit btn btn-primary" href="edit_order/${id}" title="ویرایش سفارش"></a> `;
         let sendToTelegram = `<i class="fab fa-telegram-plane btn btn-info" onclick="sendToTelegram(${id})" title="ارسال به تلگرام"></i> `;
         let generatePDF = `<i class="fa fa-file-pdf btn btn-secondary" onclick="generatePDF(${id})" title="مشاهده PDF"></i> `;
-        let invoice = `<i class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title=" فاکتور"></i> `;
+        let invoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" href="/invoice/${id}" target="_blank" title=" فاکتور"></a> `;
         counter++;
         res.push([
             `<input type="checkbox" class="orders_checkbox" onclick="list_ids()" order_id="${id}">`,
@@ -108,10 +108,10 @@ function create_table(data) {
                 {title: "کدپستی"},
                 {title: "آیدی"},
             ],
-            "columnDefs": [
+            columnDefs: [
                 {
-                    "targets": [0, 1, 5, 6],
-                    "searchable": false
+                    targets: [0, 1, 5, 6],
+                    searchable: false
                 },
                 {
                     targets: [0, 4, 6],
@@ -144,7 +144,7 @@ function create_table(data) {
                     "next": "بعدی",
                     "previous": "قبلی"
                 },
-                "aria": {
+                aria: {
                     "sortAscending": ": activate to sort column ascending",
                     "sortDescending": ": activate to sort column descending"
                 }
@@ -282,7 +282,7 @@ function generatePDFs() {
     //
     // return;
     //
-    $.get('pdfs/'+ids.toString())
+    $.get('pdfs/' + ids.toString())
         .done(res => {
 
         })
@@ -422,6 +422,7 @@ function invoice(id) {
     $.post('invoice/' + id, {_token: token})
         .done(res => {
 
-        })
-    return;
+        });
 }
+
+

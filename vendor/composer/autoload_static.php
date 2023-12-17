@@ -595,6 +595,7 @@ class ComposerStaticInitc50c57f8749005a128a17433b3c77404
         'App\\Models\\Coupon' => __DIR__ . '/../..' . '/app/Models/Coupon.php',
         'App\\Models\\CouponLink' => __DIR__ . '/../..' . '/app/Models/CouponLink.php',
         'App\\Models\\Customer' => __DIR__ . '/../..' . '/app/Models/Customer.php',
+        'App\\Models\\CustomerTransactions' => __DIR__ . '/../..' . '/app/Models/CustomerTransactions.php',
         'App\\Models\\Deposit' => __DIR__ . '/../..' . '/app/Models/Deposit.php',
         'App\\Models\\Order' => __DIR__ . '/../..' . '/app/Models/Order.php',
         'App\\Models\\OrderProduct' => __DIR__ . '/../..' . '/app/Models/OrderProduct.php',

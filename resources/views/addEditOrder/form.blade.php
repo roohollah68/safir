@@ -1,3 +1,8 @@
+
+@if($admin)
+    <label for="customerId">شماره مشتری:</label>
+    <input type="number" value="" min="0" step="1" name="customerId" id="customerId" style="width: 70px" onchange="customerFind()">
+@endif
 <div id="formElements">
     <div class="row">
         <div class="col-md-6">
@@ -17,6 +22,7 @@
                        minlength="11"
                        maxlength="11" pattern="^[۰-۹0-9]*$"
                        oninvalid="this.setCustomValidity('لطفا شماره 11 رقمی تلفن را وارد کنید.')"
+                       onkeypress="return event.charCode >= 48 && event.charCode <= 57"
                        oninput="this.setCustomValidity('')" placeholder="مانند 09123456789">
             </div>
         </div>
@@ -36,7 +42,8 @@
                 </div>
                 <input value="{{$zip_code}}" type="text" id="zip_code" class="form-control" name="zip_code"
                        minlength="10"
-                       maxlength="10" pattern="^[۰-۹0-9]*$">
+                       maxlength="10" pattern="^[۰-۹0-9]*$"
+                       onkeypress="return event.charCode >= 48 && event.charCode <= 57">
             </div>
         </div>
         <div class="col-md-6">

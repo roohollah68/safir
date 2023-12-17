@@ -32,6 +32,9 @@
                     <thead>
                     <tr>
                         <th>محصول</th>
+                        @if($admin)
+                            <th>تخفیف(%)</th>
+                        @endif
                         <th>قیمت(تومان)</th>
                         <th>تعداد</th>
                     </tr>
@@ -40,24 +43,52 @@
                     @foreach($products as $product)
                         @if($product->available)
                             <tr>
-                                <td>{{$product->name}}({{$product->coupon}}%)</td>
-                                <td>
-                                    <span class="text-danger"
-                                          @if($product->priceWithDiscount!=$product->price)
-                                          style='text-decoration: line-through'
+                                @if($admin)
+                                    <td>{{$product->name}}</td>
+                                    <td>
+                                        <input type="number" name="discount_{{$product->id}}"
+                                               class="discount-value"
+                                               id="discount_{{$product->id}}"
+                                               value="{{$product->coupon}}"
+                                               style="width: 50px"
+                                               pattern="^[1-9][0-9]?$|^100$"
+                                               min="0" max="100" minlength="1" maxlength="3">
+                                    </td>
+                                    <td id="price_{{$product->id}}">
+                                        <span class="text-danger original"
+                                            @if($product->priceWithDiscount!=$product->price)
+                                            style="text-decoration: line-through"
+                                            @endif
+                                        >
+                                            {{number_format($product->price)}}
+                                        </span>
+                                        <span class="text-success discount">
+                                            {{$product->priceWithDiscount!=$product->price?number_format($product->priceWithDiscount):''}}
+                                        </span>
+                                    </td>
+                                @else
+                                    <td>{{$product->name}}({{$product->coupon}}%)</td>
+                                    <td>
+                                        <span class="text-danger"
+                                            @if($product->priceWithDiscount!=$product->price)
+                                            style="text-decoration: line-through"
                                           @endif
-                                    >
-                                        {{number_format($product->price)}}
-                                    </span>
-                                    <span class="text-success">
-                                        {{$product->priceWithDiscount!=$product->price?number_format($product->priceWithDiscount):''}}
-                                    </span>
-                                </td>
+                                        >
+                                            {{number_format($product->price)}}
+                                        </span>
+                                        <span class="text-success">
+                                            {{$product->priceWithDiscount!=$product->price?number_format($product->priceWithDiscount):''}}
+                                        </span>
+                                    </td>
+                                @endif
+
                                 <td>
-                                    <span class="btn btn-primary plusOne">+</span>
-                                    <input class="product-number" product_id="{{$product->id}}" name="product_{{$product->id}}" id="product_{{$product->id}}"
+                                    <span class="btn btn-primary" onclick="num_plus({{$product->id}})">+</span>
+                                    <input class="product-number" product_id="{{$product->id}}"
+                                           name="product_{{$product->id}}" id="product_{{$product->id}}"
+                                           onchange="num_product({{$product->id}})"
                                            type="number" value="0" style="width: 50px" min="0">
-                                    <span class="btn btn-primary minusOne">-</span>
+                                    <span class="btn btn-primary" onclick="num_minus({{$product->id}})">-</span>
                                 </td>
                             </tr>
                         @endif

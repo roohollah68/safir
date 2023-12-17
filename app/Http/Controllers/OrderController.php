@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PDF;
+use function PHPUnit\Framework\lessThanOrEqual;
 
 class OrderController extends Controller
 {
@@ -63,11 +64,11 @@ class OrderController extends Controller
         if ($this->isAdmin()) // استثنا  ادمین
             $products = Product::all()->keyBy('id');
 
-        elseif ($user->id == 10) // استثنا خانوم موسوی
-            $products = Product::where('price', '<>', '1')->get()->keyBy('id');
-
-        elseif ($user->id == 29) // استثنا شرکت برادر حامد
-            $products = Product::where('price', '=', '1')->get()->keyBy('id');
+//        elseif ($user->id == 10) // استثنا خانوم موسوی
+//            $products = Product::where('price', '<>', '1')->get()->keyBy('id');
+//
+//        elseif ($user->id == 29) // استثنا شرکت برادر حامد
+//            $products = Product::where('price', '=', '1')->get()->keyBy('id');
 
         else
             $products = Product::where('price', '>', '1')->get()->keyBy('id');
@@ -75,11 +76,14 @@ class OrderController extends Controller
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
         }
-        $customers = auth()->user()->customers()->get()->keyBy('name');
+        $customersData = auth()->user()->customers()->get();
+        $customers = $customersData->keyBy('name');
+        $customersId = $customersData->keyBy('id');
         return view('addEditOrder', [
             'req' => $request->all(),
             'order' => false,
             'customers' => $customers,
+            'customersId' => $customersId,
             'products' => $products,
             'settings' => $this->settings(),
             'id' => $user->id
@@ -115,7 +119,10 @@ class OrderController extends Controller
                 $number = $request['product_' . $id];
                 if ($number > 0) {
                     $request->orders = $request->orders . ' ' . $product->name . ' ' . $number . 'عدد' . '،';
-                    $coupon = $this->calculateDis($id);
+                    if ($this->isAdmin())
+                        $coupon = $request['discount_' . $id];
+                    else
+                        $coupon = $this->calculateDis($id);
                     $total += round((100 - $coupon) * $product->price * $number / 100);
                     $Total += $product->price * $number;
                     $hasProduct = true;
@@ -150,51 +157,20 @@ class OrderController extends Controller
                     return $this->errorBack('مشکلی پیش آمده!');
         }
 
-        $order = $user->orders()->create([
-            'name' => $request->name,
-            'phone' => $request->phone,
-            'address' => $request->address,
-            'zip_code' => $request->zip_code,
-            'orders' => $request->orders,
-            'desc' => $request->desc,
-            'receipt' => $request->receipt,
-            'total' => $total,
-            'customerCost' => $customerCost,
-            'paymentMethod' => $request->paymentMethod,
-            'deliveryMethod' => $request->deliveryMethod,
-        ]);
+        $request = $this->addToCustomers($request);
 
-        foreach ($products as $name => $product) {
-            if (($request['product_' . $name]) > 0) {
-                $coupon = $this->calculateDis($product->id);
-                $price = round((100 - $coupon) * $product->price / 100);
-                $order->orderProducts()->create([
-                    'name' => $product->name,
-                    'price' => $price,
-                    'photo' => $product->photo,
-                    'product_id' => $product->id,
-                    'number' => $request['product_' . $name],
-                    'discount' => $coupon,
-                ]);
-            }
-        }
-        if (!$this->isAdmin() && $request->paymentMethod == 'credit')
-            $order->transactions()->create([
-                'user_id' => $user->id,
-                'amount' => $total,
-                'balance' => $user->balance,
-                'type' => false,
-                'description' => 'ثبت سفارش',
-            ]);
+        $order = $this->addToOrders($user, $request, $total, $customerCost);
 
-//        if (!$this->isAdmin())
-//            TelegramController::sendOrderToTelegram($order);
+        $this->addToOrderProducts($request, $products, $order);
 
-//        TelegramController::sendOrderToTelegramAdmins($order);
-        app('App\Http\Controllers\TelegramController')->sendOrderToBale($order, '4521394649');
+        $this->addToTransactions($request, $order, $user, $total);
 
-        $this->addToCustomers($request);
+        $this->addToCustomerTransactions($request, $order, $total);
+
+        //app('Telegram')->sendOrderToBale($order, env('GroupId'));
+
         DB::commit();
+
         return redirect()->route('listOrders');
     }
 
@@ -326,7 +302,7 @@ class OrderController extends Controller
 
     public function pdfs($ids)
     {
-        $ids = explode(",",$ids);
+        $ids = explode(",", $ids);
         $fonts = array();
         $orders = array();
         foreach ($ids as $id) {
@@ -360,7 +336,7 @@ class OrderController extends Controller
             'margin_top' => 2,
             'margin_bottom' => 2,
         ]);
-        return $pdfs->stream(sizeof($ids)."_".$order->name . '.pdf');
+        return $pdfs->stream(sizeof($ids) . "_" . $order->name . '.pdf');
     }
 
     public function invoice($id)
@@ -372,7 +348,7 @@ class OrderController extends Controller
         $orderProducts = OrderProduct::where('order_id', $id)->get();
         $order->created_at_p = jdate('H:i Y/m/d ', $order->created_at->getTimestamp());
         $pdf = PDF::loadHTML('test' . (string)view('invoice', ['order' => $order, 'orderProducts' => $orderProducts]));
-        $pdf->stream('فاکتور_' . $order->name . '.pdf');
+        $pdf->stream('فاکتور_' . $order->name . $order->id . '.pdf');
 
     }
 
@@ -402,6 +378,24 @@ class OrderController extends Controller
                     'description' => 'حذف سفارش',
                 ]);
             }
+
+            $customerTransaction = $order->customerTransactions()->first();
+            if ($customerTransaction) {
+                $customer = $customerTransaction->customer()->first();
+                $order->customerTransactions()->create([
+                    'amount' => $customerTransaction->amount,
+                    'description' => 'ابطال سفارش - ' . $customerTransaction->desc,
+                    'type' => true,
+                    'balance' => $customer->balance - $customerTransaction->amount,
+                    'customer_id' => $customer->id,
+                ]);
+                $customerTransaction->update([
+                    'deleted' => true,
+                ]);
+                $customer->update([
+                    'balance' => $customer->balance - $customerTransaction->amount,
+                ]);
+            }
             DB::commit();
             return 'با موفقیت حذف شد';
         };
@@ -422,23 +416,92 @@ class OrderController extends Controller
     private function addToCustomers($request)
     {
         if ($request->addToCustomers) {
-            $customer = auth()->user()->customers()->where('name', $request->name);
+            $customer = auth()->user()->customers()->where('id', $request->customerId);
             if ($customer->count()) {
                 $customer->update([
+                    'name' => $request->name,
                     'phone' => $request->phone,
                     'address' => $request->address,
                     'zip_code' => $request->zip_code,
                 ]);
             } else {
-                auth()->user()->customers()->create([
+                $customer = auth()->user()->customers()->create([
                     'name' => $request->name,
                     'phone' => $request->phone,
                     'address' => $request->address,
                     'zip_code' => $request->zip_code,
                 ]);
             }
+            $request->customerId = $customer->id;
+        }
+        return $request;
+    }
+
+    public function addToTransactions($request, $order, $user, $total)
+    {
+        if (!$this->isAdmin() && $request->paymentMethod == 'credit')
+            $order->transactions()->create([
+                'user_id' => $user->id,
+                'amount' => $total,
+                'balance' => $user->balance,
+                'type' => false,
+                'description' => 'ثبت سفارش',
+            ]);
+    }
+
+    public function addToCustomerTransactions($request, $order, $total)
+    {
+        if ($this->isAdmin() && $request->customerId) {
+            $customer = auth()->user()->customers()->where('id', $request->customerId)->first();
+            $customer->update([
+                'balance' => $customer->balance - $total
+            ]);
+            $order->customerTransactions()->create([
+                'customer_id' => $request->customerId,
+                'amount' => $total,
+                'balance' => $customer->balance,
+                'type' => false,
+                'description' => 'ثبت سفارش',
+            ]);
         }
     }
 
+    public function addToOrderProducts($request, $products, $order)
+    {
+        foreach ($products as $id => $product) {
+            if (($request['product_' . $id]) > 0) {
+                if ($this->isAdmin())
+                    $coupon = $request['discount_' . $id];
+                else
+                    $coupon = $this->calculateDis($product->id);
+                $price = round((100 - $coupon) * $product->price / 100);
+                $order->orderProducts()->create([
+                    'name' => $product->name,
+                    'price' => $price,
+                    'photo' => $product->photo,
+                    'product_id' => $product->id,
+                    'number' => $request['product_' . $id],
+                    'discount' => $coupon,
+                ]);
+            }
+        }
+    }
 
+    public function addToOrders($user, $request, $total, $customerCost)
+    {
+        return $user->orders()->create([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'zip_code' => $request->zip_code,
+            'orders' => $request->orders,
+            'desc' => $request->desc,
+            'receipt' => $request->receipt,
+            'total' => $total,
+            'customerCost' => $customerCost,
+            'paymentMethod' => $request->paymentMethod,
+            'deliveryMethod' => $request->deliveryMethod,
+            'customer_id' => $request->customerId,
+        ]);
+    }
 }

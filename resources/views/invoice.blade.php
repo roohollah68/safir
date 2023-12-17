@@ -47,8 +47,8 @@
             @endphp
             @foreach($orderProducts as $orderProduct)
                 @php
-                    $t= ($orderProduct->price * $orderProduct->number); //قیمت * تعداد
-                    $original = round((100/(100-$orderProduct->discount))*$orderProduct->price);
+                    $t= ($orderProduct->price * $orderProduct->number)*10; //قیمت * تعداد
+                    $original = round((100/(100-$orderProduct->discount))*$orderProduct->price)*10;
                     $total_original = $total_original + $original;
                     $total = $total + $t;
                 @endphp
@@ -58,7 +58,7 @@
                     <td>{{$orderProduct->number}}</td>
                     <td>{{number_format($original)}}</td>
                     <td>{{$orderProduct->discount}}</td>
-                    <td>{{number_format($orderProduct->price)}}</td>
+                    <td>{{number_format($orderProduct->price*10)}}</td>
                     <td>{{number_format($t)}}</td>
                 </tr>
             @endforeach
@@ -68,11 +68,11 @@
             </tr>
             <tr class="">
                 <td colspan="4" style="border: none;"></td>
-                <td colspan="2" >مبلغ کل بدون تخفیف</td>
+                <td colspan="2">مبلغ کل بدون تخفیف</td>
                 <td>{{number_format($total_original)}}</td>
             </tr>
             <tr class="">
-                <th colspan="4"> شما از این خرید {{number_format($total_original-$total)}} ریال تخفیف گرفتید</th>
+                <th colspan="4"> شما از این خرید {{number_format(abs($total_original-$total))}} ریال تخفیف گرفتید</th>
                 <th colspan="2">مبلغ قابل پرداخت</th>
                 <th>{{number_format($total)}}</th>
             </tr>

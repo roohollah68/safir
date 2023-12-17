@@ -20,6 +20,7 @@ class CreateCustomersTable extends Migration
             $table->string('address',300);
             $table->string('phone',30);
             $table->string('zip_code')->nullable();
+            $table->bigInteger('balance')->default(0);
             $table->timestamps();
         });
     }

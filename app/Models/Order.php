@@ -18,20 +18,24 @@ class Order extends Model
         'zip_code',
         'orders',
         'desc',
-        //'printed',
         'receipt',
         'state',
         'total',
-       // 'fromCredit',
         'paymentMethod',
         'customerCost',
         'deliveryMethod',
-        'admin'
+        'admin',
+        'customer_id',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
     }
 
     public function orderProducts()
@@ -42,6 +46,11 @@ class Order extends Model
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function customerTransactions()
+    {
+        return $this->hasMany(CustomerTransactions::class);
     }
 
     public function admin()
