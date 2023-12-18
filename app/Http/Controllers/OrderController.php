@@ -167,7 +167,7 @@ class OrderController extends Controller
 
         $this->addToCustomerTransactions($request, $order, $total);
 
-        //app('Telegram')->sendOrderToBale($order, env('GroupId'));
+        app('Telegram')->sendOrderToBale($order, env('GroupId'));
 
         DB::commit();
 
