@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
-use Automattic\WooCommerce\Client;
+//use Illuminate\Http\Request;
+//use Automattic\WooCommerce\Client;
 use Illuminate\Support\Facades\DB;
 
 class WoocommerceController extends Controller
@@ -17,7 +17,7 @@ class WoocommerceController extends Controller
         $this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
 //        die();
         $request = json_decode(file_get_contents('php://input'));
-        file_put_contents('woo'.rand(100000,1000000).'.html' , file_get_contents('php://input'));
+        file_put_contents('woo/woo'.rand(100000,1000000).'.html' , file_get_contents('php://input'));
         $orders = '';
         foreach ($request->line_items as $item) {
             $orders = $orders . ' ' . $item->name . ' ' . $item->quantity . 'عدد' . '،';
@@ -50,10 +50,10 @@ class WoocommerceController extends Controller
         ]);
 
         if($request->status != 'processing'){
-            app('App\Http\Controllers\TelegramController')->sendOrderToBale($order,'5742084958');
+            app('Telegram')->sendOrderToBale($order,'5742084958');
             $order->forceDelete();
         }else{
-            app('App\Http\Controllers\TelegramController')->sendOrderToBale($order,'4521394649');
+            app('Telegram')->sendOrderToBale($order,'4521394649');
         }
         DB::commit();
         return 'order saved!';
