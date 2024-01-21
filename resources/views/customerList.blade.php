@@ -5,10 +5,18 @@
 @endsection
 
 @section('content')
+    @if($admin)
+        <span class="h5">مجموع بدهکاری مشتریان </span>
+        <span class="h3 btn btn-danger" dir="ltr" onclick="$('#table-container ,#brief-table ').toggle(); ">
+            {{number_format($total)}}
+        </span>
+        <span
+            class="h5">ریال</span><br><br>
+    @endif
     <a class="btn btn-info" href="{{route('newCustomer')}}">افزودن مشتری جدید</a>
-{{--    <a class="btn btn-info" href="{{route('newCustomer')}}">مشتریان دارای حساب</a>--}}
     <br>
     <br>
+    <div id="table-container">
     <table class="stripe" id="customer-table">
         <thead>
         <tr>
@@ -17,7 +25,7 @@
             <th>شماره تماس</th>
             <th>آدرس</th>
             @if($admin)
-                <th>اعتبار(تومان)</th>
+                <th>بدهکاری(ریال)</th>
             @else
                 <th>کد پستی</th>
             @endif
@@ -33,28 +41,45 @@
                 <td>{{$customer->phone}}</td>
                 <td>{{$customer->address}}</td>
                 @if($admin)
-                    <td dir="ltr">{{$customer->balance}}</td>
+                    <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
+                                     class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
                 @else
                     <td>{{$customer->zip_code}}</td>
                 @endif
 
                 <td>
                     <a class="btn btn-primary" href="/customer/edit/{{$customer->id}}">ویرایش</a>
-{{--                    <span class="fa fa-edit btn btn-primary"--}}
-{{--                          onclick="window.open('/customer/edit/{{$customer->id}}','_self');"--}}
-{{--                          title="ویرایش مشتری">--}}
-{{--                    </span>--}}
+
                     @if($admin)
                         <a class="btn btn-info" href="/customer/transaction/{{$customer->id}}">تراکنش ها</a>
-{{--                    <span class="fa fa-eye btn btn-primary"--}}
-{{--                          onclick="window.open('/customer/transaction/{{$customer->id}}','_self');"--}}
-{{--                          title="تراکنش های مشتری">--}}
-{{--                    </span>--}}
                     @endif
-                    <a class="btn btn-danger" onclick="delete_customer({{$customer->id}})">حذف</a>
-{{--                    <span class="fa fa-trash-alt btn btn-danger" onclick="delete_customer({{$customer->id}})"--}}
-{{--                          title="حذف مشتری"></span>--}}
+                    @if($customer->balance == 0)
+                        <a class="btn btn-danger" onclick="delete_customer({{$customer->id}})">حذف</a>
+                    @endif
                 </td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
+    </div>
+    <table class="stripe" style="display: none" id="brief-table">
+        <thead>
+        <tr>
+            <th>شماره مشتری</th>
+            <th>نام</th>
+            <th>بدهی(ریال)</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach($customers as $customer)
+            @if($customer->balance == 0)
+                @continue
+            @endif
+            <tr>
+                <td>{{$customer->id}}</td>
+                <td>{{$customer->name}}</td>
+                <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
+                                 class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
             </tr>
         @endforeach
         </tbody>
@@ -67,7 +92,14 @@
     @csrf
     <script>
         $(function () {
-            $('#customer-table').DataTable();
+            $('#customer-table').DataTable({
+                order: [[4, "asc"]],
+                pageLength: 100,
+            });
+            $('#brief-table').DataTable({
+                order: [[2, "asc"]],
+                pageLength: 100,
+            });
         });
 
         function delete_customer(id) {

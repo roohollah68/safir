@@ -17,6 +17,7 @@
         "hekmatinasser/verta": "^1.12",
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
+        "livewire/livewire": "^2.12",
         "telegram-bot/api": "^2.3"
     },
     "require-dev": {

@@ -13,11 +13,18 @@ class Product extends Model
         'name',
         'price',
         'photo',
-        'available'
+        'available',
+        'quantity',
+        'alarm',
     ];
 
     public function orderProducts()
     {
         return $this->hasMany(OrderProduct::class);
+    }
+
+    public function productChange()
+    {
+        return $this->hasMany(ProductChange::class);
     }
 }

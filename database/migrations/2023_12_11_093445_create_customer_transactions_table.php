@@ -21,6 +21,7 @@ class CreateCustomerTransactionsTable extends Migration
             $table->integer('balance');
             $table->boolean('type');
             $table->boolean('deleted');
+            $table->bigInteger('paymentLink')->unsigned()->default(null);
             $table->string('description');
             $table->string('photo')->nullable();
             $table->timestamps();

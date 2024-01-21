@@ -17,11 +17,11 @@ class CreateOrderProductsTable extends Migration
             $table->id();
             $table->foreignId('order_id');
             $table->foreignId('product_id');
+            $table->boolean('verified')->default(false);
             $table->string('name');
             $table->integer('number');
             $table->integer('discount')->default(0);
             $table->decimal('price',10,0);
-//            $table->decimal('price_main',10,0);
             $table->string('photo')->nullable();
             $table->timestamps();
         });

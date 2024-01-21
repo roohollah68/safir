@@ -5,6 +5,7 @@ use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DepositController;
 use App\Http\Controllers\OrderProductController;
+use App\Http\Controllers\ProductChangeController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
@@ -21,7 +22,6 @@ Route::group(['middleware'=>['auth' , 'verify'] ],function (){
 //  Order
     Route::get('add_order',[OrderController::class , 'newForm'])->name('newOrder');
     Route::post('add_order',[OrderController::class , 'insertOrder']);
-
 
 
     Route::get('edit_order/{id}',[OrderController::class , 'editForm']);
@@ -76,6 +76,10 @@ Route::group(['middleware'=>['auth','admin']],function (){
     Route::post('product/deletePhoto/{id}', [ProductController::class , 'deletePhoto']);
     Route::post('product/delete/{id}', [ProductController::class , 'deleteProduct']);
 
+    Route::get('/productQuantity/add/{id}', [ProductChangeController::class , 'addQuantity']);
+    Route::post('/productQuantity/add/{id}', [ProductChangeController::class , 'insertRecord']);
+    Route::get('/productQuantity/delete/{id}', [ProductChangeController::class , 'deleteRecord']);
+
     Route::get('settings' , [SettingController::class , 'showSettings'])->name('settings');
     Route::post('settings' , [SettingController::class , 'editSettings']);
 
@@ -86,12 +90,14 @@ Route::group(['middleware'=>['auth','admin']],function (){
     Route::post('coupon/edit/{id}' , [CouponController::class , 'update']);
     Route::post('coupon/delete/{id}', [CouponController::class , 'deleteCoupon']);
 
-    Route::post('increase_state/{id}',[OrderController::class , 'increaseState']);
+    Route::post('change_state/{id}',[OrderController::class , 'changeState']);
     Route::post('pdf/{id}',[OrderController::class , 'pdf']);
     Route::get('pdfs/{ids}',[OrderController::class , 'pdfs']);
 
-    Route::post('invoice/{id}',[OrderController::class , 'invoice']);
-    Route::get('invoice/{id}',[OrderController::class , 'invoice']);
+    Route::post('/invoice/{id}',[OrderController::class , 'invoice']);
+    Route::post('confirm_invoice/{id}',[OrderController::class , 'confirmInvoice']);
+    Route::post('cancel_invoice/{id}',[OrderController::class , 'cancelInvoice']);
+
     Route::get('statistic' , [OrderProductController::class , 'show'])->name('statistic');
 
     Route::get('/clear/route', [SettingController::class , 'clearRoute']);
@@ -100,20 +106,21 @@ Route::group(['middleware'=>['auth','admin']],function (){
         ->name('customersTransactionList');
 
     Route::get('/customerDeposit/add/{id}' , [CustomerController::class , 'newForm']);
+    Route::get('/customerDeposit/add/{id}/{linkId}' , [CustomerController::class , 'newForm']);
     Route::post('/customerDeposit/add/{id}' , [CustomerController::class , 'storeNew']);
     Route::post('/customerDeposit/delete/{id}' , [CustomerController::class , 'deleteDeposit']);
 
 });
 
 
-Route::post('/telegram',[TelegramController::class , 'receive']);
-Route::get('register-from-telegram',[RegisteredUserController::class , 'fromTelegram']);
-Route::get('list-orders/{id}/{pass}',[OrderController::class , 'listOrderTelegram']);
-Route::get('new-order/{id}/{pass}',[OrderController::class , 'newOrderTelegram']);
-Route::get('new-order-receipt/{id}/{pass}/{file_id}',[OrderController::class , 'newOrderWithPhotoTelegram']);
+//Route::post('/telegram',[TelegramController::class , 'receive']);
+//Route::get('register-from-telegram',[RegisteredUserController::class , 'fromTelegram']);
+//Route::get('list-orders/{id}/{pass}',[OrderController::class , 'listOrderTelegram']);
+//Route::get('new-order/{id}/{pass}',[OrderController::class , 'newOrderTelegram']);
+//Route::get('new-order-receipt/{id}/{pass}/{file_id}',[OrderController::class , 'newOrderWithPhotoTelegram']);
 
-Route::post('/deposit/telegram' , [DepositController::class , 'receive']);
-Route::get('/deposit/add/{id}/{pass}/{file_id}' , [DepositController::class , 'newDepositWithPhotoTelegram']);
+//Route::post('/deposit/telegram' , [DepositController::class , 'receive']);
+//Route::get('/deposit/add/{id}/{pass}/{file_id}' , [DepositController::class , 'newDepositWithPhotoTelegram']);
 
 Route::post('/woocommerce/{website}' , [WoocommerceController::class , 'addPeptinaOrder']);
 Route::get('/backup', [TelegramController::class , 'backUpDatabase']);

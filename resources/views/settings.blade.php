@@ -18,22 +18,22 @@
 
         <br>
 
-        <label for="negative">سقف اعتبار منفی مجاز(تومان):</label>
+        <label for="negative">سقف اعتبار منفی مجاز(ریال):</label>
         <input id="negative" name="negative" type="number" value="{{$negative}}">
 
         <br>
 
-        <label for="peykCost">هزینه ارسال با تیپاکس(تومان):</label>
+        <label for="peykCost">هزینه ارسال با تیپاکس(ریال):</label>
         <input id="peykCost" name="peykCost" type="number" value="{{$peykCost}}">
 
         <br>
 
-        <label for="postCost">هزینه ارسال با پست(تومان):</label>
+        <label for="postCost">هزینه ارسال با پست(ریال):</label>
         <input id="postCost" name="postCost" type="number" value="{{$postCost}}">
 
         <br>
 
-        <label for="freeDelivery">حداقل خرید برای ارسال رایگان(تومان):</label>
+        <label for="freeDelivery">حداقل خرید برای ارسال رایگان(ریال):</label>
         <input id="freeDelivery" name="freeDelivery" type="number" value="{{$freeDelivery}}">
 
         <br>

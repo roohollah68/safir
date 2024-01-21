@@ -15,7 +15,8 @@ class OrderProduct extends Model
         'photo',
         'product_id',
         'number',
-        'discount'
+        'discount',
+        'verify',
     ];
 
     public function order()

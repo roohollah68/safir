@@ -11,12 +11,14 @@ class CustomerTransactions extends Model
 
     protected $fillable = [
         'customer_id',
+        'order_id',
         'amount',
         'balance',
         'type',
         'description',
         'photo',
         'deleted',
+        'paymentLink',
     ];
 
     public function customer()

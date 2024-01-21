@@ -11,9 +11,11 @@
     <table class="stripe" id="product-table">
         <thead>
         <tr>
-            <th>تصویر</th>
+            <th>شماره</th>
             <th>نام</th>
-            <th>قیمت(تومان)</th>
+            <th>قیمت(ریال)</th>
+            <th>موجودی</th>
+            <th>حدآلارم</th>
             <th>وضعیت</th>
             <th>عملیات</th>
         </tr>
@@ -21,15 +23,18 @@
         <tbody>
         @foreach($products as $product)
             <tr>
-                <td>
-                    @if($product->photo)
-                    <a target="_blank" href="/product_photo/{{$product->photo}}">
-                        <p>مشاهده</p>
-                    </a>
-                        @endif
-                </td>
-                <td>{{$product->name}}</td>
+                {{--                <td>--}}
+                {{--                    @if($product->photo)--}}
+                {{--                    <a target="_blank" href="/product_photo/{{$product->photo}}">--}}
+                {{--                        <p>مشاهده</p>--}}
+                {{--                    </a>--}}
+                {{--                        @endif--}}
+                {{--                </td>--}}
+                <td>{{$product->id}}</td>
+                <td><a class="btn" href="/productQuantity/add/{{$product->id}}">{{$product->name}}</a></td>
                 <td>{{number_format($product->price)}}</td>
+                <td>{{$product->quantity}}</td>
+                <td>{{$product->alarm}}</td>
                 <td>
                     @if($product->available)
                         <p class="btn btn-success">موجود</p>
@@ -54,7 +59,9 @@
 @section('files')
     <script>
         $(function () {
-            $('#product-table').DataTable();
+            $('#product-table').DataTable({
+                order: [[3, "desc"]],
+            });
         });
 
         function delete_product(id) {

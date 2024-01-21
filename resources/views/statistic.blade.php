@@ -28,7 +28,7 @@
 
 
     <br>
-    <h4>کل مبلغ آمار فروش در این دوره :   <span>{{number_format($totalSale)}}</span> تومان </h4>
+    <h4>کل مبلغ آمار فروش در این دوره :   <span>{{number_format($totalSale)}}</span> ریال </h4>
     <br>
     <p>نمایش آمار از <span>{{$start}}</span> تا <span>{{$end}}</span></p>
     <table class="stripe" id="statistic-table">
@@ -36,8 +36,8 @@
         <tr>
             <th>نام محصول</th>
             <th>تعداد فروش</th>
-            <th>مبلغ کل(تومان)</th>
-            <th>قیمت میانگین(تومان)</th>
+            <th>مبلغ کل(ریال)</th>
+            <th>قیمت میانگین(ریال)</th>
         </tr>
         </thead>
         <tbody>

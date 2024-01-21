@@ -8,23 +8,6 @@
     @endif
 @endsection
 
-@section('files')
-    <script>
-        $(function () {
-            $('input[type="radio"]').checkboxradio();
-            @if($product)
-            if (!({{$product->available}}))
-                $('#notavailable').click();
-            @endif
-        });
-    </script>
-    <style>
-        #navailable.ui-state-active {
-            background: #ff0000;
-        }
-    </style>
-@endsection
-
 @section('content')
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
     <form action="" method="post" enctype="multipart/form-data">
@@ -57,7 +40,7 @@
                            value="{{old('price')}}"
                            @endif pattern="^[0-9]*$" required>
                     <div class="input-group-append" style="min-width: 120px">
-                        <label for="price" class="input-group-text w-100">تومان</label>
+                        <label for="price" class="input-group-text w-100">ریال</label>
                     </div>
                 </div>
             </div>
@@ -107,4 +90,21 @@
 
     </form>
 
+@endsection
+
+@section('files')
+    <script>
+        $(function () {
+            $('input[type="radio"]').checkboxradio();
+            @if($product)
+            if (!({{$product->available}}))
+                $('#notavailable').click();
+            @endif
+        });
+    </script>
+    <style>
+        #navailable.ui-state-active {
+            background: #ff0000;
+        }
+    </style>
 @endsection

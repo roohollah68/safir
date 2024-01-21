@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CouponLink;
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
@@ -10,66 +11,42 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PDF;
-use function PHPUnit\Framework\lessThanOrEqual;
 
 class OrderController extends Controller
 {
     public function showOrders()
     {
-        return view('orders');
-    }
-
-    public function getOrders()
-    {
         if ($this->isAdmin()) {
-            $users = User::withTrashed()->get();
-            $orders = Order::withTrashed()->orderBy('id', 'desc')->limit($this->settings()->loadOrders)->get();
+            $users = User::withTrashed()->get()->keyBy("id");
+            $orders = Order::withTrashed()->orderBy('id', 'desc')
+                ->limit($this->settings()->loadOrders)->get()->keyBy('id');
         } else {
-            $users = [auth()->user()];
-            $orders = auth()->user()->orders()->withTrashed()->orderBy('id', 'desc')->limit($this->settings()->loadOrders)->get();
+            $users = array();
+            $users[auth()->user()->id] = auth()->user();
+            $orders = auth()->user()->orders()->withTrashed()
+                ->orderBy('id', 'desc')->limit($this->settings()->loadOrders)->get()->keyBy('id');
         }
-
-        include('../app/jdf.php');
-        $dates = [];
-        foreach ($orders as $key => $order) {
-            $dates[$key][0] = $order->created_at->getTimestamp();
-            $dates[$key][1] = $order->updated_at->getTimestamp();
-            $order->deleted_at ? ($dates[$key][2] = $order->deleted_at->getTimestamp()) : ($dates[$key][2] = null);
-        }
-        foreach ($orders as $key => $order) {
-            $order->created_at_p = jdate('Y/m/d H:i', $dates[$key][0]);
-            $order->updated_at_p = jdate('Y/m/d H:i', $dates[$key][1]);
-            if ($dates[$key][2])
-                $order->deleted_at_p = jdate('Y/m/d H:i', $dates[$key][2]);
+        foreach ($orders as $id => $order) {
+            $order->created_at_p = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
+            $order->updated_at_p = verta($order->updated_at)->timezone('Asia/tehran')->formatJalaliDatetime();
+            if ($order->deleted_at)
+                $order->deleted_at_p = verta($order->deleted_at)->timezone('Asia/tehran')->formatJalaliDatetime();
             else
                 $order->deleted_at_p = null;
-            $orders[$key] = $order;
+            $orders[$id] = $order;
         }
-        return [$orders, $users, $this->isAdmin(), $this->userId()];
+        return view('orders', [
+            'users' => $users,
+            'orders' => $orders,
+            'userId' => $this->userId(),
+        ]);
     }
 
-    public function listOrderTelegram($id, $pass)
-    {
-        $user = User::findOrFail($id);
-        if ($user->telegram_code == $pass) {
-            auth()->login($user);
-            return redirect()->route('listOrders');
-        }
-        return abort(404);
-    }
-
-    public function newForm(Request $request)
+    public function newForm()
     {
         $user = auth()->user();
-        if ($this->isAdmin()) // استثنا  ادمین
+        if ($this->isAdmin())
             $products = Product::all()->keyBy('id');
-
-//        elseif ($user->id == 10) // استثنا خانوم موسوی
-//            $products = Product::where('price', '<>', '1')->get()->keyBy('id');
-//
-//        elseif ($user->id == 29) // استثنا شرکت برادر حامد
-//            $products = Product::where('price', '=', '1')->get()->keyBy('id');
-
         else
             $products = Product::where('price', '>', '1')->get()->keyBy('id');
         foreach ($products as $id => $product) {
@@ -80,94 +57,114 @@ class OrderController extends Controller
         $customers = $customersData->keyBy('name');
         $customersId = $customersData->keyBy('id');
         return view('addEditOrder', [
-            'req' => $request->all(),
-            'order' => false,
+            'edit' => false,
             'customers' => $customers,
             'customersId' => $customersId,
             'products' => $products,
             'settings' => $this->settings(),
-            'id' => $user->id
+            'id' => $user->id,
+            'cart' => (object)[],
         ]);
     }
 
     public function insertOrder(Request $request)
     {
         DB::beginTransaction();
-
         request()->validate([
             'receipt' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
             'name' => 'required|string|min:3',
             'address' => 'required|string|min:3',
             'phone' => 'required|string|min:11,max:11',
         ]);
-        $request->phone = $this->number_Fa_En($request->phone);
-        $request->zip_code = $this->number_Fa_En($request->zip_code);
+        $request->phone = $this->number_Fa_En($request->phone); //تبدیل اعداد فارسی به انگلیسی
+        $request->zip_code = $this->number_Fa_En($request->zip_code); //تبدیل اعداد فارسی به انگلیسی
 
         $user = auth()->user();
         $products = Product::where('available', true)->get()->keyBy('id');
         $request->orders = '';
-        $Total = 0;
-        $total = 0;
-        $customerCost = 0;
-
-        if ($this->isAdmin() && $request->factor)
-            $request->orders = 'طبق فاکتور';
-        else {
-            $deliveryCost = $this->deliveryCost($request->deliveryMethod);
-            $hasProduct = false;
-            foreach ($products as $id => $product) {
-                $number = $request['product_' . $id];
-                if ($number > 0) {
-                    $request->orders = $request->orders . ' ' . $product->name . ' ' . $number . 'عدد' . '،';
-                    if ($this->isAdmin())
-                        $coupon = $request['discount_' . $id];
-                    else
-                        $coupon = $this->calculateDis($id);
-                    $total += round((100 - $coupon) * $product->price * $number / 100);
-                    $Total += $product->price * $number;
-                    $hasProduct = true;
-                }
+        $Total = 0;     //جمع بدون احتساب تخفیف
+        $total = 0;  //جمع با احتساب تخفیف
+        $request->customerCost = 0;
+        $admin = $this->isAdmin();
+        $request->orderList = [];
+        foreach ($products as $id => $product) {
+            $number = $request['product_' . $id];
+            if ($number > 0) {
+                if ($number > $product->quantity)
+                    return $this->errorBack('تعداد درخواست شده از "' . $product->name . '" بیش از موجودی انبار است.');
+                $request->orders .= ' ' . $product->name . ' ' . $number . 'عدد' . '،';
+                $coupon = $this->calculateDis($id);
+                if ($admin)
+                    $coupon = $request['discount_' . $id];
+                $price = round((100 - $coupon) * $product->price / 100);
+                $total += $price * $number;
+                $Total += $product->price * $number;
+                $request->orderList[$id] = [
+                    'name' => $product->name,
+                    'price' => $price,
+                    'photo' => $product->photo,
+                    'product_id' => $product->id,
+                    'number' => $number,
+                    'discount' => $coupon,
+                    'verified' => !$admin,
+                ];
             }
-            if ($Total < $this->settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
-                $total += $deliveryCost;
-            if (!$hasProduct && $user->id != 29) {
-                return $this->errorBack('محصولی انتخاب نشده است!');
-            }
-            if (!$this->isAdmin())
-                if ($request->paymentMethod == 'credit') {
-                    if ($total > ($user->balance + $this->settings()->negative)) {
-                        return $this->errorBack('اعتبار شما کافی نیست!');
-                    } else {
-                        $user->update([
-                            'balance' => $user->balance - $total
-                        ]);
-                    }
-                } elseif ($request->paymentMethod == 'receipt') {
-                    if ($request->file("receipt")) {
-                        $request->receipt = $request->file("receipt")->store("", 'receipt');
-                    } elseif ($request->file) {
-                        $request->receipt = $request->file;
-                    } else {
-                        return $this->errorBack('باید عکس رسید بانکی بارگذاری شود!');
-                    }
-                } elseif ($request->paymentMethod == 'onDelivery') {
-                    $request->desc = $request->desc . '- پرداخت در محل';
-                    $customerCost = round($Total * (100 - $request->customerDiscount) / 100 + $deliveryCost);
-                } else
-                    return $this->errorBack('مشکلی پیش آمده!');
+        }
+        if (!count($request->orderList)) {
+            return $this->errorBack('محصولی انتخاب نشده است!');
         }
 
-        $request = $this->addToCustomers($request);
+        if (!$admin) {
+            $deliveryCost = $this->deliveryCost($request->deliveryMethod);
+            if ($Total < $this->settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
+                $total += $deliveryCost;
+            if ($request->paymentMethod == 'credit') {
+                if ($total > ($user->balance + $this->settings()->negative)) {
+                    return $this->errorBack('اعتبار شما کافی نیست!');
+                } else {
+                    $user->update([
+                        'balance' => $user->balance - $total
+                    ]);
+                }
+            } elseif ($request->paymentMethod == 'receipt') {
+                if ($request->file("receipt"))
+                    $request->receipt = $request->file("receipt")->store("", 'receipt');
+                else
+                    return $this->errorBack('باید عکس رسید بانکی بارگذاری شود!');
 
-        $order = $this->addToOrders($user, $request, $total, $customerCost);
+            } elseif ($request->paymentMethod == 'onDelivery') {
+                $request->desc .= '- پرداخت در محل';
+                $request->customerCost = round($Total * (100 - $request->customerDiscount) / 100 + $deliveryCost);
+            } else
+                return $this->errorBack('مشکلی پیش آمده!');
+        } else {
+            $request->paymentMethod = 'admin';
+            $request->deliveryMethod = 'admin';
+        }
+        $request->total = $total;
 
-        $this->addToOrderProducts($request, $products, $order);
+        $request->customerId = $this->addToCustomers($request);
 
-        $this->addToTransactions($request, $order, $user, $total);
+        $order = $this->addToOrders($request);
 
-        $this->addToCustomerTransactions($request, $order, $total);
+        $this->addToOrderProducts($request, $order);
 
-        app('Telegram')->sendOrderToBale($order, env('GroupId'));
+        $this->addToTransactions($request, $order);
+
+        if (!$admin)
+            foreach ($request->orderList as $id => $product) {
+                $products[$id]->update([
+                    'quantity' => $products[$id]->quantity - $product['number'],
+                ]);
+                $order->productChange()->create([
+                    'product_id' => $product['product_id'],
+                    'change' => -$product['number'],
+                    'quantity' => $products[$id]->quantity,
+                    'desc' => ' خرید سفیر '. $user->name
+                ]);
+            }
+
+        //app('Telegram')->sendOrderToBale($order, env('GroupId'));
 
         DB::commit();
 
@@ -200,19 +197,48 @@ class OrderController extends Controller
 
     public function editForm($id)
     {
+        $user = auth()->user();
         if ($this->isAdmin())
             $order = Order::findOrFail($id);
         else
-            $order = auth()->user()->orders()->findOrFail($id);
+            $order = $user->orders()->findOrFail($id);
 
-        if ($order->state > 0)
-            return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);;
-        $customers = auth()->user()->customers()->get()->keyBy('name');
-        return view('addEditOrder')->with(['order' => $order, 'customers' => $customers]);
+        if ($order->state)
+            return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
+
+        if ($this->isAdmin())
+            $products = Product::all()->keyBy('id');
+        else
+            $products = Product::where('price', '>', '1')->get()->keyBy('id');
+        foreach ($products as $id => $product) {
+            $products[$id]->coupon = $this->calculateDis($id);
+            $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
+        }
+        $customersData = $user->customers()->get();
+        $customers = $customersData->keyBy('name');
+        $customersId = $customersData->keyBy('id');
+        $selectedProducts = $order->orderProducts()->get();
+        $cart = [];
+        foreach ($selectedProducts as $product) {
+            $cart[$product->product_id] = $product->number;
+            $products[$product->product_id]->coupon = $product->discount;
+        }
+        return view('addEditOrder')->with([
+            'edit' => true,
+            'order' => $order,
+            'customers' => $customers,
+            'customersId' => $customersId,
+            'products' => $products,
+            'settings' => $this->settings(),
+            'id' => $user->id,
+            'cart' => $cart,
+        ]);
     }
 
     public function editOrder($id, Request $request)
     {
+        DB::beginTransaction();
+
         if ($this->isAdmin())
             $order = Order::findOrFail($id);
         else
@@ -228,32 +254,74 @@ class OrderController extends Controller
         $request->phone = $this->number_Fa_En($request->phone);
         $request->zip_code = $this->number_Fa_En($request->zip_code);
 
+        if ($this->isAdmin()) {
+            $orders = '';
+            $products = Product::where('available', true)->get()->keyBy('id');
+            $productOrders = $order->orderProducts()->get()->keyBy('product_id');
+            $total = 0;
+            foreach ($products as $id => $product) {
+                $number = $request['product_' . $id];
+                if ($number > 0) {
+                    $coupon = $request['discount_' . $id];
+                    $total += round((100 - $coupon) * $product->price * $number / 100);
+                    $orders .= ' ' . $product->name . ' ' . $number . 'عدد' . '،';
+                    if (isset($productOrders[$id]))
+                        $productOrders[$id]->update([
+                            'discount' => $request['discount_' . $id],
+                            'number' => $number,
+                            'price' => round((100 - $request['discount_' . $id]) * $product->price / 100),
+                        ]);
+                    else
+                        $order->orderProducts()->create([
+                            'discount' => $request['discount_' . $id],
+                            'number' => $number,
+                            'price' => round((100 - $request['discount_' . $id]) * $product->price / 100),
+                            'name' => $product->name,
+                            'product_id' => $id,
+                        ]);
+                }
+            }
+            foreach ($productOrders as $product_id => $productOrder) {
+                $number = $request['product_' . $product_id];
+                if ($number < 1 && $productOrder->number > 0)
+                    $productOrder->delete();
+            }
+        } else {
+            $orders = $order->orders;
+            $total = $order->total;
+        }
+
         $order->update([
             'name' => $request->name,
             'phone' => $request->phone,
             'address' => $request->address,
             'zip_code' => $request->zip_code,
             'desc' => $request->desc,
+            'orders' => $orders,
+            'total' => $total,
         ]);
 
         $this->addToCustomers($request);
 
+        DB::commit();
+
         return redirect()->route('listOrders');
     }
 
-    public function increaseState($id)
+    public function changeState($id)
     {
+        DB::beginTransaction();
         $order = Order::findOrFail($id);
-        if ($order->admin != $this->userId() && $order->admin)
-            return $order->state;
-        $user = User::findOrFail($order->user_id);
-        $order->state = '' . (($order->state + 1) % 4);
-        if ($order->state < 1)
+        if ($order->admin != $this->userId() && $order->admin && $order->paymentMethod == 'admin')
+            return [$order->state, $order->admin];
+        $user = $order->user()->first();
+        $order->state = !$order->state;
+        if (!$order->state)
             $order->admin = null;
         else
             $order->admin = $this->userId();
         if ($order->paymentMethod == 'onDelivery') {
-            if ($order->state == '1') {
+            if ($order->state) {
                 $user->balance += $order->customerCost - $order->total;
                 $order->transactions()->create([
                     'user_id' => $user->id,
@@ -262,7 +330,7 @@ class OrderController extends Controller
                     'type' => true,
                     'description' => 'سهم سفیر(پرداخت در محل)',
                 ]);
-            } elseif ($order->state == '0') {
+            } else {
                 $user->balance -= $order->customerCost - $order->total;
                 $order->transactions()->create([
                     'user_id' => $user->id,
@@ -275,6 +343,7 @@ class OrderController extends Controller
         }
         $order->save();
         $user->save();
+        DB::commit();
         return [$order->state, $order->admin];
 
     }
@@ -342,14 +411,56 @@ class OrderController extends Controller
     public function invoice($id)
     {
         $order = Order::findOrFail($id);
-        include('../app/jdf.php');
-        if ($order->admin != $this->userId() && $order->admin)
-            return 'not allowed request';
         $orderProducts = OrderProduct::where('order_id', $id)->get();
-        $order->created_at_p = jdate('H:i Y/m/d ', $order->created_at->getTimestamp());
-        $pdf = PDF::loadHTML('test' . (string)view('invoice', ['order' => $order, 'orderProducts' => $orderProducts]));
-        $pdf->stream('فاکتور_' . $order->name . $order->id . '.pdf');
+        $order->created_at_p = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
+        return view('orders.invoice', [
+            'order' => $order,
+            'orderProducts' => $orderProducts,
+        ]);
+    }
 
+    public function confirmInvoice($id)
+    {
+        DB::beginTransaction();
+        $order = Order::findOrFail($id);
+        $order->paymentMethod = 'credit';
+        $order->save();
+        $orderProducts = $order->orderProducts();
+        $orderProducts->update(['verified' => true]);
+        foreach ($orderProducts->get() as $orderProduct) {
+            $product = $orderProduct->product()->first();
+            $product->update([
+                'quantity' => $product->quantity - $orderProduct->number,
+            ]);
+            $order->productChange()->create([
+                'product_id' => $product->id,
+                'change' => -$orderProduct->number,
+                'quantity' => $product->quantity,
+                'desc' => ' خرید مشتری '. $order->name
+            ]);
+        }
+        $this->addToCustomerTransactions($order);
+        DB::commit();
+        return $order;
+    }
+
+    public function cancelInvoice($id)
+    {
+        DB::beginTransaction();
+        $order = Order::findOrFail($id);
+        $order->paymentMethod = 'admin';
+        $order->save();
+        $order->orderProducts()->update(['verified' => false]);
+        foreach ($order->productChange()->get() as $productChange) {
+            $product = $productChange->product()->first();
+            $product->update([
+                'quantity' => $product->quantity - $productChange->change,
+            ]);
+        }
+        $order->productChange()->delete();
+        $this->removeFromCustomerTransactions($order);
+        DB::commit();
+        return $order;
     }
 
     public function deleteOrder($id, Request $request)
@@ -360,11 +471,22 @@ class OrderController extends Controller
         else
             $order = auth()->user()->orders()->findOrFail($id);
 
-        if ($order->state > 0)
+        if ($order->state)
             return 'سفارش نمی تواند حذف شود، چون پردازش شده است!';
 
         if ($order->delete()) {
-            OrderProduct::where('order_id', $id)->delete();
+            $orderProducts = $order->orderProduct();
+            if (!$order->user()->first()->isAdmin()) {
+                foreach ($order->productChange()->get() as $productChange) {
+                    $product = $productChange->product()->first();
+                    $product->update([
+                        'quantity' => $product->quantity - $productChange->change,
+                    ]);
+                }
+                $order->productChange()->delete();
+            }
+            $orderProducts->delete();
+//            OrderProduct::where('order_id', $id)->delete();
             if ($order->paymentMethod == 'credit' && !$order->user()->first()->isAdmin()) {
                 $user = $order->user()->first();
                 $user->update([
@@ -378,26 +500,12 @@ class OrderController extends Controller
                     'description' => 'حذف سفارش',
                 ]);
             }
-
-            $customerTransaction = $order->customerTransactions()->first();
-            if ($customerTransaction) {
-                $customer = $customerTransaction->customer()->first();
-                $order->customerTransactions()->create([
-                    'amount' => $customerTransaction->amount,
-                    'description' => 'ابطال سفارش - ' . $customerTransaction->desc,
-                    'type' => true,
-                    'balance' => $customer->balance - $customerTransaction->amount,
-                    'customer_id' => $customer->id,
-                ]);
-                $customerTransaction->update([
-                    'deleted' => true,
-                ]);
-                $customer->update([
-                    'balance' => $customer->balance - $customerTransaction->amount,
-                ]);
-            }
+            $order->created_at_p = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
+            $order->updated_at_p = verta($order->updated_at)->timezone('Asia/tehran')->formatJalaliDatetime();
+            $order->deleted_at_p = verta($order->deleted_at)->timezone('Asia/tehran')->formatJalaliDatetime();
             DB::commit();
-            return 'با موفقیت حذف شد';
+            return ['با موفقیت حذف شد', $order];
+
         };
         return 'مشکلی به وجود آمده!';
     }
@@ -413,83 +521,79 @@ class OrderController extends Controller
         return $dis + $this->settings()->minCoupon;
     }
 
-    private function addToCustomers($request)
+    public function addToCustomers($request)
     {
-        if ($request->addToCustomers) {
-            $customer = auth()->user()->customers()->where('id', $request->customerId);
-            if ($customer->count()) {
-                $customer->update([
-                    'name' => $request->name,
-                    'phone' => $request->phone,
-                    'address' => $request->address,
-                    'zip_code' => $request->zip_code,
-                ]);
-            } else {
-                $customer = auth()->user()->customers()->create([
-                    'name' => $request->name,
-                    'phone' => $request->phone,
-                    'address' => $request->address,
-                    'zip_code' => $request->zip_code,
-                ]);
-            }
-            $request->customerId = $customer->id;
+        if ($request->addToCustomers || $this->isAdmin()) {
+            $customer = auth()->user()->customers()->updateOrCreate([
+                'id' => [$request->customerId]
+            ], [
+                'name' => $request->name,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'zip_code' => $request->zip_code,
+            ]);
+            return $customer->id;
         }
-        return $request;
     }
 
-    public function addToTransactions($request, $order, $user, $total)
+    public function addToTransactions($request, $order)
     {
         if (!$this->isAdmin() && $request->paymentMethod == 'credit')
             $order->transactions()->create([
-                'user_id' => $user->id,
-                'amount' => $total,
-                'balance' => $user->balance,
+                'user_id' => auth()->user()->id,
+                'amount' => $request->total,
+                'balance' => auth()->user()->balance,
                 'type' => false,
                 'description' => 'ثبت سفارش',
             ]);
     }
 
-    public function addToCustomerTransactions($request, $order, $total)
+    public function addToCustomerTransactions($order)
     {
-        if ($this->isAdmin() && $request->customerId) {
-            $customer = auth()->user()->customers()->where('id', $request->customerId)->first();
-            $customer->update([
-                'balance' => $customer->balance - $total
-            ]);
-            $order->customerTransactions()->create([
-                'customer_id' => $request->customerId,
-                'amount' => $total,
-                'balance' => $customer->balance,
-                'type' => false,
-                'description' => 'ثبت سفارش',
-            ]);
+        $customer = $order->customer()->first();
+        $customer->update([
+            'balance' => $customer->balance - $order->total,
+        ]);
+        $customer->transactions()->create([
+            'order_id' => $order->id,
+            'amount' => $order->total,
+            'balance' => $customer->balance,
+            'type' => false,
+            'description' => 'تایید سفارش ' . $order->id,
+        ]);
+    }
+
+    public function removeFromCustomerTransactions($order)
+    {
+        $customerTransaction = $order->customerTransactions()->latest()->first();
+        $customer = $customerTransaction->customer()->first();
+        $order->customerTransactions()->create([
+            'amount' => $customerTransaction->amount,
+            'description' => 'ابطال سفارش  ' . $order->id,
+            'type' => true,
+            'balance' => $customer->balance + $customerTransaction->amount,
+            'customer_id' => $customer->id,
+            'deleted' => true,
+        ]);
+        $customerTransaction->update([
+            'deleted' => true,
+            'description' => $customerTransaction->description . '* باطل شد'
+        ]);
+        $customer->update([
+            'balance' => $customer->balance + $customerTransaction->amount,
+        ]);
+    }
+
+    public function addToOrderProducts($request, $order)
+    {
+        foreach ($request->orderList as $id => $product) {
+            $order->orderProducts()->create($product);
         }
     }
 
-    public function addToOrderProducts($request, $products, $order)
+    public function addToOrders($request)
     {
-        foreach ($products as $id => $product) {
-            if (($request['product_' . $id]) > 0) {
-                if ($this->isAdmin())
-                    $coupon = $request['discount_' . $id];
-                else
-                    $coupon = $this->calculateDis($product->id);
-                $price = round((100 - $coupon) * $product->price / 100);
-                $order->orderProducts()->create([
-                    'name' => $product->name,
-                    'price' => $price,
-                    'photo' => $product->photo,
-                    'product_id' => $product->id,
-                    'number' => $request['product_' . $id],
-                    'discount' => $coupon,
-                ]);
-            }
-        }
-    }
-
-    public function addToOrders($user, $request, $total, $customerCost)
-    {
-        return $user->orders()->create([
+        return auth()->user()->orders()->create([
             'name' => $request->name,
             'phone' => $request->phone,
             'address' => $request->address,
@@ -497,8 +601,8 @@ class OrderController extends Controller
             'orders' => $request->orders,
             'desc' => $request->desc,
             'receipt' => $request->receipt,
-            'total' => $total,
-            'customerCost' => $customerCost,
+            'total' => $request->total,
+            'customerCost' => $request->customerCost,
             'paymentMethod' => $request->paymentMethod,
             'deliveryMethod' => $request->deliveryMethod,
             'customer_id' => $request->customerId,

@@ -19,6 +19,8 @@ class CreateProductsTable extends Migration
             $table->decimal('price',10,0,true);
             $table->string('photo')->nullable();
             $table->boolean('available')->default(true);
+            $table->integer('quantity')->default('0');
+            $table->integer('alarm')->default('10');
             $table->timestamps();
         });
     }

@@ -11,8 +11,12 @@ class CustomerController extends Controller
 {
     public function customersList()
     {
-        $customers = auth()->user()->customers()->get();
-        return view('customerList', ['customers' => $customers]);
+        $customers = auth()->user()->customers()->get()->keyBy("id");;
+        $total = 0;
+        foreach ($customers as $customer) {
+            $total += $customer->balance;
+        }
+        return view('customerList', ['customers' => $customers, 'total' => $total]);
     }
 
     public function customersTransactionList($id)
@@ -92,10 +96,15 @@ class CustomerController extends Controller
         return redirect()->route('CustomerList');
     }
 
-    public function newForm($id)
+    public function newForm($id, $linkId = false)
     {
         $customer = auth()->user()->customers()->find($id);
-        return view('addEditCustomerDeposit', ['customer' => $customer, 'deposit' => false]);
+        if ($linkId) {
+            $link = CustomerTransactions::find($linkId);
+        } else {
+            $link = false;
+        }
+        return view('addEditCustomerDeposit', ['customer' => $customer, 'deposit' => false, 'link' => $link]);
     }
 
     public function storeNew(Request $req)
@@ -111,20 +120,27 @@ class CustomerController extends Controller
         if ($req->file("photo")) {
             $photo = $req->file("photo")->store("", 'deposit');
         }
+        $order_id = '';
+        if ($req->link)
+            $order_id = CustomerTransactions::find($req->link)->order()->first()->id;
 
         $customer = Customer::find($req->id);
-        $customer->transactions()->create([
+        $newTransaction = $customer->transactions()->create([
             'amount' => $req->amount,
-            'description' => 'ثبت واریزی - ' . $req->desc,
+            'description' => 'واریزی ' .$order_id. ' * ' . $req->desc,
             'type' => true,
             'photo' => $photo,
             'balance' => $customer->balance + $req->amount,
+            'paymentLink' => $req->link,
         ]);
 
         $customer->update([
             'balance' => $customer->balance + $req->amount,
         ]);
-
+        if ($req->link)
+            $customer->transactions()->find($req->link)->update([
+                'paymentLink' => $newTransaction->id,
+            ]);
         DB::commit();
 
         return redirect('/customer/transaction/' . $req->id);
@@ -134,18 +150,24 @@ class CustomerController extends Controller
     {
         DB::beginTransaction();
         $transaction = CustomerTransactions::find($id);
-        $customer = Customer::find($transaction->customer_id);
-        CustomerTransactions::create([
+        $customer = $transaction->customer()->first();
+        $customer->transactions()->create([
             'amount' => $transaction->amount,
             'description' => 'ابطال ثبت واریزی - ' . $transaction->desc,
             'type' => false,
             'photo' => $transaction->photo,
             'balance' => $customer->balance - $transaction->amount,
-            'customer_id' => $transaction->customer_id
+            'deleted' => true,
         ]);
+        if ($transaction->paymentLink) {
+            CustomerTransactions::find($transaction->paymentLink)->update([
+                'paymentLink' => null,
+            ]);
+        }
         $transaction->update([
-            'deleted'=>true,
-            'description' => $transaction->description . '- باطل شد',
+            'paymentLink' => null,
+            'deleted' => true,
+            'description' => $transaction->description . '* باطل شد',
         ]);
         $customer->update([
             'balance' => $customer->balance - $transaction->amount,

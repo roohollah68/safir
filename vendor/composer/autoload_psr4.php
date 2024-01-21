@@ -57,6 +57,7 @@ return array(
     'Mpdf\\' => array($vendorDir . '/mpdf/mpdf/src'),
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
     'Mccarlosen\\LaravelMpdf\\' => array($vendorDir . '/carlos-meneses/laravel-mpdf/src'),
+    'Livewire\\' => array($vendorDir . '/livewire/livewire/src'),
     'League\\MimeTypeDetection\\' => array($vendorDir . '/league/mime-type-detection/src'),
     'League\\Flysystem\\' => array($vendorDir . '/league/flysystem/src'),
     'League\\Config\\' => array($vendorDir . '/league/config/src'),
