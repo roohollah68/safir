@@ -475,7 +475,7 @@ class OrderController extends Controller
             return 'سفارش نمی تواند حذف شود، چون پردازش شده است!';
 
         if ($order->delete()) {
-            $orderProducts = $order->orderProduct();
+            $orderProducts = $order->orderProducts();
             if (!$order->user()->first()->isAdmin()) {
                 foreach ($order->productChange()->get() as $productChange) {
                     $product = $productChange->product()->first();
