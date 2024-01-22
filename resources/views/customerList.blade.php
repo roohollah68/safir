@@ -17,73 +17,75 @@
     <br>
     <br>
     <div id="table-container">
-    <table class="stripe" id="customer-table">
-        <thead>
-        <tr>
-            <th>شماره</th>
-            <th>نام</th>
-            <th>شماره تماس</th>
-            <th>آدرس</th>
-            @if($admin)
-                <th>بدهکاری(ریال)</th>
-            @else
-                <th>کد پستی</th>
-            @endif
-
-            <th>عملیات</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach($customers as $customer)
+        <table class="stripe" id="customer-table">
+            <thead>
             <tr>
-                <td>{{$customer->id}}</td>
-                <td>{{$customer->name}}</td>
-                <td>{{$customer->phone}}</td>
-                <td>{{$customer->address}}</td>
+                <th>شماره</th>
+                <th>نام</th>
+                <th>شماره تماس</th>
+                <th>آدرس</th>
                 @if($admin)
-                    <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
-                                     class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
+                    <th>بدهکاری(ریال)</th>
                 @else
-                    <td>{{$customer->zip_code}}</td>
+                    <th>کد پستی</th>
                 @endif
 
-                <td>
-                    <a class="btn btn-primary" href="/customer/edit/{{$customer->id}}">ویرایش</a>
-
+                <th>عملیات</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($customers as $customer)
+                <tr>
+                    <td>{{$customer->id}}</td>
+                    <td>{{$customer->name}}</td>
+                    <td>{{$customer->phone}}</td>
+                    <td>{{$customer->address}}</td>
                     @if($admin)
-                        <a class="btn btn-info" href="/customer/transaction/{{$customer->id}}">تراکنش ها</a>
+                        <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
+                                         class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
+                    @else
+                        <td>{{$customer->zip_code}}</td>
                     @endif
-                    @if($customer->balance == 0)
-                        <a class="btn btn-danger" onclick="delete_customer({{$customer->id}})">حذف</a>
-                    @endif
-                </td>
-            </tr>
-        @endforeach
-        </tbody>
-    </table>
+
+                    <td>
+                        <a class="btn btn-primary" href="/customer/edit/{{$customer->id}}">ویرایش</a>
+
+                        @if($admin)
+                            <a class="btn btn-info" href="/customer/transaction/{{$customer->id}}">تراکنش ها</a>
+                        @endif
+                        @if($customer->balance == 0)
+                            <a class="btn btn-danger" onclick="delete_customer({{$customer->id}})">حذف</a>
+                        @endif
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
     </div>
-    <table class="stripe" style="display: none" id="brief-table">
-        <thead>
-        <tr>
-            <th>شماره مشتری</th>
-            <th>نام</th>
-            <th>بدهی(ریال)</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach($customers as $customer)
-            @if($customer->balance == 0)
-                @continue
-            @endif
+    <div style="display: none" id="brief-table">
+        <table class="stripe">
+            <thead>
             <tr>
-                <td>{{$customer->id}}</td>
-                <td>{{$customer->name}}</td>
-                <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
-                                 class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
+                <th>شماره مشتری</th>
+                <th>نام</th>
+                <th>بدهی(ریال)</th>
             </tr>
-        @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach($customers as $customer)
+                @if($customer->balance == 0)
+                    @continue
+                @endif
+                <tr>
+                    <td>{{$customer->id}}</td>
+                    <td>{{$customer->name}}</td>
+                    <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
+                                     class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+    </div>
 
 @endsection
 
