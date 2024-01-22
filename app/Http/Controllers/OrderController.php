@@ -53,7 +53,14 @@ class OrderController extends Controller
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
         }
-        $customersData = auth()->user()->customers()->get();
+        if($this->isAdmin()) {
+//            $customersData = Customer::where('id','>',0)->get()->reject(function ($customer){
+//                return $customer->user()->role == 'user';
+//            });
+            $customersData = auth()->user()->customers()->get();
+        }else
+            $customersData = auth()->user()->customers()->get();
+
         $customers = $customersData->keyBy('name');
         $customersId = $customersData->keyBy('id');
         return view('addEditOrder', [

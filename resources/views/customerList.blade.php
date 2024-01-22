@@ -103,7 +103,7 @@
                 pageLength: 100,
             });
             $('#brief-table').hide();
-            
+
 
         });
 
