@@ -62,7 +62,7 @@
             </tbody>
         </table>
     </div>
-    <div style="display: none" id="brief-table">
+    <div id="brief-table">
         <table class="stripe">
             <thead>
             <tr>
@@ -102,6 +102,7 @@
                 order: [[2, "asc"]],
                 pageLength: 100,
             });
+            $('#brief-table').hide()
         });
 
         function delete_customer(id) {
