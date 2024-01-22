@@ -28,11 +28,11 @@
                 </select>
             </div>
         </div>
-    @endif
-    <table id="main-table" class="stripe">
-    </table>
-    @if($admin)
+
         <button class="btn btn-secondary m-2" onclick="generatePDFs()"> فایل PDF انتخابی ها</button>
         <div id="invoice-wrapper" class="d-none"></div>
     @endif
+    <table id="main-table" class="stripe">
+    </table>
+
 @endsection
