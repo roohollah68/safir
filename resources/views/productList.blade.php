@@ -5,7 +5,10 @@
 @endsection
 
 @section('content')
-    <a class="btn btn-info" href="{{route('addProduct')}}">افزودن محصول جدید</a>
+    <a class="btn btn-info" href="{{route('addProduct')}}">
+        <span class=" fa fa-plus"></span>
+        افزودن محصول جدید
+    </a>
     <span class="btn btn-warning" onclick="$('.high-quantity').toggle()">
         <span class="fa fa-check deleted high-quantity"></span>محصولات با موجودی کم
     </span>
