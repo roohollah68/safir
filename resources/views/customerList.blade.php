@@ -98,13 +98,13 @@
                 order: [[4, "asc"]],
                 pageLength: 100,
             });
-            $('#brief-table').DataTable({
+            $('#brief-table table').DataTable({
                 order: [[2, "asc"]],
                 pageLength: 100,
             });
-            setTimeout(function (){
-                $('#brief-table').hide()
-            },200)
+            // setTimeout(function (){
+            //     $('#brief-table').hide()
+            // },200)
 
         });
 
