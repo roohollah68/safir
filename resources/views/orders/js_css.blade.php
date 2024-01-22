@@ -187,7 +187,7 @@
     function createdTime(order) {
 
         let timestamp = new Date(order.created_at);
-        timestamp = timestamp.getTime() + 1000 * 3600 * 3.5;
+        timestamp = timestamp.getTime(); //+ 1000 * 3600 * 3.5
         let diff = (Date.now() - timestamp) / 1000;
         let res = `<span class="d-none">${timestamp}</span>`;
         if (diff < 60) {
