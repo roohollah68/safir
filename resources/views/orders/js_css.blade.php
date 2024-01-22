@@ -234,13 +234,13 @@
 
         let res = viewOrder;
 
-        if(deleted)
+        if (deleted)
             return res;
 
-        if ( !order.state && (creatorRole === 'user' || order.paymentMethod === 'admin'))
+        if (!order.state && (creatorRole === 'user' || order.paymentMethod === 'admin'))
             res += deleteOrder + editOrder;
 
-        if (role === 'print' || role === 'admin')
+        if ((role === 'print' || role === 'admin') && order.state)
             res += generatePDF
 
         if (creatorRole === 'admin' && role === 'admin') {
@@ -250,7 +250,7 @@
             } else if (!order.state) {
                 res += invoice;
                 res += cancelInvoice;
-            }else
+            } else
                 res += invoice;
         }
         return res;
@@ -323,7 +323,7 @@
     }
 
     function cancelInvoice(id, element) {
-        if (confirm('آیا از حذف کردن فاکتور مطمئن هستید؟')){
+        if (confirm('آیا از حذف کردن فاکتور مطمئن هستید؟')) {
             $.post('cancel_invoice/' + id, {_token: token})
                 .done(res => {
                     orders[id] = res;
