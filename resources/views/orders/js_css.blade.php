@@ -274,7 +274,7 @@
     function change_state(id, element) {
         if (!isAdmin || (orders[id].admin !== userId && orders[id].state))
             return
-        if (orders[id].paymentMethod === 'admin') {
+        if (orders[id].paymentMethod === 'admin' && users[orders[id].user_id].role == 'admin') {
             alert('ابتدا فاکتور باید تایید شود!');
             return
         }
