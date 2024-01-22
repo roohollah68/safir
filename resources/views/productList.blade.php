@@ -6,6 +6,12 @@
 
 @section('content')
     <a class="btn btn-info" href="{{route('addProduct')}}">افزودن محصول جدید</a>
+    <span class="btn btn-warning" onclick="$('.high-quantity').toggle()">
+        <span class="fa fa-check deleted high-quantity"></span>محصولات با موجودی کم
+    </span>
+    <span class="btn btn-primary" onclick="$('.not-available').toggle()">
+        <span class="fa fa-check not-available"></span>محصولات موجود
+    </span>
     <br>
     <br>
     <table class="stripe" id="product-table">
@@ -22,14 +28,8 @@
         </thead>
         <tbody>
         @foreach($products as $product)
-            <tr>
-                {{--                <td>--}}
-                {{--                    @if($product->photo)--}}
-                {{--                    <a target="_blank" href="/product_photo/{{$product->photo}}">--}}
-                {{--                        <p>مشاهده</p>--}}
-                {{--                    </a>--}}
-                {{--                        @endif--}}
-                {{--                </td>--}}
+            <tr class="{{$product->alarm > $product->quantity ? '' : 'high-quantity'}}
+            {{$product->available?'':'deleted not-available'}}">
                 <td>{{$product->id}}</td>
                 <td><a class="btn" href="/productQuantity/add/{{$product->id}}">{{$product->name}}</a></td>
                 <td>{{number_format($product->price)}}</td>
@@ -61,6 +61,7 @@
         $(function () {
             $('#product-table').DataTable({
                 order: [[3, "desc"]],
+                paging: false,
             });
         });
 
@@ -73,7 +74,10 @@
                 :
                 ""
         }
-
-
     </script>
+    <style>
+        .deleted {
+            display: none;
+        }
+    </style>
 @endsection

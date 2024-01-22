@@ -28,8 +28,8 @@
         refreshProducts()
         $("input[type=radio]").checkboxradio();
         product_table = $('#product-table').DataTable({
-            "autoWidth": false,
-            "paging": false,
+            autoWidth: false,
+            paging: false,
             order: [[3, "desc"]],
         });
 
