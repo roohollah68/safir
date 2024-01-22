@@ -102,7 +102,10 @@
                 order: [[2, "asc"]],
                 pageLength: 100,
             });
-            $('#brief-table').hide()
+            setTimeout(function (){
+                $('#brief-table').hide()
+            },200)
+
         });
 
         function delete_customer(id) {
