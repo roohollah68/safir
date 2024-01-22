@@ -102,9 +102,8 @@
                 order: [[2, "asc"]],
                 pageLength: 100,
             });
-            // setTimeout(function (){
-            //     $('#brief-table').hide()
-            // },200)
+            $('#brief-table').hide();
+            
 
         });
 
