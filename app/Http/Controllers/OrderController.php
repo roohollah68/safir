@@ -164,7 +164,7 @@ class OrderController extends Controller
                 ]);
             }
 
-        //app('Telegram')->sendOrderToBale($order, env('GroupId'));
+        app('Telegram')->sendOrderToBale($order, env('GroupId'));
 
         DB::commit();
 
