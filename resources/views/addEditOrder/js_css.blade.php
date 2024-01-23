@@ -183,6 +183,7 @@
     }
 
     function beforeSubmit() {
+        $('input[type="search"]').val('').keyup();
         if (!Object.keys(cart).length) {
             alert('محصولی انتخاب نشده است');
             return false;
@@ -192,6 +193,7 @@
         @else
         if (submit)
             return submit
+
         $('#invoice-name').text($('#name').val());
         $('#invoice-phone').text($('#phone').val());
         $('#invoice-address').text($('#address').val());
