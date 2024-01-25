@@ -44,7 +44,6 @@ class WoocommerceController extends Controller
             'zip_code' => $request->billing->postcode,
             'orders' => $orders,
             'desc' => $request->customer_note .' - '.$request->shipping_lines[0]->method_title . ' - ' . $desc,
-//            'receipt' => $request->receipt,
             'total' => $request->total,
             'customerCost' => 0,
             'paymentMethod' => 'admin',

@@ -52,8 +52,8 @@
                         @endphp
                         @foreach($orderProducts as $orderProduct)
                             @php
-                                $t= ($orderProduct->price * $orderProduct->number)*10; //قیمت * تعداد
-                                $original = round((100/(100-$orderProduct->discount))*$orderProduct->price)*10;
+                                $t= ($orderProduct->price * $orderProduct->number); //قیمت * تعداد
+                                $original = round((100/(100-$orderProduct->discount))*$orderProduct->price);
                                 $total_original = $total_original + $original;
                                 $total = $total + $t;
                             @endphp
@@ -63,7 +63,7 @@
                                 <td>{{$orderProduct->number}}</td>
                                 <td>{{number_format($original)}}</td>
                                 <td>{{$orderProduct->discount}}</td>
-                                <td>{{number_format($orderProduct->price*10)}}</td>
+                                <td>{{number_format($orderProduct->price)}}</td>
                                 <td>{{number_format($t)}}</td>
                             </tr>
                         @endforeach
@@ -146,20 +146,8 @@
                     width: 9%;
                 }
 
-                .w-10 {
-                    width: 10%;
-                }
-
-                .w-11 {
-                    width: 11%;
-                }
-
                 .w-12 {
                     width: 12%;
-                }
-
-                .w-15 {
-                    width: 15%;
                 }
 
                 .w-20 {
@@ -168,10 +156,6 @@
 
                 .w-23 {
                     width: 23%;
-                }
-
-                .w-30 {
-                    width: 30%;
                 }
 
                 .w-33 {
@@ -184,22 +168,6 @@
 
                 .w-42 {
                     width: 42%;
-                }
-
-                .w-70 {
-                    width: 70%;
-                }
-
-                .w-80 {
-                    width: 80%;
-                }
-
-                .w-90 {
-                    width: 90%;
-                }
-
-                .w-95 {
-                    width: 95%;
                 }
 
                 .w-100 {

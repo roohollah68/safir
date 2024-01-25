@@ -360,6 +360,8 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         if ($order->admin != $this->userId() && $order->admin)
             abort(405);
+        if($order->user()->first()->role == 'admin')
+            $order->orders = 'طبق فاکتور';
         $font = 28;
         do {
             $pdf = PDF::loadView('pdf', ['order' => $order], [], [
@@ -385,6 +387,8 @@ class OrderController extends Controller
             $order = Order::findOrFail($id);
             if ($order->admin != $this->userId() && $order->admin)
                 abort(405);
+            if($order->user()->first()->role == 'admin')
+                $order->orders = 'طبق فاکتور';
             $font = 28;
             do {
                 $font = $font - 1;

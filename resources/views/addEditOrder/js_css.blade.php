@@ -234,12 +234,12 @@
         @elseif($edit)
         $('#name').val("{{$order->name}}");
         $('#phone').val("{{$order->phone}}");
-        $('#address').val("{{$order->address}}");
-        $('#zip_code').val("{{$order->zip_code}}");
-        $('#desc').val("{{$order->desc}}");
-        $('#customerId').val("{{$order->customer_id}}");
-        deliveryMethod = "{{$order->deliveryMethod}}";
-        paymentMethod = "{{$order->paymentMethod}}";
+        $('#address').val(`{{$order->address}}`);
+        $('#zip_code').val(`{{$order->zip_code}}`);
+        $('#desc').val(`{{$order->desc}}`);
+        $('#customerId').val(`{{$order->customer_id}}`);
+        deliveryMethod = `{{$order->deliveryMethod}}`;
+        paymentMethod = `{{$order->paymentMethod}}`;
 
         @if($order->paymentMethod == 'receipt')
         $('#edit-payment-method').html(`<p>نحوه پرداخت: کارت به کارت با رسید بانکی .</p>
