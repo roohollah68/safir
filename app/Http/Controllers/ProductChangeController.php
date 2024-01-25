@@ -68,15 +68,20 @@ class ProductChangeController extends Controller
     public function productAlarm()
     {
         $products = Product::all();
-        $message = 'لیست محصولات با موجودی کم:/n';
+        $message = 'لیست محصولات با موجودی کم:
+';
+        $condition = false;
         foreach ($products as $product) {
             if ($product->available && ($product->alarm > $product->quantity)) {
-                $message .= $product->name . ' -> ' . $product->quantity . '/n';
+                $message .= '⬅️ ' . $product->name . ' -> ' . $product->quantity . '
+';
+                $condition = true;
             }
-            $content = array( "text" => $message);
-            $chatId = '';
-            $this->sendMessageToBale($content, $chatId);
-
         }
+//        return $message;
+        $content = array("text" => $message);
+        $chatId = '6192295684';
+        if ($condition)
+            $this->sendMessageToBale($content, $chatId);
     }
 }

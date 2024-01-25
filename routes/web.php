@@ -125,4 +125,6 @@ Route::group(['middleware'=>['auth','admin']],function (){
 Route::post('/woocommerce/{website}' , [WoocommerceController::class , 'addPeptinaOrder']);
 Route::get('/backup', [TelegramController::class , 'backUpDatabase']);
 
+Route::get('/product/alarm',[ProductChangeController::class , 'productAlarm']);
+
 require __DIR__.'/auth.php';
