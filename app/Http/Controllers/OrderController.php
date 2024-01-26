@@ -53,12 +53,12 @@ class OrderController extends Controller
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
         }
-        if($this->isAdmin()) {
+        if ($this->isAdmin()) {
 //            $customersData = Customer::where('id','>',0)->get()->reject(function ($customer){
 //                return $customer->user()->role == 'user';
 //            });
             $customersData = auth()->user()->customers()->get();
-        }else
+        } else
             $customersData = auth()->user()->customers()->get();
 
         $customers = $customersData->keyBy('name');
@@ -71,6 +71,7 @@ class OrderController extends Controller
             'settings' => $this->settings(),
             'id' => $user->id,
             'cart' => (object)[],
+            'creator'=>$this->isAdmin(),
         ]);
     }
 
@@ -167,7 +168,7 @@ class OrderController extends Controller
                     'product_id' => $product['product_id'],
                     'change' => -$product['number'],
                     'quantity' => $products[$id]->quantity,
-                    'desc' => ' خرید سفیر '. $user->name
+                    'desc' => ' خرید سفیر ' . $user->name
                 ]);
             }
 
@@ -212,7 +213,7 @@ class OrderController extends Controller
 
         if ($order->state)
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
-
+        $creator = $order->user()->first()->role == 'admin';
         if ($this->isAdmin())
             $products = Product::all()->keyBy('id');
         else
@@ -239,6 +240,7 @@ class OrderController extends Controller
             'settings' => $this->settings(),
             'id' => $user->id,
             'cart' => $cart,
+            'creator' => $creator,
         ]);
     }
 
@@ -261,7 +263,7 @@ class OrderController extends Controller
         $request->phone = $this->number_Fa_En($request->phone);
         $request->zip_code = $this->number_Fa_En($request->zip_code);
 
-        if ($this->isAdmin()) {
+        if ($order->user()->first()->role == 'admin') {
             $orders = '';
             $products = Product::where('available', true)->get()->keyBy('id');
             $productOrders = $order->orderProducts()->get()->keyBy('product_id');
@@ -360,7 +362,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         if ($order->admin != $this->userId() && $order->admin)
             abort(405);
-        if($order->user()->first()->role == 'admin')
+        if ($order->user()->first()->role == 'admin')
             $order->orders = 'طبق فاکتور';
         $font = 28;
         do {
@@ -387,7 +389,7 @@ class OrderController extends Controller
             $order = Order::findOrFail($id);
             if ($order->admin != $this->userId() && $order->admin)
                 abort(405);
-            if($order->user()->first()->role == 'admin')
+            if ($order->user()->first()->role == 'admin')
                 $order->orders = 'طبق فاکتور';
             $font = 28;
             do {
@@ -447,7 +449,7 @@ class OrderController extends Controller
                 'product_id' => $product->id,
                 'change' => -$orderProduct->number,
                 'quantity' => $product->quantity,
-                'desc' => ' خرید مشتری '. $order->name
+                'desc' => ' خرید مشتری ' . $order->name
             ]);
         }
         $this->addToCustomerTransactions($order);

@@ -77,21 +77,28 @@ class Controller extends BaseController
     public function sendMessageToBale($array, $chatId)
     {
         $bot = new BaleAPIv2(env('BaleToken'));
-        $array["chat_id"] =  $chatId;
+        $array["chat_id"] = $chatId;
+        $bot->sendText($array);
+    }
+
+    public function sendTextToBale($text, $chatId)
+    {
+        $bot = new BaleAPIv2(env('BaleToken'));
+        $array = array('chat_id' =>$chatId , "text" => $text);
         $bot->sendText($array);
     }
 
     public function sendPhotoToBale($array, $chatId)
     {
         $bot = new BaleAPIv2(env('BaleToken'));
-        $array["chat_id"] =  $chatId;
+        $array["chat_id"] = $chatId;
         $bot->sendPhoto($array);
     }
 
     public function sendDocumentToBale($array, $chatId)
     {
         $bot = new BaleAPIv2(env('BaleToken'));
-        $array["chat_id"] =  $chatId;
+        $array["chat_id"] = $chatId;
         return $bot->sendDocument($array);
     }
 }

@@ -1,7 +1,7 @@
 <x-auth-validation-errors class="mb-4" id="errors" :errors="$errors"/>
 <form id="form" action="" method="post" enctype="multipart/form-data" onsubmit="return beforeSubmit();">
     @csrf
-    @if($admin)
+    @if($creator)
         <label for="customerId">شماره مشتری:</label>
         <input type="number" value="{{old('customerId')}}" min="0" step="1" name="customerId" id="customerId" style="width: 70px"
                onchange="customerFind()">
@@ -51,7 +51,7 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group input-group required">
-                    <div class="input-group-append w-25" style="/*min-width: 160px">
+                    <div class="input-group-append w-25">
                         <label for="orders" class="input-group-text w-100">سفارشات:</label>
                     </div>
                     <div class="w-75 border">

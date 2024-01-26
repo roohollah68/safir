@@ -1,4 +1,4 @@
-@if($admin || !$edit)
+@if(($edit && $creator) || !$edit)
     <div id="products" class="my-4">
         <table class="stripe" id="product-table">
             <thead>
@@ -61,5 +61,5 @@
         </table>
         {{--                <span class="btn btn-info" onclick="formMode()">بازگشت</span>--}}
     </div>
-    @endif
+@endif
     </form>

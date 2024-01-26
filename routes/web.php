@@ -123,6 +123,7 @@ Route::group(['middleware'=>['auth','admin']],function (){
 //Route::get('/deposit/add/{id}/{pass}/{file_id}' , [DepositController::class , 'newDepositWithPhotoTelegram']);
 
 Route::post('/woocommerce/{website}' , [WoocommerceController::class , 'addPeptinaOrder']);
+Route::get('/woocommerce/{website}' , [WoocommerceController::class , 'addPeptinaOrder']);
 Route::get('/backup', [TelegramController::class , 'backUpDatabase']);
 
 Route::get('/product/alarm',[ProductChangeController::class , 'productAlarm']);

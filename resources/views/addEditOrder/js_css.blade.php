@@ -1,20 +1,5 @@
 <script>
 
-    $(function () {
-        setTimeout(function () {
-            $("#errors").hide()
-        }, 10000);
-        $("#name").autocomplete({
-            source: Object.keys(customers),
-            select: function (event, ui) {
-                let customer = customers[ui.item.value];
-                setCustomerInfo(customer);
-            }
-        });
-        $("#addToCustomers").checkboxradio();
-    });
-
-
     let customers = {!!json_encode($customers)!!};
     let customersId = {!!json_encode($customersId)!!};
     let paymentMethod = "credit";
@@ -23,16 +8,32 @@
     let products = {!!json_encode($products)!!};
     let cart = {!!json_encode($cart)!!};
     let submit = false;
+    let creator = !!'{{$creator}}';
     $(function () {
+        setTimeout(function () {
+            $("#errors").hide()
+        }, 10000);
         startEditProccess();
-        refreshProducts()
+
         $("input[type=radio]").checkboxradio();
+        $("#addToCustomers").checkboxradio();
+    });
+
+    @if(($edit && $creator) || !$edit)
+    $(function () {
         product_table = $('#product-table').DataTable({
             autoWidth: false,
             paging: false,
             order: [[3, "desc"]],
         });
-
+        $("#name").autocomplete({
+            source: Object.keys(customers),
+            select: function (event, ui) {
+                let customer = customers[ui.item.value];
+                setCustomerInfo(customer);
+            }
+        });
+        refreshProducts()
         $('input[name=paymentMethod]').click(paymentAction);
         $('input[name=deliveryMethod]').click(deliveryAction);
     });
@@ -182,18 +183,28 @@
         $('#zip_code').val(customer.zip_code);
     }
 
+    function changeDiscount(id, value) {
+        value = Math.min(100, +value);
+        value = Math.max(0, +value);
+        value = Math.round(value);
+        $('#discount_' + id).val(value);
+        products[id].coupon = value;
+        products[id].priceWithDiscount = (products[id].price * (100 - products[id].coupon) / 100);
+        $("#price_" + id + " .discount").html(priceFormat(products[id].priceWithDiscount));
+        refreshProducts();
+    }
+
     function beforeSubmit() {
         $('input[type="search"]').val('').keyup();
         if (!Object.keys(cart).length) {
             alert('محصولی انتخاب نشده است');
             return false;
         }
-        @if(!$admin)
+        @if(!$creator)
             return true;
         @else
         if (submit)
             return submit
-
         $('#invoice-name').text($('#name').val());
         $('#invoice-phone').text($('#phone').val());
         $('#invoice-address').text($('#address').val());
@@ -214,18 +225,16 @@
         @endif
     }
 
-    function changeDiscount(id, value) {
-        value = Math.min(100, +value);
-        value = Math.max(0, +value);
-        value = Math.round(value);
-        $('#discount_' + id).val(value);
-        products[id].coupon = value;
-        products[id].priceWithDiscount = (products[id].price * (100 - products[id].coupon) / 100);
-        $("#price_" + id + " .discount").html(priceFormat(products[id].priceWithDiscount));
-        refreshProducts();
+    @else
+
+    function beforeSubmit() {
+        return true;
     }
 
+    @endif
+
     function startEditProccess() {
+
         @if($errors->count())
         @if(!$admin)
         $('#{{old("paymentMethod")}}').click();
@@ -238,14 +247,15 @@
         $('#zip_code').val(`{{$order->zip_code}}`);
         $('#desc').val(`{{$order->desc}}`);
         $('#customerId').val(`{{$order->customer_id}}`);
+        $('#orders').html(`{{$order->orders}}`);
         deliveryMethod = `{{$order->deliveryMethod}}`;
         paymentMethod = `{{$order->paymentMethod}}`;
 
         @if($order->paymentMethod == 'receipt')
         $('#edit-payment-method').html(`<p>نحوه پرداخت: کارت به کارت با رسید بانکی .</p>
-            <a href="/receipt/{{$order->receipt}}" target="_blank"><img
-                style="max-width: 200px; max-height: 200px"
-                src="/receipt/{{$order->receipt}}"></a>`);
+                <a href="/receipt/{{$order->receipt}}" target="_blank"><img
+                    style="max-width: 200px; max-height: 200px"
+                    src="/receipt/{{$order->receipt}}"></a>`);
         @elseif($order->paymentMethod == 'credit')
         $('#edit-payment-method').html(`<p>نحوه پرداخت اعتباری است.</p>`);
         @elseif($order->paymentMethod == 'onDelivery')
