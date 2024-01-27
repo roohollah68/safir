@@ -45,6 +45,18 @@
                 </div>
             </div>
 
+            <div class="col-md-6 bg-light">
+                <div class="form-group input-group">
+                    <input type="radio" name="category" id="final" value="final">
+                    <label for="final">محصول نهایی</label>
+                    <input type="radio" name="category" id="raw" value="raw">
+                    <label for="raw">مواد اولیه</label>
+                    <input type="radio" name="category" id="pack" value="pack">
+                    <label for="pack">ملزومات بسته بندی</label>
+
+                </div>
+            </div>
+
             <div class="col-md-6">
                 <div>
                     <input type="radio" id="available" name="available" value="true" checked>
@@ -79,6 +91,7 @@
                     </div>
                 @endif
             </div>
+
         </div>
         @if($product)
             <input type="submit" class="btn btn-success" value="ویرایش">
@@ -99,6 +112,8 @@
             @if($product)
             if (!({{$product->available}}))
                 $('#notavailable').click();
+            if(!!'{{$product->category}}')
+                $('#{{$product->category}}').click();
             @endif
         });
     </script>

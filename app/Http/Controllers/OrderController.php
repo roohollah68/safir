@@ -10,7 +10,6 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PDF;
 
 class OrderController extends Controller
 {
@@ -46,9 +45,9 @@ class OrderController extends Controller
     {
         $user = auth()->user();
         if ($this->isAdmin())
-            $products = Product::all()->keyBy('id');
+            $products = Product::where('category', '<>' , 'pack')->get()->keyBy('id');
         else
-            $products = Product::where('price', '>', '1')->get()->keyBy('id');
+            $products = Product::where('category', 'final')->where('price', '>', '1')->get()->keyBy('id');
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
@@ -215,9 +214,9 @@ class OrderController extends Controller
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
         $creator = $order->user()->first()->role == 'admin';
         if ($this->isAdmin())
-            $products = Product::all()->keyBy('id');
+            $products = Product::where('category', '<>' , 'pack')->get()->keyBy('id');
         else
-            $products = Product::where('price', '>', '1')->get()->keyBy('id');
+            $products = Product::where('category', 'final')->where('price', '>', '1')->get()->keyBy('id');
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);

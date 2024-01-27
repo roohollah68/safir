@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\User;
 
-//use Illuminate\Http\Request;
-//use Automattic\WooCommerce\Client;
 use Illuminate\Support\Facades\DB;
 
 class WoocommerceController extends Controller

@@ -10,19 +10,22 @@ class ProductController extends Controller
     public function showProducts()
     {
         $products = Product::all();
-        return view('productList' , ['products'=>$products]);
+        return view('productList', ['products' => $products]);
     }
 
-    public function showAddForm(){
-        return view('addEditProduct' , ['product'=>false]);
+    public function showAddForm()
+    {
+        return view('addEditProduct', ['product' => false]);
     }
 
-    public function showEditForm($id){
+    public function showEditForm($id)
+    {
         $product = Product::findOrfail($id);
-        return view('addEditProduct' , ['product'=>$product]);
+        return view('addEditProduct', ['product' => $product]);
     }
 
-    public function storeNew(Request $req){
+    public function storeNew(Request $req)
+    {
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'unique:products,name|required|string|max:255|min:4',
@@ -34,18 +37,19 @@ class ProductController extends Controller
         }
 
         $available = false;
-        if($req->available == 'true')
+        if ($req->available == 'true')
             $available = true;
         Product::create([
             'name' => $req->name,
             'price' => $req->price,
             'available' => $available,
-            'photo' => $photo
-            ]);
+            'photo' => $photo,
+            'category' => $req->category,
+        ]);
         return redirect()->route('productList');
     }
 
-    public function editProduct(Request $req , $id)
+    public function editProduct(Request $req, $id)
     {
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
@@ -53,7 +57,7 @@ class ProductController extends Controller
             'price' => 'required|numeric',
         ]);
         $product = Product::find($id);
-        if($product->photo)
+        if ($product->photo)
             $photo = $product->photo;
         else
             $photo = '';
@@ -61,13 +65,14 @@ class ProductController extends Controller
             $photo = $req->file("photo")->store("", 'p-photo');
         }
         $available = false;
-        if($req->available == 'true')
+        if ($req->available == 'true')
             $available = true;
         $product->update([
             'name' => $req->name,
             'price' => $req->price,
             'available' => $available,
-            'photo' => $photo
+            'photo' => $photo,
+            'category' => $req->category,
         ]);
         return redirect()->route('productList');
     }

@@ -53,6 +53,18 @@
                 </div>
             </div>
 
+            <div class="col-md-6 bg-light">
+                <div class="form-group input-group">
+                    <input type="radio" name="category" id="final" value="final">
+                    <label for="final">محصول نهایی</label>
+                    <input type="radio" name="category" id="raw" value="raw">
+                    <label for="raw">مواد اولیه</label>
+                    <input type="radio" name="category" id="pack" value="pack">
+                    <label for="pack">ملزومات بسته بندی</label>
+
+                </div>
+            </div>
+
             <div class="col-md-6">
                 <div>
                     <span>
@@ -103,9 +115,11 @@
 @section('files')
     <script>
         $(function () {
-            $('input[name="available"]').checkboxradio();
+            $('input[name="available"], input[name="category"]').checkboxradio();
             if (!({{$product->available}}))
                 $('#notavailable').click();
+            if(!!'{{$product->category}}')
+                $('#{{$product->category}}').click();
             $('#table1').DataTable({
                 order: [[0, "desc"]],
                 pageLength: 100,

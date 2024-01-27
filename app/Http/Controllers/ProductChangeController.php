@@ -40,6 +40,7 @@ class ProductChangeController extends Controller
         $productChange->quantity = $product->quantity;
         $product->alarm = $req->alarm;
         $product->available = ($req->available == 'true');
+        $product->category = $req->category;
         $product->save();
         if ($productChange->change != 0)
             $productChange->save();

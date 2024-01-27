@@ -16,6 +16,7 @@ class Product extends Model
         'available',
         'quantity',
         'alarm',
+        'category',
     ];
 
     public function orderProducts()
