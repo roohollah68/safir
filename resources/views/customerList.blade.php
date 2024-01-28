@@ -53,9 +53,9 @@
                         @if($admin)
                             <a class="btn btn-info" href="/customer/transaction/{{$customer->id}}">تراکنش ها</a>
                         @endif
-                        @if($customer->balance == 0)
-                            <a class="btn btn-danger" onclick="delete_customer({{$customer->id}})">حذف</a>
-                        @endif
+{{--                        @if($customer->balance == 0)--}}
+{{--                            <a class="btn btn-danger" onclick="delete_customer({{$customer->id}})">حذف</a>--}}
+{{--                        @endif--}}
                     </td>
                 </tr>
             @endforeach
@@ -107,15 +107,15 @@
 
         });
 
-        function delete_customer(id) {
-            confirm("برای همیشه حذف شود؟") ?
-                $.post('/customer/delete/' + id, {_token: "{{ csrf_token() }}"})
-                    .done(res => {
-                        location.reload();
-                    })
-                :
-                ""
-        }
+        {{--function delete_customer(id) {--}}
+        {{--    confirm("برای همیشه حذف شود؟") ?--}}
+        {{--        $.post('/customer/delete/' + id, {_token: "{{ csrf_token() }}"})--}}
+        {{--            .done(res => {--}}
+        {{--                location.reload();--}}
+        {{--            })--}}
+        {{--        :--}}
+        {{--        ""--}}
+        {{--}--}}
 
 
     </script>
