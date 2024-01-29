@@ -5,15 +5,38 @@
 @endsection
 
 @section('content')
-    <a class="btn btn-info" href="{{route('addProduct')}}">
+    <a class="btn btn-info mb-3" href="{{route('addProduct')}}">
         <span class=" fa fa-plus"></span>
         افزودن محصول جدید
     </a>
-    <span class="btn btn-primary" onclick="$('.high-quantity, .available, .not-available').show()">همه محصولات</span>
-    <span class="btn btn-warning"
-          onclick="$('.available').show();$('.high-quantity, .not-available').hide()">موجودی کم</span>
-    <span class="btn btn-success" onclick="$('.high-quantity, .available').show();$('.not-available').hide()">محصولات موجود</span>
-    <span class="btn btn-danger" onclick="$('.high-quantity, .not-available').show();$('.available').hide()">محصولات ناموجود</span>
+    <br>
+    <script>
+        function hide_show(list) {
+            let array = {
+                hq: '.high-quantity',
+                a: '.available',
+                na: '.not-available',
+                f: '.final',
+                r: '.raw',
+                p: '.pack'
+            };
+            $.each(array, (index, value) => {
+                $(value).show();
+            });
+            $.each(array, (index, value) => {
+                if (list.includes(index)) {
+                    $(value).hide();
+                }
+            });
+        }
+    </script>
+    <span class="btn btn-primary" onclick="hide_show([])">همه محصولات</span>
+    <span class="btn btn-warning" onclick="hide_show(['na','hq'])">موجودی کم</span>
+    <span class="btn btn-success" onclick="hide_show(['na'])">محصولات موجود</span>
+    <span class="btn btn-danger" onclick="hide_show(['a'])">محصولات ناموجود</span>
+    <span class="btn btn-info" onclick="hide_show(['na','r','p'])">محصول نهایی</span>
+    <span class="btn btn-secondary" onclick="hide_show(['na','f','p'])">مواد اولیه</span>
+    <span class="btn btn-light" onclick="hide_show(['na','f','r'])">ملزومات بسته بندی</span>
     {{--    <span class="btn btn-secondary" onclick="print()">پرینت</span>--}}
     <br>
     <br>
@@ -31,8 +54,8 @@
         </thead>
         <tbody>
         @foreach($products as $product)
-            <tr class="{{$product->alarm > $product->quantity ? 'bg-warning' : 'high-quantity '}}
-            {{$product->available?'available':'deleted not-available'}}" id="row_{{$product->id}}">
+            <tr class="{{$product->alarm > $product->quantity ? 'bg-warning ' : 'high-quantity '}}
+            {{$product->available?'available ':'deleted not-available '}} {{$product->category}}" id="row_{{$product->id}}">
                 <td>{{$product->id}}</td>
                 <td><a class="btn" href="/productQuantity/add/{{$product->id}}">{{$product->name}}</a></td>
                 <td>{{number_format($product->price)}}</td>
@@ -77,10 +100,9 @@
                     .done(res => {
                         if (res == 'ok')
                             $('#row_' + id).remove();
-                    })
-            } 
+                    });
+            }
         }
-
 
     </script>
     <script src="/js/dom-to-image.min.js"></script>
