@@ -40,7 +40,7 @@
                         </tr>
 
                         <tr>
-                            <td colspan="6" style="border-bottom: none;"><br><br><br><br></td>
+                            <td colspan="6" style="border-bottom: none;"><br><br></td>
                             <td></td>
                         </tr>
                         <tr class="">
