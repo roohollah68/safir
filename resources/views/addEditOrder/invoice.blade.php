@@ -28,7 +28,7 @@
                             <td class="text-center" id="invoice-time"></td>
                         </tr>
                     </table>
-                    <table class="border w-100 table2 round">
+                    <table class="border w-100 table2 round table-striped">
                         <tr class="w-100" id="invoice-head">
                             <th class="w-5 border-left smaller">ردیف</th>
                             <th class="w-35 border-left ">شرح کالا/خدمات</th>
@@ -97,11 +97,11 @@
         }
 
         #invoice th, #invoice .normal{
-            font-size: 40px;
+            font-size: 45px;
         }
 
         #invoice td, #invoice .smaller{
-            font-size: 35px;
+            font-size: 40px;
             text-align: center !important;
             font-weight: bold;
         }
