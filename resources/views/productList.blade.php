@@ -55,7 +55,7 @@
         <tbody>
         @foreach($products as $product)
             <tr class="{{$product->alarm > $product->quantity ? 'bg-warning ' : 'high-quantity '}}
-            {{$product->available?'available ':'deleted not-available '}} {{$product->category}}" id="row_{{$product->id}}">
+            {{$product->available?'available ':'not-available '}} {{$product->category}}" id="row_{{$product->id}}">
                 <td>{{$product->id}}</td>
                 <td><a class="btn" href="/productQuantity/add/{{$product->id}}">{{$product->name}}</a></td>
                 <td>{{number_format($product->price)}}</td>
@@ -92,6 +92,7 @@
                 paging: false,
             });
             $('#all, #low, #not-available').checkboxradio();
+            hide_show(['na']);
         });
 
         function delete_product(id) {
