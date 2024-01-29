@@ -4,6 +4,17 @@
         src: url('/css/BNAZANB.TTF');
     }
 
+    @font-face {
+        font-family: IranSans;
+        src: url('/css/IRANSans/ttf/IRANSansWeb_FaNum.ttf');
+    }
+
+    @font-face {
+        font-family: IranSans;
+        src: url('/css/IRANSans/ttf/IRANSansWeb_FaNum_Bold.ttf');
+        font-weight: bold;
+    }
+
     body{
         text-align: right;
         margin-bottom: 150px !important;

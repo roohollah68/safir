@@ -128,6 +128,10 @@
                     text-align: center !important;
                     font-weight: bold;
                 }
+                #invoice{
+                    font-family: IranSans;
+                }
+
             </style>
 
             <style>
