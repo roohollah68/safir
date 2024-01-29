@@ -22,12 +22,14 @@
                                        class="discount-value"
                                        id="discount_{{$product->id}}"
                                        value="{{old("discount_".$product->id)?:$product->coupon}}"
-                                       style="width: 50px"
+                                       style="width: 80px"
                                        onchange="changeDiscount({{$product->id}},this.value)"
                                        @if(!$admin)
                                            disabled
                                        @endif
-                                       min="0" max="100" step="1">
+                                       min="0" max="100" step="0.25">
+                                <a class="btn btn-outline-info fa fa-plus" dir="ltr"
+                                   onclick="$('#discount_{{$product->id}}').val(+$('#discount_{{$product->id}}').val()+5)">5</a>
                             </td>
 
                             {{--قیمت(ریال)--}}
