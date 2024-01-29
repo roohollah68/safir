@@ -9,7 +9,7 @@ class ProductController extends Controller
 {
     public function showProducts()
     {
-        $products = Product::all();
+        $products = Product::all()->keyBy('id');
         return view('productList', ['products' => $products]);
     }
 
@@ -79,7 +79,9 @@ class ProductController extends Controller
 
     public function deleteProduct($id)
     {
-        Product::find($id)->delete();
+        if(Product::find($id)->delete())
+            return 'ok';
+
     }
 
     public function deletePhoto($id)

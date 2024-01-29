@@ -10,10 +10,11 @@
         افزودن محصول جدید
     </a>
     <span class="btn btn-primary" onclick="$('.high-quantity, .available, .not-available').show()">همه محصولات</span>
-    <span class="btn btn-warning" onclick="$('.available').show();$('.high-quantity, .not-available').hide()">موجودی کم</span>
+    <span class="btn btn-warning"
+          onclick="$('.available').show();$('.high-quantity, .not-available').hide()">موجودی کم</span>
     <span class="btn btn-success" onclick="$('.high-quantity, .available').show();$('.not-available').hide()">محصولات موجود</span>
     <span class="btn btn-danger" onclick="$('.high-quantity, .not-available').show();$('.available').hide()">محصولات ناموجود</span>
-{{--    <span class="btn btn-secondary" onclick="print()">پرینت</span>--}}
+    {{--    <span class="btn btn-secondary" onclick="print()">پرینت</span>--}}
     <br>
     <br>
     <table class="stripe" id="product-table">
@@ -31,7 +32,7 @@
         <tbody>
         @foreach($products as $product)
             <tr class="{{$product->alarm > $product->quantity ? 'bg-warning' : 'high-quantity '}}
-            {{$product->available?'available':'deleted not-available'}}">
+            {{$product->available?'available':'deleted not-available'}}" id="row_{{$product->id}}">
                 <td>{{$product->id}}</td>
                 <td><a class="btn" href="/productQuantity/add/{{$product->id}}">{{$product->name}}</a></td>
                 <td>{{number_format($product->price)}}</td>
@@ -60,16 +61,7 @@
 
 @section('files')
     <script>
-        // let notAvailable = true;
-        // let highQuantity = false;
-        // function hide_show(){
-        //     $('.not-available').show();
-        //     $('.high-quantity').show();
-        //     if(notAvailable)
-        //         $('.not-available').hide();
-        //     if(highQuantity)
-        //         $('.high-quantity').hide();
-        // }
+        let products = {!!$products!!};
 
         $(function () {
             $('#product-table').DataTable({
@@ -77,31 +69,19 @@
                 paging: false,
             });
             $('#all, #low, #not-available').checkboxradio();
-            hide_show();
         });
 
         function delete_product(id) {
-            confirm("برای همیشه حذف شود؟") ?
+            if (!products[id].available || confirm("برای همیشه حذف شود؟")) {
                 $.post('/product/delete/' + id, {_token: "{{ csrf_token() }}"})
                     .done(res => {
-                        location.reload();
+                        if (res == 'ok')
+                            $('#row_' + id).remove();
                     })
-                :
-                ""
+            } 
         }
 
-        // function print(){
-        //     domtoimage.toJpeg(document.getElementById('product-table'), {})
-        //         .then(function (dataUrl) {
-        //             var link = document.createElement('a');
-        //             link.download = 'محصولات.jpeg';
-        //             link.href = dataUrl;
-        //             link.click();
-        //             submit = true;
-        //             $('#form').submit();
-        //         });
-        //     return false;
-        // }
+
     </script>
     <script src="/js/dom-to-image.min.js"></script>
     <style>
