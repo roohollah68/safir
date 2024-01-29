@@ -21,7 +21,7 @@
                             </th>
                             <th class="w-42 p-2"> نام: {{$order->name}}</th>
                             <th class="w-33 p-2"> تلفن: {{$order->phone}}</th>
-                            <th rowspan="2" class="w-20 text-center border-bottom">شماره فاکتور: {{$order->id}}</th>
+                            <th rowspan="2" class="w-20 text-center border-bottom">شماره فاکتور: {{$order->id%1000}}</th>
                         </tr>
                         <tr>
                             <td colspan="3"><br></td>
