@@ -143,7 +143,7 @@
 
     function num_plus(id) {
         let n = +$('#product_' + id).val() + 1;
-        n = Math.min(+n, products[id].quantity);
+        // n = Math.min(+n, products[id].quantity);
         $('#product_' + id).val(n);
         cart[id] = n;
         refreshProducts();
@@ -159,7 +159,7 @@
 
     function num_product(id, value) {
         value = Math.max(0, +value);
-        value = Math.min(value, products[id].quantity);
+        // value = Math.min(value, products[id].quantity);
         value = Math.round(value);
         $('#product_' + id).val(value);
         cart[id] = value;

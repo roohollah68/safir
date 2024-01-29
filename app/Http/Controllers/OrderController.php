@@ -98,8 +98,8 @@ class OrderController extends Controller
         foreach ($products as $id => $product) {
             $number = $request['product_' . $id];
             if ($number > 0) {
-                if ($number > $product->quantity)
-                    return $this->errorBack('تعداد درخواست شده از "' . $product->name . '" بیش از موجودی انبار است.');
+//                if ($number > $product->quantity)
+//                    return $this->errorBack('تعداد درخواست شده از "' . $product->name . '" بیش از موجودی انبار است.');
                 $request->orders .= ' ' . $product->name . ' ' . $number . 'عدد' . '،';
                 $coupon = $this->calculateDis($id);
                 if ($admin)

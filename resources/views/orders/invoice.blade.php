@@ -98,38 +98,35 @@
 
             <style>
 
-                .table2 td {
+                #invoice .table2 td {
                     border-bottom: 1px solid #000000 !important;
                     border-left: 1px solid #000000 !important;
                 }
 
-                .table2 th {
+                #invoice .table2 th {
                     background: #eee;
                 }
 
-                .table2 th {
+                #invoice .table2 th {
                     border: 1px solid #000000 !important;
                 }
 
-                td {
-                    font-size: 12px;
-                    text-align: center !important;
-                }
-
-                .text-center, .table2 th {
+                #invoice .text-center, #invoice .table2 th {
                     text-align: center !important;
                 }
 
                 #invoice h4{
-                    font-size: 60px;
+                    font-size: 80px;
                 }
 
                 #invoice th, #invoice .normal{
-                    font-size: 30px;
+                    font-size: 40px;
                 }
 
                 #invoice td, #invoice .smaller{
-                    font-size: 26px;
+                    font-size: 35px;
+                    text-align: center !important;
+                    font-weight: bold;
                 }
             </style>
 

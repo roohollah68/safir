@@ -10,34 +10,13 @@
         افزودن محصول جدید
     </a>
     <br>
-    <script>
-        function hide_show(list) {
-            let array = {
-                hq: '.high-quantity',
-                a: '.available',
-                na: '.not-available',
-                f: '.final',
-                r: '.raw',
-                p: '.pack'
-            };
-            $.each(array, (index, value) => {
-                $(value).show();
-            });
-            $.each(array, (index, value) => {
-                if (list.includes(index)) {
-                    $(value).hide();
-                }
-            });
-        }
-    </script>
-    <span class="btn btn-primary" onclick="hide_show([])">همه محصولات</span>
-    <span class="btn btn-warning" onclick="hide_show(['na','hq'])">موجودی کم</span>
-    <span class="btn btn-success" onclick="hide_show(['na'])">محصولات موجود</span>
-    <span class="btn btn-danger" onclick="hide_show(['a'])">محصولات ناموجود</span>
-    <span class="btn btn-info" onclick="hide_show(['na','r','p'])">محصول نهایی</span>
-    <span class="btn btn-secondary" onclick="hide_show(['na','f','p'])">مواد اولیه</span>
-    <span class="btn btn-light" onclick="hide_show(['na','f','r'])">ملزومات بسته بندی</span>
-    {{--    <span class="btn btn-secondary" onclick="print()">پرینت</span>--}}
+    <span class="btn btn-primary" onclick="hide([])">همه محصولات</span>
+    <span class="btn btn-warning" onclick="hide(['na','hq'])">موجودی کم</span>
+    <span class="btn btn-success" onclick="hide(['na'])">محصولات موجود</span>
+    <span class="btn btn-danger" onclick="hide(['a'])">محصولات ناموجود</span>
+    <span class="btn btn-info" onclick="hide(['na','r','p'])">محصول نهایی</span>
+    <span class="btn btn-secondary" onclick="hide(['na','f','p'])">مواد اولیه</span>
+    <span class="btn btn-secondary" onclick="hide(['na','f','r'])">ملزومات بسته بندی</span>
     <br>
     <br>
     <table class="stripe" id="product-table">
@@ -87,13 +66,17 @@
         let products = {!!$products!!};
 
         $(function () {
+            draw();
+            hide(['na']);
+        });
+
+        function draw(){
             $('#product-table').DataTable({
                 order: [[3, "desc"]],
                 paging: false,
+                destroy: true,
             });
-            $('#all, #low, #not-available').checkboxradio();
-            hide_show(['na']);
-        });
+        }
 
         function delete_product(id) {
             if (!products[id].available || confirm("برای همیشه حذف شود؟")) {
@@ -105,11 +88,25 @@
             }
         }
 
+        function hide(list) {
+            let array = {
+                hq: '.high-quantity',
+                a: '.available',
+                na: '.not-available',
+                f: '.final',
+                r: '.raw',
+                p: '.pack'
+            };
+            $.each(array, (index, value) => {
+                $(value).show();
+            });
+            $.each(array, (index, value) => {
+                if (list.includes(index)) {
+                    $(value).hide();
+                }
+            });
+        }
+
     </script>
     <script src="/js/dom-to-image.min.js"></script>
-    <style>
-        .deleted {
-            display: none;
-        }
-    </style>
 @endsection
