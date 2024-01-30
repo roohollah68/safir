@@ -52,9 +52,10 @@
                         @endphp
                         @foreach($orderProducts as $orderProduct)
                             @php
-                                $sub_total_no_dis= ($orderProduct->price * $orderProduct->number); //قیمت * تعداد
-                                $price_dis = round((100/(100-$orderProduct->discount))*$orderProduct->price);
-                                $sub_total_dis = $price_dis * $orderProduct->number;
+                                $price_dis = $orderProduct->price;
+                                $sub_total_dis= ($orderProduct->price * $orderProduct->number); //قیمت * تعداد
+                                $price_no_dis = round((100/(100-$orderProduct->discount))*$orderProduct->price);
+                                $sub_total_no_dis = $price_no_dis * $orderProduct->number;
                                 $total_no_dis = $total_no_dis + $sub_total_no_dis;
                                 $total_dis = $total_dis + $sub_total_dis;
                             @endphp
@@ -62,7 +63,7 @@
                                 <td>{{$counter++}}</td>
                                 <td>{{$orderProduct->name}}</td>
                                 <td>{{$orderProduct->number}}</td>
-                                <td>{{number_format($orderProduct->price)}}</td>
+                                <td>{{number_format($price_no_dis)}}</td>
                                 <td>{{$orderProduct->discount}}</td>
                                 <td>{{number_format($price_dis)}}</td>
                                 <td>{{number_format($sub_total_dis)}}</td>
