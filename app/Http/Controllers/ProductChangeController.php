@@ -59,11 +59,12 @@ class ProductChangeController extends Controller
         $productChange->isDeleted = true;
         $productChange->save();
         $newProductChange = $productChange->replicate();
+        $newProductChange->isDeleted = true;
         $newProductChange->desc = 'حذف رکورد';
         $newProductChange->change = -$productChange->change;
         $newProductChange->quantity = $product->quantity;
         $newProductChange->save();
-        return redirect('/productQuantity/add/' . $product->id);
+        return redirect('/product/edit/' . $product->id);
     }
 
     public function productAlarm()

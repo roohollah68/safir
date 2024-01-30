@@ -12,7 +12,7 @@
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
     @if($product)
         <h4 class="">{{$product->name}}</h4>
-        <h4 class="">تعداد موجود در انبار: {{$product->quantity}}</h4>
+        <h4 class="">تعداد موجود در انبار: {{+$product->quantity}}</h4>
         <a class="btn btn-danger" href="{{route('productList')}}">بازگشت</a>
         <hr>
     @endif
@@ -104,7 +104,7 @@
             {{--دسته بندی محصول--}}
             <div class="col-md-6 bg-light">
                 <div class="form-group input-group">
-                    <input type="radio" name="category" id="final" value="final">
+                    <input type="radio" name="category" id="final" value="final" checked>
                     <label for="final">محصول نهایی</label>
                     <input type="radio" name="category" id="raw" value="raw">
                     <label for="raw">مواد اولیه</label>
@@ -177,8 +177,8 @@
                 <tr class="{{$productChange->isDeleted?'deleted':''}}">
                     <td>{{$productChange->created_at}}</td>
                     <td>{{$productChange->desc}}</td>
-                    <td>{{$productChange->change}}</td>
-                    <td>{{$productChange->quantity}}</td>
+                    <td dir="ltr">{{+$productChange->change}}</td>
+                    <td dir="ltr">{{+$productChange->quantity}}</td>
                     <td>
                         @if(!$productChange->order_id && !$productChange->isDeleted)
                             <span class="btn btn-danger fa fa-trash-alt"
@@ -206,18 +206,22 @@
                 pageLength: 100,
             });
 
-            function deleteRecord(id) {
-                if (confirm('آیا از حذف رکورد اطمینان دارید؟')) {
-                    // $.get('/productQuantity/delete/'+id);
-                    window.location.replace('/productQuantity/delete/' + id)
-                }
-            }
+
             @endif
         });
+        function deleteRecord(id) {
+            if (confirm('آیا از حذف رکورد اطمینان دارید؟')) {
+                // $.get('/productQuantity/delete/'+id);
+                window.location.replace('/productQuantity/delete/' + id)
+            }
+        }
     </script>
     <style>
         #navailable.ui-state-active {
             background: #ff0000;
+        }
+        .deleted{
+            display: none;
         }
     </style>
 @endsection

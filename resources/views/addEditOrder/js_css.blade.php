@@ -190,7 +190,7 @@
         $('#discount_' + id).val(value);
         products[id].coupon = value;
         products[id].priceWithDiscount = (products[id].price * (100 - products[id].coupon) / 100);
-        $("#price_" + id + " .discount").html(priceFormat(products[id].priceWithDiscount));
+        $("#price_" + id + " .discount").val(priceFormat(products[id].priceWithDiscount));
         refreshProducts();
     }
 
@@ -223,6 +223,13 @@
             });
         return false;
         @endif
+    }
+
+    function calculate_discount(id , value){
+        value = +(value.replace(',',''));
+        value = Math.min(products[id].price, +value);
+        value = Math.max(0, +value);
+        $('#discount_'+id).val((1-value/products[id].price)*100).change();
     }
 
     @else

@@ -28,22 +28,34 @@
                                            disabled
                                        @endif
                                        min="0" max="100" step="0.25">
+                                @if($admin)
                                 <a class="btn btn-outline-info fa fa-plus" dir="ltr"
                                    onclick="$('#discount_{{$product->id}}').val(+$('#discount_{{$product->id}}').val()+5).change()">5</a>
+                                @endif
                             </td>
 
                             {{--قیمت(ریال)--}}
                             <td id="price_{{$product->id}}">
-                                        <span class="text-danger original"
-                                              @if($product->priceWithDiscount!=$product->price)
-                                              style="text-decoration: line-through"
+
+                                <input type="text" class="price-input text-success discount" style="width: 80px;"
+                                   value="{{$product->priceWithDiscount}}"
+                                   onchange="calculate_discount({{$product->id}},this.value)"
+                                   @if(!$admin)
+                                       disabled
+                                   @endif
+                                >
+
+                                        <span class=" btn text-danger original"
+                                            @if($product->priceWithDiscount!=$product->price)
+                                                style="text-decoration: line-through"
+                                            @endif
+                                            @if($admin)
+                                                onclick="$('#price_{{$product->id}} .discount').val('{{number_format($product->price)}}').change()"
                                             @endif
                                         >
                                             {{number_format($product->price)}}
                                         </span>
-                                <span class="text-success discount">
-                                            {{$product->priceWithDiscount!=$product->price?number_format($product->priceWithDiscount):''}}
-                                        </span>
+
                             </td>
 
                         {{--تعداد--}}

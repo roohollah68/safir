@@ -230,6 +230,7 @@ class OrderController extends Controller
         foreach ($selectedProducts as $product) {
             $cart[$product->product_id] = +$product->number;
             $products[$product->product_id]->coupon = +$product->discount;
+            $products[$product->product_id]->priceWithDiscount = round((100 - +$product->discount) * $product->price / 100);
         }
         return view('addEditOrder')->with([
             'edit' => true,
