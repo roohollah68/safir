@@ -47,24 +47,25 @@
                         </tr>
                         @php
                             $counter = 1;
-                            $total = 0;
-                            $total_original=0;
+                            $total_dis = 0;
+                            $total_no_dis=0;
                         @endphp
                         @foreach($orderProducts as $orderProduct)
                             @php
-                                $t= ($orderProduct->price * $orderProduct->number); //قیمت * تعداد
-                                $original = round((100/(100-$orderProduct->discount))*$orderProduct->price);
-                                $total_original = $total_original + $original;
-                                $total = $total + $t;
+                                $sub_total_no_dis= ($orderProduct->price * $orderProduct->number); //قیمت * تعداد
+                                $price_dis = round((100/(100-$orderProduct->discount))*$orderProduct->price);
+                                $sub_total_dis = $price_dis * $orderProduct->number;
+                                $total_no_dis = $total_no_dis + $sub_total_no_dis;
+                                $total_dis = $total_dis + $sub_total_dis;
                             @endphp
                             <tr class="">
                                 <td>{{$counter++}}</td>
                                 <td>{{$orderProduct->name}}</td>
                                 <td>{{$orderProduct->number}}</td>
-                                <td>{{number_format($original)}}</td>
-                                <td>{{$orderProduct->discount}}</td>
                                 <td>{{number_format($orderProduct->price)}}</td>
-                                <td>{{number_format($t)}}</td>
+                                <td>{{$orderProduct->discount}}</td>
+                                <td>{{number_format($price_dis)}}</td>
+                                <td>{{number_format($sub_total_dis)}}</td>
                             </tr>
                         @endforeach
                         <tr>
@@ -74,12 +75,12 @@
                         <tr class="">
                             <td colspan="4" style="border: none;"></td>
                             <td colspan="2">مبلغ کل بدون تخفیف</td>
-                            <td>{{number_format($total_original)}}</td>
+                            <td>{{number_format($total_no_dis)}}</td>
                         </tr>
                         <tr class="">
-                            <th colspan="4"> شما از این خرید {{number_format(abs($total_original-$total))}} ریال تخفیف گرفتید</th>
+                            <th colspan="4"> شما از این خرید {{number_format(abs($total_no_dis-$total_dis))}} ریال تخفیف گرفتید</th>
                             <th colspan="2">مبلغ قابل پرداخت</th>
-                            <th>{{number_format($total)}}</th>
+                            <th>{{number_format($total_dis)}}</th>
                         </tr>
                     </table>
 
