@@ -145,12 +145,13 @@ class CustomerController extends Controller
             $customer->transactions()->find($req->link)->update([
                 'paymentLink' => $newTransaction->id,
             ]);
+        $req->amount = number_format($req->amount);
         $message="ثبت سند واریزی مشتری
         نام:{$customer->name}
         مبلغ: {$req->amount} ریال
         ";
         $array = array("caption" => $message, "photo" => env('APP_URL') . "deposit/{$photo}");
-        dd($this->sendPhotoToBale($array, '4538199149'));
+        $this->sendPhotoToBale($array, '4538199149');
 
         DB::commit();
 
