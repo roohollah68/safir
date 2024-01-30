@@ -186,7 +186,7 @@
     function changeDiscount(id, value) {
         value = Math.min(100, +value);
         value = Math.max(0, +value);
-        value = Math.round(value*4)/4;
+        value = Math.round(value * 4) / 4;
         $('#discount_' + id).val(value);
         products[id].coupon = value;
         products[id].priceWithDiscount = (products[id].price * (100 - products[id].coupon) / 100);
@@ -225,11 +225,11 @@
         @endif
     }
 
-    function calculate_discount(id , value){
-        value = +(value.replace(',',''));
+    function calculate_discount(id, value) {
+        value = +(value.replaceAll(',', ''));
         value = Math.min(products[id].price, +value);
         value = Math.max(0, +value);
-        $('#discount_'+id).val((1-value/products[id].price)*100).change();
+        $('#discount_' + id).val((1 - value / products[id].price) * 100).change();
     }
 
     @else
