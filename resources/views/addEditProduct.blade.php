@@ -33,7 +33,7 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="price" class="input-group-text w-100">قیمت:</label>
                     </div>
-                    <input type="text" id="price" class="form-control" name="price"
+                    <input type="text" id="price" class="form-control price-input" name="price"
                            @if($product)
                            value="{{$product->price}}"
                            @else

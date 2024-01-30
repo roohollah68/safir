@@ -360,8 +360,8 @@ class OrderController extends Controller
     public function pdf($id)
     {
         $order = Order::findOrFail($id);
-        if ($order->admin != $this->userId() && $order->admin)
-            abort(405);
+//        if ($order->admin != $this->userId() && $order->admin)
+//            abort(405);
         if ($order->user()->first()->role == 'admin')
             $order->orders = 'طبق فاکتور';
         $font = 28;

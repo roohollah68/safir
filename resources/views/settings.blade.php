@@ -9,7 +9,7 @@
     <form action="" method="post">
         @csrf
         <label for="loadOrders">تعداد سفارشات قابل نمایش:</label>
-        <input id="loadOrders" name="loadOrders" type="number" value="{{$loadOrders}}">
+        <input id="loadOrders" name="loadOrders" type="text" class="price-input" value="{{$loadOrders}}">
 
         <br>
 
@@ -19,22 +19,22 @@
         <br>
 
         <label for="negative">سقف اعتبار منفی مجاز(ریال):</label>
-        <input id="negative" name="negative" type="number" value="{{$negative}}">
+        <input id="negative" name="negative" type="text" class="price-input" value="{{$negative}}">
 
         <br>
 
         <label for="peykCost">هزینه ارسال با تیپاکس(ریال):</label>
-        <input id="peykCost" name="peykCost" type="number" value="{{$peykCost}}">
+        <input id="peykCost" name="peykCost" type="text" class="price-input" value="{{$peykCost}}">
 
         <br>
 
         <label for="postCost">هزینه ارسال با پست(ریال):</label>
-        <input id="postCost" name="postCost" type="number" value="{{$postCost}}">
+        <input id="postCost" name="postCost" type="text" class="price-input" value="{{$postCost}}">
 
         <br>
 
         <label for="freeDelivery">حداقل خرید برای ارسال رایگان(ریال):</label>
-        <input id="freeDelivery" name="freeDelivery" type="number" value="{{$freeDelivery}}">
+        <input id="freeDelivery" name="freeDelivery" type="text" class="price-input" value="{{$freeDelivery}}">
 
         <br>
         <input type="submit" value="اعمال">

@@ -26,7 +26,7 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="amount" class="input-group-text w-100">میزان واریزی:</label>
                     </div>
-                    <input value="{{$amount}}" type="text" id="amount" class="form-control" name="amount"
+                    <input value="{{$amount}}" type="text" id="amount" class="form-control price-input" name="amount"
                            pattern="^[0-9]*$" required>
                     <div class="input-group-prepend" style="min-width: 120px">
                         <label for="amount" class="input-group-text w-100"> ریال</label>
