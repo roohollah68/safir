@@ -36,9 +36,9 @@
             <tr class="{{$product->alarm > $product->quantity ? 'bg-warning ' : 'high-quantity '}}
             {{$product->available?'available ':'not-available '}} {{$product->category}}" id="row_{{$product->id}}">
                 <td>{{$product->id}}</td>
-                <td><a class="btn" href="/productQuantity/add/{{$product->id}}">{{$product->name}}</a></td>
+                <td><a class="btn" href="/product/edit/{{$product->id}}">{{$product->name}}</a></td>
                 <td>{{number_format($product->price)}}</td>
-                <td>{{$product->quantity}}</td>
+                <td>{{+$product->quantity}}</td>
                 <td>{{$product->alarm}}</td>
                 <td>
                     @if($product->available)

@@ -67,7 +67,7 @@
             input = input.replace(/[\D\s\._\-]+/g, "");
             input = input ? parseInt(input, 10) : 0;
             $this.val(function () {
-                return (input === 0) ? "" : input.toLocaleString("en-US");
+                return (input === 0) ? "0" : input.toLocaleString("en-US");
             });
         });
         $(".price-input").each(function (event) {
@@ -86,7 +86,7 @@
             input = input.replace(/[\D\s\._\-]+/g, "");
             input = input ? parseInt(input, 10) : 0;
             $this.val(function () {
-                return (input === 0) ? "" : input.toLocaleString("en-US");
+                return (input === 0) ? "0" : input.toLocaleString("en-US");
             });
         });
 

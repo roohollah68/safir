@@ -100,7 +100,7 @@ class OrderController extends Controller
             if ($number > 0) {
 //                if ($number > $product->quantity)
 //                    return $this->errorBack('تعداد درخواست شده از "' . $product->name . '" بیش از موجودی انبار است.');
-                $request->orders .= ' ' . $product->name . ' ' . $number . 'عدد' . '،';
+                $request->orders .= ' ' . $product->name . ' ' . +$number . 'عدد' . '،';
                 $coupon = $this->calculateDis($id);
                 if ($admin)
                     $coupon = $request['discount_' . $id];
@@ -228,8 +228,8 @@ class OrderController extends Controller
         $selectedProducts = $order->orderProducts()->get();
         $cart = [];
         foreach ($selectedProducts as $product) {
-            $cart[$product->product_id] = $product->number;
-            $products[$product->product_id]->coupon = $product->discount;
+            $cart[$product->product_id] = +$product->number;
+            $products[$product->product_id]->coupon = +$product->discount;
         }
         return view('addEditOrder')->with([
             'edit' => true,

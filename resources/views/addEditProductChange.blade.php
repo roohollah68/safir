@@ -129,7 +129,6 @@
             if(confirm('آیا از حذف رکورد اطمینان دارید؟')){
                 // $.get('/productQuantity/delete/'+id);
                 window.location.replace('/productQuantity/delete/'+id)
-
             }
         }
     </script>

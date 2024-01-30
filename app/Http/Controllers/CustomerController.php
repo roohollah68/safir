@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\BaleAPIv2;
 use App\Models\Customer;
 use App\Models\CustomerTransactions;
 use Illuminate\Http\Request;
@@ -109,9 +110,12 @@ class CustomerController extends Controller
 
     public function storeNew(Request $req)
     {
+        $req->amount = +str_replace(",","",$req->amount);
         request()->validate([
-            'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
-            'amount' => 'required|numeric',
+            'photo' => 'required|mimes:jpeg,jpg,png,bmp|max:2048',
+            'amount' => 'required',
+        ],[
+            'photo.required' => 'ارائه رسید بانکی الزامی است!'
         ]);
 
         DB::beginTransaction();
@@ -141,6 +145,13 @@ class CustomerController extends Controller
             $customer->transactions()->find($req->link)->update([
                 'paymentLink' => $newTransaction->id,
             ]);
+        $message="ثبت سند واریزی مشتری
+        نام:{$customer->name}
+        مبلغ: {$req->amount} ریال
+        ";
+        $array = array("caption" => $message, "photo" => env('APP_URL') . "deposit/{$photo}");
+        dd($this->sendPhotoToBale($array, '4538199149'));
+
         DB::commit();
 
         return redirect('/customer/transaction/' . $req->id);

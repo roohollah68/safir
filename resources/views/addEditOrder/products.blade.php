@@ -21,7 +21,7 @@
                                 <input type="number" name="discount_{{$product->id}}"
                                        class="discount-value"
                                        id="discount_{{$product->id}}"
-                                       value="{{old("discount_".$product->id)?:$product->coupon}}"
+                                       value="{{old("discount_".$product->id)?:+$product->coupon}}"
                                        style="width: 80px"
                                        onchange="changeDiscount({{$product->id}},this.value)"
                                        @if(!$admin)
@@ -29,7 +29,7 @@
                                        @endif
                                        min="0" max="100" step="0.25">
                                 <a class="btn btn-outline-info fa fa-plus" dir="ltr"
-                                   onclick="$('#discount_{{$product->id}}').val(+$('#discount_{{$product->id}}').val()+5)">5</a>
+                                   onclick="$('#discount_{{$product->id}}').val(+$('#discount_{{$product->id}}').val()+5).change()">5</a>
                             </td>
 
                             {{--قیمت(ریال)--}}
@@ -49,12 +49,12 @@
                         {{--تعداد--}}
                         <td>
                             <span class="btn btn-primary" onclick="num_plus({{$product->id}})">+</span>
-                            <input class="product-number" product_id="{{$product->id}}"
+                            <input class="product-number" {{--product_id="{{$product->id}}"--}}
                                    name="product_{{$product->id}}" id="product_{{$product->id}}"
                                    onchange="num_product({{$product->id}},this.value)"
                                    type="number" value="{{old("product_".$product->id)}}" style="width: 50px" min="0">
                             <span class="btn btn-primary" onclick="num_minus({{$product->id}})">-</span>
-                            <span class="btn btn-outline-info">{{$product->quantity}}</span>
+                            <span class="btn btn-outline-info">{{+$product->quantity}}</span>
                         </td>
                     </tr>
                 @endif

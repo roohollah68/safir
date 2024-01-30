@@ -62,9 +62,9 @@
                             <tr class="">
                                 <td>{{$counter++}}</td>
                                 <td>{{$orderProduct->name}}</td>
-                                <td>{{$orderProduct->number}}</td>
+                                <td>{{+$orderProduct->number}}</td>
                                 <td>{{number_format($price_no_dis)}}</td>
-                                <td>{{$orderProduct->discount}}</td>
+                                <td>{{+$orderProduct->discount}}</td>
                                 <td>{{number_format($price_dis)}}</td>
                                 <td>{{number_format($sub_total_dis)}}</td>
                             </tr>

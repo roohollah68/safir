@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductChange;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -21,15 +23,22 @@ class ProductController extends Controller
     public function showEditForm($id)
     {
         $product = Product::findOrfail($id);
-        return view('addEditProduct', ['product' => $product]);
+        $productChanges = $product->productChange()->get()->keyBy('id');
+        foreach ($productChanges as $id => $productChange)
+            $productChanges[$id]->created_at = verta($productChange->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
+        return view('addEditProduct', [
+            'product' => $product,
+            'productChanges' => $productChanges,
+        ]);
     }
 
     public function storeNew(Request $req)
     {
+        $req->price = +str_replace(",","",$req->price);
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'unique:products,name|required|string|max:255|min:4',
-            'price' => 'required|numeric',
+            'price' => 'required',
         ]);
         $photo = '';
         if ($req->file("photo")) {
@@ -39,47 +48,67 @@ class ProductController extends Controller
         $available = false;
         if ($req->available == 'true')
             $available = true;
-        Product::create([
+        $product = Product::create([
             'name' => $req->name,
             'price' => $req->price,
             'available' => $available,
             'photo' => $photo,
             'category' => $req->category,
+            'quantity' => $req->quantity,
+            'alarm' => $req->alarm,
         ]);
+        if ($req->quantity > 0) {
+            $product->productChange()->create([
+                'change' => $product->quantity,
+                'quantity' => $product->quantity,
+                'desc' => 'مقدار اولیه',
+            ]);
+        }
         return redirect()->route('productList');
     }
 
     public function editProduct(Request $req, $id)
     {
+        DB::beginTransaction();
+        $req->price = str_replace(",","",$req->price);
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'required|string|max:255|min:4',
-            'price' => 'required|numeric',
+            'price' => 'required',
         ]);
-        $product = Product::find($id);
-        if ($product->photo)
-            $photo = $product->photo;
-        else
-            $photo = '';
+        $product = Product::findOrFail($id);
+        $productChange = new ProductChange();
+        $productChange->product_id = $product->id;
+        if (!$product->photo)
+            $product->photo = '';
         if ($req->file("photo")) {
-            $photo = $req->file("photo")->store("", 'p-photo');
+            $product->photo = $req->file("photo")->store("", 'p-photo');
         }
-        $available = false;
-        if ($req->available == 'true')
-            $available = true;
-        $product->update([
-            'name' => $req->name,
-            'price' => $req->price,
-            'available' => $available,
-            'photo' => $photo,
-            'category' => $req->category,
-        ]);
-        return redirect()->route('productList');
+        $product->name = $req->name;
+        $product->price = $req->price;
+        if ($req->addType == 'add') {
+            $productChange->change = +$req->add;
+            $product->quantity += $req->add;
+            $productChange->desc = 'اضافه کردن موجودی به اندازه ' . $req->add . ' عدد';
+        } else {
+            $productChange->change = +$req->value - (+$product->quantity);
+            $product->quantity = $req->value;
+            $productChange->desc = 'اصلاح موجودی به مقدار' . $req->value . ' عدد';
+        }
+        $productChange->quantity = $product->quantity;
+        $product->alarm = $req->alarm;
+        $product->available = ($req->available == 'true');
+        $product->category = $req->category;
+        $product->save();
+        if ($productChange->change != 0)
+            $productChange->save();
+        DB::commit();
+        return redirect('/product/edit/' . $id);
     }
 
     public function deleteProduct($id)
     {
-        if(Product::find($id)->delete())
+        if (Product::find($id)->delete())
             return 'ok';
 
     }
