@@ -9,6 +9,8 @@
     let cart = {!!json_encode($cart)!!};
     let submit = false;
     let creator = !!'{{$creator}}';
+    let totalPages = 1;
+    let currentPage = 1;
     $(function () {
         setTimeout(function () {
             $("#errors").hide()
@@ -71,8 +73,9 @@
                 let Price = products[id].price * number;  //قیمت بدون تخفیف
                 $('#product_' + id).val(number);
                 ordersText = ordersText.concat(products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + '<br>');
+                let page = (ii > 33 ? 'last-page' : 'first-page');
                 invoiceOrders = invoiceOrders.concat(
-                    `<tr class="invoice-list">
+                    `<tr class="invoice-list ${page}">
                     <td>${ii}</td>
                     <td>${products[id].name}</td>
                     <td>${number}</td>
@@ -196,7 +199,9 @@
 
     function beforeSubmit() {
         $('input[type="search"]').val('').keyup();
-        if (!Object.keys(cart).length) {
+        let number = Object.keys(cart).length;
+
+        if (!number) {
             alert('محصولی انتخاب نشده است');
             return false;
         }
@@ -205,6 +210,17 @@
         @else
         if (submit)
             return submit
+        if (number > 33) {
+            totalPages = 2;
+            if (currentPage == 1) {
+                $('#invoice .last-page').hide();
+            } else {
+                $('#invoice .first-page').hide();
+                $('#invoice .last-page').show();
+            }
+        }
+        $('#total-pages').html(totalPages);
+        $('#current-page').html(currentPage);
         $('#invoice-name').text($('#name').val());
         $('#invoice-phone').text($('#phone').val());
         $('#invoice-address').text($('#address').val());
@@ -218,7 +234,9 @@
                 link.download = 'invoice.jpeg';
                 link.href = dataUrl;
                 link.click();
-                submit = true;
+                if (currentPage === totalPages)
+                    submit = true;
+                currentPage++;
                 $('#form').submit();
             });
         return false;

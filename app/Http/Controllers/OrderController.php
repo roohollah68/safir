@@ -46,7 +46,7 @@ class OrderController extends Controller
     {
         $user = auth()->user();
         if ($this->isAdmin())
-            $products = Product::where('category', '<>' , 'pack')->get()->keyBy('id');
+            $products = Product::where('category', '<>', 'pack')->get()->keyBy('id');
         else
             $products = Product::where('category', 'final')->where('price', '>', '1')->get()->keyBy('id');
         foreach ($products as $id => $product) {
@@ -71,7 +71,7 @@ class OrderController extends Controller
             'settings' => $this->settings(),
             'id' => $user->id,
             'cart' => (object)[],
-            'creator'=>$this->isAdmin(),
+            'creator' => $this->isAdmin(),
         ]);
     }
 
@@ -123,7 +123,7 @@ class OrderController extends Controller
         if (!count($request->orderList)) {
             return $this->errorBack('محصولی انتخاب نشده است!');
         }
-        if($admin && $counter>20)
+        if ($admin && $counter > 10)
             $request->orders = 'طبق فاکتور';
 
         if (!$admin) {
@@ -219,7 +219,7 @@ class OrderController extends Controller
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
         $creator = $order->user()->first()->role == 'admin';
         if ($this->isAdmin())
-            $products = Product::where('category', '<>' , 'pack')->get()->keyBy('id');
+            $products = Product::where('category', '<>', 'pack')->get()->keyBy('id');
         else
             $products = Product::where('category', 'final')->where('price', '>', '1')->get()->keyBy('id');
         foreach ($products as $id => $product) {
@@ -273,11 +273,13 @@ class OrderController extends Controller
             $products = Product::where('available', true)->get()->keyBy('id');
             $productOrders = $order->orderProducts()->get()->keyBy('product_id');
             $total = 0;
+            $counter = 0;
             foreach ($products as $id => $product) {
                 $number = $request['product_' . $id];
                 if ($number > 0) {
                     $coupon = $request['discount_' . $id];
                     $total += round((100 - $coupon) * $product->price * $number / 100);
+                    $counter++;
                     $orders .= ' ' . $product->name . ' ' . $number . 'عدد' . '،';
                     if (isset($productOrders[$id]))
                         $productOrders[$id]->update([
@@ -295,6 +297,8 @@ class OrderController extends Controller
                         ]);
                 }
             }
+            if ($counter > 10)
+                $orders = 'طبق فاکتور';
             foreach ($productOrders as $product_id => $productOrder) {
                 $number = $request['product_' . $product_id];
                 if ($number < 1 && $productOrder->number > 0)
@@ -429,12 +433,39 @@ class OrderController extends Controller
     public function invoice($id)
     {
         $order = Order::findOrFail($id);
-        $orderProducts = OrderProduct::where('order_id', $id)->get();
         $order->created_at_p = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
-        return view('orders.invoice', [
-            'order' => $order,
-            'orderProducts' => $orderProducts,
-        ]);
+        $orderProducts = OrderProduct::where('order_id', $id)->get();
+        $number = $orderProducts->count();
+        if ($number > 33) {
+            $v1 = view('orders.invoice', [
+                'firstPage' => '',
+                'lastPage' => 'd-none',
+                'page' => '1',
+                'pages' => '2',
+                'order' => $order,
+                'orderProducts' => $orderProducts,
+            ])->render();
+            $v2 = view('orders.invoice', [
+                'firstPage' => 'd-none',
+                'lastPage' => '',
+                'page' => '2',
+                'pages' => '2',
+                'order' => $order,
+                'orderProducts' => $orderProducts,
+            ])->render();
+            return [[$v1, $order->id . '(page1)'], [$v2, $order->id . '(page2)']];
+        } else {
+            return [[view('orders.invoice', [
+                'firstPage' => '',
+                'lastPage' => '',
+                'page' => '1',
+                'pages' => '1',
+                'order' => $order,
+                'orderProducts' => $orderProducts,
+            ])->render(), $order->id]];
+        }
+
+
     }
 
     public function confirmInvoice($id)

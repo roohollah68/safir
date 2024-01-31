@@ -1,13 +1,16 @@
 <div class="d-none">
     <div id="invoice" style="background: white;" class="bg-white m-3">
         <div class="m-3 p-3">
+
             <div>
+                <span class="m-3" style="font-size: 35px; display: flex;position: fixed">&nbsp; صفحه&nbsp;  <span
+                        id="current-page">1</span>  &nbsp;از&nbsp; <span id="total-pages">1</span></span>
                 <h4 class="text-center m-3 title" id="invoice-title">پیش فاکتور </h4>
             </div>
             <div id="main">
 
                 <div class="w-100">
-                    <table class="w-100 border table1 round" style="text-align: right;">
+                    <table class="w-100 border table1 round first-page" style="text-align: right;">
                         <tr>
                             <th rowspan="3" class="w-5 border-left text-center" style="writing-mode:vertical-rl;">
                                 خریدار
@@ -39,16 +42,16 @@
                             <th class="w-23 border-left">جمع (ریال)</th>
                         </tr>
 
-                        <tr>
+                        <tr class="last-page">
                             <td colspan="6" style="border-bottom: none;"><br><br></td>
                             <td></td>
                         </tr>
-                        <tr class="">
+                        <tr class="last-page">
                             <td colspan="4" style="border: none;"></td>
                             <td colspan="2">مبلغ کل بدون تخفیف</td>
                             <td id="invoice-total-no-discount">0</td>
                         </tr>
-                        <tr class="">
+                        <tr class="last-page">
                             <th colspan="4"> شما از این خرید <span id="invoice-total-discount">0</span> ریال تخفیف
                                 گرفتید
                             </th>
@@ -59,17 +62,18 @@
                     </table>
 
                 </div>
-                <div class="w-100 normal">
+                <div class="w-100 normal last-page">
                     توضیحات:
                     <span id="invoice-description"></span>
+                    <br>
                 </div>
-                <br>
-                <div class="w-100 normal d-flex justify-content-around">
-                    <span>امضای خریدار</span>
-                    <span>تایید حسابداری</span>
-                    <span>امضای فروشنده</span>
+                <div class="last-page">
+                    <div class="w-100 normal d-flex justify-content-around">
+                        <span>امضای خریدار</span>
+                        <span>تایید حسابداری</span>
+                        <span>امضای فروشنده</span>
+                    </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -92,15 +96,15 @@
             text-align: center !important;
         }
 
-        #invoice h4{
+        #invoice h4 {
             font-size: 80px;
         }
 
-        #invoice th, #invoice .normal{
+        #invoice th, #invoice .normal {
             font-size: 45px;
         }
 
-        #invoice td, #invoice .smaller{
+        #invoice td, #invoice .smaller {
             font-size: 40px;
             text-align: center !important;
             font-weight: bold;

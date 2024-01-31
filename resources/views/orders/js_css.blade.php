@@ -336,16 +336,40 @@
     function invoice(id) {
         $.post('/invoice/' + id, {_token: token})
             .done(res => {
-                // console.log(res);
-                $('#invoice-wrapper').html(res);
+                // $.each(res,(index , content)=>{
+                //     console.log(content);
+                //     $('#invoice-wrapper').html(content[0]);
+                //     domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
+                //         .then(function (dataUrl) {
+                //             let link = document.createElement('a');
+                //             link.download = content[1] + '.jpg';
+                //             link.href = dataUrl;
+                //             link.click();
+                //             $('#invoice-wrapper').html('');
+                //         });
+                // })
+                $('#invoice-wrapper').html(res[0][0]);
                 domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
                     .then(function (dataUrl) {
                         let link = document.createElement('a');
-                        link.download = id + '.jpg';
+                        link.download = res[0][1] + '.jpg';
                         link.href = dataUrl;
                         link.click();
                         $('#invoice-wrapper').html('');
+                        if(res.length>1) {
+                            $('#invoice-wrapper').html(res[1][0]);
+                            domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
+                                .then(function (dataUrl) {
+                                    let link = document.createElement('a');
+                                    link.download = res[1][1] + '.jpg';
+                                    link.href = dataUrl;
+                                    link.click();
+                                    $('#invoice-wrapper').html('');
+                                        });
+                        }
                     });
+
+
             })
     }
 
