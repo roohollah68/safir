@@ -17,7 +17,7 @@ class WoocommerceController extends Controller
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
 //        die();
         $request = json_decode(file_get_contents('php://input'));
-//        $request = json_decode(file_get_contents('woo/woo' . '414720' . '.html'));
+//        $request = json_decode(file_get_contents('woo/woo' . '274006' . '.html'));
         file_put_contents('woo/woo' . rand(100000, 1000000) . '.html', file_get_contents('php://input'));
         $orders = '';
         $chatId = '5742084958';
@@ -78,6 +78,7 @@ class WoocommerceController extends Controller
             foreach ($products as $id => $data) {
                 $product = $data[1];
                 $order->orderProducts()->create([
+                    'product_id'=>$product->id,
                     'verified' => true,
                     'name' => $product->name,
                     'number' => $data[0],
