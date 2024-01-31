@@ -22,24 +22,23 @@ class WoocommerceController extends Controller
         $orders = '';
         $chatId = '5742084958';
         $products = array();
-        $text = 'بررسی مطابقت محصولات: '.$website.' '.$request->billing->first_name . ' ' . $request->billing->last_name.'
+        $text = 'بررسی مطابقت محصولات: ' . $website . ' ' . $request->billing->first_name . ' ' . $request->billing->last_name . '
 ';
-        $hasInconsistent =false;
+        $hasInconsistent = false;
         foreach ($request->line_items as $item) {
             $orders = $orders . ' ' . $item->name . ' ' . $item->quantity . 'عدد' . '،';
             if (substr($item->sku, 0, 1) == 's') {
-                $product_id = (int) filter_var($item->sku, FILTER_SANITIZE_NUMBER_INT);
+                $product_id = (int)filter_var($item->sku, FILTER_SANITIZE_NUMBER_INT);
                 $product = Product::find($product_id);
-                $products[$product->id] = [$product->quantity , $product];
+                $products[$product->id] = [$product->quantity, $product];
 //                $text .='✔️ محصول منطبق:
 // '.$item->name . ' -> ' . $item->sku.'
 // '.$product->name.'
 // ';
-            }
-            else{
+            } else {
                 $hasInconsistent = true;
-                $text .='❌ محصول نامنطبق:
- '.$item->name . ' -> ' . $item->sku.'
+                $text .= '❌ محصول نامنطبق:
+ ' . $item->name . ' -> ' . $item->sku . '
  ';
             }
         }
@@ -57,7 +56,7 @@ class WoocommerceController extends Controller
             } else {
                 $desc = $request->payment_method_title . ' - ' . number_format($request->total) . ' ' . $request->currency_symbol;
             }
-        }else
+        } else
             $desc = '';
         $user = User::where('username', $website)->first();
         $order = $user->orders()->create([
@@ -73,12 +72,10 @@ class WoocommerceController extends Controller
             'deliveryMethod' => 'admin',
         ]);
 
-        if ($request->status != 'processing') {
-            app('Telegram')->sendOrderToBale($order, '5742084958');
-            $order->forceDelete();
-        } else {
+
+        if ($request->status == 'processing') {
             app('Telegram')->sendOrderToBale($order, '4521394649');
-            foreach ($products as $id => $data){
+            foreach ($products as $id => $data) {
                 $product = $data[1];
                 $order->orderProducts()->create([
                     'verified' => true,
@@ -91,12 +88,15 @@ class WoocommerceController extends Controller
                 ]);
                 $product->productChange()->create([
                     'order_id' => $order->id,
-                    'change'=>-$data[0],
-                    'quantity'=>$product->quantity,
+                    'change' => -$data[0],
+                    'quantity' => $product->quantity,
                 ]);
             }
+        } else {
+            if($request->status != 'pending')
+                app('Telegram')->sendOrderToBale($order, '5742084958');
+            $order->forceDelete();
         }
-
         DB::commit();
         return 'order saved!';
     }
