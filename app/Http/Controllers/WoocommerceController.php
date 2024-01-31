@@ -24,25 +24,28 @@ class WoocommerceController extends Controller
         $products = array();
         $text = 'بررسی مطابقت محصولات: '.$website.' '.$request->billing->first_name . ' ' . $request->billing->last_name.'
 ';
+        $hasInconsistent =false;
         foreach ($request->line_items as $item) {
             $orders = $orders . ' ' . $item->name . ' ' . $item->quantity . 'عدد' . '،';
             if (substr($item->sku, 0, 1) == 's') {
                 $product_id = (int) filter_var($item->sku, FILTER_SANITIZE_NUMBER_INT);
                 $product = Product::find($product_id);
                 $products[$product->id] = [$product->quantity , $product];
-                $text .='✔️ محصول منطبق:
- '.$item->name . ' -> ' . $item->sku.'
- '.$product->name.'
- ';
+//                $text .='✔️ محصول منطبق:
+// '.$item->name . ' -> ' . $item->sku.'
+// '.$product->name.'
+// ';
             }
             else{
+                $hasInconsistent = true;
                 $text .='❌ محصول نامنطبق:
  '.$item->name . ' -> ' . $item->sku.'
  ';
             }
         }
-        $this->sendTextToBale($text, $chatId);
-        return 'order saved!';
+        if ($hasInconsistent)
+            $this->sendTextToBale($text, $chatId);
+        //return 'order saved!';
 
         if ($request->payment_method == 'cod') {
             if ($website == 'matchano') {

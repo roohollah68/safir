@@ -95,12 +95,14 @@ class OrderController extends Controller
         $request->customerCost = 0;
         $admin = $this->isAdmin();
         $request->orderList = [];
+        $counter = 0;
         foreach ($products as $id => $product) {
             $number = $request['product_' . $id];
             if ($number > 0) {
 //                if ($number > $product->quantity)
 //                    return $this->errorBack('تعداد درخواست شده از "' . $product->name . '" بیش از موجودی انبار است.');
                 $request->orders .= ' ' . $product->name . ' ' . +$number . 'عدد' . '،';
+                $counter++;
                 $coupon = $this->calculateDis($id);
                 if ($admin)
                     $coupon = $request['discount_' . $id];
@@ -121,6 +123,8 @@ class OrderController extends Controller
         if (!count($request->orderList)) {
             return $this->errorBack('محصولی انتخاب نشده است!');
         }
+        if($admin && $counter>20)
+            $request->orders = 'طبق فاکتور';
 
         if (!$admin) {
             $deliveryCost = $this->deliveryCost($request->deliveryMethod);
