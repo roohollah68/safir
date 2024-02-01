@@ -33,9 +33,10 @@ class DepositController extends Controller
 
     public function storeNew(Request $req)
     {
+        $req->amount = str_replace(",","",$req->amount);
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
-            'amount' => 'required|numeric',
+            'amount' => 'required',
         ]);
         $photo = '';
         if ($req->file("photo")) {
@@ -74,9 +75,10 @@ class DepositController extends Controller
 
     public function updateDeposit($id, Request $req)
     {
+        $req->amount = str_replace(",","",$req->amount);
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
-            'amount' => 'required|numeric',
+            'amount' => 'required',
         ]);
         if ($this->isAdmin()) {
             $deposit = Deposit::where('confirmed', 'false')->findOrFail($id);
