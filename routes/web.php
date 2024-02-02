@@ -128,4 +128,6 @@ Route::get('/backup', [TelegramController::class , 'backUpDatabase']);
 
 Route::get('/product/alarm',[ProductChangeController::class , 'productAlarm']);
 
+Route::get('/list', [ProductController::class , 'productsList']);
+
 require __DIR__.'/auth.php';

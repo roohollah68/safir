@@ -120,4 +120,11 @@ class ProductController extends Controller
         ]);
     }
 
+    public function productsList(){
+        $products = Product::all()->keyBy('id');
+        return view('productsList',[
+            'products'=>$products,
+        ]);
+    }
+
 }
