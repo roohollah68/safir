@@ -299,9 +299,10 @@
             $.notify('ابتدا باید سفارشات مورد نظر را انتخاب کنید', 'error')
             return
         }
+
         $.get('pdfs/' + ids.toString())
             .done(res => {
-
+                $('#pdf-link').html("لینک دانلود").attr('href',"{{env('APP_URL')}}"+res).trigger("click");
             })
     }
 
@@ -336,18 +337,6 @@
     function invoice(id) {
         $.post('/invoice/' + id, {_token: token})
             .done(res => {
-                // $.each(res,(index , content)=>{
-                //     console.log(content);
-                //     $('#invoice-wrapper').html(content[0]);
-                //     domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
-                //         .then(function (dataUrl) {
-                //             let link = document.createElement('a');
-                //             link.download = content[1] + '.jpg';
-                //             link.href = dataUrl;
-                //             link.click();
-                //             $('#invoice-wrapper').html('');
-                //         });
-                // })
                 $('#invoice-wrapper').html(res[0][0]);
                 domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
                     .then(function (dataUrl) {

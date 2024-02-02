@@ -1,6 +1,7 @@
 <html dir="rtl">
 <head>
-
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
 
 </head>

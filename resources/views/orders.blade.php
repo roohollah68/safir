@@ -30,6 +30,7 @@
         </div>
 
         <button class="btn btn-secondary m-2" onclick="generatePDFs()"> فایل PDF انتخابی ها</button>
+        <a id="pdf-link"></a>
         <div id="invoice-wrapper" class="d-none"></div>
     @endif
     <table id="main-table" class="stripe">

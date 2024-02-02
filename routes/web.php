@@ -91,6 +91,7 @@ Route::group(['middleware'=>['auth','admin']],function (){
     Route::post('coupon/delete/{id}', [CouponController::class , 'deleteCoupon']);
 
     Route::post('change_state/{id}',[OrderController::class , 'changeState']);
+
     Route::post('pdf/{id}',[OrderController::class , 'pdf']);
     Route::get('pdfs/{ids}',[OrderController::class , 'pdfs']);
 
