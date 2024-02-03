@@ -2,6 +2,7 @@
 /public/deposit
 /public/receipt
 /public/product_photo
+/public/pdf
 /storage/*.key
 .idea
 .git

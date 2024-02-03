@@ -10,6 +10,7 @@ class SettingController extends Controller
     public function showSettings()
     {
         $setting = $this->settings();
+
         return view('settings',
             [
                 'loadOrders' => $setting->loadOrders,
@@ -24,6 +25,7 @@ class SettingController extends Controller
     public function editSettings(Request $req)
     {
         foreach ($req->all() as $name => $value) {
+            $value = str_replace(",","",$value);
             Setting::where('name', $name)->update([
                 'value' => $value
             ]);
