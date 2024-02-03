@@ -302,7 +302,7 @@
 
         $.get('pdfs/' + ids.toString())
             .done(res => {
-                $('#pdf-link').html("لینک دانلود").attr('href',"{{env('APP_URL')}}"+res).trigger("click");
+                $('#pdf-link').html("لینک دانلود").attr('href',"{{env('APP_URL')}}"+res)[0].click();
             })
     }
 
