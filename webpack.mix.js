@@ -18,4 +18,4 @@ mix
     require('tailwindcss'),
     require('autoprefixer'),
 ])
-    .version(['public/js','public/css'])
+    //.version(['public/js','public/css'])
