@@ -76,4 +76,3 @@
         {{--                <span class="btn btn-info" onclick="formMode()">بازگشت</span>--}}
     </div>
 @endif
-    </form>
