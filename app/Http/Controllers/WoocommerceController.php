@@ -30,7 +30,14 @@ class WoocommerceController extends Controller
             if (substr($item->sku, 0, 1) == 's') {
                 $product_id = (int)filter_var($item->sku, FILTER_SANITIZE_NUMBER_INT);
                 $product = Product::find($product_id);
-                $products[$product->id] = [$item->quantity, $product];
+                if ($product)
+                    $products[$product->id] = [$item->quantity, $product];
+                else {
+                    $text .= '❌ آیدی نامنطبق:
+ ' . $item->name . ' -> ' . $item->sku . '
+ ' . $product_id . '
+ ';
+                }
 
             } else {
                 $hasInconsistent = true;
@@ -45,13 +52,19 @@ class WoocommerceController extends Controller
 
         if ($request->payment_method == 'cod') {
             if ($website == 'matchano') {
+                $websiteTitle = 'ماچانو';
                 $request->total = $request->total * 10000;
                 $desc = $request->payment_method_title . ' - ' . number_format($request->total, 0, '.', '/') . ' ریال';
             } elseif ($website == 'peptina' || $website == 'berrynocom') {
                 $request->total = $request->total * 10;
                 $desc = $request->payment_method_title . ' - ' . number_format($request->total, 0, '.', '/') . ' ریال';
+                if ($website == 'peptina')
+                    $websiteTitle = 'پپتینا';
+                else
+                    $websiteTitle = 'برینو';
             } else {
                 $desc = $request->payment_method_title . ' - ' . number_format($request->total) . ' ' . $request->currency_symbol;
+                $websiteTitle = '?';
             }
         } else
             $desc = '';
@@ -75,7 +88,7 @@ class WoocommerceController extends Controller
             foreach ($products as $id => $data) {
                 $product = $data[1];
                 $order->orderProducts()->create([
-                    'product_id'=>$product->id,
+                    'product_id' => $product->id,
                     'verified' => true,
                     'name' => $product->name,
                     'number' => $data[0],
@@ -88,10 +101,11 @@ class WoocommerceController extends Controller
                     'order_id' => $order->id,
                     'change' => -$data[0],
                     'quantity' => $product->quantity,
+                    'desc' => 'خرید اینترنتی سایت ' . $websiteTitle . ' خریدار: ' . $order->name,
                 ]);
             }
         } else {
-            if($request->status != 'pending')
+            if ($request->status != 'pending')
                 app('Telegram')->sendOrderToBale($order, '5742084958');
             $order->forceDelete();
         }
