@@ -30,11 +30,8 @@ class WoocommerceController extends Controller
             if (substr($item->sku, 0, 1) == 's') {
                 $product_id = (int)filter_var($item->sku, FILTER_SANITIZE_NUMBER_INT);
                 $product = Product::find($product_id);
-                $products[$product->id] = [$product->quantity, $product];
-//                $text .='✔️ محصول منطبق:
-// '.$item->name . ' -> ' . $item->sku.'
-// '.$product->name.'
-// ';
+                $products[$product->id] = [$item->quantity, $product];
+
             } else {
                 $hasInconsistent = true;
                 $text .= '❌ محصول نامنطبق:
