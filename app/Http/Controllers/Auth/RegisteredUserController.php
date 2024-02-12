@@ -23,10 +23,10 @@ class RegisteredUserController extends Controller
         return view('auth.register');
     }
 
-    public function createFromTelegram($name, $phone, $telegram_id)
-    {
-        return view('auth.register', ['name' => $name, 'phone' => $phone, 'telegram_id' => $telegram_id]);
-    }
+//    public function createFromTelegram($name, $phone, $telegram_id)
+//    {
+//        return view('auth.register', ['name' => $name, 'phone' => $phone, 'telegram_id' => $telegram_id]);
+//    }
 
     /**
      * Handle an incoming registration request.
@@ -42,7 +42,7 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|min:5|unique:users',
             'phone' => 'required|string|max:11|min:11|unique:users',
-            'telegram_id' => 'numeric|unique:users',
+//            'telegram_id' => 'numeric|unique:users',
             'password' => 'required|string|confirmed|min:8',
         ]);
 
@@ -52,9 +52,9 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
-            'telegram_id' => $request->telegram_id,
+//            'telegram_id' => $request->telegram_id,
             'password' => Hash::make($request->password),
-            'telegram_code' => Str::random(40),
+//            'telegram_code' => Str::random(40),
         ]);
         Auth::login($user);
 
@@ -68,12 +68,12 @@ class RegisteredUserController extends Controller
         return view('auth.new-user-message');
     }
 
-    public function fromTelegram(Request $request)
-    {
-        auth()->logout();
-        $name = $request['name'];
-        $phone = $request['phone'];
-        $telegram_id = $request['telegram_id'];
-        return redirect("register/$name/$phone/$telegram_id");
-    }
+//    public function fromTelegram(Request $request)
+//    {
+//        auth()->logout();
+//        $name = $request['name'];
+//        $phone = $request['phone'];
+//        $telegram_id = $request['telegram_id'];
+//        return redirect("register/$name/$phone/$telegram_id");
+//    }
 }

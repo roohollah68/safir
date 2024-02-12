@@ -17,7 +17,7 @@ class WoocommerceController extends Controller
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
 //        die();
         $request = json_decode(file_get_contents('php://input'));
-//        $request = json_decode(file_get_contents('woo/woo' . '274006' . '.html'));
+//        $request = json_decode(file_get_contents('woo/woo' . '605781' . '.html'));
         file_put_contents('woo/woo' . rand(100000, 1000000) . '.html', file_get_contents('php://input'));
         $orders = '';
         $chatId = '5742084958';
@@ -49,14 +49,16 @@ class WoocommerceController extends Controller
         if ($hasInconsistent)
             $this->sendTextToBale($text, $chatId);
         //return 'order saved!';
-
+        $websiteTitle = "";
+        $total = 0;
+//        dd($website);
         if ($request->payment_method == 'cod') {
             if ($website == 'matchano') {
                 $websiteTitle = 'ماچانو';
-                $request->total = $request->total * 10000;
+                $total = +$request->total * 10000;
                 $desc = $request->payment_method_title . ' - ' . number_format($request->total, 0, '.', '/') . ' ریال';
             } elseif ($website == 'peptina' || $website == 'berrynocom') {
-                $request->total = $request->total * 10;
+                $total = +$request->total * 10;
                 $desc = $request->payment_method_title . ' - ' . number_format($request->total, 0, '.', '/') . ' ریال';
                 if ($website == 'peptina')
                     $websiteTitle = 'پپتینا';
@@ -76,7 +78,7 @@ class WoocommerceController extends Controller
             'zip_code' => $request->billing->postcode,
             'orders' => $orders,
             'desc' => $request->customer_note . ' - ' . $request->shipping_lines[0]->method_title . ' - ' . $desc,
-            'total' => $request->total,
+            'total' => $total,
             'customerCost' => 0,
             'paymentMethod' => 'admin',
             'deliveryMethod' => 'admin',

@@ -20,11 +20,11 @@ class CreateUsersTable extends Migration
             $table->string('phone');
             $table->string('telegram_id')->nullable();
             $table->boolean('verified')->default(false);
-            $table->enum('role' , ['admin' , 'user' , 'print' , 'warehouse'])->default('user');
+            $table->enum('role', ['superAdmin', 'admin', 'user', 'print', 'warehouse'])->default('user');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('telegram_code');
-            $table->decimal('balance',10,0)->default(0);
+            $table->decimal('balance', 10, 0)->default(0);
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();

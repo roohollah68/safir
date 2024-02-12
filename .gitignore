@@ -3,6 +3,7 @@
 /public/receipt
 /public/product_photo
 /public/pdf
+/public/woo
 /storage/*.key
 .idea
 .git

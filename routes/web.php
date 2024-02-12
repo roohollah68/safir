@@ -114,15 +114,6 @@ Route::group(['middleware'=>['auth','admin']],function (){
 });
 
 
-//Route::post('/telegram',[TelegramController::class , 'receive']);
-//Route::get('register-from-telegram',[RegisteredUserController::class , 'fromTelegram']);
-//Route::get('list-orders/{id}/{pass}',[OrderController::class , 'listOrderTelegram']);
-//Route::get('new-order/{id}/{pass}',[OrderController::class , 'newOrderTelegram']);
-//Route::get('new-order-receipt/{id}/{pass}/{file_id}',[OrderController::class , 'newOrderWithPhotoTelegram']);
-
-//Route::post('/deposit/telegram' , [DepositController::class , 'receive']);
-//Route::get('/deposit/add/{id}/{pass}/{file_id}' , [DepositController::class , 'newDepositWithPhotoTelegram']);
-
 Route::post('/woocommerce/{website}' , [WoocommerceController::class , 'addPeptinaOrder']);
 Route::get('/woocommerce/{website}' , [WoocommerceController::class , 'addPeptinaOrder']);
 Route::get('/backup', [TelegramController::class , 'backUpDatabase']);
