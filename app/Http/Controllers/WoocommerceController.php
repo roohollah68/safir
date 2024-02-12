@@ -15,12 +15,10 @@ class WoocommerceController extends Controller
         DB::beginTransaction();
 
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
-//        die();
         $request = json_decode(file_get_contents('php://input'));
 //        $request = json_decode(file_get_contents('woo/woo' . '605781' . '.html'));
         file_put_contents('woo/woo' . rand(100000, 1000000) . '.html', file_get_contents('php://input'));
         $orders = '';
-        $chatId = '5742084958';
         $products = array();
         $text = 'بررسی مطابقت محصولات: ' . $website . ' ' . $request->billing->first_name . ' ' . $request->billing->last_name . '
 ';
@@ -33,6 +31,7 @@ class WoocommerceController extends Controller
                 if ($product)
                     $products[$product->id] = [$item->quantity, $product];
                 else {
+                    $hasInconsistent = true;
                     $text .= '❌ آیدی نامنطبق:
  ' . $item->name . ' -> ' . $item->sku . '
  ' . $product_id . '
@@ -47,29 +46,25 @@ class WoocommerceController extends Controller
             }
         }
         if ($hasInconsistent)
-            $this->sendTextToBale($text, $chatId);
-        //return 'order saved!';
-        $websiteTitle = "";
-        $total = 0;
-//        dd($website);
-        if ($request->payment_method == 'cod') {
-            if ($website == 'matchano') {
-                $websiteTitle = 'ماچانو';
-                $total = +$request->total * 10000;
+            $this->sendTextToBale($text, '5742084958');
+
+        $websiteTitle = "?";
+        $desc = '';
+        if ($website == 'matchano') {
+            $websiteTitle = 'ماچانو';
+            $request->total = $request->total * 10000;
+            if ($request->payment_method == 'cod')
                 $desc = $request->payment_method_title . ' - ' . number_format($request->total, 0, '.', '/') . ' ریال';
-            } elseif ($website == 'peptina' || $website == 'berrynocom') {
-                $total = +$request->total * 10;
+        } elseif ($website == 'peptina' || $website == 'berrynocom') {
+            $request->total = $request->total * 10;
+            if ($website == 'peptina')
+                $websiteTitle = 'پپتینا';
+            else
+                $websiteTitle = 'برینو';
+            if ($request->payment_method == 'cod')
                 $desc = $request->payment_method_title . ' - ' . number_format($request->total, 0, '.', '/') . ' ریال';
-                if ($website == 'peptina')
-                    $websiteTitle = 'پپتینا';
-                else
-                    $websiteTitle = 'برینو';
-            } else {
-                $desc = $request->payment_method_title . ' - ' . number_format($request->total) . ' ' . $request->currency_symbol;
-                $websiteTitle = '?';
-            }
-        } else
-            $desc = '';
+        }
+
         $user = User::where('username', $website)->first();
         $order = $user->orders()->create([
             'name' => $request->billing->first_name . ' ' . $request->billing->last_name,
@@ -78,7 +73,7 @@ class WoocommerceController extends Controller
             'zip_code' => $request->billing->postcode,
             'orders' => $orders,
             'desc' => $request->customer_note . ' - ' . $request->shipping_lines[0]->method_title . ' - ' . $desc,
-            'total' => $total,
+            'total' => $request->total,
             'customerCost' => 0,
             'paymentMethod' => 'admin',
             'deliveryMethod' => 'admin',
