@@ -533,9 +533,10 @@ class OrderController extends Controller
             if (!$order->user()->first()->isAdmin()) {
                 foreach ($order->productChange()->get() as $productChange) {
                     $product = $productChange->product()->first();
-                    $product->update([
-                        'quantity' => $product->quantity - $productChange->change,
-                    ]);
+                    if ($product)
+                        $product->update([
+                            'quantity' => $product->quantity - $productChange->change,
+                        ]);
                 }
                 $order->productChange()->delete();
             }
