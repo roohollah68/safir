@@ -94,6 +94,7 @@
                     }
                 ],
                 order: [[0, "desc"]],
+                paging: false,
             });
             token = $('input[name=_token]').val();
         });
