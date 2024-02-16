@@ -9,7 +9,6 @@ class SettingController extends Controller
 {
     public function showSettings()
     {
-        \Artisan::call('route:cache');
         $setting = $this->settings();
         return view('settings',
             [
