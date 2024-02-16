@@ -99,7 +99,7 @@ Route::group(['middleware'=>['auth','admin']],function (){
     Route::post('confirm_invoice/{id}',[OrderController::class , 'confirmInvoice']);
     Route::post('cancel_invoice/{id}',[OrderController::class , 'cancelInvoice']);
 
-    Route::get('statistic' , [OrderProductController::class , 'show'])->name('statistic');
+    Route::get('statistic' , [OrderProductController::class , 'showStatistic'])->name('statistic');
 
     Route::get('/clear/route', [SettingController::class , 'clearRoute']);
 

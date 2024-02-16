@@ -52,18 +52,18 @@
         </tbody>
     </table>
 
-    <script src="{{mix('js/jalaali.js')}}"></script>
-    <script src="{{mix('js/jquery.Bootstrap-PersianDateTimePicker.js')}}"></script>
+    <script src="/js/jalaali.js"></script>
+    <script src="/js/jquery.Bootstrap-PersianDateTimePicker.js"></script>
 
 @endsection
 
 
 @section('files')
-    <link rel="stylesheet" href="{{mix('css/bootstrap.min.css')}}">
-    <link rel="stylesheet" href="{{mix('css/bootstrap-theme.min.css')}}">
-    <link rel="stylesheet" href="{{mix('css/jquery.Bootstrap-PersianDateTimePicker.css')}}">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/jquery.Bootstrap-PersianDateTimePicker.css">
 
-    <script src="{{mix('js/bootstrap.min.js')}}"></script>
+    <script src="/js/bootstrap.min.js"></script>
 
     @csrf
     <script>
@@ -77,6 +77,7 @@
         body, table {
             font-family: 'Segoe UI', Tahoma;
             font-size: 14px;
+            text-align: right;
         }
         th {
             text-align: right;

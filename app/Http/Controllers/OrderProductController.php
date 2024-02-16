@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class OrderProductController extends Controller
 {
-    public function show(Request $request)
+    public function showStatistic(Request $request)
     {
         if(isset($request->start)) {
             $start = $request->start;
