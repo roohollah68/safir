@@ -36,7 +36,7 @@ class UserController extends Controller
 
     public function edit($id = null)
     {
-        if ($this->superAdmin())
+        if ($this->superAdmin() && $id)
             return view('editUser', ['user' => User::find($id)]);
         else
             return view('editUser', ['user' => auth()->user()]);
