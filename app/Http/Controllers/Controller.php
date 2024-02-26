@@ -30,18 +30,39 @@ class Controller extends BaseController
         return $Number;
     }
 
-    public function isAdmin()
-    {
-        if (auth()->user()->role == 'admin') {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public function role()
     {
         return auth()->user()->role;
+    }
+
+    public function superAdmin(){
+        if(auth()->user()->role == 'superAdmin')
+            return true;
+        return false;
+    }
+
+    public function admin(){
+        if(auth()->user()->role == 'admin')
+            return true;
+        return false;
+    }
+
+    public function safir(){
+        if(auth()->user()->role == 'safir')
+            return true;
+        return false;
+    }
+
+    public function print(){
+        if(auth()->user()->role == 'print')
+            return true;
+        return false;
+    }
+
+    public function warehouse(){
+        if(auth()->user()->role == 'warehouse')
+            return true;
+        return false;
     }
 
     public function userId()

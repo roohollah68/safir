@@ -33,7 +33,7 @@ class CustomerController extends Controller
 
     public function addForm()
     {
-        return view('addEditCustomer', ['customer' => false]);
+        return view('addEditCustomer', ['edit' => false]);
     }
 
     public function storeNewCustomer(Request $request)
@@ -66,15 +66,15 @@ class CustomerController extends Controller
         return redirect()->route('CustomerList');
     }
 
-    public function deleteCustomer($id)
-    {
-        auth()->user()->customers()->find($id)->delete();
-    }
+//    public function deleteCustomer($id)
+//    {
+//        auth()->user()->customers()->find($id)->delete();
+//    }
 
     public function showEditForm($id)
     {
         $customer = auth()->user()->customers()->find($id);
-        return view('addEditCustomer', ['customer' => $customer]);
+        return view('addEditCustomer', ['customer' => $customer, 'edit' => true]);
     }
 
     public function updateCustomer($id, Request $request)
@@ -110,11 +110,11 @@ class CustomerController extends Controller
 
     public function storeNew(Request $req)
     {
-        $req->amount = +str_replace(",","",$req->amount);
+        $req->amount = +str_replace(",", "", $req->amount);
         request()->validate([
             'photo' => 'required|mimes:jpeg,jpg,png,bmp|max:2048',
             'amount' => 'required',
-        ],[
+        ], [
             'photo.required' => 'ارائه رسید بانکی الزامی است!'
         ]);
 
@@ -131,7 +131,7 @@ class CustomerController extends Controller
         $customer = Customer::find($req->id);
         $newTransaction = $customer->transactions()->create([
             'amount' => $req->amount,
-            'description' => 'واریزی ' .$order_id. ' * ' . $req->desc,
+            'description' => 'واریزی ' . $order_id . ' * ' . $req->desc,
             'type' => true,
             'photo' => $photo,
             'balance' => $customer->balance + $req->amount,
@@ -146,7 +146,7 @@ class CustomerController extends Controller
                 'paymentLink' => $newTransaction->id,
             ]);
         $req->amount = number_format($req->amount);
-        $message="ثبت سند واریزی مشتری
+        $message = "ثبت سند واریزی مشتری
         نام:{$customer->name}
         مبلغ: {$req->amount} ریال
         ";
@@ -162,6 +162,8 @@ class CustomerController extends Controller
     {
         DB::beginTransaction();
         $transaction = CustomerTransactions::find($id);
+        if($transaction->deleted)
+            return ;
         $customer = $transaction->customer()->first();
         $customer->transactions()->create([
             'amount' => $transaction->amount,

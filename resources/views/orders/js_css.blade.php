@@ -1,7 +1,10 @@
 <script>
 
     let token = "{{ csrf_token() }}";
-    let isAdmin ={{$admin ? 'true' : 'false'}};
+    let superAdmin ={{$superAdmin ? 'true' : 'false'}};
+    let print ={{$print ? 'true' : 'false'}};
+    let admin ={{$admin ? 'true' : 'false'}};
+    let safir ={{$safir ? 'true' : 'false'}};
     let userId = {{$userId}};
     let table;
     let users = {!!json_encode($users)!!};
@@ -20,11 +23,11 @@
         let counter = 0;
 
         $.each(orders, (id, order) => {
-            if (user !== 'all' && user != order.user_id)
+            if (user !== 'all' && user !== order.user_id)
                 return
             if (deleted ^ !!order.deleted_at)
                 return
-            if (role != 'admin' && order.paymentMethod == 'admin')
+            if (safir && order.paymentMethod === 'admin')
                 return
             counter++;
             res.push([
@@ -36,10 +39,7 @@
 
                 users[order.user_id].name,
 
-                (order.orders.length > 30) ?
-                    order.orders.substr(0, 30) + ' ...'
-                    :
-                    order.orders,
+                (order.orders.length > 30) ? order.orders.substr(0, 30) + ' ...' : order.orders,
 
                 createdTime(order),
 
@@ -68,7 +68,7 @@
             table.rows.add(data);
             table.draw();
         } else {
-            let hideRows = isAdmin ? [1, 7, 8, 9, 10, 11, 12] : [0, 1, 3, 7, 8, 9, 10, 11, 12]
+            let hideRows = (print || superAdmin) ? [1, 7, 8, 9, 10, 11, 12] : [0, 1, 3, 7, 8, 9, 10, 11, 12]
             table = $('#main-table').DataTable({
                 columns: [
                     {title: "انتخاب"},
@@ -187,7 +187,7 @@
     function createdTime(order) {
 
         let timestamp = new Date(order.created_at);
-        timestamp = timestamp.getTime(); //+ 1000 * 3600 * 3.5
+        timestamp = timestamp.getTime();
         let diff = (Date.now() - timestamp) / 1000;
         let res = `<span class="d-none">${timestamp}</span>`;
         if (diff < 60) {
@@ -209,51 +209,52 @@
         }
         if (!order.state || order.deleted_at) {
             res = `<span class="btn btn-secondary" onclick="change_state(${order.id},this)">${res}</span>`
-        } else if (order.state) {
-            if (order.admin !== userId) {
-                res = `<span class="btn btn-info" onclick="change_state(${order.id}),this">${res} <i class="fas fa-check"></i></span>`
-            } else {
-                res = `<span class="btn btn-success" onclick="change_state(${order.id},this)">${res} <i class="fas fa-check"></i></span>`
-            }
+        } else {
+            res = `<span class="btn btn-success" onclick="change_state(${order.id},this)">${res} <i class="fas fa-check"></i></span>`
         }
-
         return res;
     }
 
     function operations(order) {
-        let creatorRole = users[order.user_id].role
         let id = order.id;
-        let cancelInvoice = `<a class="fa-regular fa-xmark btn btn-danger" onclick="cancelInvoice(${id},this)" title=" رد فاکتور"> </a> `;
         let viewOrder = `<i class="fa fa-eye btn btn-info" onclick="view_order(${id})"></i> `;
         let deleteOrder = `<i class="fa fa-trash-alt btn btn-danger" onclick="delete_order(${id},this)" title="حذف سفارش" ></i> `;
         let editOrder = `<a class="fa fa-edit btn btn-primary" href="edit_order/${id}" title="ویرایش سفارش"></a> `;
+        let res = viewOrder;
+        if (deleted)
+            return res;
+        @if($safir)
+        if (!order.state)
+            res += deleteOrder + editOrder;
+        @else
+        let creatorRole = users[order.user_id].role
+
+        let cancelInvoice = `<a class="fa-regular fa-xmark btn btn-danger" onclick="cancelInvoice(${id},this)" title=" رد فاکتور"> </a> `;
         let generatePDF = `<i class="fa fa-file-pdf btn btn-secondary" onclick="generatePDF(${id})" title="دانلود لیبل"></i> `;
         let confirmInvoice = `<a class="fa fa-check btn btn-success" onclick="confirmInvoice(${id},this)" title=" تایید فاکتور"></a> `;
         let invoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title=" فاکتور"></a> `;
         let preInvoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title="پیش فاکتور"></a> `;
 
-        let res = viewOrder;
-
-        if (deleted)
-            return res;
-
-        if (!order.state && (creatorRole === 'user' || order.paymentMethod === 'admin'))
+        if (!order.state && (!order.confirm || creatorRole === 'user') && !print)
             res += deleteOrder + editOrder;
 
-        if ((role === 'print' || role === 'admin') && order.state)
+        if ((print || superAdmin) && order.state)
             res += generatePDF
 
-        if (creatorRole === 'admin' && role === 'admin') {
-            if (order.paymentMethod === 'admin') {
+        if (creatorRole !== 'user') {
+            if (!order.confirm) {
                 res += preInvoice;
-                res += confirmInvoice;
+                if (!print)
+                    res += confirmInvoice;
             } else if (!order.state) {
                 res += invoice;
-                res += cancelInvoice;
+                if (!print)
+                    res += cancelInvoice;
             } else
                 res += invoice;
         }
-        return res;
+        @endif
+            return res;
     }
 
     function delete_order(id, element) {
@@ -269,12 +270,10 @@
             })
     }
 
-    @if($admin)
+    @if($print || $superAdmin )
 
     function change_state(id, element) {
-        if (!isAdmin || (orders[id].admin !== userId && orders[id].state))
-            return
-        if (orders[id].paymentMethod === 'admin' && users[orders[id].user_id].role == 'admin') {
+        if (!orders[id].confirm) {
             alert('ابتدا فاکتور باید تایید شود!');
             return
         }
@@ -295,14 +294,19 @@
     }
 
     function generatePDFs() {
-        if (ids.length === 0) {
+        let verifiedIds =[];
+        $.each(ids, function( index, id ) {
+            if(orders[id].state)
+                verifiedIds.push(id);
+        });
+        if (verifiedIds.length === 0) {
             $.notify('ابتدا باید سفارشات مورد نظر را انتخاب کنید', 'error')
             return
         }
 
-        $.get('pdfs/' + ids.toString())
+        $.get('pdfs/' + verifiedIds.toString())
             .done(res => {
-                $('#pdf-link').html("لینک دانلود").attr('href',"{{env('APP_URL')}}"+res)[0].click();
+                $('#pdf-link').html("لینک دانلود").attr('href', "{{env('APP_URL')}}" + res)[0].click();
             })
     }
 
@@ -312,9 +316,12 @@
             ids.splice(index, 1);
         }
     }
+    @endif
+
+    @if($admin || $superAdmin)
 
     function confirmInvoice(id, element) {
-        if (!isAdmin || orders[id].state)
+        if (orders[id].state)
             return
         $.post('confirm_invoice/' + id, {_token: token})
             .done(res => {
@@ -333,6 +340,9 @@
         }
 
     }
+    @endif
+
+    @if($admin || $superAdmin || $print)
 
     function invoice(id) {
         $.post('/invoice/' + id, {_token: token})
@@ -345,7 +355,7 @@
                         link.href = dataUrl;
                         link.click();
                         $('#invoice-wrapper').html('');
-                        if(res.length>1) {
+                        if (res.length > 1) {
                             $('#invoice-wrapper').html(res[1][0]);
                             domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
                                 .then(function (dataUrl) {
@@ -354,14 +364,13 @@
                                     link.href = dataUrl;
                                     link.click();
                                     $('#invoice-wrapper').html('');
-                                        });
+                                });
                         }
                     });
 
 
             })
     }
-
     @endif
 
 </script>

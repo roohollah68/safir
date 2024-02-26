@@ -16,7 +16,7 @@ class DepositController extends Controller
 
     public function depositList()
     {
-        if ($this->isAdmin()) {
+        if ($this->superAdmin()) {
             $deposits = Deposit::all();
             $users = User::with('deposits')->get()->keyBy('id');
             return view('depositList', ['deposits' => $deposits, 'users' => $users]);
@@ -55,7 +55,7 @@ class DepositController extends Controller
 
     public function deleteDeposit($id)
     {
-        if ($this->isAdmin()) {
+        if ($this->superAdmin()) {
             Deposit::where('confirmed', 'false')->findOrFail($id)->delete();
         } else {
             auth()->user()->deposits()->where('confirmed', 'false')->findOrFail($id)->delete();
@@ -64,7 +64,7 @@ class DepositController extends Controller
 
     public function editDeposit($id)
     {
-        if ($this->isAdmin()) {
+        if ($this->superAdmin()) {
             $deposit = Deposit::where('confirmed', 'false')->findOrFail($id);
             return view('addEditDeposit', ['deposit' => $deposit]);
         } else {
@@ -80,7 +80,7 @@ class DepositController extends Controller
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'amount' => 'required',
         ]);
-        if ($this->isAdmin()) {
+        if ($this->superAdmin()) {
             $deposit = Deposit::where('confirmed', 'false')->findOrFail($id);
         } else {
             $deposit = auth()->user()->deposits()->where('confirmed', 'false')->findOrFail($id);
@@ -100,7 +100,7 @@ class DepositController extends Controller
 
     public function changeConfirm($id)
     {
-        if ($this->isAdmin()) {
+        if ($this->superAdmin()) {
             $deposit = Deposit::find($id);
             $deposit->update([
                 'confirmed' => !$deposit->confirmed

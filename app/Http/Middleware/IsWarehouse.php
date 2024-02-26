@@ -10,16 +10,16 @@ class IsWarehouse
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
-        if (auth()->user() &&  auth()->user()->verified && auth()->user()->role == 'print') {
-            return $next($request);
+
+        if (auth()->user()->role == 'warehouse') {
+            $request->hasRole = true;
         }
-        auth()->logout();
-        return redirect(route('not-verify'));
+        return $next($request);
     }
 }

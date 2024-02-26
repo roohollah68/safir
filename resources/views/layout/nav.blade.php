@@ -1,103 +1,79 @@
-<div class="topnav" id="myTopnav">
-    <a href="javascript:void(0);" class="icon" onclick="myFunction()">
-        <i class="fa fa-bars"></i>
-    </a>
-    @if(!$admin)
-        <a href="{{route('DepositList')}}" class="active">اعتبار <span dir="ltr">{{$balance}}</span>  ریال</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary" id="navbar">
+    <a class="navbar-brand" href="{{route('editUser')}}">{{$user}} خوش آمدید</a>
+    @if($safir)
+        <a class="navbar-brand" href="{{route('DepositList')}}">| اعتبار <span dir="ltr">{{$balance}}</span> ریال</a>
     @endif
-    <a href="{{route('newOrder')}}">ایجاد سفارش</a>
-    <a href="{{route('listOrders')}}">مشاهده سفارشات @if($admin) ({{$orderCount}}) @endif</a>
-    <a href="{{route('CustomerList')}}">مشتریان </a>
-    <a href="{{route('DepositList')}}">واریزی ها @if($admin) ({{$depositCount}}) @endif</a>
-    @if($admin)
-        <a href="{{route('manageUsers')}}">مدیریت کاربران ({{$userCount}}) </a>
-        <a href="{{route('couponList')}}">تخفیف ها</a>
-        <a href="{{route('productList')}}">محصولات</a>
-        <a href="{{route('settings')}}">تنظیمات</a>
-        <a href="{{route('statistic')}}">آمار</a>
-    @else
-        <a href="{{route('editUser')}}">ویرایش حساب کاربری</a>
-        <a href="{{route('transactions')}}">تراکنش ها</a>
-    @endif
-    <a href="{{route('logout')}}">خروج</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-</div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            @if($superAdmin || $admin || $safir)
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{route('newOrder')}}">ایجاد سفارش</a>
+                </li>
+            @endif
+            @if($superAdmin || $admin || $safir || $print)
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{route('listOrders')}}">مشاهده سفارشات</a>
+                </li>
+            @endif
+            @if($superAdmin || $admin || $safir)
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{route('CustomerList')}}">مشتریان</a>
+                </li>
+            @endif
+            @if($superAdmin || $warehouse )
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{route('productList')}}">محصولات</a>
+                </li>
+            @endif
+            @if($superAdmin)
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">مدیریت کاربران</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{route('manageUsers')}}">مدیریت اکانت ها</a>
+                        <a class="dropdown-item" href="{{route('DepositList')}}">واریزی های سفیران</a>
+                        <a class="dropdown-item" href="{{route('couponList')}}">مدیریت تخفیف ها</a>
+                        <a class="dropdown-item" href="{{route('settings')}}">تنظیمات </a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{route('statistic')}}">آمار</a>
+                </li>
+            @endif
+            @if($safir)
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{route('DepositList')}}">واریزی ها</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{route('transactions')}}">تراکنش ها</a>
+                </li>
+            @endif
+            @if(!$superAdmin)
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{route('editUser')}}">ویرایش حساب کاربری</a>
+                </li>
+            @endif
+            <li class="nav-item">
+                <a class="nav-link active" href="{{route('logout')}}">خروج</a>
+            </li>
+        </ul>
 
-<script>
-    function myFunction() {
-        var x = document.getElementById("myTopnav");
-        if (x.className === "topnav") {
-            x.className += " responsive";
-        } else {
-            x.className = "topnav";
-        }
-    }
-</script>
+    </div>
+</nav>
 
 <style>
-    body {
-        margin: 0;
-    }
-
-    .topnav {
-        overflow: hidden;
-        background-color: #333;
-    }
-
-    .topnav a {
-        float: right;
-        display: block;
-        color: #f2f2f2;
-        text-align: center;
-        padding: 14px 16px;
-        text-decoration: none;
-        font-size: 17px;
-    }
-
-    .topnav a:hover {
-        background-color: #ddd;
-        color: black;
-    }
-
-    .topnav a.active {
-        background-color: #04AA6D;
-        color: white;
-    }
-
-    .topnav .icon {
-        display: none;
-    }
-
-    @media screen and (max-width: 600px) {
-        .topnav a:not(:first-child,.active) {
-            display: none;
-        }
-
-        .topnav a.icon {
-            float: right;
-            display: block;
+    @media (min-width: 991px) {
+        #navbar .nav-link {
+            border-right: 2px solid white;
         }
     }
-
-    @media screen and (max-width: 600px) {
-        .topnav.responsive {
-            position: relative;
-        }
-
-        .topnav.responsive .icon {
-            position: absolute;
-            right: 0;
-            top: 0;
-        }
-
-        .topnav.responsive a {
-            float: none;
-            display: block;
-            text-align: right;
-        }
-
-        .topnav.responsive a.active {
-            text-align: left;
-        }
+    #navbar .nav-link:hover , #navbar .navbar-brand:hover{
+        color: green;
     }
 </style>

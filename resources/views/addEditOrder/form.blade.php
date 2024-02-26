@@ -70,7 +70,7 @@
     </div>
 
 
-    @if(!$admin)
+    @if($safir)
         <div class="p-3 m-2 border">
             <h4>نحوه پرداخت</h4>
             @if(!$edit)

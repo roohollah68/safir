@@ -21,7 +21,7 @@
         $("#addToCustomers").checkboxradio();
     });
 
-    @if(($edit && $creator) || !$edit)
+    @if($creator || !$edit)
     $(function () {
         product_table = $('#product-table').DataTable({
             autoWidth: false,
@@ -64,7 +64,7 @@
         let total = 0, Total = 0;
         let hasProduct = false;
         let ordersText = ''; //عبارت مربوط به قسمت محصولات
-        let ordersListText = ''; // عبارت مربو به فاکتور سفیران
+        let ordersListText = ''; // عبارت مربوط به فاکتور سفیران
         let invoiceOrders = ''; //مربوط به پیش فاکتور
         let ii = 1;
         $.each(cart, (id, number) => {
@@ -102,7 +102,7 @@
         $('#invoice-total-discount').html(priceFormat(Total - total));
         $('#invoice-total-with-discount').html(priceFormat(total));
 
-        @if(!$admin)
+        @if($safir)
         $('#order-list').html(ordersListText)
         let deliveryCost = 0;
         if (Total < {{$settings->freeDelivery}} || {{$id}} == 10)
@@ -132,7 +132,7 @@
     }
 
     function deleteBTN(id) {
-        @if($admin || !$edit)
+        @if($creator || !$edit)
             return '<span class="btn btn-danger mx-1" ' +
             'onclick="$(`#product_' + id + '`).val(0);cart[' + id + '] =0 ;refreshProducts()">X</span>'
         @else

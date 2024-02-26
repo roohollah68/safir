@@ -20,6 +20,7 @@ class Order extends Model
         'desc',
         'receipt',
         'state',
+        'confirm',
         'total',
         'paymentMethod',
         'customerCost',

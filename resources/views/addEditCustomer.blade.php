@@ -1,10 +1,10 @@
 @extends('layout.main')
 
 @section('title')
-    @if(!$customer)
-        افزودن مشتری
-    @else
+    @if($edit)
         ویرایش مشتری
+    @else
+        افزودن مشتری
     @endif
 @endsection
 
@@ -17,10 +17,10 @@
     <form action="" method="post">
         @csrf
         @php
-            $name = old('name')?old('name'):($customer?$customer->name:'');
-            $phone = old('phone')?old('phone'):($customer?$customer->phone:'');
-            $address = old('address')?old('address'):($customer?$customer->address:'');
-            $zip_code = old('zip_code')?old('zip_code'):($customer?$customer->zip_code:'');
+            $name = old('name')?:($edit?$customer->name:'');
+            $phone = old('phone')?:($edit?$customer->phone:'');
+            $address = old('address')?:($edit?$customer->address:'');
+            $zip_code = old('zip_code')?:($edit?$customer->zip_code:'');
         @endphp
         <div class="row">
             <div class="col-md-6">
@@ -57,13 +57,12 @@
             </div>
         </div>
 
-
-        @if($customer)
+        @if($edit)
             <input type="submit" class="btn btn-success" value="ویرایش">
         @else
             <input type="submit" class="btn btn-success" value="افزودن">
         @endif
-        &nbsp;
+
         <a href="{{route('CustomerList')}}" class="btn btn-danger">بازگشت</a>
 
     </form>

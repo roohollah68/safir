@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    @if($admin)
+    @if($superAdmin)
         <span class="h5">مجموع بدهکاری مشتریان </span>
         <span class="h3 btn btn-danger" dir="ltr" onclick="$('#table-container ,#brief-table ').toggle(); ">
             {{number_format($total)}}
@@ -24,7 +24,7 @@
                 <th>نام</th>
                 <th>شماره تماس</th>
                 <th>آدرس</th>
-                @if($admin)
+                @if(!$safir)
                     <th>بدهکاری(ریال)</th>
                 @else
                     <th>کد پستی</th>
@@ -40,7 +40,7 @@
                     <td>{{$customer->name}}</td>
                     <td>{{$customer->phone}}</td>
                     <td>{{$customer->address}}</td>
-                    @if($admin)
+                    @if(!$safir)
                         <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
                                          class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
                     @else
@@ -50,42 +50,44 @@
                     <td>
                         <a class="btn btn-primary" href="/customer/edit/{{$customer->id}}">ویرایش</a>
 
-                        @if($admin)
+                        @if(!$safir)
                             <a class="btn btn-info" href="/customer/transaction/{{$customer->id}}">تراکنش ها</a>
                         @endif
-{{--                        @if($customer->balance == 0)--}}
-{{--                            <a class="btn btn-danger" onclick="delete_customer({{$customer->id}})">حذف</a>--}}
-{{--                        @endif--}}
+                        {{--                        @if($customer->balance == 0)--}}
+                        {{--                            <a class="btn btn-danger" onclick="delete_customer({{$customer->id}})">حذف</a>--}}
+                        {{--                        @endif--}}
                     </td>
                 </tr>
             @endforeach
             </tbody>
         </table>
     </div>
-    <div id="brief-table">
-        <table class="stripe">
-            <thead>
-            <tr>
-                <th>شماره مشتری</th>
-                <th>نام</th>
-                <th>بدهی(ریال)</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($customers as $customer)
-                @if($customer->balance == 0)
-                    @continue
-                @endif
+    @if($superAdmin)
+        <div id="brief-table">
+            <table class="stripe">
+                <thead>
                 <tr>
-                    <td>{{$customer->id}}</td>
-                    <td>{{$customer->name}}</td>
-                    <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
-                                     class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
+                    <th>شماره مشتری</th>
+                    <th>نام</th>
+                    <th>بدهی(ریال)</th>
                 </tr>
-            @endforeach
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                @foreach($customers as $customer)
+                    @if($customer->balance == 0)
+                        @continue
+                    @endif
+                    <tr>
+                        <td>{{$customer->id}}</td>
+                        <td>{{$customer->name}}</td>
+                        <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
+                                         class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 
 @endsection
 

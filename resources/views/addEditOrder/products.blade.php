@@ -1,4 +1,4 @@
-@if(($edit && $creator) || !$edit)
+@if( $creator || !$edit)
     <div id="products" class="my-4">
         <table class="stripe" id="product-table">
             <thead>
@@ -24,11 +24,11 @@
                                        value="{{old("discount_".$product->id)?:+$product->coupon}}"
                                        style="width: 80px"
                                        onchange="changeDiscount({{$product->id}},this.value)"
-                                       @if(!$admin)
+                                       @if(!$creator)
                                            disabled
                                        @endif
                                        min="0" max="100" step="0.25">
-                                @if($admin)
+                                @if($creator)
                                 <a class="btn btn-outline-info fa fa-plus" dir="ltr"
                                    onclick="$('#discount_{{$product->id}}').val(+$('#discount_{{$product->id}}').val()+5).change()">5</a>
                                 @endif
@@ -40,22 +40,20 @@
                                 <input type="text" class="price-input text-success discount" style="width: 80px;"
                                    value="{{$product->priceWithDiscount}}"
                                    onchange="calculate_discount({{$product->id}},this.value)"
-                                   @if(!$admin)
+                                   @if(!$creator)
                                        disabled
                                    @endif
                                 >
-
                                         <span class=" btn text-danger original"
                                             @if($product->priceWithDiscount!=$product->price)
                                                 style="text-decoration: line-through"
                                             @endif
-                                            @if($admin)
+                                            @if($creator)
                                                 onclick="$('#price_{{$product->id}} .discount').val('{{number_format($product->price)}}').change()"
                                             @endif
                                         >
                                             {{number_format($product->price)}}
                                         </span>
-
                             </td>
 
                         {{--تعداد--}}
@@ -73,6 +71,5 @@
             @endforeach
             </tbody>
         </table>
-        {{--                <span class="btn btn-info" onclick="formMode()">بازگشت</span>--}}
     </div>
 @endif

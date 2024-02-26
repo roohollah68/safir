@@ -12,12 +12,12 @@
         <thead>
         <tr>
             <th>#</th>
-            @if($admin)
+            @if($superAdmin)
                 <th>نام سفیر</th>
             @endif
             <th>تاریخ ثبت</th>
             <th>مبلغ (ریال)</th>
-            @if($admin)
+            @if($superAdmin)
                 <th>توضیحات</th>
                 <th>تصویر</th>
             @endif
@@ -32,28 +32,28 @@
         @foreach($deposits as $deposit)
             <tr>
                 <td>{{$counter--}}</td>
-                @if($admin)
+                @if($superAdmin)
                     <th>{{$users[$deposit->user_id]->username}}</th>
                 @endif
                 <td>{{verta($deposit->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
                 <td>{{number_format($deposit->amount)}}</td>
-                @if($admin)
+                @if($superAdmin)
                     <td>{{$deposit->desc}}</td>
                     <td>
                         @if($deposit->photo)
-                        <a target="_blank" href="/deposit/{{$deposit->photo}}">
-                            <p>مشاهده سند</p>
-                        </a>
+                            <a target="_blank" href="/deposit/{{$deposit->photo}}">
+                                <p>مشاهده سند</p>
+                            </a>
                         @endif
                     </td>
                 @endif
                 <td>
                     @if($deposit->confirmed)
-                        <p class="btn btn-success" @if($admin) id="confirm{{$deposit->id}}"
+                        <p class="btn btn-success" @if($superAdmin) id="confirm{{$deposit->id}}"
                            onclick="confirm_deposit({{$deposit->id}})" @endif>
                             تایید شده</p>
                     @else
-                        <p class="btn btn-danger" @if($admin) id="confirm{{$deposit->id}}"
+                        <p class="btn btn-danger" @if($superAdmin) id="confirm{{$deposit->id}}"
                            onclick="confirm_deposit({{$deposit->id}})" @endif>تایید
                             نشده</p>
                     @endif
@@ -91,7 +91,7 @@
                 ""
         }
 
-        @if($admin)
+        @if($superAdmin)
         function confirm_deposit(id) {
             $.post('/deposit/changeConfirm/' + id, {_token: "{{ csrf_token() }}"})
                 .done(res => {

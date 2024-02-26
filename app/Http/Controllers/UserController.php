@@ -11,62 +11,40 @@ class UserController extends Controller
 
     public function home()
     {
+        if (auth()->user()->role == 'warehouse')
+            return redirect()->route('productList');
         return redirect()->route('listOrders');
     }
 
     public function show()
     {
-        if ($this->isAdmin())
-            return view('userList', ['users' => User::all()]);
-        else
-            abort(404);
-
+        return view('userList', ['users' => User::all()]);
     }
 
-    public function delete($id)
-    {
-        if ($this->isAdmin()){
-            User::where('id', $id)->where('role', 'user')->where('verified', false)->delete();
-            return redirect()->route('manageUsers');
-        }
-        else
-            abort(404);
-
-    }
 
     public function confirm($id)
     {
-        if ($this->isAdmin()){
-            User::find($id)->update(['verified' => true]);
-            return redirect()->route('manageUsers');
-        }
-        else
-            abort(404);
-
+        User::find($id)->update(['verified' => true]);
+        return redirect()->route('manageUsers');
     }
 
     public function suspend($id)
     {
-        if ($this->isAdmin()){
-            User::where('id', $id)->where('role', 'user')->update(['verified' => false]);
-            return redirect()->route('manageUsers');
-        }
-        else
-            abort(404);
-
+        User::where('id', $id)->where('role', 'user')->update(['verified' => false]);
+        return redirect()->route('manageUsers');
     }
 
     public function edit($id = null)
     {
-        if ($this->isAdmin())
-            return view('editUser', [ 'user' => User::find($id)]);
+        if ($this->superAdmin())
+            return view('editUser', ['user' => User::find($id)]);
         else
-            return view('editUser', [ 'user' => auth()->user()]);
+            return view('editUser', ['user' => auth()->user()]);
     }
 
-    public function update( Request $request ,$id = null)
+    public function update(Request $request, $id = null)
     {
-        if (!$this->isAdmin())
+        if (!$this->superAdmin())
             $id = auth()->user()->id;
         $request->validate([
             'name' => 'required|string|max:255',
@@ -89,8 +67,8 @@ class UserController extends Controller
                 'password' => Hash::make($request->password),
             ]);
         }
-        if (auth()->user()->role != 'admin')
-            return redirect()->route('listOrders');
-        return redirect()->route('manageUsers');
+        if ($this->superAdmin())
+            return redirect()->route('manageUsers');
+        return redirect()->route('listOrders');
     }
 }

@@ -16,7 +16,7 @@ class OrderController extends Controller
 {
     public function showOrders()
     {
-        if ($this->isAdmin()) {
+        if ($this->superAdmin() || $this->print()) {
             $users = User::withTrashed()->get()->keyBy("id");
             $orders = Order::withTrashed()->orderBy('id', 'desc')
                 ->limit($this->settings()->loadOrders)->get()->keyBy('id');
@@ -45,7 +45,7 @@ class OrderController extends Controller
     public function newForm()
     {
         $user = auth()->user();
-        if ($this->isAdmin())
+        if ($this->superAdmin() || $this->admin())
             $products = Product::where('category', '<>', 'pack')->get()->keyBy('id');
         else
             $products = Product::where('category', 'final')->where('price', '>', '1')->get()->keyBy('id');
@@ -53,13 +53,8 @@ class OrderController extends Controller
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
         }
-        if ($this->isAdmin()) {
-//            $customersData = Customer::where('id','>',0)->get()->reject(function ($customer){
-//                return $customer->user()->role == 'user';
-//            });
-            $customersData = auth()->user()->customers()->get();
-        } else
-            $customersData = auth()->user()->customers()->get();
+
+        $customersData = auth()->user()->customers()->get();
 
         $customers = $customersData->keyBy('name');
         $customersId = $customersData->keyBy('id');
@@ -71,7 +66,7 @@ class OrderController extends Controller
             'settings' => $this->settings(),
             'id' => $user->id,
             'cart' => (object)[],
-            'creator' => $this->isAdmin(),
+            'creator' => ($this->superAdmin() || $this->admin()),
         ]);
     }
 
@@ -93,14 +88,12 @@ class OrderController extends Controller
         $Total = 0;     //جمع بدون احتساب تخفیف
         $total = 0;  //جمع با احتساب تخفیف
         $request->customerCost = 0;
-        $admin = $this->isAdmin();
+        $admin = $this->superAdmin() || $this->admin();
         $request->orderList = [];
         $counter = 0;
         foreach ($products as $id => $product) {
             $number = $request['product_' . $id];
             if ($number > 0) {
-//                if ($number > $product->quantity)
-//                    return $this->errorBack('تعداد درخواست شده از "' . $product->name . '" بیش از موجودی انبار است.');
                 $request->orders .= ' ' . $product->name . ' ' . +$number . 'عدد' . '،';
                 $counter++;
                 $coupon = $this->calculateDis($id);
@@ -126,7 +119,7 @@ class OrderController extends Controller
         if ($admin && $counter > 10)
             $request->orders = 'طبق فاکتور';
 
-        if (!$admin) {
+        if ($this->safir()) {
             $deliveryCost = $this->deliveryCost($request->deliveryMethod);
             if ($Total < $this->settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
                 $total += $deliveryCost;
@@ -163,7 +156,7 @@ class OrderController extends Controller
 
         $this->addToTransactions($request, $order);
 
-        if (!$admin)
+        if ($this->safir())
             foreach ($request->orderList as $id => $product) {
                 $products[$id]->update([
                     'quantity' => $products[$id]->quantity - $product['number'],
@@ -210,18 +203,21 @@ class OrderController extends Controller
     public function editForm($id)
     {
         $user = auth()->user();
-        if ($this->isAdmin())
+        if ($this->superAdmin())
             $order = Order::findOrFail($id);
         else
             $order = $user->orders()->findOrFail($id);
 
-        if ($order->state)
+        $creator = $order->user()->first()->role !== 'user';
+
+        if ($order->state || ($order->confirm && $creator))
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
-        $creator = $order->user()->first()->role == 'admin';
-        if ($this->isAdmin())
+
+        if (!$this->safir())
             $products = Product::where('category', '<>', 'pack')->get()->keyBy('id');
         else
             $products = Product::where('category', 'final')->where('price', '>', '1')->get()->keyBy('id');
+
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
@@ -253,7 +249,7 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
 
-        if ($this->isAdmin())
+        if ($this->superAdmin())
             $order = Order::findOrFail($id);
         else
             $order = auth()->user()->orders()->findOrFail($id);
@@ -268,7 +264,7 @@ class OrderController extends Controller
         $request->phone = $this->number_Fa_En($request->phone);
         $request->zip_code = $this->number_Fa_En($request->zip_code);
 
-        if ($order->user()->first()->role == 'admin') {
+        if ($order->user()->first()->role !== 'user') {
             $orders = '';
             $products = Product::where('available', true)->get()->keyBy('id');
             $productOrders = $order->orderProducts()->get()->keyBy('product_id');
@@ -369,8 +365,6 @@ class OrderController extends Controller
     public function pdf($id)
     {
         $order = Order::findOrFail($id);
-//        if ($order->admin != $this->userId() && $order->admin)
-//            abort(405);
         if ($order->user()->first()->role == 'admin')
             $order->orders = 'طبق فاکتور';
         $font = 28;
@@ -469,15 +463,15 @@ class OrderController extends Controller
                 'orderProducts' => $orderProducts,
             ])->render(), $order->id]];
         }
-
-
     }
 
     public function confirmInvoice($id)
     {
         DB::beginTransaction();
         $order = Order::findOrFail($id);
-        $order->paymentMethod = 'credit';
+        if ($order->confirm || $order->state)
+            return $order;
+        $order->confirm = true;
         $order->save();
         $orderProducts = $order->orderProducts();
         $orderProducts->update(['verified' => true]);
@@ -502,7 +496,9 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
         $order = Order::findOrFail($id);
-        $order->paymentMethod = 'admin';
+        if (!$order->confirm || $order->state)
+            return $order;
+        $order->confirm = false;
         $order->save();
         $order->orderProducts()->update(['verified' => false]);
         foreach ($order->productChange()->get() as $productChange) {
@@ -520,17 +516,17 @@ class OrderController extends Controller
     public function deleteOrder($id, Request $request)
     {
         DB::beginTransaction();
-        if ($this->isAdmin())
+        if ($this->superAdmin())
             $order = Order::findOrFail($id);
         else
             $order = auth()->user()->orders()->findOrFail($id);
 
-        if ($order->state)
+        if ($order->state || ($order->confirm && $order->user()->first()->role !== 'user'))
             return 'سفارش نمی تواند حذف شود، چون پردازش شده است!';
 
         if ($order->delete()) {
             $orderProducts = $order->orderProducts();
-            if (!$order->user()->first()->isAdmin()) {
+            if ($order->user()->first()->safir()) {
                 foreach ($order->productChange()->get() as $productChange) {
                     $product = $productChange->product()->first();
                     if ($product)
@@ -542,7 +538,7 @@ class OrderController extends Controller
             }
             $orderProducts->delete();
 //            OrderProduct::where('order_id', $id)->delete();
-            if ($order->paymentMethod == 'credit' && !$order->user()->first()->isAdmin()) {
+            if ($order->paymentMethod == 'credit' && $order->user()->first()->safir()) {
                 $user = $order->user()->first();
                 $user->update([
                     'balance' => $user->balance + $order->total,
@@ -578,22 +574,49 @@ class OrderController extends Controller
 
     public function addToCustomers($request)
     {
-        if ($request->addToCustomers || $this->isAdmin()) {
-            $customer = auth()->user()->customers()->updateOrCreate([
-                'id' => [$request->customerId]
-            ], [
-                'name' => $request->name,
-                'phone' => $request->phone,
-                'address' => $request->address,
-                'zip_code' => $request->zip_code,
-            ]);
-            return $customer->id;
+        if ($this->safir()) {
+            $request->customerId = false;
         }
+        if (!$request->addToCustomers && ($this->superAdmin() || $this->admin())) {
+            if ($request->customerId) {
+                $customer = auth()->user()->customers()->findOrFail($request->customerId);
+                if ($customer->name != $request->name) {
+                    return $this->errorBack('نام مشتری مطابقت ندارد!');
+                }
+            } else {
+                $customer = auth()->user()->customers()->Create([
+                    'name' => $request->name,
+                    'phone' => $request->phone,
+                    'address' => $request->address,
+                    'zip_code' => $request->zip_code,
+                ]);
+            }
+        }
+
+        if ($request->addToCustomers) {
+            if ($request->customerId) {
+                $customer = auth()->user()->customers()->findOrFail($request->customerId);
+                $customer->update([
+                    'name' => $request->name,
+                    'phone' => $request->phone,
+                    'address' => $request->address,
+                    'zip_code' => $request->zip_code,
+                ]);
+            } else {
+                $customer = auth()->user()->customers()->Create([
+                    'name' => $request->name,
+                    'phone' => $request->phone,
+                    'address' => $request->address,
+                    'zip_code' => $request->zip_code,
+                ]);
+            }
+        }
+        return $customer->id;
     }
 
     public function addToTransactions($request, $order)
     {
-        if (!$this->isAdmin() && $request->paymentMethod == 'credit')
+        if ($this->safir() && $request->paymentMethod == 'credit')
             $order->transactions()->create([
                 'user_id' => auth()->user()->id,
                 'amount' => $request->total,
@@ -605,6 +628,7 @@ class OrderController extends Controller
 
     public function addToCustomerTransactions($order)
     {
+        DB::beginTransaction();
         $customer = $order->customer()->first();
         $customer->update([
             'balance' => $customer->balance - $order->total,
@@ -616,10 +640,12 @@ class OrderController extends Controller
             'type' => false,
             'description' => 'تایید سفارش ' . $order->id,
         ]);
+        DB::commit();
     }
 
     public function removeFromCustomerTransactions($order)
     {
+        DB::beginTransaction();
         $customerTransaction = $order->customerTransactions()->latest()->first();
         $customer = $customerTransaction->customer()->first();
         $order->customerTransactions()->create([
@@ -637,6 +663,7 @@ class OrderController extends Controller
         $customer->update([
             'balance' => $customer->balance + $customerTransaction->amount,
         ]);
+        DB::commit();
     }
 
     public function addToOrderProducts($request, $order)
@@ -661,6 +688,7 @@ class OrderController extends Controller
             'paymentMethod' => $request->paymentMethod,
             'deliveryMethod' => $request->deliveryMethod,
             'customer_id' => $request->customerId,
+            'confirm' => $this->safir(),
         ]);
     }
 }

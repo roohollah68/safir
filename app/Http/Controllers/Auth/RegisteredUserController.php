@@ -42,7 +42,6 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|min:5|unique:users',
             'phone' => 'required|string|max:11|min:11|unique:users',
-//            'telegram_id' => 'numeric|unique:users',
             'password' => 'required|string|confirmed|min:8',
         ]);
 
@@ -52,15 +51,13 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
-//            'telegram_id' => $request->telegram_id,
             'password' => Hash::make($request->password),
-//            'telegram_code' => Str::random(40),
         ]);
         Auth::login($user);
 
         event(new Registered($user));
 
-        return redirect()->route('listOrders');
+        return redirect()->route('/');
     }
 
     public function newUserMessage()

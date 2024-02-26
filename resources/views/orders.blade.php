@@ -11,11 +11,12 @@
 
 @section('content')
 
-    <label for="deleted_orders">مشاهده سفارشات حذف شده</label><input type="checkbox" id="deleted_orders"
-                                                                     onclick="deleted = $('#deleted_orders').prop('checked');prepare_data()">
+    <label for="deleted_orders">مشاهده سفارشات حذف شده</label>
+    <input type="checkbox" id="deleted_orders"
+           onclick="deleted = $('#deleted_orders').prop('checked');prepare_data()">
     <br>
-    @if($admin)
-        <div>
+    @if($superAdmin || $print)
+        <div class="my-3">
             <div class="form-group input-group col-lg-3">
                 <div class="input-group-append">
                     <label for="user" class="input-group-text">سفیر:</label>
@@ -29,10 +30,10 @@
             </div>
         </div>
 
-        <button class="btn btn-secondary m-2" onclick="generatePDFs()"> فایل PDF انتخابی ها</button>
+        <button class="btn btn-secondary my-2" onclick="generatePDFs()"> فایل PDF انتخابی ها</button>
         <a id="pdf-link"></a>
-        <div id="invoice-wrapper" class="d-none"></div>
     @endif
+    <div id="invoice-wrapper" class="d-none"></div>
     <table id="main-table" class="stripe">
     </table>
 

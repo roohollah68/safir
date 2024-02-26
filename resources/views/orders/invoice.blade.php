@@ -4,10 +4,10 @@
                 <span class="m-3" style="font-size: 35px; display: flex;position: fixed">&nbsp; صفحه&nbsp;
                     {{$page}}  &nbsp;از&nbsp; {{$pages}}</span>
             <h4 class="text-center m-3 title" id="invoice-title">
-                @if($order->paymentMethod == 'admin')
-                    پیش فاکتور
-                @else
+                @if($order->confirm)
                     فاکتور فروش
+                @else
+                    پیش فاکتور
                 @endif
             </h4>
 

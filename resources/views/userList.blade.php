@@ -51,7 +51,13 @@
         @foreach($users as $user)
             @if($user->verified)
                 <tr>
-                    <td>{{$user->name}} @if($user->role == 'admin')( ادمین )@endif</td>
+                    <td>{{$user->name}}
+                        @if($user->superAdmin())( سوپر ادمین )@endif
+                        @if($user->admin())( فروشنده با فاکتور )@endif
+                        @if($user->safir())( سفیر )@endif
+                        @if($user->print())( ارسال سفارش )@endif
+                        @if($user->warehouse())( انباردار )@endif
+                    </td>
                     <td>{{$user->username}}</td>
                     <td>{{$user->phone}}</td>
                     <td dir="ltr">{{number_format($user->balance)}}</td>
