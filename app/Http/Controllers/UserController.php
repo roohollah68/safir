@@ -30,7 +30,7 @@ class UserController extends Controller
 
     public function suspend($id)
     {
-        User::where('id', $id)->where('role', 'user')->update(['verified' => false]);
+        User::where('id', $id)->update(['verified' => false]);
         return redirect()->route('manageUsers');
     }
 

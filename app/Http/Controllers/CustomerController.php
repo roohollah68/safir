@@ -12,7 +12,10 @@ class CustomerController extends Controller
 {
     public function customersList()
     {
-        $customers = auth()->user()->customers()->get()->keyBy("id");;
+        if ($this->superAdmin())
+            $customers = Customer::all()->keyBy("id");
+        else
+            $customers = auth()->user()->customers()->get()->keyBy("id");
         $total = 0;
         foreach ($customers as $customer) {
             $total += $customer->balance;
@@ -162,8 +165,8 @@ class CustomerController extends Controller
     {
         DB::beginTransaction();
         $transaction = CustomerTransactions::find($id);
-        if($transaction->deleted)
-            return ;
+        if ($transaction->deleted)
+            return;
         $customer = $transaction->customer()->first();
         $customer->transactions()->create([
             'amount' => $transaction->amount,

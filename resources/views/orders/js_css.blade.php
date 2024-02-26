@@ -27,7 +27,9 @@
                 return
             if (deleted ^ !!order.deleted_at)
                 return
-            if (safir && order.paymentMethod === 'admin')
+            // if (safir && !order.confirm)
+            //     return
+            if (print && !order.confirm)
                 return
             counter++;
             res.push([
@@ -294,9 +296,9 @@
     }
 
     function generatePDFs() {
-        let verifiedIds =[];
-        $.each(ids, function( index, id ) {
-            if(orders[id].state)
+        let verifiedIds = [];
+        $.each(ids, function (index, id) {
+            if (orders[id].state)
                 verifiedIds.push(id);
         });
         if (verifiedIds.length === 0) {
