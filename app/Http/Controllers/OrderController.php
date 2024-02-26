@@ -116,7 +116,7 @@ class OrderController extends Controller
         if (!count($request->orderList)) {
             return $this->errorBack('محصولی انتخاب نشده است!');
         }
-        if ($admin && $counter > 10)
+        if ($admin)
             $request->orders = 'طبق فاکتور';
 
         if ($this->safir()) {
@@ -264,8 +264,8 @@ class OrderController extends Controller
         $request->phone = $this->number_Fa_En($request->phone);
         $request->zip_code = $this->number_Fa_En($request->zip_code);
 
-        if ($order->user()->first()->role !== 'user') {
-            $orders = '';
+        if (!$order->user()->first()->safir()) {
+//            $orders = '';
             $products = Product::where('available', true)->get()->keyBy('id');
             $productOrders = $order->orderProducts()->get()->keyBy('product_id');
             $total = 0;
@@ -276,7 +276,7 @@ class OrderController extends Controller
                     $coupon = $request['discount_' . $id];
                     $total += round((100 - $coupon) * $product->price * $number / 100);
                     $counter++;
-                    $orders .= ' ' . $product->name . ' ' . $number . 'عدد' . '،';
+//                    $orders .= ' ' . $product->name . ' ' . $number . 'عدد' . '،';
                     if (isset($productOrders[$id]))
                         $productOrders[$id]->update([
                             'discount' => $request['discount_' . $id],
@@ -293,8 +293,8 @@ class OrderController extends Controller
                         ]);
                 }
             }
-            if ($counter > 10)
-                $orders = 'طبق فاکتور';
+//            if ($counter > 10)
+            $orders = 'طبق فاکتور';
             foreach ($productOrders as $product_id => $productOrder) {
                 $number = $request['product_' . $product_id];
                 if ($number < 1 && $productOrder->number > 0)
