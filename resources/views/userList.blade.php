@@ -10,32 +10,8 @@
 
 @section('content')
     @csrf
-    <h3>لیست کاربران تایید نشده:</h3>
-    <table class="table mb-5">
-        <thead>
-        <tr>
-            <th>نام و نام خانوادگی</th>
-            <th>نام کاربری</th>
-            <th>شماره تماس</th>
-            <th>عملیات</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach($users as $user)
-            @unless($user->verified)
-                <tr>
-                    <td>{{$user->name}}</td>
-                    <td>{{$user->username}}</td>
-                    <td>{{$user->phone}}</td>
-                    <td>
-                        <a class="btn btn-success" href="/confirm_user/{{$user->id}}">تایید</a>
-                    </td>
-                </tr>
-            @endunless
-        @endforeach
-        </tbody>
-    </table>
-    <hr>
+
+
     <h3>لیست کاربران تایید شده:</h3>
     <table class="table">
         <thead>
@@ -70,4 +46,31 @@
         @endforeach
         </tbody>
     </table>
+    <hr>
+    <h3>لیست کاربران تایید نشده:</h3>
+    <table class="table mb-5">
+        <thead>
+        <tr>
+            <th>نام و نام خانوادگی</th>
+            <th>نام کاربری</th>
+            <th>شماره تماس</th>
+            <th>عملیات</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach($users as $user)
+            @unless($user->verified)
+                <tr>
+                    <td>{{$user->name}}</td>
+                    <td>{{$user->username}}</td>
+                    <td>{{$user->phone}}</td>
+                    <td>
+                        <a class="btn btn-success" href="/confirm_user/{{$user->id}}">تایید</a>
+                    </td>
+                </tr>
+            @endunless
+        @endforeach
+        </tbody>
+    </table>
+    
 @endsection
