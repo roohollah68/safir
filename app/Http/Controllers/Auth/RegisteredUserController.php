@@ -57,7 +57,7 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        return redirect()->route('/');
+        return redirect()->route('not-verify');
     }
 
     public function newUserMessage()
