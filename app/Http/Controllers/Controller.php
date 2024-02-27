@@ -36,33 +36,23 @@ class Controller extends BaseController
     }
 
     public function superAdmin(){
-        if(auth()->user()->role == 'superAdmin')
-            return true;
-        return false;
+        return auth()->user()->superAdmin();
     }
 
     public function admin(){
-        if(auth()->user()->role == 'admin')
-            return true;
-        return false;
+        return auth()->user()->admin();
     }
 
     public function safir(){
-        if(auth()->user()->role == 'safir')
-            return true;
-        return false;
+        return auth()->user()->safir();
     }
 
     public function print(){
-        if(auth()->user()->role == 'print')
-            return true;
-        return false;
+        return auth()->user()->print();
     }
 
     public function warehouse(){
-        if(auth()->user()->role == 'warehouse')
-            return true;
-        return false;
+        return auth()->user()->warehouse();
     }
 
     public function userId()

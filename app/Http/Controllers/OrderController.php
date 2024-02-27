@@ -572,10 +572,13 @@ class OrderController extends Controller
         return $dis + $this->settings()->minCoupon;
     }
 
-    public function addToCustomers($request)
+          public function addToCustomers($request)
     {
         if ($this->safir()) {
             $request->customerId = false;
+        }
+        if ($this->safir() && !$request->addToCustomers) {
+            return null;
         }
         if (!$request->addToCustomers && ($this->superAdmin() || $this->admin())) {
             if ($request->customerId) {
