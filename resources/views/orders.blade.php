@@ -15,6 +15,22 @@
 
 @section('content')
 
+
+    <form action="" method="post" class="input-group col-12 mb-3" onsubmit="return dateFilter();">
+        <div class="col-md-6 d-flex">
+            <span class="input-group-text cursor-pointer" id="date1">📅</span>
+            <input type="text" class="form-control" placeholder="از تاریخ" data-name="date1-text" required>
+            <input type="hidden" name="from" data-name="date1-date">
+        </div>
+        <div class=" col-md-6 d-flex" >
+            <span class="input-group-text cursor-pointer" id="date2">📅</span>
+            <input type="text" class="form-control" placeholder="تا تاریخ" data-name="date2-text" required>
+            <input type="hidden" name="to" data-name="date2-date">
+            <input type="submit" value="اعمال فیلتر">
+        </div>
+    </form>
+
+
     <label for="deleted_orders">مشاهده سفارشات حذف شده</label>
     <input type="checkbox" id="deleted_orders"
            onclick="deleted = $('#deleted_orders').prop('checked');prepare_data()">

@@ -718,4 +718,22 @@ class OrderController extends Controller
             'confirm' => $this->safir(),
         ]);
     }
+
+    public function dateFilter(Request $request)
+    {
+        $from = date($request->date1 . ' 00:00:00');
+        $to = date($request->date2 . ' 23:59:59');
+
+        if ($this->superAdmin() || $this->print()) {
+            $orders = Order::withTrashed()
+                ->whereBetween('created_at', [$from, $to])
+                ->orderBy('id', 'desc')
+                ->limit($this->settings()->loadOrders)->get()->keyBy('id');
+        } else {
+            $orders = auth()->user()->orders()->withTrashed()
+                ->whereBetween('created_at', [$from, $to])
+                ->orderBy('id', 'desc')->limit($this->settings()->loadOrders)->get()->keyBy('id');
+        }
+        return $orders;
+    }
 }

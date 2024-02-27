@@ -17,6 +17,15 @@
     $(() => {
         $("#deleted_orders").checkboxradio();
         prepare_data();
+
+        const dtp1Instance2 = new mds.MdsPersianDateTimePicker(document.getElementById('date1'), {
+            targetTextSelector: '[data-name="date1-text"]',
+            targetDateSelector: '[data-name="date1-date"]',
+        });
+        const dtp1Instance3 = new mds.MdsPersianDateTimePicker(document.getElementById('date2'), {
+            targetTextSelector: '[data-name="date2-text"]',
+            targetDateSelector: '[data-name="date2-date"]',
+        });
     });
 
     function prepare_data() {
@@ -408,6 +417,20 @@
             })
     }
     @endif
+
+    function dateFilter(){
+        let date1 = $('input[name=from]').val();
+        let date2 = $('input[name=to]').val();
+        $.post('/orders/dateFilter',{_token: token, date1: date1, date2: date2})
+            .done(res => {
+                orders = res;
+                prepare_data();
+            })
+
+
+        return false;
+
+    }
 
 </script>
 

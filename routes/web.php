@@ -71,6 +71,7 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'admin', 'safir',
 
     Route::get('orders', [OrderController::class, 'showOrders'])->name('listOrders');
     Route::post('/invoice/{id}', [OrderController::class, 'invoice']);
+    Route::post('/orders/dateFilter', [OrderController::class, 'dateFilter']);
 
 });
 

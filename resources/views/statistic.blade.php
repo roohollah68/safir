@@ -52,15 +52,14 @@
         </tbody>
     </table>
 
-    <script src="/js/jalaali.js"></script>
-    <script src="/js/jquery.Bootstrap-PersianDateTimePicker.js"></script>
-
 @endsection
 
 
 @section('files')
-    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="/css/jquery.Bootstrap-PersianDateTimePicker.css">
+    <script src="/bootstrap-5.1.3-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/popper.min.js"></script>
+    <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
+    <link rel="stylesheet" href="/date-time-picker/mds.bs.datetimepicker.style.css">
 
     @csrf
     <script>
@@ -70,15 +69,6 @@
             });
         });
     </script>
-    <style type="text/css">
-        body, table {
-            font-family: 'Segoe UI', Tahoma;
-            font-size: 14px;
-            text-align: right;
-        }
-        th {
-            text-align: right;
-        }
-    </style>
+
 
 @endsection
