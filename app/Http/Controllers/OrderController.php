@@ -465,13 +465,36 @@ class OrderController extends Controller
         }
     }
 
-    public function confirmInvoice($id)
+    public function confirmInvoice($id, Request $request)
     {
         DB::beginTransaction();
+        $pay = +$request->pay;
         $order = Order::findOrFail($id);
         if ($order->confirm || $order->state)
             return $order;
-        $order->confirm = true;
+        $order->confirm = $pay;
+        $desc = 'شیوه پرداخت نامغلوم';
+        switch ($pay) {
+            case 1:
+                $desc = 'پرداخت نقدی';
+                break;
+            case 2:
+                $desc = 'پرداخت چکی';
+                break;
+            case 3:
+                $desc = 'پرداخت در محل';
+                break;
+            case 4:
+                $desc = 'امانی';
+                break;
+            case 5:
+                $desc = ' پرداخت در تاریخ ' .$request->date;
+                break;
+            case 6:
+                $desc = 'فاکتور به فاکتور';
+                break;
+        }
+        $order->desc .= '***' . $desc;
         $order->save();
         $orderProducts = $order->orderProducts();
         $orderProducts->update(['verified' => true]);
@@ -499,6 +522,7 @@ class OrderController extends Controller
         if (!$order->confirm || $order->state)
             return $order;
         $order->confirm = false;
+        $order->desc = substr( $order->desc, 0, strpos( $order->desc, '***' ) );
         $order->save();
         $order->orderProducts()->update(['verified' => false]);
         foreach ($order->productChange()->get() as $productChange) {
@@ -572,7 +596,7 @@ class OrderController extends Controller
         return $dis + $this->settings()->minCoupon;
     }
 
-          public function addToCustomers($request)
+    public function addToCustomers($request)
     {
         if ($this->safir()) {
             $request->customerId = false;

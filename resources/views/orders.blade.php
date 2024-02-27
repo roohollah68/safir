@@ -7,6 +7,10 @@
 @section('files')
     @include('orders.js_css')
     <script src="/js/dom-to-image.min.js"></script>
+    <script src="/bootstrap-5.1.3-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/popper.min.js"></script>
+    <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
+    <link rel="stylesheet" href="/date-time-picker/mds.bs.datetimepicker.style.css">
 @endsection
 
 @section('content')
@@ -33,8 +37,12 @@
         <button class="btn btn-secondary my-2" onclick="generatePDFs()"> فایل PDF انتخابی ها</button>
         <a id="pdf-link"></a>
     @endif
+
     <div id="invoice-wrapper" class="d-none"></div>
     <table id="main-table" class="stripe">
     </table>
+
+
+
 
 @endsection

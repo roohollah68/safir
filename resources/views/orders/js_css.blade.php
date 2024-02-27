@@ -12,6 +12,8 @@
     let ids;
     let deleted, user = 'all';
     let role = users[userId].role;
+    let globalElement;
+    let dtp1Instance;
     $(() => {
         $("#deleted_orders").checkboxradio();
         prepare_data();
@@ -325,10 +327,42 @@
     function confirmInvoice(id, element) {
         if (orders[id].state)
             return
-        $.post('confirm_invoice/' + id, {_token: token})
+        globalElement = element;
+        let dialog = `<div title="نحوه پرداخت" class="dialogs">`;
+        dialog += `<p class="btn btn-success" onclick="sendConfirm(${id},1)">نقدی</p><br>`;
+        dialog += `<p class="btn btn-info" onclick="sendConfirm(${id},2)">چک</p><br>`;
+        dialog += `<p class="btn btn-primary" onclick="sendConfirm(${id},3)">پرداخت در محل</p><br>`;
+        dialog += `<p class="btn btn-secondary" onclick="sendConfirm(${id},6)">فاکتور به فاکتور</p><br>`;
+        dialog += `<p class="btn btn-warning" onclick="sendConfirm(${id},4)">امانی</p><br>`;
+        dialog += `<p class="btn btn-danger" id="dtp1">پرداخت در تاریخ</p>`;
+        dialog += `<input type="text" id="dateOfPayment" class="form-control d-none" placeholder="تاریخ پرداخت" data-name="dtp1-text">`;
+
+        $(dialog).dialog({
+            modal: true,
+            open: () => {
+                $('.ui-dialog-titlebar-close').hide();
+                $('.ui-widget-overlay').bind('click', function () {
+                    $(".dialogs").dialog('destroy').remove()
+                });
+            }
+        });
+
+        dtp1Instance = new mds.MdsPersianDateTimePicker(document.getElementById('dtp1'), {
+            targetTextSelector: '[data-name="dtp1-text"]',
+            persianNumber: true,
+            onDayClick: function () {
+                sendConfirm(id, 5);
+            }
+        });
+    }
+
+    function sendConfirm(id, pay) {
+        let date = $('#dateOfPayment').val();
+        $(".dialogs").dialog('destroy').remove();
+        $.post('confirm_invoice/' + id, {_token: token, pay: pay, date: date})
             .done(res => {
                 orders[id] = res;
-                $(element).parent().html(operations(orders[id]));
+                $(globalElement).parent().html(operations(orders[id]));
             })
     }
 
