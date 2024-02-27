@@ -734,6 +734,15 @@ class OrderController extends Controller
                 ->whereBetween('created_at', [$from, $to])
                 ->orderBy('id', 'desc')->limit($this->settings()->loadOrders)->get()->keyBy('id');
         }
+        foreach ($orders as $id => $order) {
+            $order->created_at_p = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
+            $order->updated_at_p = verta($order->updated_at)->timezone('Asia/tehran')->formatJalaliDatetime();
+            if ($order->deleted_at)
+                $order->deleted_at_p = verta($order->deleted_at)->timezone('Asia/tehran')->formatJalaliDatetime();
+            else
+                $order->deleted_at_p = null;
+            $orders[$id] = $order;
+        }
         return $orders;
     }
 }
