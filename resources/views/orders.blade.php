@@ -7,8 +7,8 @@
 @section('files')
     @include('orders.js_css')
     <script src="/js/dom-to-image.min.js"></script>
-{{--    <script src="/bootstrap-5.1.3-dist/js/bootstrap.bundle.min.js"></script>--}}
-{{--    <script src="/js/popper.min.js"></script>--}}
+    {{--    <script src="/bootstrap-5.1.3-dist/js/bootstrap.bundle.min.js"></script>--}}
+    {{--    <script src="/js/popper.min.js"></script>--}}
     <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
     <link rel="stylesheet" href="/date-time-picker/mds.bs.datetimepicker.style.css">
 @endsection
@@ -22,7 +22,7 @@
             <input type="text" class="form-control" placeholder="از تاریخ" data-name="date1-text" required>
             <input type="hidden" name="from" data-name="date1-date">
         </div>
-        <div class=" col-md-6 d-flex" >
+        <div class=" col-md-6 d-flex">
             <span class="input-group-text cursor-pointer" id="date2">📅</span>
             <input type="text" class="form-control" placeholder="تا تاریخ" data-name="date2-text" required>
             <input type="hidden" name="to" data-name="date2-date">
@@ -37,11 +37,12 @@
     <br>
     @if($superAdmin || $print)
         <div class="my-3">
-            <div class="form-group input-group col-lg-3">
-                <div class="input-group-append">
-                    <label for="user" class="input-group-text">سفیر:</label>
-                </div>
-                <select class="form-control" id="user" onchange="user = $('#user option:selected').val() || 'all';prepare_data()">
+            <div class="form-group col-md-4 d-flex">
+
+                <label for="user" class="input-group-text">سفیر:</label>
+
+                <select class="form-control" id="user"
+                        onchange="user = $('#user option:selected').val() || 'all';prepare_data()">
                     <option value="all" selected>همه</option>
                     @foreach($users as $id=>$user)
                         <option value="{{$id}}">{{$user->name}}</option>
