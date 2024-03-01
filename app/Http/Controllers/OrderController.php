@@ -39,6 +39,7 @@ class OrderController extends Controller
             'users' => $users,
             'orders' => $orders,
             'userId' => $this->userId(),
+            'limit' => $this->settings()->loadOrders,
         ]);
     }
 
@@ -723,16 +724,17 @@ class OrderController extends Controller
     {
         $from = date($request->date1 . ' 00:00:00');
         $to = date($request->date2 . ' 23:59:59');
+        $limit =$request->limit;
 
         if ($this->superAdmin() || $this->print()) {
             $orders = Order::withTrashed()
                 ->whereBetween('created_at', [$from, $to])
                 ->orderBy('id', 'desc')
-                ->limit($this->settings()->loadOrders)->get()->keyBy('id');
+                ->limit($limit)->get()->keyBy('id');
         } else {
             $orders = auth()->user()->orders()->withTrashed()
                 ->whereBetween('created_at', [$from, $to])
-                ->orderBy('id', 'desc')->limit($this->settings()->loadOrders)->get()->keyBy('id');
+                ->orderBy('id', 'desc')->limit($limit)->get()->keyBy('id');
         }
         foreach ($orders as $id => $order) {
             $order->created_at_p = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();

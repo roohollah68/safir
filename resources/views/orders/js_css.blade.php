@@ -421,7 +421,8 @@
     function dateFilter(){
         let date1 = $('input[name=from]').val();
         let date2 = $('input[name=to]').val();
-        $.post('/orders/dateFilter',{_token: token, date1: date1, date2: date2})
+        let limit = $('input[name=limit]').val();
+        $.post('/orders/dateFilter',{_token: token, date1: date1, date2: date2, limit: limit})
             .done(res => {
                 orders = res;
                 prepare_data();

@@ -26,6 +26,7 @@
             <span class="input-group-text cursor-pointer" id="date2">📅</span>
             <input type="text" class="form-control" placeholder="تا تاریخ" data-name="date2-text" required>
             <input type="hidden" name="to" data-name="date2-date">
+            <input type="number" name="limit" value="{{$limit}}" placeholder="تعداد" min="1" max="5000" step="1">
             <input type="submit" value="اعمال فیلتر">
         </div>
     </form>
