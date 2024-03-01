@@ -177,30 +177,6 @@ class OrderController extends Controller
         return redirect()->route('listOrders');
     }
 
-    public function newOrderTelegram($id, $pass)
-    {
-        $user = User::findOrFail($id);
-        if ($user->telegram_code == $pass) {
-            auth()->login($user);
-            return redirect()->route('newOrder');
-        }
-        return abort(404);
-    }
-
-    public function newOrderWithPhotoTelegram($id, $pass, $file_id)
-    {
-        $user = User::findOrFail($id);
-        if ($user->telegram_code == $pass) {
-            auth()->login($user);
-            $order = $user->orders->where('receipt', $file_id . '.jpg')->first();
-            if ($order)
-                return redirect("edit_order/{$order->id}");
-            elseif (TelegramController::savePhoto($file_id))
-                return redirect("add_order?file=$file_id");
-        }
-        return abort(404);
-    }
-
     public function editForm($id)
     {
         $user = auth()->user();
@@ -729,12 +705,17 @@ class OrderController extends Controller
         if ($this->superAdmin() || $this->print()) {
             $orders = Order::withTrashed()
                 ->whereBetween('created_at', [$from, $to])
-                ->orderBy('id', 'desc')
-                ->limit($limit)->get()->keyBy('id');
+//                ->orderBy('id', 'desc')
+                ->limit($limit)
+//                ->take($limit)
+                ->get()->keyBy('id');
         } else {
             $orders = auth()->user()->orders()->withTrashed()
                 ->whereBetween('created_at', [$from, $to])
-                ->orderBy('id', 'desc')->limit($limit)->get()->keyBy('id');
+//                ->orderBy('id', 'desc')
+                ->limit($limit)
+//                ->take($limit)
+                ->get()->keyBy('id');
         }
         foreach ($orders as $id => $order) {
             $order->created_at_p = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
