@@ -48,7 +48,7 @@
 
                 counter,
 
-                order.name,
+                order.customer_id?'<a href="/customer/transaction/'+order.customer_id+'">'+order.name + '</a>':order.name,
 
                 users[order.user_id].name,
 
