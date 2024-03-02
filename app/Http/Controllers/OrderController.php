@@ -46,16 +46,17 @@ class OrderController extends Controller
     public function newForm()
     {
         $user = auth()->user();
-        if ($this->superAdmin() || $this->admin())
+        if ($this->superAdmin() || $this->admin()) {
             $products = Product::where('category', '<>', 'pack')->get()->keyBy('id');
-        else
+            $customersData = Customer::all();
+        } else {
             $products = Product::where('category', 'final')->where('price', '>', '1')->get()->keyBy('id');
+            $customersData = auth()->user()->customers()->get();
+        }
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
         }
-
-        $customersData = auth()->user()->customers()->get();
 
         $customers = $customersData->keyBy('name');
         $customersId = $customersData->keyBy('id');
@@ -465,7 +466,7 @@ class OrderController extends Controller
                 $desc = 'امانی';
                 break;
             case 5:
-                $desc = ' پرداخت در تاریخ ' .$request->date;
+                $desc = ' پرداخت در تاریخ ' . $request->date;
                 break;
             case 6:
                 $desc = 'فاکتور به فاکتور';
@@ -484,7 +485,7 @@ class OrderController extends Controller
                 'product_id' => $product->id,
                 'change' => -$orderProduct->number,
                 'quantity' => $product->quantity,
-                'desc' => ' خرید مشتری ' . $order->name
+                'desc' => ' خرید مشتری ' . $order->name ,
             ]);
         }
         $this->addToCustomerTransactions($order);
@@ -499,9 +500,9 @@ class OrderController extends Controller
         if (!$order->confirm || $order->state)
             return $order;
         $order->confirm = false;
-        $order->desc = substr( $order->desc, 0, strpos( $order->desc, '***' ) );
+        $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
         $order->save();
-        $order->orderProducts()->update(['verified' => false]);
+        $order->orderProducts()->delete();
         foreach ($order->productChange()->get() as $productChange) {
             $product = $productChange->product()->first();
             $product->update([
@@ -526,7 +527,7 @@ class OrderController extends Controller
             return 'سفارش نمی تواند حذف شود، چون پردازش شده است!';
 
         if ($order->delete()) {
-            $orderProducts = $order->orderProducts();
+            $orderProducts = $order->orderProducts()->delete();
             if ($order->user()->first()->safir()) {
                 foreach ($order->productChange()->get() as $productChange) {
                     $product = $productChange->product()->first();
@@ -537,8 +538,7 @@ class OrderController extends Controller
                 }
                 $order->productChange()->delete();
             }
-            $orderProducts->delete();
-//            OrderProduct::where('order_id', $id)->delete();
+
             if ($order->paymentMethod == 'credit' && $order->user()->first()->safir()) {
                 $user = $order->user()->first();
                 $user->update([
@@ -583,12 +583,12 @@ class OrderController extends Controller
         }
         if (!$request->addToCustomers && ($this->superAdmin() || $this->admin())) {
             if ($request->customerId) {
-                $customer = auth()->user()->customers()->findOrFail($request->customerId);
+                $customer = Customer::findOrFail($request->customerId);
                 if ($customer->name != $request->name) {
                     return $this->errorBack('نام مشتری مطابقت ندارد!');
                 }
             } else {
-                $customer = auth()->user()->customers()->Create([
+                $customer = Customer::Create([
                     'name' => $request->name,
                     'phone' => $request->phone,
                     'address' => $request->address,
@@ -599,7 +599,7 @@ class OrderController extends Controller
 
         if ($request->addToCustomers) {
             if ($request->customerId) {
-                $customer = auth()->user()->customers()->findOrFail($request->customerId);
+                $customer = Customer::findOrFail($request->customerId);
                 $customer->update([
                     'name' => $request->name,
                     'phone' => $request->phone,
@@ -607,7 +607,7 @@ class OrderController extends Controller
                     'zip_code' => $request->zip_code,
                 ]);
             } else {
-                $customer = auth()->user()->customers()->Create([
+                $customer = Customer::Create([
                     'name' => $request->name,
                     'phone' => $request->phone,
                     'address' => $request->address,
@@ -642,7 +642,7 @@ class OrderController extends Controller
             'amount' => $order->total,
             'balance' => $customer->balance,
             'type' => false,
-            'description' => 'تایید سفارش ' . $order->id,
+            'description' => 'تایید سفارش ' . $order->id . ' - '.auth()->user()->name,
         ]);
         DB::commit();
     }
@@ -654,7 +654,7 @@ class OrderController extends Controller
         $customer = $customerTransaction->customer()->first();
         $order->customerTransactions()->create([
             'amount' => $customerTransaction->amount,
-            'description' => 'ابطال سفارش  ' . $order->id,
+            'description' => 'ابطال سفارش  ' . $order->id . ' - '.auth()->user()->name,
             'type' => true,
             'balance' => $customer->balance + $customerTransaction->amount,
             'customer_id' => $customer->id,
@@ -700,7 +700,7 @@ class OrderController extends Controller
     {
         $from = date($request->date1 . ' 00:00:00');
         $to = date($request->date2 . ' 23:59:59');
-        $limit =$request->limit;
+        $limit = $request->limit;
 
         if ($this->superAdmin() || $this->print()) {
             $orders = Order::withTrashed()

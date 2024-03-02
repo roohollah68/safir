@@ -74,13 +74,12 @@ class ProductChangeController extends Controller
 ';
         $condition = false;
         foreach ($products as $product) {
-            if ($product->available && ($product->alarm > $product->quantity)) {
+            if ($product->available && ($product->alarm > $product->quantity) && $product->alarm > 0) {
                 $message .= '⬅️ ' . $product->name . ' -> ' . $product->quantity . '
 ';
                 $condition = true;
             }
         }
-//        return $message;
         $content = array("text" => $message);
         $chatId = '6192295684';
         if ($condition)

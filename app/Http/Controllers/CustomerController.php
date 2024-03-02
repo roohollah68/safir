@@ -12,7 +12,7 @@ class CustomerController extends Controller
 {
     public function customersList()
     {
-        if ($this->superAdmin())
+        if ($this->superAdmin() || $this->admin())
             $customers = Customer::all()->keyBy("id");
         else
             $customers = auth()->user()->customers()->get()->keyBy("id");
@@ -25,7 +25,7 @@ class CustomerController extends Controller
 
     public function customersTransactionList($id)
     {
-        $customer = auth()->user()->customers()->find($id);
+        $customer = Customer::find($id);
         $transactions = $customer->transactions()->get();
         $orders = $customer->orders()->get();
 
@@ -51,7 +51,7 @@ class CustomerController extends Controller
 
 
 //      check duplicate name
-        $customer = auth()->user()->customers()->where('name', $request->name);
+        $customer = Customer::where('name', $request->name);
         if ($customer->count()) {
             $customer->first()->update([
                 'phone' => $request->phone,
@@ -76,7 +76,7 @@ class CustomerController extends Controller
 
     public function showEditForm($id)
     {
-        $customer = auth()->user()->customers()->find($id);
+        $customer = Customer::find($id);
         return view('addEditCustomer', ['customer' => $customer, 'edit' => true]);
     }
 
@@ -102,7 +102,7 @@ class CustomerController extends Controller
 
     public function newForm($id, $linkId = false)
     {
-        $customer = auth()->user()->customers()->find($id);
+        $customer = Customer::find($id);
         if ($linkId) {
             $link = CustomerTransactions::find($linkId);
         } else {
@@ -134,7 +134,7 @@ class CustomerController extends Controller
         $customer = Customer::find($req->id);
         $newTransaction = $customer->transactions()->create([
             'amount' => $req->amount,
-            'description' => 'واریزی ' . $order_id . ' * ' . $req->desc,
+            'description' => 'واریزی ' . $order_id . ' * ' . $req->desc.' - '.auth()->user()->name,
             'type' => true,
             'photo' => $photo,
             'balance' => $customer->balance + $req->amount,
@@ -170,7 +170,7 @@ class CustomerController extends Controller
         $customer = $transaction->customer()->first();
         $customer->transactions()->create([
             'amount' => $transaction->amount,
-            'description' => 'ابطال ثبت واریزی - ' . $transaction->desc,
+            'description' => 'ابطال ثبت واریزی - ' . $transaction->desc .' - '.auth()->user()->name,
             'type' => false,
             'photo' => $transaction->photo,
             'balance' => $customer->balance - $transaction->amount,
