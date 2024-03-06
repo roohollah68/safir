@@ -502,7 +502,7 @@ class OrderController extends Controller
         $order->confirm = false;
         $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
         $order->save();
-        $order->orderProducts()->delete();
+        $order->orderProducts()->update(['verified' => false]);
         foreach ($order->productChange()->get() as $productChange) {
             $product = $productChange->product()->first();
             $product->update([
