@@ -19,12 +19,12 @@
 
                         {{--تعداد--}}
                         <td>
-                            <span class="btn btn-primary" onclick="num_plus({{$product->id}})">+</span>
-                            <input class="product-number" {{--product_id="{{$product->id}}"--}}
+                            <span class="btn btn-primary fa fa-plus" onclick="num_plus({{$product->id}})"></span>
+                            <input class="product-number"
                             name="product_{{$product->id}}" id="product_{{$product->id}}"
                                    onchange="num_product({{$product->id}},this.value)"
                                    type="number" value="{{old("product_".$product->id)}}" style="width: 50px" min="0">
-                            <span class="btn btn-primary" onclick="num_minus({{$product->id}})">-</span>
+                            <span class="btn btn-primary fa fa-minus" onclick="num_minus({{$product->id}})"></span>
                             <span class="btn btn-outline-info">{{+$product->quantity}}</span>
                         </td>
 
