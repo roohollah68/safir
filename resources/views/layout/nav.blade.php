@@ -70,7 +70,7 @@
 
     </div>
 </nav>
-
+<div class="my-5"></div>
 <style>
     @media (min-width: 991px) {
         #navbar .nav-link {
@@ -79,5 +79,11 @@
     }
     #navbar .nav-link:hover , #navbar .navbar-brand:hover{
         color: green;
+    }
+
+    #navbar {
+        position: sticky;
+        top: 0;
+        z-index: 1030;
     }
 </style>
