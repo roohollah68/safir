@@ -607,7 +607,7 @@ class OrderController extends Controller
                     'zip_code' => $request->zip_code,
                 ]);
             } else {
-                $customer = Customer::Create([
+                $customer = auth()->user()->customers()->Create([
                     'name' => $request->name,
                     'phone' => $request->phone,
                     'address' => $request->address,
