@@ -588,7 +588,7 @@ class OrderController extends Controller
                     return $this->errorBack('نام مشتری مطابقت ندارد!');
                 }
             } else {
-                $customer = Customer::Create([
+                $customer = auth()->user()->customers()->Create([
                     'name' => $request->name,
                     'phone' => $request->phone,
                     'address' => $request->address,
