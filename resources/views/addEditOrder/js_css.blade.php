@@ -133,8 +133,8 @@
 
     function deleteBTN(id) {
         @if($creator || !$edit)
-            return '<span class="btn btn-danger mx-1" ' +
-            'onclick="$(`#product_' + id + '`).val(0);cart[' + id + '] =0 ;refreshProducts()">X</span>'
+            return '<span class="btn btn-danger mx-1 fa fa-xmark" ' +
+            'onclick="$(`#product_' + id + '`).val(0);cart[' + id + '] =0 ;refreshProducts()"></span>'
         @else
             return '';
         @endif

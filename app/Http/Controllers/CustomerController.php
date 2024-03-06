@@ -36,7 +36,8 @@ class CustomerController extends Controller
 
     public function addForm()
     {
-        return view('addEditCustomer', ['edit' => false]);
+        $customer = new Customer;
+        return view('addEditCustomer', [ 'customer' => $customer]);
     }
 
     public function storeNewCustomer(Request $request)
@@ -49,35 +50,20 @@ class CustomerController extends Controller
         $request->phone = $this->number_Fa_En($request->phone);
         $request->zip_code = $this->number_Fa_En($request->zip_code);
 
-
-//      check duplicate name
-        $customer = Customer::where('name', $request->name);
-        if ($customer->count()) {
-            $customer->first()->update([
-                'phone' => $request->phone,
-                'address' => $request->address,
-                'zip_code' => $request->zip_code,
-            ]);
-        } else {
-            auth()->user()->customers()->create([
-                'name' => $request->name,
-                'phone' => $request->phone,
-                'address' => $request->address,
-                'zip_code' => $request->zip_code,
-            ]);
-        }
+        auth()->user()->customers()->create([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'zip_code' => $request->zip_code,
+            'category' => $request->category,
+        ]);
         return redirect()->route('CustomerList');
     }
-
-//    public function deleteCustomer($id)
-//    {
-//        auth()->user()->customers()->find($id)->delete();
-//    }
 
     public function showEditForm($id)
     {
         $customer = Customer::find($id);
-        return view('addEditCustomer', ['customer' => $customer, 'edit' => true]);
+        return view('addEditCustomer', ['customer' => $customer]);
     }
 
     public function updateCustomer($id, Request $request)
@@ -96,6 +82,7 @@ class CustomerController extends Controller
             'phone' => $request->phone,
             'address' => $request->address,
             'zip_code' => $request->zip_code,
+            'category' => $request->category,
         ]);
         return redirect()->route('CustomerList');
     }

@@ -15,6 +15,7 @@ class Customer extends Model
         'phone',
         'zip_code',
         'balance',
+        'category'
     ];
 
     public function user()
@@ -30,5 +31,32 @@ class Customer extends Model
     public function transactions()
     {
         return $this->hasMany(CustomerTransactions::class);
+    }
+
+    public function categoryText($cat)
+    {
+        switch ($cat) {
+            case 1:
+                return 'فروشگاه قهوه';
+            case 2:
+                return 'عطاری';
+            case 3:
+                return 'هایپرمارکت';
+            case 4:
+                return 'کافی شاپ';
+            case 5:
+                return 'آجیل و شیرینی فروشی';
+            case 6:
+                return 'پخش';
+            case 7:
+                return 'نمایندگی پپتینا';
+            case 8:
+                return 'مردمی';
+            case 9:
+                return 'نمونه رایگان';
+            case 10:
+                return 'سایر';
+        }
+        return 'انتخاب نشده';
     }
 }
