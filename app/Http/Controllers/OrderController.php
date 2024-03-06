@@ -343,8 +343,8 @@ class OrderController extends Controller
     public function pdf($id)
     {
         $order = Order::findOrFail($id);
-        if ($order->user()->first()->role == 'admin')
-            $order->orders = 'طبق فاکتور';
+        if($order->confirm != 3)
+            $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
         $font = 28;
         do {
             $pdf = PDF::loadView('pdf', ['order' => $order], [], [
@@ -368,10 +368,8 @@ class OrderController extends Controller
         $orders = array();
         foreach ($ids as $id) {
             $order = Order::findOrFail($id);
-            if ($order->admin != $this->userId() && $order->admin)
-                abort(405);
-            if ($order->user()->first()->role == 'admin')
-                $order->orders = 'طبق فاکتور';
+            if($order->confirm != 3)
+                $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
             $font = 28;
             do {
                 $font = $font - 1;
@@ -399,11 +397,8 @@ class OrderController extends Controller
             'margin_top' => 2,
             'margin_bottom' => 2,
         ]);
-//        $fileName =  sizeof($ids) . "_" . $order->name . '.pdf';
         $fileName = $order->id . '(' . sizeof($ids) . ').pdf';
         $pdfs->getMpdf()->OutputFile('pdf/' . $fileName);
-//        return $pdfs->stream(sizeof($ids) . "_" . $order->name . '.pdf');
-//        return response()->download(public_path($fileName));
         return 'pdf/' . $fileName;
     }
 
