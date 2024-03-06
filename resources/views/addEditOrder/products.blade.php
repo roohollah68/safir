@@ -65,7 +65,9 @@
                                    min="0" max="100" step="0.25">
                             @if($creator)
                                 <a class="btn btn-outline-info fa fa-plus" dir="ltr"
-                                   onclick="$('#discount_{{$product->id}}').val(+$('#discount_{{$product->id}}').val()+5).change()">5</a>
+                                   onclick="$('#discount_{{$product->id}}').val(+$('#discount_{{$product->id}}').val()+5).change()">5
+                                <i class="fa fa-percent"></i>
+                                </a>
                             @endif
                         </td>
                     </tr>
