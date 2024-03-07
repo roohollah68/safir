@@ -12,7 +12,7 @@ class CustomerController extends Controller
 {
     public function customersList()
     {
-        if ($this->superAdmin() || $this->admin())
+        if (($this->superAdmin() || $this->admin()) && auth()->user()->id != 57)
             $customers = Customer::all()->keyBy("id");
         else
             $customers = auth()->user()->customers()->get()->keyBy("id");
@@ -37,7 +37,7 @@ class CustomerController extends Controller
     public function addForm()
     {
         $customer = new Customer;
-        return view('addEditCustomer', [ 'customer' => $customer]);
+        return view('addEditCustomer', ['customer' => $customer]);
     }
 
     public function storeNewCustomer(Request $request)
@@ -62,7 +62,10 @@ class CustomerController extends Controller
 
     public function showEditForm($id)
     {
-        $customer = Customer::find($id);
+        if ($this->superAdmin())
+            $customer = Customer::find($id);
+        else
+            $customer = auth()->user()->customers()->find($id);
         return view('addEditCustomer', ['customer' => $customer]);
     }
 
@@ -121,7 +124,7 @@ class CustomerController extends Controller
         $customer = Customer::find($req->id);
         $newTransaction = $customer->transactions()->create([
             'amount' => $req->amount,
-            'description' => 'واریزی ' . $order_id . ' * ' . $req->desc.' - '.auth()->user()->name,
+            'description' => 'واریزی ' . $order_id . ' * ' . $req->desc . ' - ' . auth()->user()->name,
             'type' => true,
             'photo' => $photo,
             'balance' => $customer->balance + $req->amount,
@@ -157,7 +160,7 @@ class CustomerController extends Controller
         $customer = $transaction->customer()->first();
         $customer->transactions()->create([
             'amount' => $transaction->amount,
-            'description' => 'ابطال ثبت واریزی - ' . $transaction->desc .' - '.auth()->user()->name,
+            'description' => 'ابطال ثبت واریزی - ' . $transaction->desc . ' - ' . auth()->user()->name,
             'type' => false,
             'photo' => $transaction->photo,
             'balance' => $customer->balance - $transaction->amount,
