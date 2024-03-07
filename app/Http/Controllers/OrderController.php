@@ -46,12 +46,12 @@ class OrderController extends Controller
     public function newForm()
     {
         $user = auth()->user();
-        if ($this->superAdmin() || $this->admin()) {
+        if (($this->superAdmin() || $this->admin()) && $user->id != 57) {
             $products = Product::where('category', '<>', 'pack')->get()->keyBy('id');
             $customersData = Customer::all();
         } else {
             $products = Product::where('category', 'final')->where('price', '>', '1')->get()->keyBy('id');
-            $customersData = auth()->user()->customers()->get();
+            $customersData = $user->customers()->get();
         }
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
@@ -185,22 +185,22 @@ class OrderController extends Controller
             $order = Order::findOrFail($id);
         else
             $order = $user->orders()->findOrFail($id);
-
-        $creator = $order->user()->first()->role !== 'user';
+        $creator = $order->user()->first()->safir();
 
         if ($order->state || ($order->confirm && $creator))
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
 
-        if (!$this->safir())
+        if (($this->superAdmin() || $this->admin()) && $user->id != 57) {
             $products = Product::where('category', '<>', 'pack')->get()->keyBy('id');
-        else
+            $customersData = Customer::all();
+        } else {
             $products = Product::where('category', 'final')->where('price', '>', '1')->get()->keyBy('id');
-
+            $customersData = $user->customers()->get();
+        }
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
         }
-        $customersData = $user->customers()->get();
         $customers = $customersData->keyBy('name');
         $customersId = $customersData->keyBy('id');
         $selectedProducts = $order->orderProducts()->get();
@@ -343,7 +343,7 @@ class OrderController extends Controller
     public function pdf($id)
     {
         $order = Order::findOrFail($id);
-        if($order->confirm != 3)
+        if ($order->confirm != 3)
             $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
         $font = 28;
         do {
@@ -368,7 +368,7 @@ class OrderController extends Controller
         $orders = array();
         foreach ($ids as $id) {
             $order = Order::findOrFail($id);
-            if($order->confirm != 3)
+            if ($order->confirm != 3)
                 $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
             $font = 28;
             do {
@@ -480,7 +480,7 @@ class OrderController extends Controller
                 'product_id' => $product->id,
                 'change' => -$orderProduct->number,
                 'quantity' => $product->quantity,
-                'desc' => ' خرید مشتری ' . $order->name ,
+                'desc' => ' خرید مشتری ' . $order->name,
             ]);
         }
         $this->addToCustomerTransactions($order);
@@ -637,7 +637,7 @@ class OrderController extends Controller
             'amount' => $order->total,
             'balance' => $customer->balance,
             'type' => false,
-            'description' => 'تایید سفارش ' . $order->id . ' - '.auth()->user()->name,
+            'description' => 'تایید سفارش ' . $order->id . ' - ' . auth()->user()->name,
         ]);
         DB::commit();
     }
@@ -649,7 +649,7 @@ class OrderController extends Controller
         $customer = $customerTransaction->customer()->first();
         $order->customerTransactions()->create([
             'amount' => $customerTransaction->amount,
-            'description' => 'ابطال سفارش  ' . $order->id . ' - '.auth()->user()->name,
+            'description' => 'ابطال سفارش  ' . $order->id . ' - ' . auth()->user()->name,
             'type' => true,
             'balance' => $customer->balance + $customerTransaction->amount,
             'customer_id' => $customer->id,

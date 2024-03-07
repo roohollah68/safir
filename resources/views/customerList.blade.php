@@ -23,10 +23,12 @@
                 <th>شماره</th>
                 <th>نام</th>
                 <th>شماره تماس</th>
-                <th>آدرس</th>
+
                 @if(!$safir)
+                    <th>دسته</th>
                     <th>بدهکاری(ریال)</th>
                 @else
+                    <th>آدرس</th>
                     <th>کد پستی</th>
                 @endif
 
@@ -39,11 +41,13 @@
                     <td>{{$customer->id}}</td>
                     <td>{{$customer->name}}</td>
                     <td>{{$customer->phone}}</td>
-                    <td>{{$customer->address}}</td>
+
                     @if(!$safir)
+                        <td>{{$customer->categoryText($customer->category)}}</td>
                         <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
                                          class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
                     @else
+                        <td>{{$customer->address}}</td>
                         <td>{{$customer->zip_code}}</td>
                     @endif
 
@@ -53,9 +57,6 @@
                         @if(!$safir)
                             <a class="btn btn-info" href="/customer/transaction/{{$customer->id}}">تراکنش ها</a>
                         @endif
-                        {{--                        @if($customer->balance == 0)--}}
-                        {{--                            <a class="btn btn-danger" onclick="delete_customer({{$customer->id}})">حذف</a>--}}
-                        {{--                        @endif--}}
                     </td>
                 </tr>
             @endforeach
@@ -108,16 +109,6 @@
 
 
         });
-
-        {{--function delete_customer(id) {--}}
-        {{--    confirm("برای همیشه حذف شود؟") ?--}}
-        {{--        $.post('/customer/delete/' + id, {_token: "{{ csrf_token() }}"})--}}
-        {{--            .done(res => {--}}
-        {{--                location.reload();--}}
-        {{--            })--}}
-        {{--        :--}}
-        {{--        ""--}}
-        {{--}--}}
 
 
     </script>
