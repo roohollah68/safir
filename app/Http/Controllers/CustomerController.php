@@ -25,7 +25,10 @@ class CustomerController extends Controller
 
     public function customersTransactionList($id)
     {
-        $customer = Customer::find($id);
+        if (($this->superAdmin() || $this->admin()) && auth()->user()->id != 57)
+            $customer = Customer::findOrFail($id);
+        else
+            $customer = auth()->user()->customers()->findOrFail($id);
         $transactions = $customer->transactions()->get();
         $orders = $customer->orders()->get();
 
@@ -62,10 +65,10 @@ class CustomerController extends Controller
 
     public function showEditForm($id)
     {
-        if ($this->superAdmin())
-            $customer = Customer::find($id);
+        if (($this->superAdmin() || $this->admin()) && auth()->user()->id != 57)
+            $customer = Customer::findOrFail($id);
         else
-            $customer = auth()->user()->customers()->find($id);
+            $customer = auth()->user()->customers()->findOrFail($id);
         return view('addEditCustomer', ['customer' => $customer]);
     }
 
@@ -80,7 +83,12 @@ class CustomerController extends Controller
         $request->phone = $this->number_Fa_En($request->phone);
         $request->zip_code = $this->number_Fa_En($request->zip_code);
 
-        auth()->user()->customers()->find($id)->update([
+        if (($this->superAdmin() || $this->admin()) && auth()->user()->id != 57)
+            $customer = Customer::findOrFail($id);
+        else
+            $customer = auth()->user()->customers()->findOrFail($id);
+
+        $customer->update([
             'name' => $request->name,
             'phone' => $request->phone,
             'address' => $request->address,
@@ -92,12 +100,16 @@ class CustomerController extends Controller
 
     public function newForm($id, $linkId = false)
     {
-        $customer = Customer::find($id);
-        if ($linkId) {
-            $link = CustomerTransactions::find($linkId);
-        } else {
+        if (($this->superAdmin() || $this->admin()) && auth()->user()->id != 57)
+            $customer = Customer::findOrFail($id);
+        else
+            $customer = auth()->user()->customers()->findOrFail($id);
+
+        if ($linkId)
+            $link = $customer->transactions()->findOrFail($linkId);
+         else
             $link = false;
-        }
+
         return view('addEditCustomerDeposit', ['customer' => $customer, 'deposit' => false, 'link' => $link]);
     }
 
@@ -121,7 +133,11 @@ class CustomerController extends Controller
         if ($req->link)
             $order_id = CustomerTransactions::find($req->link)->order()->first()->id;
 
-        $customer = Customer::find($req->id);
+        if (($this->superAdmin() || $this->admin()) && auth()->user()->id != 57)
+            $customer = Customer::findOrFail($req->id);
+        else
+            $customer = auth()->user()->customers()->findOrFail($req->id);
+
         $newTransaction = $customer->transactions()->create([
             'amount' => $req->amount,
             'description' => 'واریزی ' . $order_id . ' * ' . $req->desc . ' - ' . auth()->user()->name,
@@ -154,6 +170,7 @@ class CustomerController extends Controller
     public function deleteDeposit($id)
     {
         DB::beginTransaction();
+
         $transaction = CustomerTransactions::find($id);
         if ($transaction->deleted)
             return;
