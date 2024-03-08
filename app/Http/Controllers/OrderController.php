@@ -57,9 +57,10 @@ class OrderController extends Controller
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
         }
-
+        $order = new Order();
         $customers = $customersData->keyBy('name');
         $customersId = $customersData->keyBy('id');
+        $customer = new Customer();
         return view('addEditOrder', [
             'edit' => false,
             'customers' => $customers,
@@ -69,6 +70,8 @@ class OrderController extends Controller
             'id' => $user->id,
             'cart' => (object)[],
             'creator' => ($this->superAdmin() || $this->admin()),
+            'order' => $order,
+            'customer' => $customer,
         ]);
     }
 
@@ -118,8 +121,6 @@ class OrderController extends Controller
         if (!count($request->orderList)) {
             return $this->errorBack('محصولی انتخاب نشده است!');
         }
-        if ($admin)
-            $request->orders = 'طبق فاکتور';
 
         if ($this->safir()) {
             $deliveryCost = $this->deliveryCost($request->deliveryMethod);
@@ -151,6 +152,8 @@ class OrderController extends Controller
         $request->total = $total;
 
         $request->customerId = $this->addToCustomers($request);
+        if ($request->customerId == 'not match')
+            return $this->errorBack('نام مشتری مطابقت ندارد!');
 
         $order = $this->addToOrders($request);
 
@@ -185,7 +188,7 @@ class OrderController extends Controller
             $order = Order::findOrFail($id);
         else
             $order = $user->orders()->findOrFail($id);
-        $creator = $order->user()->first()->safir();
+        $creator = !$order->user()->first()->safir();
 
         if ($order->state || ($order->confirm && $creator))
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
@@ -210,6 +213,10 @@ class OrderController extends Controller
             $products[$product->product_id]->coupon = +$product->discount;
             $products[$product->product_id]->priceWithDiscount = round((100 - +$product->discount) * $product->price / 100);
         }
+        $customer = null;
+        if($creator)
+            $customer = $order->customer()->first();
+
         return view('addEditOrder')->with([
             'edit' => true,
             'order' => $order,
@@ -220,6 +227,7 @@ class OrderController extends Controller
             'id' => $user->id,
             'cart' => $cart,
             'creator' => $creator,
+            'customer' => $customer,
         ]);
     }
 
@@ -243,7 +251,7 @@ class OrderController extends Controller
         $request->zip_code = $this->number_Fa_En($request->zip_code);
 
         if (!$order->user()->first()->safir()) {
-//            $orders = '';
+            $orders = '';
             $products = Product::where('available', true)->get()->keyBy('id');
             $productOrders = $order->orderProducts()->get()->keyBy('product_id');
             $total = 0;
@@ -254,7 +262,7 @@ class OrderController extends Controller
                     $coupon = $request['discount_' . $id];
                     $total += round((100 - $coupon) * $product->price * $number / 100);
                     $counter++;
-//                    $orders .= ' ' . $product->name . ' ' . $number . 'عدد' . '،';
+                    $orders .= ' ' . $product->name . ' ' . +$number . 'عدد' . '،';
                     if (isset($productOrders[$id]))
                         $productOrders[$id]->update([
                             'discount' => $request['discount_' . $id],
@@ -271,8 +279,6 @@ class OrderController extends Controller
                         ]);
                 }
             }
-//            if ($counter > 10)
-            $orders = 'طبق فاکتور';
             foreach ($productOrders as $product_id => $productOrder) {
                 $number = $request['product_' . $product_id];
                 if ($number < 1 && $productOrder->number > 0)
@@ -343,6 +349,8 @@ class OrderController extends Controller
     public function pdf($id)
     {
         $order = Order::findOrFail($id);
+        if(!$order->user()->first()->safir())
+            $order->orders = 'طبق فاکتور';
         if ($order->confirm != 3)
             $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
         $font = 28;
@@ -368,6 +376,8 @@ class OrderController extends Controller
         $orders = array();
         foreach ($ids as $id) {
             $order = Order::findOrFail($id);
+            if(!$order->user()->first()->safir())
+                $order->orders = 'طبق فاکتور';
             if ($order->confirm != 3)
                 $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
             $font = 28;
@@ -576,38 +586,30 @@ class OrderController extends Controller
         if ($this->safir() && !$request->addToCustomers) {
             return null;
         }
+        $data = [
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'zip_code' => $request->zip_code,
+            'category' => $request->category,
+        ];
         if (!$request->addToCustomers && ($this->superAdmin() || $this->admin())) {
             if ($request->customerId) {
                 $customer = Customer::findOrFail($request->customerId);
                 if ($customer->name != $request->name) {
-                    return $this->errorBack('نام مشتری مطابقت ندارد!');
+                    return 'not match';
                 }
             } else {
-                $customer = auth()->user()->customers()->Create([
-                    'name' => $request->name,
-                    'phone' => $request->phone,
-                    'address' => $request->address,
-                    'zip_code' => $request->zip_code,
-                ]);
+                $customer = auth()->user()->customers()->Create($data);
             }
         }
 
         if ($request->addToCustomers) {
             if ($request->customerId) {
                 $customer = Customer::findOrFail($request->customerId);
-                $customer->update([
-                    'name' => $request->name,
-                    'phone' => $request->phone,
-                    'address' => $request->address,
-                    'zip_code' => $request->zip_code,
-                ]);
+                $customer->update($data);
             } else {
-                $customer = auth()->user()->customers()->Create([
-                    'name' => $request->name,
-                    'phone' => $request->phone,
-                    'address' => $request->address,
-                    'zip_code' => $request->zip_code,
-                ]);
+                $customer = auth()->user()->customers()->Create($data);
             }
         }
         return $customer->id;

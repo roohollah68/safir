@@ -146,23 +146,16 @@
 
     function num_plus(id) {
         let n = +$('#product_' + id).val() + 1;
-        // n = Math.min(+n, products[id].quantity);
-        $('#product_' + id).val(n);
-        cart[id] = n;
-        refreshProducts();
+        $('#product_' + id).val(n).change();
     }
 
     function num_minus(id) {
         let n = +$('#product_' + id).val() - 1;
-        n = Math.max(0, +n)
-        $('#product_' + id).val(n);
-        cart[id] = n;
-        refreshProducts();
+        $('#product_' + id).val(n).change();
     }
 
     function num_product(id, value) {
         value = Math.max(0, +value);
-        // value = Math.min(value, products[id].quantity);
         value = Math.round(value);
         $('#product_' + id).val(value);
         cart[id] = value;
@@ -261,18 +254,12 @@
     function startEditProccess() {
 
         @if($errors->count())
-        @if(!$admin)
+        setOldValue()
+        @if($safir)
         $('#{{old("paymentMethod")}}').click();
         $('#{{old("deliveryMethod")}}').click();
         @endif
         @elseif($edit)
-        $('#name').val("{{$order->name}}");
-        $('#phone').val("{{$order->phone}}");
-        $('#address').val(`{{$order->address}}`);
-        $('#zip_code').val(`{{$order->zip_code}}`);
-        $('#desc').val(`{{$order->desc}}`);
-        $('#customerId').val(`{{$order->customer_id}}`);
-        $('#orders').html(`{{$order->orders}}`);
         deliveryMethod = `{{$order->deliveryMethod}}`;
         paymentMethod = `{{$order->paymentMethod}}`;
 
@@ -287,6 +274,13 @@
         $('#edit-payment-method').html(`<p>نحوه پرداخت ، پرداخت در محل است.</p>`);
         @endif
         @endif
+    }
+
+    function setOldValue(){
+        $.each(products,function (id){
+            $('#product_'+id).change();
+            refreshProducts();
+        });
     }
 
 </script>

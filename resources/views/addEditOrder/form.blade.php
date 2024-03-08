@@ -1,7 +1,8 @@
 @csrf
 @if($creator)
     <label for="customerId">شماره مشتری:</label>
-    <input type="number" value="{{old('customerId')}}" min="0" step="1" name="customerId" id="customerId"
+    <input type="number" value="{{old('customerId')?:$order->customer_id}}" min="0" step="1" name="customerId"
+           id="customerId"
            style="width: 70px"
            onchange="customerFind()">
 @endif
@@ -12,7 +13,8 @@
                 <div class="input-group-append" style="min-width: 160px">
                     <label for="name" class="input-group-text w-100">نام و نام خانوادگی:</label>
                 </div>
-                <input value="{{old('name')}}" type="text" id="name" class="form-control" name="name" required="">
+                <input value="{{old('name')?:$order->name}}" type="text" id="name" class="form-control" name="name"
+                       required="">
             </div>
         </div>
         <div class="col-md-6">
@@ -20,7 +22,8 @@
                 <div class="input-group-append" style="min-width: 160px">
                     <label for="phone" class="input-group-text w-100">شماره تماس:</label>
                 </div>
-                <input value="{{old('phone')}}" type="text" id="phone" class="form-control" name="phone" required=""
+                <input value="{{old('phone')?:$order->phone}}" type="text" id="phone" class="form-control" name="phone"
+                       required=""
                        minlength="11"
                        maxlength="11" pattern="^[۰-۹0-9]*$"
                        oninvalid="this.setCustomValidity('لطفا شماره 11 رقمی تلفن را وارد کنید.')"
@@ -34,7 +37,7 @@
                     <label for="address" class="input-group-text w-100">آدرس:</label>
                 </div>
                 <textarea name="address" id="address" class="form-control" rows="2"
-                          required="">{{old('address')}}</textarea>
+                          required="">{{old('address')?:$order->address}}</textarea>
             </div>
         </div>
         <div class="col-md-6">
@@ -42,7 +45,8 @@
                 <div class="input-group-append" style="min-width: 160px">
                     <label for="zip_code" class="input-group-text w-100">کد پستی:</label>
                 </div>
-                <input value="{{old('zip_code')}}" type="text" id="zip_code" class="form-control" name="zip_code"
+                <input value="{{old('zip_code')?:$order->zip_code}}" type="text" id="zip_code" class="form-control"
+                       name="zip_code"
                        minlength="10"
                        maxlength="10" pattern="^[۰-۹0-9]*$"
                        onkeypress="return event.charCode >= 48 && event.charCode <= 57">
@@ -54,19 +58,38 @@
                     <label for="orders" class="input-group-text w-100">سفارشات:</label>
                 </div>
                 <div class="w-75 border">
-                    <div id="orders"></div>
+                    <div id="orders">{{$order->orders}}</div>
                 </div>
             </div>
 
         </div>
+
         <div class="col-md-6">
             <div class="form-group input-group ">
                 <div class="input-group-append" style="min-width: 160px">
                     <label for="desc" class="input-group-text w-100">توضیحات:</label>
                 </div>
-                <textarea name="desc" id="desc" class="form-control" rows="2">{{old('desc')}}</textarea>
+                <textarea name="desc" id="desc" class="form-control" rows="2">{{old('desc')?:$order->desc}}</textarea>
             </div>
         </div>
+        @if($creator)
+            <div class="col-md-6">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="category" class="input-group-text w-100">دسته بندی:</label>
+                    </div>
+                    <select class="form-control" name="category" id="category">
+                        @for($ii=0;$ii<11;$ii++)
+                            <option value="{{$ii}}"
+                                    @if($ii == $customer->category)
+                                    selected
+                                @endif
+                            >{{$customer->categoryText($ii)}}</option>
+                        @endfor
+                    </select>
+                </div>
+            </div>
+        @endif
     </div>
 
 
@@ -139,10 +162,15 @@
                     id="safirShare">{{$edit?$order->customerCost-$order->total:''}}</span><span>  ریال </span><br>
             </span>
         </div>
+
     @endif
 
     <input type="checkbox" name="addToCustomers" id="addToCustomers">
-    <label for="addToCustomers">افزودن به لیست مشتریان</label><br>
+    @if($edit)
+        <label for="addToCustomers">ویرایش مشتری</label><br>
+    @else
+        <label for="addToCustomers">افزودن به لیست مشتریان</label><br>
+    @endif
 
     <div class="d-flex justify-content-around">
         @if($edit)
@@ -150,7 +178,8 @@
         @else
             <input type="submit" class="btn btn-success" value="ثبت">&nbsp;
         @endif
-        <a class="btn btn-danger" onclick="confirm('آیا از ثبت سفارش منصرف شدید؟')?(window.location.href = '{{route('listOrders')}}'):''" >بازگشت</a>
+        <a class="btn btn-danger"
+           onclick="confirm('آیا از ثبت سفارش منصرف شدید؟')?(window.location.href = '{{route('listOrders')}}'):''">بازگشت</a>
     </div>
 
 </div>
