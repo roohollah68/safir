@@ -1,6 +1,6 @@
-<div class="d-none">
-    <div id="invoice" style="background: white;" class="bg-white m-3">
-        <div class="m-3 p-3">
+<div id="invoice-wrapper" style="display: none">
+    <div id="invoice" style="background: white; width: 2100px;height: 2970px;" class="bg-white m-3">
+        <div id="invoice-content" class="m-3 p-3">
 
             <div>
                 <span class="m-3" style="font-size: 35px; display: flex;position: fixed">&nbsp; صفحه&nbsp;  <span

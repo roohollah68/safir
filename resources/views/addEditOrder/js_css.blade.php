@@ -11,6 +11,7 @@
     let creator = !!'{{$creator}}';
     let totalPages = 1;
     let currentPage = 1;
+    let firstPageItems = 40;
     $(function () {
         setTimeout(function () {
             $("#errors").hide()
@@ -73,7 +74,7 @@
                 let Price = products[id].price * number;  //قیمت بدون تخفیف
                 $('#product_' + id).val(number);
                 ordersText = ordersText.concat(products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + '<br>');
-                let page = (ii > 33 ? 'last-page' : 'first-page');
+                let page = (ii > firstPageItems ? 'last-page' : 'first-page');
                 invoiceOrders = invoiceOrders.concat(
                     `<tr class="invoice-list ${page}">
                     <td>${ii}</td>
@@ -203,17 +204,7 @@
         @else
         if (submit)
             return submit
-        if (number > 33) {
-            totalPages = 2;
-            if (currentPage == 1) {
-                $('#invoice .last-page').hide();
-            } else {
-                $('#invoice .first-page').hide();
-                $('#invoice .last-page').show();
-            }
-        }
-        $('#total-pages').html(totalPages);
-        $('#current-page').html(currentPage);
+        $('#invoice-wrapper').show();
         $('#invoice-name').text($('#name').val());
         $('#invoice-phone').text($('#phone').val());
         $('#invoice-address').text($('#address').val());
@@ -221,6 +212,24 @@
         if (!$('#zip_code').val())
             $('#invoice-zip').text('');
         $('#invoice-description').text($('#desc').val());
+
+        if ($('#invoice-content')[0].offsetHeight > 2900) {
+            totalPages = 2;
+            if (currentPage === 1) {
+                while ($('#invoice-content')[0].offsetHeight > 2950){
+                    refreshProducts();
+                    $('#invoice .last-page').hide();
+                    firstPageItems = firstPageItems-1;
+                }
+            } else {
+                $('#invoice .first-page').hide();
+                $('#invoice .last-page').show();
+            }
+        }
+
+        $('#total-pages').html(totalPages);
+        $('#current-page').html(currentPage);
+
         domtoimage.toJpeg(document.getElementById('invoice'), {width: 2100, height: 2970})
             .then(function (dataUrl) {
                 var link = document.createElement('a');
