@@ -352,7 +352,8 @@ class OrderController extends Controller
         if(!$order->user()->first()->safir())
             $order->orders = 'طبق فاکتور';
         if ($order->confirm != 3)
-            $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
+            if ( is_int(strpos($order->desc, '***')))
+                $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
         $font = 28;
         do {
             $pdf = PDF::loadView('pdf', ['order' => $order], [], [
@@ -379,7 +380,8 @@ class OrderController extends Controller
             if(!$order->user()->first()->safir())
                 $order->orders = 'طبق فاکتور';
             if ($order->confirm != 3)
-                $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
+                if ( is_int(strpos($order->desc, '***')))
+                    $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
             $font = 28;
             do {
                 $font = $font - 1;
