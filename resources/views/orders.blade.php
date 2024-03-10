@@ -54,9 +54,9 @@
         <a id="pdf-link"></a>
     @endif
 
-    <div id="invoice-wrapper" class="d-none"></div>
     <table id="main-table" class="stripe">
     </table>
+    <div id="invoice-wrapper"></div>
 
 
 

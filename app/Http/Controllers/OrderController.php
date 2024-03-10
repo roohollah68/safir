@@ -412,13 +412,18 @@ class OrderController extends Controller
         return 'pdf/' . $fileName;
     }
 
-    public function invoice($id)
+    public function invoice($id , Request $request)
     {
-        $order = Order::findOrFail($id);
+        if($this->superAdmin()|| $this->print())
+            $order = Order::findOrFail($id);
+        else
+           $order = auth()->user()->orders()->findOrFail($id);
+        $firstPageItems = $request->firstPageItems;
+        $totalPages = $request->totalPages;
         $order->created_at_p = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
         $orderProducts = OrderProduct::where('order_id', $id)->get();
         $number = $orderProducts->count();
-        if ($number > 33) {
+        if ($totalPages > 1) {
             $v1 = view('orders.invoice', [
                 'firstPage' => '',
                 'lastPage' => 'd-none',
@@ -426,6 +431,7 @@ class OrderController extends Controller
                 'pages' => '2',
                 'order' => $order,
                 'orderProducts' => $orderProducts,
+                'firstPageItems' => $firstPageItems,
             ])->render();
             $v2 = view('orders.invoice', [
                 'firstPage' => 'd-none',
@@ -434,6 +440,7 @@ class OrderController extends Controller
                 'pages' => '2',
                 'order' => $order,
                 'orderProducts' => $orderProducts,
+                'firstPageItems' => $firstPageItems,
             ])->render();
             return [[$v1, $order->id . '(page1)'], [$v2, $order->id . '(page2)']];
         } else {
@@ -444,6 +451,7 @@ class OrderController extends Controller
                 'pages' => '1',
                 'order' => $order,
                 'orderProducts' => $orderProducts,
+                'firstPageItems' => $firstPageItems,
             ])->render(), $order->id]];
         }
     }

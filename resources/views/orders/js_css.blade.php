@@ -48,7 +48,7 @@
 
                 counter,
 
-                order.customer_id?'<a href="/customer/transaction/'+order.customer_id+'">'+order.name + '</a>':order.name,
+                order.customer_id ? '<a href="/customer/transaction/' + order.customer_id + '">' + order.name + '</a>' : order.name,
 
                 users[order.user_id].name,
 
@@ -389,40 +389,49 @@
 
     @if($admin || $superAdmin || $print)
 
+    let totalPages = 1;
+    let firstPageItems = 40;
+
     function invoice(id) {
-        $.post('/invoice/' + id, {_token: token})
-            .done(res => {
-                $('#invoice-wrapper').html(res[0][0]);
-                domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
-                    .then(function (dataUrl) {
-                        let link = document.createElement('a');
-                        link.download = res[0][1] + '.jpg';
-                        link.href = dataUrl;
-                        link.click();
-                        $('#invoice-wrapper').html('');
-                        if (res.length > 1) {
-                            $('#invoice-wrapper').html(res[1][0]);
-                            domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
-                                .then(function (dataUrl) {
-                                    let link = document.createElement('a');
-                                    link.download = res[1][1] + '.jpg';
-                                    link.href = dataUrl;
-                                    link.click();
-                                    $('#invoice-wrapper').html('');
-                                });
-                        }
-                    });
+            $.post('/invoice/' + id, {_token: token, firstPageItems: firstPageItems, totalPages: totalPages})
+                .done(res => {
+                    $('#invoice-wrapper').html(res[0][0]);
+                    if($('#invoice-content')[0].offsetHeight > 2900) {
+                        totalPages = 2;
+                        firstPageItems--;
+                        invoice(id);
+                        return
+                    }
+                    domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
+                        .then(function (dataUrl) {
+                            let link = document.createElement('a');
+                            link.download = res[0][1] + '.jpg';
+                            link.href = dataUrl;
+                            link.click();
+                            $('#invoice-wrapper').html('');
+                            if (res.length > 1) {
+                                $('#invoice-wrapper').html(res[1][0]);
+                                domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
+                                    .then(function (dataUrl) {
+                                        let link = document.createElement('a');
+                                        link.download = res[1][1] + '.jpg';
+                                        link.href = dataUrl;
+                                        link.click();
+                                        $('#invoice-wrapper').html('');
+                                    });
+                            }
+                        });
+                })
 
 
-            })
     }
     @endif
 
-    function dateFilter(){
+    function dateFilter() {
         let date1 = $('input[name=from]').val();
         let date2 = $('input[name=to]').val();
         let limit = $('input[name=limit]').val();
-        $.post('/orders/dateFilter',{_token: token, date1: date1, date2: date2, limit: limit})
+        $.post('/orders/dateFilter', {_token: token, date1: date1, date2: date2, limit: limit})
             .done(res => {
                 orders = res;
                 prepare_data();

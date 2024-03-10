@@ -1,5 +1,5 @@
-<div id="invoice" style="background: white;" class="bg-white m-3">
-    <div class="m-3 p-3">
+<div id="invoice" style="background: white; width: 2100px;height: 2970px;" class="bg-white m-3">
+    <div id="invoice-content" class="m-3 p-3">
         <div>
                 <span class="m-3" style="font-size: 35px; display: flex;position: fixed">&nbsp; صفحه&nbsp;
                     {{$page}}  &nbsp;از&nbsp; {{$pages}}</span>
@@ -60,7 +60,7 @@
                             $total_no_dis = $total_no_dis + $sub_total_no_dis;
                             $total_dis = $total_dis + $sub_total_dis;
                         @endphp
-                        <tr class="{{$counter>33?$lastPage:$firstPage}}">
+                        <tr class="{{$counter>$firstPageItems?$lastPage:$firstPage}}">
                             <td>{{$counter++}}</td>
                             <td>{{$orderProduct->name}}</td>
                             <td>{{+$orderProduct->number}}</td>

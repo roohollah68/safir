@@ -199,6 +199,7 @@
             alert('محصولی انتخاب نشده است');
             return false;
         }
+        return true;
         @if(!$creator)
             return true;
         @else
@@ -263,7 +264,7 @@
     function startEditProccess() {
 
         @if($errors->count())
-        setOldValue()
+        setOldValue();
         @if($safir)
         $('#{{old("paymentMethod")}}').click();
         $('#{{old("deliveryMethod")}}').click();
