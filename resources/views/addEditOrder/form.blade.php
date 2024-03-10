@@ -89,6 +89,8 @@
                     </select>
                 </div>
             </div>
+        @else
+            <input type="hidden" name="category" value="0">
         @endif
     </div>
 
