@@ -349,11 +349,12 @@ class OrderController extends Controller
     public function pdf($id)
     {
         $order = Order::findOrFail($id);
-        if(!$order->user()->first()->safir())
+        if(!$order->user()->first()->safir()) {
             $order->orders = 'طبق فاکتور';
-        if ($order->confirm != 3)
-            if ( is_int(strpos($order->desc, '***')))
-                $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
+            if ($order->confirm != 3)
+                if (is_int(strpos($order->desc, '***')))
+                    $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
+        }
         $font = 28;
         do {
             $pdf = PDF::loadView('pdf', ['order' => $order], [], [
@@ -377,11 +378,12 @@ class OrderController extends Controller
         $orders = array();
         foreach ($ids as $id) {
             $order = Order::findOrFail($id);
-            if(!$order->user()->first()->safir())
+            if(!$order->user()->first()->safir()) {
                 $order->orders = 'طبق فاکتور';
-            if ($order->confirm != 3)
-                if ( is_int(strpos($order->desc, '***')))
-                    $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
+                if ($order->confirm != 3)
+                    if (is_int(strpos($order->desc, '***')))
+                        $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
+            }
             $font = 28;
             do {
                 $font = $font - 1;
