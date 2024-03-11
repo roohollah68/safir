@@ -34,7 +34,7 @@
         let counter = 0;
 
         $.each(orders, (id, order) => {
-            if (user !== 'all' && user !== order.user_id)
+            if (user != 'all' && user != order.user_id)
                 return
             if (deleted ^ !!order.deleted_at)
                 return
