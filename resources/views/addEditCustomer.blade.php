@@ -28,10 +28,14 @@
                 $('#city_id').val(city.id);
                 $('#province').html(province[city.province_id].name);
             }
-            else
-                $('#city').val(citiesId[$('#city_id').val()].name)
+            else {
+                let city = citiesId[$('#city_id').val()];
+                $('#city').val(city.name)
+                $('#province').html(province[city.province_id].name);
+            }
         }).click(function (){
             this.value = '';
+            $('#province').html('<sapn class="fa fa-arrow-rotate-back"></span>');
         });
 
     });
@@ -86,10 +90,12 @@
                         <label for="city" class="input-group-text w-100">شهر:</label>
                     </div>
                     <input name="city" id="city" class="form-control" rows="2"
-                              required value="{{old('city')?:$customer->city()->first()->name}}" >
-                    <input type="hidden" id="city_id" name="city_id" value="{{old('city_id')?:$customer->city()->first()->id}}">
+                           required value="{{old('city')?:$customer->city()->first()->name}}">
+                    <input type="hidden" id="city_id" name="city_id"
+                           value="{{old('city_id')?:$customer->city()->first()->id}}">
                     <div class="input-group-append" style="min-width: 120px">
-                        <label for="city" id="province" class="input-group-text w-100">{{$customer->city()->first()->province()->first()->name}}</label>
+                        <span id="province" onclick="$('#city').change()"
+                              class="input-group-text w-100">{{$customer->city()->first()->province()->first()->name}}</span>
                     </div>
                 </div>
             </div>

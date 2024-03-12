@@ -42,8 +42,8 @@
                     <input type="hidden" id="city_id" name="city_id"
                            value="{{old('city_id')?:$customer->city()->first()->id}}">
                     <div class="input-group-append" style="min-width: 120px">
-                        <label for="city" id="province"
-                               class="input-group-text w-100">{{$customer->city()->first()->province()->first()->name}}</label>
+                        <span id="province" onclick="$('#city').change()"
+                               class="input-group-text w-100">{{$customer->city()->first()->province()->first()->name}}</span>
                     </div>
                 </div>
             </div>

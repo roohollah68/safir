@@ -56,10 +56,14 @@
                 $('#city_id').val(city.id);
                 $('#province').html(province[city.province_id].name);
             }
-            else
-                $('#city').val(citiesId[$('#city_id').val()].name)
+            else {
+                let city = citiesId[$('#city_id').val()];
+                $('#city').val(city.name)
+                $('#province').html(province[city.province_id].name);
+            }
         }).click(function (){
             this.value = '';
+            $('#province').html('<sapn class="fa fa-arrow-rotate-back"></span>');
         });
     });
 
