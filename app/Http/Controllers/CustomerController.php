@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\BaleAPIv2;
+use App\Models\City;
 use App\Models\Customer;
 use App\Models\CustomerTransactions;
+use App\Models\Province;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -40,7 +42,16 @@ class CustomerController extends Controller
     public function addForm()
     {
         $customer = new Customer;
-        return view('addEditCustomer', ['customer' => $customer]);
+        $customer->city_id = 301;
+        $cities = City::all()->keyBy('name');
+        $citiesId = $cities->keyBy('id');
+        $province = Province::all()->keyBy('id');
+        return view('addEditCustomer', [
+            'customer' => $customer,
+            'cities' => $cities,
+            'citiesId' => $citiesId,
+            'province' => $province,
+        ]);
     }
 
     public function storeNewCustomer(Request $request)
@@ -59,6 +70,7 @@ class CustomerController extends Controller
             'address' => $request->address,
             'zip_code' => $request->zip_code,
             'category' => $request->category,
+            'city_id' => $request->city_id,
         ]);
         return redirect()->route('CustomerList');
     }
@@ -69,7 +81,16 @@ class CustomerController extends Controller
             $customer = Customer::findOrFail($id);
         else
             $customer = auth()->user()->customers()->findOrFail($id);
-        return view('addEditCustomer', ['customer' => $customer]);
+        $cities = City::all()->keyBy('name');
+        $citiesId = $cities->keyBy('id');
+        $province = Province::all()->keyBy('id');
+
+        return view('addEditCustomer', [
+            'customer' => $customer,
+            'cities' => $cities,
+            'citiesId' => $citiesId,
+            'province' => $province,
+        ]);
     }
 
     public function updateCustomer($id, Request $request)
@@ -94,6 +115,7 @@ class CustomerController extends Controller
             'address' => $request->address,
             'zip_code' => $request->zip_code,
             'category' => $request->category,
+            'city_id' => $request->city_id,
         ]);
         return redirect()->route('CustomerList');
     }

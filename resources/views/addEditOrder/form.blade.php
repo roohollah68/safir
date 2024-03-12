@@ -31,6 +31,25 @@
                        oninput="this.setCustomValidity('')" placeholder="مانند 09123456789">
             </div>
         </div>
+        @if($creator)
+            <div class="col-md-6">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="city" class="input-group-text w-100">شهر:</label>
+                    </div>
+                    <input name="city" id="city" class="form-control" rows="2"
+                           required value="{{old('city')?:$customer->city()->first()->name}}">
+                    <input type="hidden" id="city_id" name="city_id"
+                           value="{{old('city_id')?:$customer->city()->first()->id}}">
+                    <div class="input-group-append" style="min-width: 120px">
+                        <label for="city" id="province"
+                               class="input-group-text w-100">{{$customer->city()->first()->province()->first()->name}}</label>
+                    </div>
+                </div>
+            </div>
+        @else
+            <input type="hidden" name="city_id" value="0">
+        @endif
         <div class="col-md-6">
             <div class="form-group input-group required">
                 <div class="input-group-append" style="min-width: 160px">
@@ -38,18 +57,6 @@
                 </div>
                 <textarea name="address" id="address" class="form-control" rows="2"
                           required="">{{old('address')?:$order->address}}</textarea>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group input-group minlength=10 maxlength=10 pattern=^[۰-۹0-9]*$">
-                <div class="input-group-append" style="min-width: 160px">
-                    <label for="zip_code" class="input-group-text w-100">کد پستی:</label>
-                </div>
-                <input value="{{old('zip_code')?:$order->zip_code}}" type="text" id="zip_code" class="form-control"
-                       name="zip_code"
-                       minlength="10"
-                       maxlength="10" pattern="^[۰-۹0-9]*$"
-                       onkeypress="return event.charCode >= 48 && event.charCode <= 57">
             </div>
         </div>
         <div class="col-md-6">
@@ -63,6 +70,19 @@
             </div>
 
         </div>
+        <div class="col-md-6">
+            <div class="form-group input-group minlength=10 maxlength=10 pattern=^[۰-۹0-9]*$">
+                <div class="input-group-append" style="min-width: 160px">
+                    <label for="zip_code" class="input-group-text w-100">کد پستی:</label>
+                </div>
+                <input value="{{old('zip_code')?:$order->zip_code}}" type="text" id="zip_code" class="form-control"
+                       name="zip_code"
+                       minlength="10"
+                       maxlength="10" pattern="^[۰-۹0-9]*$"
+                       onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+            </div>
+        </div>
+
 
         <div class="col-md-6">
             <div class="form-group input-group ">
@@ -167,12 +187,10 @@
 
     @endif
 
-    <input type="checkbox" name="addToCustomers" id="addToCustomers">
-    @if($edit)
-        <label for="addToCustomers">ویرایش مشتری</label><br>
-    @else
-        <label for="addToCustomers">افزودن به لیست مشتریان</label><br>
-    @endif
+    <input type="checkbox" name="addToCustomers" id="addToCustomers" @if($creator) checked @endif
+    onclick="$('#city, #category').prop('disabled', (i, v) => !v);">
+    <label for="addToCustomers">افزودن/ ویرایش مشتری</label><br>
+
 
     <div class="d-flex justify-content-around">
         @if($edit)

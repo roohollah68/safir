@@ -7,6 +7,9 @@
     let product_table;
     let products = {!!json_encode($products)!!};
     let cart = {!!json_encode($cart)!!};
+    let cities = {!!json_encode($cities)!!};
+    let citiesId = {!!json_encode($citiesId)!!};
+    let province = {!!json_encode($province)!!};
     let submit = false;
     let creator = !!'{{$creator}}';
     let totalPages = 1;
@@ -39,6 +42,25 @@
         refreshProducts()
         $('input[name=paymentMethod]').click(paymentAction);
         $('input[name=deliveryMethod]').click(deliveryAction);
+
+        $("#city").autocomplete({
+            source: Object.keys(cities),
+            select: function (event, ui) {
+                $('#city').change();
+            }
+        });
+
+        $('#city').change(function (){
+            let city = cities[this.value];
+            if(city) {
+                $('#city_id').val(city.id);
+                $('#province').html(province[city.province_id].name);
+            }
+            else
+                $('#city').val(citiesId[$('#city_id').val()].name)
+        }).click(function (){
+            this.value = '';
+        });
     });
 
     function paymentAction() {
@@ -178,6 +200,8 @@
         $('#phone').val(customer.phone);
         $('#address').val(customer.address);
         $('#zip_code').val(customer.zip_code);
+        $('#category').val(customer.category).change();
+        $('#city').val(citiesId[customer.city_id].name).change();
     }
 
     function changeDiscount(id, value) {

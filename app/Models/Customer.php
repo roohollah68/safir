@@ -15,7 +15,8 @@ class Customer extends Model
         'phone',
         'zip_code',
         'balance',
-        'category'
+        'category',
+        'city_id'
     ];
 
     public function user()
@@ -58,5 +59,10 @@ class Customer extends Model
                 return 'سایر';
         }
         return 'انتخاب نشده';
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
     }
 }

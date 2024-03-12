@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\City;
 use App\Models\CouponLink;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
+use App\Models\Province;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -61,6 +63,10 @@ class OrderController extends Controller
         $customers = $customersData->keyBy('name');
         $customersId = $customersData->keyBy('id');
         $customer = new Customer();
+        $customer->city_id = 301;
+        $cities = City::all()->keyBy('name');
+        $citiesId = $cities->keyBy('id');
+        $province = Province::all()->keyBy('id');
         return view('addEditOrder', [
             'edit' => false,
             'customers' => $customers,
@@ -72,6 +78,9 @@ class OrderController extends Controller
             'creator' => ($this->superAdmin() || $this->admin()),
             'order' => $order,
             'customer' => $customer,
+            'cities' => $cities,
+            'citiesId' => $citiesId,
+            'province' => $province,
         ]);
     }
 
@@ -213,9 +222,16 @@ class OrderController extends Controller
             $products[$product->product_id]->coupon = +$product->discount;
             $products[$product->product_id]->priceWithDiscount = round((100 - +$product->discount) * $product->price / 100);
         }
-        $customer = null;
-        if($creator)
-            $customer = $order->customer()->first();
+//        $customer = null;
+//        if($creator)
+        $customer = $order->customer()->first();
+        if(!$customer) {
+            $customer = new Customer();
+            $customer->city_id = 0;
+        }
+        $cities = City::all()->keyBy('name');
+        $citiesId = $cities->keyBy('id');
+        $province = Province::all()->keyBy('id');
 
         return view('addEditOrder')->with([
             'edit' => true,
@@ -228,6 +244,9 @@ class OrderController extends Controller
             'cart' => $cart,
             'creator' => $creator,
             'customer' => $customer,
+            'cities' => $cities,
+            'citiesId' => $citiesId,
+            'province' => $province,
         ]);
     }
 
@@ -349,7 +368,7 @@ class OrderController extends Controller
     public function pdf($id)
     {
         $order = Order::findOrFail($id);
-        if(!$order->user()->first()->safir()) {
+        if (!$order->user()->first()->safir()) {
             $order->orders = 'طبق فاکتور';
             if ($order->confirm != 3)
                 if (is_int(strpos($order->desc, '***')))
@@ -378,7 +397,7 @@ class OrderController extends Controller
         $orders = array();
         foreach ($ids as $id) {
             $order = Order::findOrFail($id);
-            if(!$order->user()->first()->safir()) {
+            if (!$order->user()->first()->safir()) {
                 $order->orders = 'طبق فاکتور';
                 if ($order->confirm != 3)
                     if (is_int(strpos($order->desc, '***')))
@@ -416,12 +435,12 @@ class OrderController extends Controller
         return 'pdf/' . $fileName;
     }
 
-    public function invoice($id , Request $request)
+    public function invoice($id, Request $request)
     {
-        if($this->superAdmin()|| $this->print())
+        if ($this->superAdmin() || $this->print())
             $order = Order::findOrFail($id);
         else
-           $order = auth()->user()->orders()->findOrFail($id);
+            $order = auth()->user()->orders()->findOrFail($id);
         $firstPageItems = $request->firstPageItems;
         $totalPages = $request->totalPages;
         $order->created_at_p = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
@@ -604,6 +623,7 @@ class OrderController extends Controller
             'address' => $request->address,
             'zip_code' => $request->zip_code,
             'category' => $request->category,
+            'city_id' => $request->city_id,
         ];
         if (!$request->addToCustomers && ($this->superAdmin() || $this->admin())) {
             if ($request->customerId) {

@@ -23,6 +23,5 @@
 @section('files')
     @include('addEditOrder.js_css')
     <script src="/js/dom-to-image.min.js"></script>
-    {{--    <script src="/js/less.js"></script>--}}
 @endsection
 

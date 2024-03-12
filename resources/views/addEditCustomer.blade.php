@@ -9,7 +9,42 @@
 @endsection
 
 @section('files')
+<script>
+    let cities = {!!json_encode($cities)!!};
+    let citiesId = {!!json_encode($citiesId)!!};
+    let province = {!!json_encode($province)!!};
+    $(function () {
 
+        $("#city").autocomplete({
+            source: Object.keys(cities),
+            select: function (event, ui) {
+                $('#city').change();
+            }
+        });
+
+        $('#city').change(function (){
+            let city = cities[this.value];
+            if(city) {
+                $('#city_id').val(city.id);
+                $('#province').html(province[city.province_id].name);
+            }
+            else
+                $('#city').val(citiesId[$('#city_id').val()].name)
+        }).click(function (){
+            this.value = '';
+        });
+
+    });
+
+</script>
+<style>
+    .ui-autocomplete {
+        max-height: 150px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -42,7 +77,20 @@
                         <label for="address" class="input-group-text w-100">آدرس:</label>
                     </div>
                     <textarea name="address" id="address" class="form-control" rows="2"
-                              required="">{{old('address')?:$customer->address}}</textarea>
+                              required>{{old('address')?:$customer->address}}</textarea>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="city" class="input-group-text w-100">شهر:</label>
+                    </div>
+                    <input name="city" id="city" class="form-control" rows="2"
+                              required value="{{old('city')?:$customer->city()->first()->name}}" >
+                    <input type="hidden" id="city_id" name="city_id" value="{{old('city_id')?:$customer->city()->first()->id}}">
+                    <div class="input-group-append" style="min-width: 120px">
+                        <label for="city" id="province" class="input-group-text w-100">{{$customer->city()->first()->province()->first()->name}}</label>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6">

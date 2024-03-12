@@ -9,8 +9,8 @@ class Province extends Model
 {
     use HasFactory;
 
-    public function transactions()
+    public function cities()
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasMany(City::class);
     }
 }
