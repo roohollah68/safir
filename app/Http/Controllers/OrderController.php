@@ -365,7 +365,7 @@ class OrderController extends Controller
                 if (is_int(strpos($order->desc, '***')))
                     $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
         }
-        $font = 28;
+        $font = 32;
         do {
             $pdf = PDF::loadView('pdf', ['order' => $order], [], [
                 'format' => [200, 100],
@@ -378,7 +378,7 @@ class OrderController extends Controller
             ]);
             if($font<19 && !$order->user()->first()->safir()) {
                 $order->orders = 'طبق فاکتور';
-                $font = 28;
+                $font = 32;
             }
             $font = $font - 1;
         } while ($pdf->getMpdf()->page > 1);
@@ -398,11 +398,11 @@ class OrderController extends Controller
                     if (is_int(strpos($order->desc, '***')))
                         $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
             }
-            $font = 28;
+            $font = 32;
             do {
                 if($font<19 && !$order->user()->first()->safir()) {
                     $order->orders = 'طبق فاکتور';
-                    $font=28;
+                    $font=32;
                 }
                 $font = $font - 1;
                 $pdf = PDF::loadView('pdf', ['order' => $order], [], [
