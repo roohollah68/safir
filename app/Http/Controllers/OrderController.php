@@ -361,7 +361,6 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($id);
         if (!$order->user()->first()->safir()) {
-            $order->orders = 'طبق فاکتور';
             if ($order->confirm != 3)
                 if (is_int(strpos($order->desc, '***')))
                     $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
@@ -377,6 +376,10 @@ class OrderController extends Controller
                 'margin_top' => 2,
                 'margin_bottom' => 2,
             ]);
+            if($font<19 && !$order->user()->first()->safir()) {
+                $order->orders = 'طبق فاکتور';
+                $font = 28;
+            }
             $font = $font - 1;
         } while ($pdf->getMpdf()->page > 1);
         return $pdf->stream($order->name . '.pdf');
@@ -397,6 +400,10 @@ class OrderController extends Controller
             }
             $font = 28;
             do {
+                if($font<19 && !$order->user()->first()->safir()) {
+                    $order->orders = 'طبق فاکتور';
+                    $font=28;
+                }
                 $font = $font - 1;
                 $pdf = PDF::loadView('pdf', ['order' => $order], [], [
                     'format' => [200, 100],
