@@ -52,7 +52,7 @@
             </div>
             {{--اصلاح موجودی--}}
             @if($product)
-                <div class="col-md-6">
+                <div class="col-md-6 my-2">
                     <div class="form-group input-group">
                         <div class="input-group-text">
                             <input type="radio" name="addType" value="add"
@@ -90,13 +90,23 @@
                 </div>
             @endif
             {{--حد آلارم--}}
-            <div class="col-md-6">
+            <div class="col-md-6 my-2">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
-                        <label for="alarm" class="input-group-text w-100">حد آلارم:</label>
+                        <label for="alarm" class="input-group-text w-100">حد پایین:</label>
                     </div>
                     <input type="number" id="alarm" class="form-control" name="alarm"
                            value="{{$product?$product->alarm:'10'}}"
+                           required>
+
+                </div>
+
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="high_alarm" class="input-group-text w-100">حد بالا:</label>
+                    </div>
+                    <input type="number" id="high_alarm" class="form-control" name="high_alarm"
+                           value="{{$product?$product->high_alarm:'100'}}"
                            required>
 
                 </div>

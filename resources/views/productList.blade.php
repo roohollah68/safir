@@ -10,13 +10,43 @@
         افزودن محصول جدید
     </a>
     <br>
-    <span class="btn btn-primary" onclick="hide([])">همه محصولات</span>
-    <span class="btn btn-warning" onclick="hide(['na','hq'])">موجودی کم</span>
-    <span class="btn btn-success" onclick="hide(['na'])">محصولات موجود</span>
-    <span class="btn btn-danger" onclick="hide(['a'])">محصولات ناموجود</span>
-    <span class="btn btn-info" onclick="hide(['na','r','p'])">محصول نهایی</span>
-    <span class="btn btn-secondary" onclick="hide(['na','f','p'])">مواد اولیه</span>
-    <span class="btn btn-secondary" onclick="hide(['na','f','r'])">ملزومات بسته بندی</span>
+    <div class="container border input-box">
+        <div class="row">
+            <div class="col-md-3 border">
+                <span class="btn btn-primary" onclick="$('.input-box input').prop('checked', true);$('.input-box input').checkboxradio('refresh'); filter()">همه محصولات</span>
+            </div>
+            <div class="col-md-3 border">
+                <input type="checkbox" name="low" id="low" checked>
+                <label class="btn btn-warning mb-1" for="low" )">موجودی کم</label><br>
+                <input type="checkbox" name="normal" id="normal" checked>
+                <label class="btn btn-success mb-1" for="normal" ">موجودی مناسب</label><br>
+                <input type="checkbox" name="high" id="high" checked>
+                <label class="btn btn-danger " for="high">موجودی زیاد</label>
+            </div>
+            <div class="col-md-3 border">
+                <input type="checkbox" name="available" id="available" checked>
+                <label class="btn btn-success mb-1" for="available">محصولات موجود</label><br>
+                <input type="checkbox" name="not-available" id="not-available" >
+                <label class="btn btn-danger " for="not-available">محصولات ناموجود</label>
+            </div>
+            <div class="col-md-3 border">
+                <input type="checkbox" name="final" id="final" checked >
+                <label class="btn btn-info mb-1" for="final">محصول نهایی</label><br>
+                <input type="checkbox" name="raw" id="raw" checked >
+                <label class="btn btn-secondary mb-1" for="raw">مواد اولیه</label><br>
+                <input type="checkbox" name="pack" id="pack" checked >
+                <label class="btn btn-secondary" for="pack">ملزومات بسته بندی</label>
+            </div>
+        </div>
+    </div>
+
+
+    <br>
+
+
+
+
+
     <br>
     <br>
     <table class="stripe" id="product-table">
@@ -26,20 +56,22 @@
             <th>نام</th>
             <th>قیمت(ریال)</th>
             <th>موجودی</th>
-            <th>حدآلارم</th>
+            <th>حد پایین</th>
+            <th>حد بالا</th>
             <th>وضعیت</th>
             <th>عملیات</th>
         </tr>
         </thead>
         <tbody>
         @foreach($products as $product)
-            <tr class="{{$product->alarm > $product->quantity ? 'bg-warning ' : 'high-quantity '}}
+            <tr class="{{$product->alarm > $product->quantity ? 'bg-warning low' : ($product->high_alarm < $product->quantity ? 'bg-danger high' : 'normal')}}
             {{$product->available?'available ':'not-available '}} {{$product->category}}" id="row_{{$product->id}}">
                 <td>{{$product->id}}</td>
                 <td><a class="btn" href="/product/edit/{{$product->id}}">{{$product->name}}</a></td>
                 <td>{{number_format($product->price)}}</td>
                 <td>{{+$product->quantity}}</td>
                 <td>{{$product->alarm}}</td>
+                <td>{{$product->high_alarm}}</td>
                 <td>
                     @if($product->available)
                         <p class="btn btn-success">موجود</p>
@@ -67,10 +99,11 @@
 
         $(function () {
             draw();
-            hide(['na']);
+            filter();
+            $('.input-box input').checkboxradio().click(filter);
         });
 
-        function draw(){
+        function draw() {
             $('#product-table').DataTable({
                 order: [[3, "desc"]],
                 paging: false,
@@ -88,23 +121,16 @@
             }
         }
 
-        function hide(list) {
-            let array = {
-                hq: '.high-quantity',
-                a: '.available',
-                na: '.not-available',
-                f: '.final',
-                r: '.raw',
-                p: '.pack'
-            };
-            $.each(array, (index, value) => {
-                $(value).show();
-            });
-            $.each(array, (index, value) => {
-                if (list.includes(index)) {
-                    $(value).hide();
-                }
-            });
+        function filter(){
+            $('tbody tr').show();
+            $('#low')[0].checked?'':$('.low').hide();
+            $('#normal')[0].checked?'':$('.normal').hide();
+            $('#high')[0].checked?'':$('.high').hide();
+            $('#available')[0].checked?'':$('.available').hide();
+            $('#not-available')[0].checked?'':$('.not-available').hide();
+            $('#final')[0].checked?'':$('.final').hide();
+            $('#raw')[0].checked?'':$('.raw').hide();
+            $('#pack')[0].checked?'':$('.pack').hide();
         }
 
     </script>

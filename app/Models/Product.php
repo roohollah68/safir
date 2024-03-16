@@ -17,6 +17,7 @@ class Product extends Model
         'quantity',
         'alarm',
         'category',
+        'high_alarm',
     ];
 
     public function orderProducts()
