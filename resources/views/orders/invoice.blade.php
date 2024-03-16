@@ -50,6 +50,7 @@
                         $counter = 1;
                         $total_dis = 0;
                         $total_no_dis=0;
+                        $totalProducts = 0
                     @endphp
                     @foreach($orderProducts as $orderProduct)
                         @php
@@ -59,6 +60,7 @@
                             $sub_total_no_dis = $price_no_dis * $orderProduct->number;
                             $total_no_dis = $total_no_dis + $sub_total_no_dis;
                             $total_dis = $total_dis + $sub_total_dis;
+                            $totalProducts += $orderProduct->number;
                         @endphp
                         <tr class="{{$counter>$firstPageItems?$lastPage:$firstPage}}">
                             <td>{{$counter++}}</td>
@@ -70,8 +72,14 @@
                             <td>{{number_format($sub_total_dis)}}</td>
                         </tr>
                     @endforeach
-                    <tr>
-                        <td colspan="6" style="border-bottom: none;" class="{{$lastPage}}"><br><br></td>
+                    <tr class="{{$lastPage}}">
+                        <td colspan="2" >مجموع تعداد اقلام</td>
+                        <td>{{$totalProducts}}</td>
+                        <td colspan="3"></td>
+                        <td></td>
+                    </tr>
+                    <tr class="{{$lastPage}}">
+                        <td colspan="6" style="border-bottom: none;" ><br><br></td>
                         <td></td>
                     </tr>
                     <tr class="{{$lastPage}}">
