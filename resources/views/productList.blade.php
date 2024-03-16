@@ -64,7 +64,7 @@
         </thead>
         <tbody>
         @foreach($products as $product)
-            <tr class="{{$product->alarm > $product->quantity ? 'bg-warning low' : ($product->high_alarm < $product->quantity ? 'bg-danger high' : 'normal')}}
+            <tr class="{{$product->alarm > $product->quantity ? 'bg-warning low' : ($product->high_alarm < $product->quantity ? 'bg-info high' : 'normal')}}
             {{$product->available?'available ':'not-available '}} {{$product->category}}" id="row_{{$product->id}}">
                 <td>{{$product->id}}</td>
                 <td><a class="btn" href="/product/edit/{{$product->id}}">{{$product->name}}</a></td>
