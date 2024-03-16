@@ -81,7 +81,8 @@ class WoocommerceController extends Controller
 
 
         if ($request->status == 'processing') {
-            app('Telegram')->sendOrderToBale($order, '4521394649');
+            $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+            $order->save();
             foreach ($products as $id => $data) {
                 $product = $data[1];
                 $order->orderProducts()->create([

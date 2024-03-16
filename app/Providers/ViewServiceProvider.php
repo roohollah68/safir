@@ -31,11 +31,11 @@ class ViewServiceProvider extends ServiceProvider
     {
         View::composer('*', function ($view) {
             if (auth()->user()) {
-                $view->with('superAdmin', auth()->user()->role == 'superAdmin');
-                $view->with('admin', auth()->user()->role == 'admin');
-                $view->with('safir', auth()->user()->role == 'user');
-                $view->with('print', auth()->user()->role == 'print');
-                $view->with('warehouse', auth()->user()->role == 'warehouse');
+                $view->with('superAdmin', auth()->user()->superAdmin());
+                $view->with('admin', auth()->user()->admin());
+                $view->with('safir', auth()->user()->safir());
+                $view->with('print', auth()->user()->print());
+                $view->with('warehouse', auth()->user()->warehouse());
             }
             return $view;
         });

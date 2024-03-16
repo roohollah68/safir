@@ -28,15 +28,6 @@ class OrderController extends Controller
             $orders = auth()->user()->orders()->withTrashed()
                 ->orderBy('id', 'desc')->limit($this->settings()->loadOrders)->get()->keyBy('id');
         }
-        foreach ($orders as $id => $order) {
-            $order->created_at_p = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
-            $order->updated_at_p = verta($order->updated_at)->timezone('Asia/tehran')->formatJalaliDatetime();
-            if ($order->deleted_at)
-                $order->deleted_at_p = verta($order->deleted_at)->timezone('Asia/tehran')->formatJalaliDatetime();
-            else
-                $order->deleted_at_p = null;
-            $orders[$id] = $order;
-        }
         return view('orders', [
             'users' => $users,
             'orders' => $orders,
@@ -170,7 +161,7 @@ class OrderController extends Controller
 
         $this->addToTransactions($request, $order);
 
-        if ($this->safir())
+        if ($this->safir()) {
             foreach ($request->orderList as $id => $product) {
                 $products[$id]->update([
                     'quantity' => $products[$id]->quantity - $product['number'],
@@ -182,8 +173,9 @@ class OrderController extends Controller
                     'desc' => ' خرید سفیر ' . $user->name
                 ]);
             }
-
-        app('Telegram')->sendOrderToBale($order, env('GroupId'));
+            $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+            $order->save();
+        }
 
         DB::commit();
 
@@ -225,7 +217,7 @@ class OrderController extends Controller
 //        $customer = null;
 //        if($creator)
         $customer = $order->customer()->first();
-        if(!$customer) {
+        if (!$customer) {
             $customer = new Customer();
             $customer->city_id = 0;
         }
@@ -319,7 +311,7 @@ class OrderController extends Controller
         ]);
 
         $this->addToCustomers($request);
-
+        app('Telegram')->editOrderInBale($order, env('GroupId'));
         DB::commit();
 
         return redirect()->route('listOrders');
@@ -441,9 +433,11 @@ class OrderController extends Controller
             $order = Order::findOrFail($id);
         else
             $order = auth()->user()->orders()->findOrFail($id);
+        if ($request->onlyOrderData) {
+            return $order;
+        }
         $firstPageItems = $request->firstPageItems;
         $totalPages = $request->totalPages;
-        $order->created_at_p = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
         $orderProducts = OrderProduct::where('order_id', $id)->get();
         $number = $orderProducts->count();
         if ($totalPages > 1) {
@@ -525,6 +519,8 @@ class OrderController extends Controller
             ]);
         }
         $this->addToCustomerTransactions($order);
+        $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+        $order->save();
         DB::commit();
         return $order;
     }
@@ -547,6 +543,7 @@ class OrderController extends Controller
         }
         $order->productChange()->delete();
         $this->removeFromCustomerTransactions($order);
+        $this->deleteFromBale(env('GroupId'), $order->bale_id);
         DB::commit();
         return $order;
     }
@@ -587,13 +584,11 @@ class OrderController extends Controller
                     'type' => true,
                     'description' => 'حذف سفارش',
                 ]);
+
             }
-            $order->created_at_p = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
-            $order->updated_at_p = verta($order->updated_at)->timezone('Asia/tehran')->formatJalaliDatetime();
-            $order->deleted_at_p = verta($order->deleted_at)->timezone('Asia/tehran')->formatJalaliDatetime();
+            $this->deleteFromBale(env('GroupId'), $order->bale_id);
             DB::commit();
             return ['با موفقیت حذف شد', $order];
-
         };
         return 'مشکلی به وجود آمده!';
     }
@@ -734,26 +729,13 @@ class OrderController extends Controller
         if ($this->superAdmin() || $this->print()) {
             $orders = Order::withTrashed()
                 ->whereBetween('created_at', [$from, $to])
-//                ->orderBy('id', 'desc')
                 ->limit($limit)
-//                ->take($limit)
                 ->get()->keyBy('id');
         } else {
             $orders = auth()->user()->orders()->withTrashed()
                 ->whereBetween('created_at', [$from, $to])
-//                ->orderBy('id', 'desc')
                 ->limit($limit)
-//                ->take($limit)
                 ->get()->keyBy('id');
-        }
-        foreach ($orders as $id => $order) {
-            $order->created_at_p = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
-            $order->updated_at_p = verta($order->updated_at)->timezone('Asia/tehran')->formatJalaliDatetime();
-            if ($order->deleted_at)
-                $order->deleted_at_p = verta($order->deleted_at)->timezone('Asia/tehran')->formatJalaliDatetime();
-            else
-                $order->deleted_at_p = null;
-            $orders[$id] = $order;
         }
         return $orders;
     }

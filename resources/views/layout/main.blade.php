@@ -101,6 +101,9 @@
         });
 
     })
+    function FarsiDate(uDate){
+        return new Intl.DateTimeFormat('fa-IR').format(uDate);
+    }
 </script>
 
 </body>

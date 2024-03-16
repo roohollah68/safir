@@ -33,7 +33,7 @@
                                 ،کدپستی:&nbsp;{{$order->zip_code}}
                             @endif
                         </th>
-                        <td class="text-center" id="invoice-time">{{$order->created_at_p}}</td>
+                        <td class="text-center" id="invoice-time">{{verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
                     </tr>
                 </table>
                 <table class="border w-100 table2 round table-striped">

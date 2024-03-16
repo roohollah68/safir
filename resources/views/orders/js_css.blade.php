@@ -147,6 +147,9 @@
 
     function view_order(id) {
         let order = orders[id]
+        let createdDate = new Date(order.created_at);
+        let updatedDate = new Date(order.updated_at);
+        let deletedDate = new Date(order.deleted_at);
         let paymentMethods = {
             credit: 'اعتباری',
             receipt: 'رسید واریز',
@@ -175,10 +178,10 @@
     <span>نحوه پرداخت:</span> <b>${paymentMethods[order.paymentMethod]}</b> <br>
     <span>نحوه ارسال:</span> <b>${deliveryMethods[order.deliveryMethod]}</b> <br>
     <span>توضیحات:</span> <b>${order.desc ? order.desc : ''}</b> <br>
-    <span>زمان ثبت:</span> <b>${order.created_at_p}</b> <br>
-    <span>زمان آخرین ویرایش:</span> <b>${order.updated_at_p}</b> <br>` +
-            (order.deleted_at_p ?
-                    `<span>زمان حذف:</span> <b>${order.deleted_at_p}</b> <br>`
+    <span>زمان ثبت:</span> <b>${FarsiDate(createdDate)}</b> <br>
+    <span>زمان آخرین ویرایش:</span> <b>${FarsiDate(updatedDate)}</b> <br>` +
+            (order.deleted_at ?
+                    `<span>زمان حذف:</span> <b>${FarsiDate(deletedDate)}</b> <br>`
                     :
                     ""
             ) + `
@@ -273,7 +276,6 @@
     function delete_order(id, element) {
         $.post('delete_order/' + id, {_token: token})
             .done(res => {
-                console.log(res);
                 $.notify(res[0], 'info');
                 orders[id] = res[1];
                 if (res[1].deleted_at) {

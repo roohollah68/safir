@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Keyboards\Keyboard;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -214,15 +213,22 @@ class TelegramController extends Controller
         $message = self::createOrderMessage($order);
         $content = array("caption" => $message, "text" => $message, "photo" => env('APP_URL') . "receipt/{$order->receipt}");
         if ($order->receipt) {
-            $this->sendPhotoToBale($content, $chatId);
+            return $this->sendPhotoToBale($content, $chatId);
         } else {
-            $this->sendMessageToBale($content, $chatId);
+            return $this->sendMessageToBale($content, $chatId);
         }
     }
 
-    public static function createOrderMessage($order)
+    public function editOrderInBale($order, $chatId)
     {
-        $This = new Controller();
+        $message = $this->createOrderMessage($order);
+        $content = array("message_id" => $order->bale_id, "text" => $message,"chat_id"=>$chatId);
+        return $this->editText($content);
+
+    }
+
+    public function createOrderMessage($order)
+    {
         $paymentMethods = [
             'credit' => 'اعتباری',
             'receipt' => 'رسید واریز',
@@ -238,7 +244,7 @@ class TelegramController extends Controller
         $total = number_format($order->total);
         $customerCost = number_format($order->customerCost);
         $time = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
-        $time = $This->number_En_Fa($time);
+        $time = $this->number_En_Fa($time);
         return "
 نام و نام خانوادگی: *{$order->name}*
 شماره همراه: {$order->phone}
@@ -257,7 +263,7 @@ class TelegramController extends Controller
 
     public function backUpDatabase()
     {
-        $content = array("caption" => 'backup' , "document" => "https://matchano.ir/safir_database_backup/safir.sql.gz");
+        $content = array("caption" => 'backup', "document" => "https://matchano.ir/safir_database_backup/safir.sql.gz");
         $chatId = '1444566712';
         print_r($this->sendDocumentToBale($content, $chatId));
     }
