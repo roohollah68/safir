@@ -13,7 +13,8 @@
     <div class="container border input-box">
         <div class="row">
             <div class="col-md-3 border">
-                <span class="btn btn-primary" onclick="$('.input-box input').prop('checked', true);$('.input-box input').checkboxradio('refresh'); filter()">همه محصولات</span>
+                <span class="btn btn-primary"
+                      onclick="$('.input-box input').prop('checked', true);$('.input-box input').checkboxradio('refresh'); filter()">همه محصولات</span>
             </div>
             <div class="col-md-3 border">
                 <input type="checkbox" name="low" id="low" checked>
@@ -26,15 +27,15 @@
             <div class="col-md-3 border">
                 <input type="checkbox" name="available" id="available" checked>
                 <label class="btn btn-success mb-1" for="available">محصولات موجود</label><br>
-                <input type="checkbox" name="not-available" id="not-available" >
+                <input type="checkbox" name="not-available" id="not-available">
                 <label class="btn btn-danger " for="not-available">محصولات ناموجود</label>
             </div>
             <div class="col-md-3 border">
-                <input type="checkbox" name="final" id="final" checked >
+                <input type="checkbox" name="final" id="final" checked>
                 <label class="btn btn-info mb-1" for="final">محصول نهایی</label><br>
-                <input type="checkbox" name="raw" id="raw" checked >
+                <input type="checkbox" name="raw" id="raw" checked>
                 <label class="btn btn-secondary mb-1" for="raw">مواد اولیه</label><br>
-                <input type="checkbox" name="pack" id="pack" checked >
+                <input type="checkbox" name="pack" id="pack" checked>
                 <label class="btn btn-secondary" for="pack">ملزومات بسته بندی</label>
             </div>
         </div>
@@ -64,28 +65,41 @@
         </thead>
         <tbody>
         @foreach($products as $product)
+            <form></form>
             <tr class="{{$product->alarm > $product->quantity ? 'bg-warning low' : ($product->high_alarm < $product->quantity ? 'bg-info high' : 'normal')}}
             {{$product->available?'available ':'not-available '}} {{$product->category}}" id="row_{{$product->id}}">
                 <td>{{$product->id}}</td>
-                <td><a class="btn" href="/product/edit/{{$product->id}}">{{$product->name}}</a></td>
-                <td>{{number_format($product->price)}}</td>
-                <td>{{+$product->quantity}}</td>
-                <td>{{$product->alarm}}</td>
-                <td>{{$product->high_alarm}}</td>
-                <td>
+                <td><input type="text" name="name" value="{{$product->name}}" style="width: 300px;" disabled></td>
+                <td><input type="text" name="price" class="price-input" value="{{$product->price}}"
+                           style="width: 110px;" disabled></td>
+                <td><input type="number" name="quantity" value="{{+$product->quantity}}" style="width: 60px;" disabled>
+                </td>
+                <td><input type="number" name="alarm" value="{{$product->alarm}}" style="width: 60px;" disabled></td>
+                <td><input type="number" name="high_alarm" value="{{$product->high_alarm}}" style="width: 60px;"
+                           disabled></td>
+                <td style="width: 110px;">
+                    <input type="checkbox" id="{{$product->id}}" name="available" disabled
+                           @if($product->available) checked @endif>
+
+
                     @if($product->available)
-                        <p class="btn btn-success">موجود</p>
+                        <label for="{{$product->id}}" class="btn btn-success">موجود</label>
                     @else
-                        <p class="btn btn-danger">ناموجود</p>
+                        <label for="{{$product->id}}" class="btn btn-danger">ناموجود</label>
                     @endif
                 </td>
-                <td>
+                <td style="width: 200px;">
                     <a class="fa fa-edit btn btn-primary" href="/product/edit/{{$product->id}}"
                        title="ویرایش محصول"></a>
+                    <a class="fa fa-file-edit btn btn-info" onclick="fastEdit({{$product->id}})"
+                       title="ویرایش سریع"></a>
                     <i class="fa fa-trash-alt btn btn-danger" onclick="delete_product({{$product->id}})"
                        title="حذف محصول"></i>
+                    <i class="fa fa-save btn btn-success save" onclick="save({{$product->id}})"
+                       title="ذخیره تغییرات" style="display: none;"></i>
                 </td>
             </tr>
+            </form>
         @endforeach
         </tbody>
     </table>
@@ -96,11 +110,12 @@
 @section('files')
     <script>
         let products = {!!$products!!};
+        let token = "{{ csrf_token() }}";
 
         $(function () {
             draw();
             filter();
-            $('.input-box input').checkboxradio().click(filter);
+            $('.input-box input, input[type=checkbox]').checkboxradio().click(filter);
         });
 
         function draw() {
@@ -121,16 +136,41 @@
             }
         }
 
-        function filter(){
+        function filter() {
             $('tbody tr').show();
-            $('#low')[0].checked?'':$('.low').hide();
-            $('#normal')[0].checked?'':$('.normal').hide();
-            $('#high')[0].checked?'':$('.high').hide();
-            $('#available')[0].checked?'':$('.available').hide();
-            $('#not-available')[0].checked?'':$('.not-available').hide();
-            $('#final')[0].checked?'':$('.final').hide();
-            $('#raw')[0].checked?'':$('.raw').hide();
-            $('#pack')[0].checked?'':$('.pack').hide();
+            $('#low')[0].checked ? '' : $('.low').hide();
+            $('#normal')[0].checked ? '' : $('.normal').hide();
+            $('#high')[0].checked ? '' : $('.high').hide();
+            $('#available')[0].checked ? '' : $('.available').hide();
+            $('#not-available')[0].checked ? '' : $('.not-available').hide();
+            $('#final')[0].checked ? '' : $('.final').hide();
+            $('#raw')[0].checked ? '' : $('.raw').hide();
+            $('#pack')[0].checked ? '' : $('.pack').hide();
+        }
+
+        function fastEdit(id){
+            $('#row_'+id +' input').prop('disabled' , false);
+            $('#row_'+id +' input[type=checkbox]').checkboxradio('refresh');
+            $('#row_'+id +' .save').show();
+        }
+
+        function save(id){
+            $.post('product/edit/' + id, {
+                _token: token,
+                name: $('#row_'+id +' input[name=name]').val(),
+                price: $('#row_'+id +' input[name=price]').val(),
+                quantity: $('#row_'+id +' input[name=quantity]').val(),
+                alarm: $('#row_'+id +' input[name=alarm]').val(),
+                high_alarm: $('#row_'+id +' input[name=high_alarm]').val(),
+                available: $('#row_'+id +' input[name=available]').val(),
+                fast: true,
+            })
+                .done(res => {
+                    orders[id].state = res[0];
+                    orders[id].admin = res[1];
+                    $(element).parent().next().html(operations(orders[id]));
+                    $(element).parent().html(createdTime(orders[id]))
+                })
         }
 
     </script>
