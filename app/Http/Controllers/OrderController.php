@@ -317,14 +317,14 @@ class OrderController extends Controller
         return redirect()->route('listOrders');
     }
 
-    public function changeState($id)
+    public function changeState($id , Request $req)
     {
         DB::beginTransaction();
         $order = Order::findOrFail($id);
         if ($order->admin != $this->userId() && $order->admin && $order->paymentMethod == 'admin')
             return [$order->state, $order->admin];
         $user = $order->user()->first();
-        $order->state = !$order->state;
+        $order->state = +$req->sendMethod;
         if (!$order->state)
             $order->admin = null;
         else
@@ -353,7 +353,7 @@ class OrderController extends Controller
         $order->save();
         $user->save();
         DB::commit();
-        return [$order->state, $order->admin];
+        return [+$order->state, $order->admin];
 
     }
 

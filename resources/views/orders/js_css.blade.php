@@ -1,10 +1,10 @@
 <script>
 
     let token = "{{ csrf_token() }}";
-    let superAdmin ={{$superAdmin ? 'true' : 'false'}};
-    let print ={{$print ? 'true' : 'false'}};
-    let admin ={{$admin ? 'true' : 'false'}};
-    let safir ={{$safir ? 'true' : 'false'}};
+    let superAdmin = {{$superAdmin ? 'true' : 'false'}};
+    let print = {{$print ? 'true' : 'false'}};
+    let admin = {{$admin ? 'true' : 'false'}};
+    let safir = {{$safir ? 'true' : 'false'}};
     let userId = {{$userId}};
     let table;
     let users = {!!json_encode($users)!!};
@@ -205,35 +205,34 @@
         let timestamp = new Date(order.created_at);
         timestamp = timestamp.getTime();
         let diff = (Date.now() - timestamp) / 1000;
-        let res = `<span class="d-none">${timestamp}</span>`;
+        timestamp = `<span class="d-none" id="state_${order.id}">${timestamp}</span>`;
+        let text = '';
         if (diff < 60) {
-            res += `<span>لحظاتی پیش</span>`
-
+            res += `<span>لحظاتی پیش</span>`;
         } else if (diff < 3600) {
             let minute = Math.floor(diff / 60);
-            res += `<span>${minute} دقیقه قبل </span>`
-
+            text += `<span>${minute} دقیقه قبل </span>`
         } else if (diff < 3600 * 24) {
             let hour = Math.floor(diff / 3600);
-            res += `<span>${hour} ساعت قبل </span>`
+            text += `<span>${hour} ساعت قبل </span>`
         } else if (diff < 3600 * 24 * 30) {
             let day = Math.floor(diff / (3600 * 24));
-            res += `<span>${day} روز قبل </span>`
+            text += `<span>${day} روز قبل </span>`
         } else {
             let month = Math.floor(diff / (3600 * 24 * 30));
-            res += `<span>${month} ماه قبل </span>`
+            text += `<span>${month} ماه قبل </span>`
         }
         if (!order.state || order.deleted_at) {
-            res = `<span class="btn btn-secondary" onclick="change_state(${order.id},this)">${res}</span>`
+            res = timestamp + `<span class="btn btn-secondary" onclick="selectSendMethod(${order.id})">${text}</span>`
         } else {
-            res = `<span class="btn btn-success" onclick="change_state(${order.id},this)">${res} <i class="fas fa-check"></i></span>`
+            res = timestamp + `<span class="btn btn-success" onclick="selectSendMethod(${order.id})">${text}<i class="fas fa-check"></i></span>`
         }
         return res;
     }
 
     function operations(order) {
         let id = order.id;
-        let viewOrder = `<i class="fa fa-eye btn btn-info" onclick="view_order(${id})"></i> `;
+        let viewOrder = `<i id="view_order_${id}" class="fa fa-eye btn btn-info" onclick="view_order(${id})"></i> `;
         let deleteOrder = `<i class="fa fa-trash-alt btn btn-danger" onclick="delete_order(${id},this)" title="حذف سفارش" ></i> `;
         let editOrder = `<a class="fa fa-edit btn btn-primary" href="edit_order/${id}" title="ویرایش سفارش"></a> `;
         let res = viewOrder;
@@ -287,17 +286,41 @@
 
     @if($print || $superAdmin )
 
-    function change_state(id, element) {
+    function selectSendMethod(id) {
         if (!orders[id].confirm) {
             alert('ابتدا فاکتور باید تایید شود!');
-            return
+            return;
         }
-        $.post('change_state/' + id, {_token: token})
+        if (orders[id].state) {
+            change_state(id, 0);
+            return;
+        }
+        let dialog = `<div title="نحوه ارسال" class="dialogs">`;
+        dialog += `<p class="btn btn-success" onclick="change_state(${id},1)">ماشین شر‌کت</p><br>`;
+        dialog += `<p class="btn btn-info" onclick="change_state(${id},2)">اسنپ</p><br>`;
+        dialog += `<p class="btn btn-primary" onclick="change_state(${id},3)">پست</p><br>`;
+        dialog += `<p class="btn btn-secondary" onclick="change_state(${id},4)">تیپاکس</p><br>`;
+        dialog += `<p class="btn btn-warning" onclick="change_state(${id},5)">باربری</p><br>`;
+        dialog += `<p class="btn btn-warning" onclick="change_state(${id},6)">اتوبوس</p><br>`;
+        $(dialog).dialog({
+            modal: true,
+            open: () => {
+                $('.ui-dialog-titlebar-close').hide();
+                $('.ui-widget-overlay').bind('click', function () {
+                    $(".dialogs").dialog('destroy').remove()
+                });
+            }
+        });
+    }
+
+    function change_state(id, sendMethod) {
+        $(".dialogs").dialog('destroy').remove();
+        $.post('change_state/' + id, {_token: token, sendMethod: sendMethod})
             .done(res => {
                 orders[id].state = res[0];
                 orders[id].admin = res[1];
-                $(element).parent().next().html(operations(orders[id]));
-                $(element).parent().html(createdTime(orders[id]))
+                $('#view_order_' + id).parent().html(operations(orders[id]));
+                $('#state_' + id).parent().html(createdTime(orders[id]))
             })
     }
 
@@ -395,35 +418,35 @@
     let firstPageItems = 40;
 
     function invoice(id) {
-            $.post('/invoice/' + id, {_token: token, firstPageItems: firstPageItems, totalPages: totalPages})
-                .done(res => {
-                    $('#invoice-wrapper').html(res[0][0]);
-                    if($('#invoice-content')[0].offsetHeight > 2900) {
-                        totalPages = 2;
-                        firstPageItems--;
-                        invoice(id);
-                        return
-                    }
-                    domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
-                        .then(function (dataUrl) {
-                            let link = document.createElement('a');
-                            link.download = res[0][1] + '.jpg';
-                            link.href = dataUrl;
-                            link.click();
-                            $('#invoice-wrapper').html('');
-                            if (res.length > 1) {
-                                $('#invoice-wrapper').html(res[1][0]);
-                                domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
-                                    .then(function (dataUrl) {
-                                        let link = document.createElement('a');
-                                        link.download = res[1][1] + '.jpg';
-                                        link.href = dataUrl;
-                                        link.click();
-                                        $('#invoice-wrapper').html('');
-                                    });
-                            }
-                        });
-                })
+        $.post('/invoice/' + id, {_token: token, firstPageItems: firstPageItems, totalPages: totalPages})
+            .done(res => {
+                $('#invoice-wrapper').html(res[0][0]);
+                if ($('#invoice-content')[0].offsetHeight > 2900) {
+                    totalPages = 2;
+                    firstPageItems--;
+                    invoice(id);
+                    return
+                }
+                domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
+                    .then(function (dataUrl) {
+                        let link = document.createElement('a');
+                        link.download = res[0][1] + '.jpg';
+                        link.href = dataUrl;
+                        link.click();
+                        $('#invoice-wrapper').html('');
+                        if (res.length > 1) {
+                            $('#invoice-wrapper').html(res[1][0]);
+                            domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
+                                .then(function (dataUrl) {
+                                    let link = document.createElement('a');
+                                    link.download = res[1][1] + '.jpg';
+                                    link.href = dataUrl;
+                                    link.click();
+                                    $('#invoice-wrapper').html('');
+                                });
+                        }
+                    });
+            })
 
 
     }
