@@ -64,4 +64,31 @@ class Order extends Model
     {
         return $this->hasMany(ProductChange::class);
     }
+
+    public function sendMethod()
+    {
+        $sendMethods = $this->sendMethods();
+        switch ($this->state%10) {
+            case 1:
+                return $sendMethods[1];
+            case 2:
+                return $sendMethods[2];
+            case 3:
+                return $sendMethods[3];
+            case 4:
+                return $sendMethods[4];
+            case 5:
+                return $sendMethods[5];
+            case 6:
+                return $sendMethods[6];
+            case 0:
+                return $sendMethods[0];
+        }
+        return $sendMethods[0];
+    }
+
+    public function sendMethods()
+    {
+        return ['ارسال نشده','ماشین شر‌کت','اسنپ','پست','تیپاکس','باربری','اتوبوس'];
+    }
 }
