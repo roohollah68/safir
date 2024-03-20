@@ -34,7 +34,7 @@ class ProductController extends Controller
 
     public function storeNew(Request $req)
     {
-        $req->price = +str_replace(",","",$req->price);
+        $req->price = +str_replace(",", "", $req->price);
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'unique:products,name|required|string|max:255|min:4',
@@ -71,7 +71,7 @@ class ProductController extends Controller
     public function editProduct(Request $req, $id)
     {
         DB::beginTransaction();
-        $req->price = str_replace(",","",$req->price);
+        $req->price = str_replace(",", "", $req->price);
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'required|string|max:255|min:4',
@@ -105,7 +105,10 @@ class ProductController extends Controller
         if ($productChange->change != 0)
             $productChange->save();
         DB::commit();
-        return redirect('/product/edit/' . $id);
+        if ($req->fast)
+            return ['با موفقیت ذخیره شد.', $product];
+        else
+            return redirect('/product/edit/' . $id);
     }
 
     public function deleteProduct($id)
@@ -122,10 +125,11 @@ class ProductController extends Controller
         ]);
     }
 
-    public function productsList(){
+    public function productsList()
+    {
         $products = Product::all()->keyBy('id');
-        return view('productsList',[
-            'products'=>$products,
+        return view('productsList', [
+            'products' => $products,
         ]);
     }
 

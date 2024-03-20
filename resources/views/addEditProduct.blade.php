@@ -18,6 +18,7 @@
     @endif
     <form action="" method="post" enctype="multipart/form-data">
         @csrf
+
         <div class="row">
             {{--نام محصول--}}
             <div class="col-md-6">

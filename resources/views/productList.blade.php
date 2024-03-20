@@ -14,13 +14,13 @@
         <div class="row">
             <div class="col-md-3 border">
                 <span class="btn btn-primary"
-                      onclick="$('.input-box input').prop('checked', true);$('.input-box input').checkboxradio('refresh'); filter()">همه محصولات</span>
+                      onclick="$('.input-box input').prop('checked', true).checkboxradio('refresh'); filter()">همه محصولات</span>
             </div>
             <div class="col-md-3 border">
                 <input type="checkbox" name="low" id="low" checked>
-                <label class="btn btn-warning mb-1" for="low" )">موجودی کم</label><br>
+                <label class="btn btn-warning mb-1" for="low">موجودی کم</label><br>
                 <input type="checkbox" name="normal" id="normal" checked>
-                <label class="btn btn-success mb-1" for="normal" ">موجودی مناسب</label><br>
+                <label class="btn btn-success mb-1" for="normal">موجودی مناسب</label><br>
                 <input type="checkbox" name="high" id="high" checked>
                 <label class="btn btn-danger " for="high">موجودی زیاد</label>
             </div>
@@ -65,41 +65,46 @@
         </thead>
         <tbody>
         @foreach($products as $product)
-            <form></form>
+
             <tr class="{{$product->alarm > $product->quantity ? 'bg-warning low' : ($product->high_alarm < $product->quantity ? 'bg-info high' : 'normal')}}
             {{$product->available?'available ':'not-available '}} {{$product->category}}" id="row_{{$product->id}}">
-                <td>{{$product->id}}</td>
-                <td><input type="text" name="name" value="{{$product->name}}" style="width: 300px;" disabled></td>
-                <td><input type="text" name="price" class="price-input" value="{{$product->price}}"
-                           style="width: 110px;" disabled></td>
-                <td><input type="number" name="quantity" value="{{+$product->quantity}}" style="width: 60px;" disabled>
-                </td>
-                <td><input type="number" name="alarm" value="{{$product->alarm}}" style="width: 60px;" disabled></td>
-                <td><input type="number" name="high_alarm" value="{{$product->high_alarm}}" style="width: 60px;"
-                           disabled></td>
-                <td style="width: 110px;">
-                    <input type="checkbox" id="{{$product->id}}" name="available" disabled
-                           @if($product->available) checked @endif>
+                <form>
+                    <td>{{$product->id}}</td>
+                    <td><input type="text" name="name" value="{{$product->name}}" style="width: 300px;" disabled></td>
+                    <td><input type="text" name="price" class="price-input" value="{{$product->price}}"
+                               style="width: 110px;" disabled></td>
+                    <td><input type="number" name="quantity" value="{{+$product->quantity}}" style="width: 60px;"
+                               disabled>
+                    </td>
+                    <td><input type="number" name="alarm" value="{{$product->alarm}}" style="width: 60px;" disabled>
+                    </td>
+                    <td><input type="number" name="high_alarm" value="{{$product->high_alarm}}" style="width: 60px;"
+                               disabled></td>
+                    <td style="width: 110px;">
+                        <input type="checkbox" id="{{$product->id}}" name="available" disabled
+                               @if($product->available) checked @endif>
 
 
-                    @if($product->available)
-                        <label for="{{$product->id}}" class="btn btn-success">موجود</label>
-                    @else
-                        <label for="{{$product->id}}" class="btn btn-danger">ناموجود</label>
-                    @endif
-                </td>
-                <td style="width: 200px;">
-                    <a class="fa fa-edit btn btn-primary" href="/product/edit/{{$product->id}}"
-                       title="ویرایش محصول"></a>
-                    <a class="fa fa-file-edit btn btn-info" onclick="fastEdit({{$product->id}})"
-                       title="ویرایش سریع"></a>
-                    <i class="fa fa-trash-alt btn btn-danger" onclick="delete_product({{$product->id}})"
-                       title="حذف محصول"></i>
-                    <i class="fa fa-save btn btn-success save" onclick="save({{$product->id}})"
-                       title="ذخیره تغییرات" style="display: none;"></i>
-                </td>
+                        @if($product->available)
+                            <label for="{{$product->id}}" class="btn btn-success">موجود</label>
+                        @else
+                            <label for="{{$product->id}}" class="btn btn-danger">ناموجود</label>
+                        @endif
+                    </td>
+                    <td style="width: 200px;">
+                        <a class="fa fa-edit btn btn-primary" href="/product/edit/{{$product->id}}"
+                           title="ویرایش محصول"></a>
+                        <a class="fa fa-file-edit btn btn-info fast" onclick="fastEdit({{$product->id}})"
+                           title="ویرایش سریع"></a>
+                        <i class="fa fa-trash-alt btn btn-danger" onclick="delete_product({{$product->id}})"
+                           title="حذف محصول"></i>
+                        <i class="fa fa-save btn btn-success save" onclick="save({{$product->id}})"
+                           title="ذخیره تغییرات" style="display: none;"></i>
+                    </td>
+                    <input type="hidden" name="category" value="{{$product->category}}">
+                </form>
             </tr>
-            </form>
+
         @endforeach
         </tbody>
     </table>
@@ -130,7 +135,7 @@
             if (!products[id].available || confirm("برای همیشه حذف شود؟")) {
                 $.post('/product/delete/' + id, {_token: "{{ csrf_token() }}"})
                     .done(res => {
-                        if (res == 'ok')
+                        if (res === 'ok')
                             $('#row_' + id).remove();
                     });
             }
@@ -148,28 +153,33 @@
             $('#pack')[0].checked ? '' : $('.pack').hide();
         }
 
-        function fastEdit(id){
-            $('#row_'+id +' input').prop('disabled' , false);
-            $('#row_'+id +' input[type=checkbox]').checkboxradio('refresh');
-            $('#row_'+id +' .save').show();
+        function fastEdit(id) {
+            let tag = '#row_' + id;
+            $(tag + ' input').prop('disabled', (i, v) => {
+                return !v;
+            });
+            $(tag + ' input[type=checkbox]').checkboxradio('refresh');
+            $(tag + ' .save ,' + tag + ' .fast').toggle();
         }
 
-        function save(id){
+        function save(id) {
+            let tag = '#row_' + id;
             $.post('product/edit/' + id, {
                 _token: token,
-                name: $('#row_'+id +' input[name=name]').val(),
-                price: $('#row_'+id +' input[name=price]').val(),
-                quantity: $('#row_'+id +' input[name=quantity]').val(),
-                alarm: $('#row_'+id +' input[name=alarm]').val(),
-                high_alarm: $('#row_'+id +' input[name=high_alarm]').val(),
-                available: $('#row_'+id +' input[name=available]').val(),
+                name: $(tag + ' input[name=name]').val(),
+                price: $(tag + ' input[name=price]').val(),
+                value: $(tag + ' input[name=quantity]').val(),
+                alarm: $(tag + ' input[name=alarm]').val(),
+                high_alarm: $(tag + ' input[name=high_alarm]').val(),
+                available: $(tag + ' input[name=available]').prop('checked'),
+                category: $(tag + ' input[name=category]').val(),
+                addType: 'value',
                 fast: true,
             })
                 .done(res => {
-                    orders[id].state = res[0];
-                    orders[id].admin = res[1];
-                    $(element).parent().next().html(operations(orders[id]));
-                    $(element).parent().html(createdTime(orders[id]))
+                    $.notify(res[0], 'success');
+                    products[res[1].id] = res[1];
+                    fastEdit(id)
                 })
         }
 

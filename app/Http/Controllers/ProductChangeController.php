@@ -60,7 +60,7 @@ class ProductChangeController extends Controller
         $productChange->save();
         $newProductChange = $productChange->replicate();
         $newProductChange->isDeleted = true;
-        $newProductChange->desc = 'حذف رکورد';
+        $newProductChange->desc = 'حذف رکورد : "'. $productChange->desc .'"';
         $newProductChange->change = -$productChange->change;
         $newProductChange->quantity = $product->quantity;
         $newProductChange->save();
