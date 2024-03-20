@@ -96,10 +96,10 @@
                            title="ویرایش محصول"></a>
                         <a class="fa fa-file-edit btn btn-info fast" onclick="fastEdit({{$product->id}})"
                            title="ویرایش سریع"></a>
-                        <i class="fa fa-trash-alt btn btn-danger" onclick="delete_product({{$product->id}})"
-                           title="حذف محصول"></i>
                         <i class="fa fa-save btn btn-success save" onclick="save({{$product->id}})"
                            title="ذخیره تغییرات" style="display: none;"></i>
+                        <i class="fa fa-trash-alt btn btn-danger" onclick="delete_product({{$product->id}})"
+                           title="حذف محصول"></i>
                     </td>
                     <input type="hidden" name="category" value="{{$product->category}}">
                 </form>
