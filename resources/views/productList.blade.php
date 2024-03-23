@@ -69,17 +69,29 @@
             <tr class="{{$product->alarm > $product->quantity ? 'bg-warning low' : ($product->high_alarm < $product->quantity ? 'bg-info high' : 'normal')}}
             {{$product->available?'available ':'not-available '}} {{$product->category}}" id="row_{{$product->id}}">
                 <form>
-                    <td>{{$product->id}}</td>
-                    <td><input type="text" name="name" value="{{$product->name}}" style="width: 300px;" disabled></td>
-                    <td><input type="text" name="price" class="price-input" value="{{$product->price}}"
-                               style="width: 110px;" disabled></td>
-                    <td><input type="number" name="quantity" value="{{+$product->quantity}}" style="width: 60px;"
+                    <td>
+                        {{$product->id}}
+                    </td>
+
+                    <td>
+                        <span class="d-none">{{$product->name}}</span>
+                        <input type="text" name="name" value="{{$product->name}}" style="width: 300px;" disabled>
+                    </td>
+                    <td>
+                        <input type="text" name="price" class="price-input" value="{{$product->price}}"
+                               style="width: 110px;" disabled>
+                    </td>
+                    <td>
+                        <input type="number" name="quantity" value="{{+$product->quantity}}" style="width: 60px;"
                                disabled>
                     </td>
-                    <td><input type="number" name="alarm" value="{{$product->alarm}}" style="width: 60px;" disabled>
+                    <td>
+                        <input type="number" name="alarm" value="{{$product->alarm}}" style="width: 60px;" disabled>
                     </td>
-                    <td><input type="number" name="high_alarm" value="{{$product->high_alarm}}" style="width: 60px;"
-                               disabled></td>
+                    <td>
+                        <input type="number" name="high_alarm" value="{{$product->high_alarm}}" style="width: 60px;"
+                               disabled>
+                    </td>
                     <td style="width: 110px;">
                         <input type="checkbox" id="{{$product->id}}" name="available" disabled
                                @if($product->available) checked @endif>
