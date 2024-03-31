@@ -56,6 +56,7 @@
             <th>شماره</th>
             <th>نام</th>
             <th>قیمت(ریال)</th>
+            <th>قیمت تولید</th>
             <th>موجودی</th>
             <th>حد پایین</th>
             <th>حد بالا</th>
@@ -72,6 +73,8 @@
                     <td>{{$product->id}}</td>
                     <td><input type="text" name="name" value="{{$product->name}}" style="width: 300px;" disabled></td>
                     <td><input type="text" name="price" class="price-input" value="{{$product->price}}"
+                               style="width: 110px;" disabled></td>
+                    <td><input type="text" name="PPrice" class="price-input" value="{{$product->productPrice}}"
                                style="width: 110px;" disabled></td>
                     <td><input type="number" name="quantity" value="{{+$product->quantity}}" style="width: 60px;"
                                disabled>
@@ -168,6 +171,7 @@
                 _token: token,
                 name: $(tag + ' input[name=name]').val(),
                 price: $(tag + ' input[name=price]').val(),
+                PPrice: $(tag + ' input[name=PPrice]').val(),
                 value: $(tag + ' input[name=quantity]').val(),
                 alarm: $(tag + ' input[name=alarm]').val(),
                 high_alarm: $(tag + ' input[name=high_alarm]').val(),

@@ -42,12 +42,29 @@
                     </div>
                     <input type="text" id="price" class="form-control price-input" name="price"
                            @if($product)
-                           value="{{$product->price}}"
+                           value="{{old('price')?:$product->price}}"
                            @else
                            value="{{old('price')}}"
                            @endif required>
                     <div class="input-group-append" style="min-width: 120px">
                         <label for="price" class="input-group-text w-100">ریال</label>
+                    </div>
+                </div>
+            </div>
+            {{--قیمت تولید محصول--}}
+            <div class="col-md-6">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="PPrice" class="input-group-text w-100">قیمت تولید:</label>
+                    </div>
+                    <input type="text" id="PPrice" class="form-control price-input" name="PPrice"
+                           @if($product)
+                           value="{{old('PPrice')?:$product->productPrice}}"
+                           @else
+                           value="{{old('PPrice')}}"
+                           @endif>
+                    <div class="input-group-append" style="min-width: 120px">
+                        <label for="PPrice" class="input-group-text w-100">ریال</label>
                     </div>
                 </div>
             </div>

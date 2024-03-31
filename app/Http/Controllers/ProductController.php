@@ -35,6 +35,7 @@ class ProductController extends Controller
     public function storeNew(Request $req)
     {
         $req->price = +str_replace(",", "", $req->price);
+        $req->PPrice = +str_replace(",", "", $req->PPrice);
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'unique:products,name|required|string|max:255|min:4',
@@ -51,6 +52,7 @@ class ProductController extends Controller
         $product = Product::create([
             'name' => $req->name,
             'price' => $req->price,
+            'productPrice' => $req->PPrice,
             'available' => $available,
             'photo' => $photo,
             'category' => $req->category,
@@ -72,6 +74,7 @@ class ProductController extends Controller
     {
         DB::beginTransaction();
         $req->price = str_replace(",", "", $req->price);
+        $req->PPrice = +str_replace(",", "", $req->PPrice);
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'required|string|max:255|min:4',
@@ -87,6 +90,7 @@ class ProductController extends Controller
         }
         $product->name = $req->name;
         $product->price = $req->price;
+        $product->productPrice = $req->PPrice;
         if ($req->addType == 'add') {
             $productChange->change = +$req->add;
             $product->quantity += $req->add;

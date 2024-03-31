@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    use HasFactory;
+//    use HasFactory;
 
     protected $fillable =[
         'name',
@@ -18,6 +18,7 @@ class Product extends Model
         'alarm',
         'category',
         'high_alarm',
+        'productPrice',
     ];
 
     public function orderProducts()
