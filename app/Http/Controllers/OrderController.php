@@ -33,6 +33,7 @@ class OrderController extends Controller
             'orders' => $orders,
             'userId' => $this->userId(),
             'limit' => $this->settings()->loadOrders,
+            'sendMethods' => $orders->first()->sendMethods(),
         ]);
     }
 
@@ -317,7 +318,7 @@ class OrderController extends Controller
         return redirect()->route('listOrders');
     }
 
-    public function changeState($id , Request $req)
+    public function changeState($id, Request $req)
     {
         DB::beginTransaction();
         $order = Order::findOrFail($id);
@@ -354,7 +355,6 @@ class OrderController extends Controller
         $user->save();
         DB::commit();
         return [+$order->state, $order->admin];
-
     }
 
     public function pdf($id)
@@ -365,6 +365,8 @@ class OrderController extends Controller
                 if (is_int(strpos($order->desc, '***')))
                     $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
         }
+        if(!$order->state)
+            return;
         $font = 32;
         do {
             $pdf = PDF::loadView('pdf', ['order' => $order], [], [
@@ -376,12 +378,15 @@ class OrderController extends Controller
                 'margin_top' => 2,
                 'margin_bottom' => 2,
             ]);
-            if($font<19 && !$order->user()->first()->safir()) {
+            if ($font < 19 && !$order->user()->first()->safir()) {
                 $order->orders = 'طبق فاکتور';
                 $font = 32;
             }
             $font = $font - 1;
         } while ($pdf->getMpdf()->page > 1);
+        $order->update([
+            'state' => $order->state%10 + 10
+        ]);
         return $pdf->stream($order->name . '.pdf');
     }
 
@@ -398,11 +403,13 @@ class OrderController extends Controller
                     if (is_int(strpos($order->desc, '***')))
                         $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
             }
+            if(!$order->state)
+                continue;
             $font = 32;
             do {
-                if($font<19 && !$order->user()->first()->safir()) {
+                if ($font < 19 && !$order->user()->first()->safir()) {
                     $order->orders = 'طبق فاکتور';
-                    $font=32;
+                    $font = 32;
                 }
                 $font = $font - 1;
                 $pdf = PDF::loadView('pdf', ['order' => $order], [], [
@@ -417,6 +424,9 @@ class OrderController extends Controller
                 $mpdf = $pdf->getMpdf();
 
             } while ($mpdf->page > 1);
+            $order->update([
+                'state' => $order->state%10 + 10
+            ]);
             array_push($fonts, $font);
             array_push($orders, $order);
         }

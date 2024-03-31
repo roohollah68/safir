@@ -14,6 +14,7 @@
     let role = users[userId].role;
     let globalElement;
     let dtp1Instance;
+    let sendMethods = {!!json_encode($sendMethods)!!}
     $(() => {
         $("#deleted_orders").checkboxradio();
         prepare_data();
@@ -162,6 +163,9 @@
             paskerayeh: 'پسکرایه',
             admin: 'ادمین',
         }
+        let sendMethod = sendMethods[order.state];
+        if (order.state)
+            sendMethod += ' - ارسال شده در : ' + FarsiDate(updatedDate);
         let dialog = `
     <div title="مشاهده سفارش" class="dialogs">` +
             (order.receipt ?
@@ -176,7 +180,7 @@
     <span>مبلغ کل:</span> <b>${num(order.total)}</b> <b> ریال</b> <br>
     <span>پرداختی مشتری:</span> <b>${num(order.customerCost)}</b> <b> ریال</b> <br>
     <span>نحوه پرداخت:</span> <b>${paymentMethods[order.paymentMethod]}</b> <br>
-    <span>نحوه ارسال:</span> <b>${deliveryMethods[order.deliveryMethod]}</b> <br>
+    <span>نحوه ارسال:</span> <b>${deliveryMethods[order.deliveryMethod]} - ${sendMethod}</b> <br>
     <span>توضیحات:</span> <b>${order.desc ? order.desc : ''}</b> <br>
     <span>زمان ثبت:</span> <b>${FarsiDate(createdDate)}</b> <br>
     <span>زمان آخرین ویرایش:</span> <b>${FarsiDate(updatedDate)}</b> <br>` +
@@ -245,7 +249,7 @@
         let creatorRole = users[order.user_id].role
 
         let cancelInvoice = `<a class="fa-regular fa-xmark btn btn-danger" onclick="cancelInvoice(${id},this)" title=" رد فاکتور"> </a> `;
-        let generatePDF = `<i class="fa fa-file-pdf btn btn-secondary" onclick="generatePDF(${id})" title="دانلود لیبل"></i> `;
+        let generatePDF = `<i class="fa fa-file-pdf btn btn-${order.state > 10 ? 'success' : 'secondary'}" onclick="generatePDF(${id})" title="دانلود لیبل"></i> `;
         let confirmInvoice = `<a class="fa fa-check btn btn-success" onclick="confirmInvoice(${id},this)" title=" تایید فاکتور"></a> `;
         let invoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title=" فاکتور"></a> `;
         let preInvoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title="پیش فاکتور"></a> `;
@@ -296,12 +300,12 @@
             return;
         }
         let dialog = `<div title="نحوه ارسال" class="dialogs">`;
-        dialog += `<p class="btn btn-success" onclick="change_state(${id},1)">ماشین شر‌کت</p><br>`;
-        dialog += `<p class="btn btn-info" onclick="change_state(${id},2)">اسنپ</p><br>`;
-        dialog += `<p class="btn btn-primary" onclick="change_state(${id},3)">پست</p><br>`;
-        dialog += `<p class="btn btn-secondary" onclick="change_state(${id},4)">تیپاکس</p><br>`;
-        dialog += `<p class="btn btn-warning" onclick="change_state(${id},5)">باربری</p><br>`;
-        dialog += `<p class="btn btn-warning" onclick="change_state(${id},6)">اتوبوس</p><br>`;
+        dialog += `<p class="btn btn-success" onclick="change_state(${id},1)">${sendMethods[1]}</p><br>`;
+        dialog += `<p class="btn btn-info" onclick="change_state(${id},2)">${sendMethods[2]}</p><br>`;
+        dialog += `<p class="btn btn-primary" onclick="change_state(${id},3)">${sendMethods[3]}</p><br>`;
+        dialog += `<p class="btn btn-secondary" onclick="change_state(${id},4)">${sendMethods[4]}</p><br>`;
+        dialog += `<p class="btn btn-warning" onclick="change_state(${id},5)">${sendMethods[5]}</p><br>`;
+        dialog += `<p class="btn btn-warning" onclick="change_state(${id},6)">${sendMethods[6]}</p><br>`;
         $(dialog).dialog({
             modal: true,
             open: () => {
@@ -327,7 +331,8 @@
     function generatePDF(id) {
         $.post('pdf/' + id, {_token: token})
             .done(res => {
-
+                orders[id].state = orders[id].state % 10 + 10
+                $('#view_order_' + id).parent().html(operations(orders[id]));
             })
     }
 
@@ -345,6 +350,10 @@
         $.get('pdfs/' + verifiedIds.toString())
             .done(res => {
                 $('#pdf-link').html("لینک دانلود").attr('href', "{{env('APP_URL')}}" + res)[0].click();
+                $.each(ids, function (index, id) {
+                    orders[id].state = orders[id].state % 10 + 10
+                    $('#view_order_' + id).parent().html(operations(orders[id]));
+                });
             })
     }
 
