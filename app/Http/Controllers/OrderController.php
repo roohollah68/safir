@@ -28,7 +28,7 @@ class OrderController extends Controller
             $orders = auth()->user()->orders()->withTrashed()
                 ->orderBy('id', 'desc')->limit($this->settings()->loadOrders)->get()->keyBy('id');
         }
-        return view('orders', [
+        return view('orders.orders', [
             'users' => $users,
             'orders' => $orders,
             'userId' => $this->userId(),
@@ -59,7 +59,7 @@ class OrderController extends Controller
         $cities = City::all()->keyBy('name');
         $citiesId = $cities->keyBy('id');
         $province = Province::all()->keyBy('id');
-        return view('addEditOrder', [
+        return view('addEditOrder.addEditOrder', [
             'edit' => false,
             'customers' => $customers,
             'customersId' => $customersId,
@@ -226,7 +226,7 @@ class OrderController extends Controller
         $citiesId = $cities->keyBy('id');
         $province = Province::all()->keyBy('id');
 
-        return view('addEditOrder')->with([
+        return view('addEditOrder.addEditOrder')->with([
             'edit' => true,
             'order' => $order,
             'customers' => $customers,

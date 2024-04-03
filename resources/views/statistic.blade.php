@@ -56,12 +56,9 @@
 
 
 @section('files')
-    <script src="/bootstrap-5.1.3-dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/popper.min.js"></script>
     <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
     <link rel="stylesheet" href="/date-time-picker/mds.bs.datetimepicker.style.css">
 
-    @csrf
     <script>
         $(function () {
             $('#statistic-table').DataTable({
