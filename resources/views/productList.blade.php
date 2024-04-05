@@ -43,10 +43,24 @@
 
 
     <br>
+    <span>نمایش ستون ها:</span>
+    <input type="checkbox" name="col-price" id="col-price" checked>
+    <label class="btn btn-secondary" for="col-price">قیمت</label>
 
+    <input type="checkbox" name="col-productPrice" id="col-productPrice">
+    <label class="btn btn-secondary" for="col-productPrice">قیمت تولید</label>
 
+    <input type="checkbox" name="col-quantity" id="col-quantity" checked>
+    <label class="btn btn-secondary" for="col-quantity">موجودی</label>
 
+    <input type="checkbox" name="col-alarm" id="col-alarm" >
+    <label class="btn btn-secondary" for="col-alarm">حد پایین</label>
 
+    <input type="checkbox" name="col-high_alarm" id="col-high_alarm" >
+    <label class="btn btn-secondary" for="col-high_alarm">حد بالا</label>
+
+    <input type="checkbox" name="col-available" id="col-available" >
+    <label class="btn btn-secondary" for="col-available">وضعیت موجودی</label>
 
     <br>
     <br>
@@ -54,13 +68,13 @@
         <thead>
         <tr>
             <th>شماره</th>
-            <th>نام</th>
-            <th>قیمت(ریال)</th>
-            <th>قیمت تولید</th>
-            <th>موجودی</th>
-            <th>حد پایین</th>
-            <th>حد بالا</th>
-            <th>وضعیت</th>
+            <th class="">نام</th>
+            <th class="col-price">قیمت(ریال)</th>
+            <th class="col-productPrice">قیمت تولید</th>
+            <th class="col-quantity">موجودی</th>
+            <th class="col-alarm">حد پایین</th>
+            <th class="col-high_alarm">حد بالا</th>
+            <th class="col-available">وضعیت</th>
             <th>عملیات</th>
         </tr>
         </thead>
@@ -78,26 +92,26 @@
                         <span class="d-none">{{$product->name}}</span>
                         <input type="text" name="name" value="{{$product->name}}" style="width: 300px;" disabled>
                     </td>
-                    <td>
+                    <td class="col-price">
                         <input type="text" name="price" class="price-input" value="{{$product->price}}"
                                style="width: 110px;" disabled>
                     </td>
-                    <td>
+                    <td class="col-productPrice">
                         <input type="text" name="PPrice" class="price-input" value="{{$product->productPrice}}"
                                style="width: 110px;" disabled>
                     </td>
-                    <td>
+                    <td class="col-quantity">
                         <input type="number" name="quantity" value="{{+$product->quantity}}" style="width: 60px;"
                                disabled>
                     </td>
-                    <td>
+                    <td class="col-alarm">
                         <input type="number" name="alarm" value="{{$product->alarm}}" style="width: 60px;" disabled>
                     </td>
-                    <td>
+                    <td class="col-high_alarm">
                         <input type="number" name="high_alarm" value="{{$product->high_alarm}}" style="width: 60px;"
                                disabled>
                     </td>
-                    <td style="width: 110px;">
+                    <td  class="col-available" style="width: 110px;">
                         <input type="checkbox" id="{{$product->id}}" name="available" disabled
                                @if($product->available) checked @endif>
 
@@ -168,6 +182,14 @@
             $('#final')[0].checked ? '' : $('.final').hide();
             $('#raw')[0].checked ? '' : $('.raw').hide();
             $('#pack')[0].checked ? '' : $('.pack').hide();
+
+            $('tbody td , thead th').show();
+            $('#col-price')[0].checked ? '' : $('.col-price').hide();
+            $('#col-productPrice')[0].checked ? '' : $('.col-productPrice').hide();
+            $('#col-quantity')[0].checked ? '' : $('.col-quantity').hide();
+            $('#col-alarm')[0].checked ? '' : $('.col-alarm').hide();
+            $('#col-high_alarm')[0].checked ? '' : $('.col-high_alarm').hide();
+            $('#col-available')[0].checked ? '' : $('.col-available').hide();
         }
 
         function fastEdit(id) {
@@ -202,5 +224,5 @@
         }
 
     </script>
-    <script src="/js/dom-to-image.min.js"></script>
+{{--    <script src="/js/dom-to-image.min.js"></script>--}}
 @endsection
