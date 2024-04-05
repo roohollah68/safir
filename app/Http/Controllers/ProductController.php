@@ -11,8 +11,8 @@ class ProductController extends Controller
 {
     public function showProducts()
     {
-//        $products = Product::all()->keyBy('id');
-        $products = Product::where('location','t')->get()->keyBy('id');
+        $products = Product::all()->keyBy('id');
+//        $products = Product::where('location','t')->get()->keyBy('id');
         return view('productList', ['products' => $products]);
     }
 
