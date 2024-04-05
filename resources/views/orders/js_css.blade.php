@@ -163,7 +163,7 @@
             paskerayeh: 'پسکرایه',
             admin: 'ادمین',
         }
-        let sendMethod = sendMethods[order.state];
+        let sendMethod = sendMethods[order.state%10];
         if (order.state)
             sendMethod += ' - ارسال شده در : ' + FarsiDate(updatedDate);
         let dialog = `
