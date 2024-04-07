@@ -9,7 +9,7 @@
     @endif
     <br>
 
-    <span>آدرس </span>: <b>{{$order->address}}</b>
+    <span>آدرس </span>: <b>{{$location.$order->address}}</b>
     <br>
     @if($order->orders)
         <span>سفارشات </span>: <b>{{$order->orders}}</b>

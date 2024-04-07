@@ -5,6 +5,13 @@
 @endsection
 
 @section('content')
+
+    <span>مکان انبار: </span>
+    <a class="btn {{$location == 't'?'btn-info':'btn-outline-info'}}" href="/products?city=t">تهران</a>
+    <a class="btn {{$location == 'f'?'btn-info':'btn-outline-info'}}" href="/products?city=f">فریمان</a>
+    <a class="btn {{$location == 'm'?'btn-info':'btn-outline-info'}}" href="/products?city=m">مشهد</a>
+    <br>
+    <br>
     <a class="btn btn-info mb-3" href="{{route('addProduct')}}">
         <span class=" fa fa-plus"></span>
         افزودن محصول جدید

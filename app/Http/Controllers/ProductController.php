@@ -9,11 +9,16 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    public function showProducts()
+    public function showProducts(Request $req)
     {
-        $products = Product::all()->keyBy('id');
-//        $products = Product::where('location','t')->get()->keyBy('id');
-        return view('productList', ['products' => $products]);
+        $city = $req->city?:'t';
+
+//        $products = Product::all()->keyBy('id');
+        $products = Product::where('location',$city)->get()->keyBy('id');
+        return view('productList', [
+            'products' => $products,
+            'location' => $city,
+        ]);
     }
 
     public function showAddForm()

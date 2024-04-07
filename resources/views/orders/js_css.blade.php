@@ -331,6 +331,7 @@
     function generatePDF(id) {
         $.post('pdf/' + id, {_token: token})
             .done(res => {
+                $('#pdf-link').html("لینک دانلود").attr('href', "{{env('APP_URL')}}" + res)[0].click();
                 orders[id].state = orders[id].state % 10 + 10
                 $('#view_order_' + id).parent().html(operations(orders[id]));
             })
