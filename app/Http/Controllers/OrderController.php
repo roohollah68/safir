@@ -391,12 +391,12 @@ class OrderController extends Controller
             $font = $font - 1;
         } while ($pdf->getMpdf()->page > 1);
 
-        $pdf->getMpdf()->OutputFile('pdf/' . $order->name . '.pdf');
+        $pdf->getMpdf()->OutputFile('pdf/' . $order->id . '.pdf');
         $order = Order::findOrFail($id);
         $order->update([
             'state' => $order->state % 10 + 10
         ]);
-        return 'pdf/' . $order->name . '.pdf';
+        return 'pdf/' . $order->id . '.pdf';
     }
 
     public function pdfs($ids)
