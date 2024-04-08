@@ -31,7 +31,7 @@ class OrderController extends Controller
         return view('orders.orders', [
             'users' => $users,
             'orders' => $orders,
-            'userId' => $this->userId(),
+            'userId' => auth()->user()->id,
             'limit' => $this->settings()->loadOrders,
             'sendMethods' => $orders->first()->sendMethods(),
         ]);
@@ -322,14 +322,14 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
         $order = Order::findOrFail($id);
-        if ($order->admin != $this->userId() && $order->admin && $order->paymentMethod == 'admin')
-            return [$order->state, $order->admin];
+//        if ($order->admin != $this->userId() && $order->admin && $order->paymentMethod == 'admin')
+//            return [$order->state, $order->admin];
         $user = $order->user()->first();
         $order->state = +$req->sendMethod;
         if (!$order->state)
             $order->admin = null;
         else
-            $order->admin = $this->userId();
+            $order->admin = auth()->user()->id;
         if ($order->paymentMethod == 'onDelivery') {
             if ($order->state) {
                 $user->balance += $order->customerCost - $order->total;

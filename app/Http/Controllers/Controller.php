@@ -55,10 +55,10 @@ class Controller extends BaseController
         return auth()->user()->warehouse();
     }
 
-    public function userId()
-    {
-        return auth()->user()->id;
-    }
+//    public function userId()
+//    {
+//        return auth()->user()->id;
+//    }
 
     public function settings()
     {
