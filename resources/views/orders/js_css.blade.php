@@ -249,7 +249,7 @@
         let creatorRole = users[order.user_id].role
 
         let cancelInvoice = `<a class="fa-regular fa-xmark btn btn-danger" onclick="cancelInvoice(${id},this)" title=" رد فاکتور"> </a> `;
-        let generatePDF = `<i class="fa fa-file-pdf btn btn-${order.state > 10 ? 'success' : 'secondary'}" onclick="generatePDF(${id})" title="دانلود لیبل"></i> `;
+        let generatePDF = `<i class="fa fa-file-pdf btn btn-${order.state > 10 ? 'success' : 'secondary'}" onclick="generatePDF([${id}])" title="دانلود لیبل"></i> `;
         let confirmInvoice = `<a class="fa fa-check btn btn-success" onclick="confirmInvoice(${id},this)" title=" تایید فاکتور"></a> `;
         let invoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title=" فاکتور"></a> `;
         let preInvoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title="پیش فاکتور"></a> `;
@@ -328,12 +328,15 @@
             })
     }
 
-    function generatePDF(id) {
-        $.post('pdf/' + id, {_token: token})
+    function generatePDF(Ids) {
+
+        $.get('pdfs/' + Ids.toString())
             .done(res => {
                 $('#pdf-link').html("لینک دانلود").attr('href', "{{env('APP_URL')}}" + res)[0].click();
-                orders[id].state = orders[id].state % 10 + 10
-                $('#view_order_' + id).parent().html(operations(orders[id]));
+                $.each(ids, function (index, id) {
+                    orders[id].state = orders[id].state % 10 + 10
+                    $('#view_order_' + id).parent().html(operations(orders[id]));
+                });
             })
     }
 
@@ -347,15 +350,7 @@
             $.notify('ابتدا باید سفارشات مورد نظر را انتخاب کنید', 'error')
             return
         }
-
-        $.get('pdfs/' + verifiedIds.toString())
-            .done(res => {
-                $('#pdf-link').html("لینک دانلود").attr('href', "{{env('APP_URL')}}" + res)[0].click();
-                $.each(ids, function (index, id) {
-                    orders[id].state = orders[id].state % 10 + 10
-                    $('#view_order_' + id).parent().html(operations(orders[id]));
-                });
-            })
+        generatePDF(verifiedIds)
     }
 
     function removeFromIds(id) {

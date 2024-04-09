@@ -57,7 +57,7 @@ class Order extends Model
 
     public function admin()
     {
-        return $this->belongsTo(User::class,'admin');
+        return $this->belongsTo(User::class, 'admin');
     }
 
     public function productChange()
@@ -68,7 +68,7 @@ class Order extends Model
     public function sendMethod()
     {
         $sendMethods = $this->sendMethods();
-        switch ($this->state%10) {
+        switch ($this->state % 10) {
             case 1:
                 return $sendMethods[1];
             case 2:
@@ -81,14 +81,42 @@ class Order extends Model
                 return $sendMethods[5];
             case 6:
                 return $sendMethods[6];
-            case 0:
+            default:
                 return $sendMethods[0];
         }
-        return $sendMethods[0];
     }
 
-    public function sendMethods()
+    public function sendMethods(): array
     {
-        return ['ارسال نشده','ماشین شر‌کت','اسنپ','پست','تیپاکس','باربری','اتوبوس'];
+        return ['ارسال نشده', 'ماشین شر‌کت', 'اسنپ', 'پست', 'تیپاکس', 'باربری', 'اتوبوس'];
+    }
+
+    public function payMethod(): string
+    {
+        $payMethods = $this->payMethods();
+        switch ($this->confirm) {
+            case 0:
+                return $payMethods[0];
+            case 1:
+                return $payMethods[1];
+            case 2:
+                return $payMethods[2];
+            case 3:
+                return $payMethods[3];
+            case 4:
+                return $payMethods[4];
+            case 5:
+                return $payMethods[5];
+            case 6:
+                return $payMethods[6];
+            default:
+                return $payMethods[7];
+        }
+
+    }
+
+    public function payMethods($index): array
+    {
+        return ['پرداخت نشده', 'پرداخت نقدی', 'پرداخت چکی', 'پرداخت در محل', 'امانی', 'پرداخت در تاریخ توضیحات', 'فاکتور به فاکتور', 'شیوه پرداخت نامغلوم'];
     }
 }

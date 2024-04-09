@@ -357,64 +357,34 @@ class OrderController extends Controller
         return [+$order->state, $order->admin];
     }
 
-    public function pdf($id)
-    {
-        $order = Order::findOrFail($id);
-        if (!$order->user()->first()->safir()) {
-            if ($order->confirm != 3)
-                if (is_int(strpos($order->desc, '***')))
-                    $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
-        }
-        if (!$order->state)
-            return;
-        $location = '';
-        if ($order->customer_id) {
-            $city = $order->customer()->first()->city()->first();
-            if ($city->id > 0)
-                $location = $city->province()->first()->name . '- ' . $city->name . '- ';
-        }
-        $font = 32;
-        do {
-            $pdf = PDF::loadView('pdf', ['order' => $order, 'location' => $location], [], [
-                'format' => [200, 100],
-                'default_font' => 'iransans',
-                'default_font_size' => $font,
-                'margin_left' => 2,
-                'margin_right' => 2,
-                'margin_top' => 2,
-                'margin_bottom' => 2,
-            ]);
-            if ($font < 19 && !$order->user()->first()->safir()) {
-                $order->orders = 'طبق فاکتور';
-                $font = 32;
-            }
-            $font = $font - 1;
-        } while ($pdf->getMpdf()->page > 1);
-
-        $pdf->getMpdf()->OutputFile('pdf/' . $order->id . '.pdf');
-        $order = Order::findOrFail($id);
-        $order->update([
-            'state' => $order->state % 10 + 10
-        ]);
-        return 'pdf/' . $order->id . '.pdf';
-    }
-
     public function pdfs($ids)
     {
         $ids = explode(",", $ids);
         $fonts = array();
         $orders = array();
         $locations = array();
+        $settings = [
+            'format' => [200, 100],
+            'default_font' => 'iransans',
+            'margin_left' => 2,
+            'margin_right' => 2,
+            'margin_top' => 2,
+            'margin_bottom' => 2,
+        ];
         foreach ($ids as $id) {
             $order = Order::findOrFail($id);
-            if (!$order->user()->first()->safir()) {
-                $order->orders = 'طبق فاکتور';
-                if ($order->confirm != 3)
-                    if (is_int(strpos($order->desc, '***')))
-                        $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
-            }
             if (!$order->state)
                 continue;
+            $order->update([
+                'state' => $order->state % 10 + 10
+            ]);
+            $order->desc .= '- ' . $order->sendMethod();
+
+            if ($order->confirm != 3)
+                if (is_int(strpos($order->desc, '***')))
+                    $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
+
+
             $font = 32;
             do {
                 if ($font < 19 && !$order->user()->first()->safir()) {
@@ -428,35 +398,17 @@ class OrderController extends Controller
                     if ($city->id > 0)
                         $location = $city->province()->first()->name . '- ' . $city->name . '- ';
                 }
-                $pdf = PDF::loadView('pdf', ['order' => $order, 'location' => $location], [], [
-                    'format' => [200, 100],
-                    'default_font' => 'iransans',
-                    'default_font_size' => $font,
-                    'margin_left' => 2,
-                    'margin_right' => 2,
-                    'margin_top' => 2,
-                    'margin_bottom' => 2,
-                ]);
+                $pdf = PDF::loadView('pdfs', ['orders' => [$order], 'locations' => [$location], 'fonts' => [$font]], [], $settings);
                 $mpdf = $pdf->getMpdf();
 
             } while ($mpdf->page > 1);
             array_push($fonts, $font);
             array_push($orders, $order);
             array_push($locations, $location);
-            $order = Order::findOrFail($id);
-            $order->update([
-                'state' => $order->state % 10 + 10
-            ]);
+
         }
 
-        $pdfs = PDF::loadView('pdfs', ['orders' => $orders, 'fonts' => $fonts, 'locations' => $locations], [], [
-            'format' => [200, 100],
-            'default_font' => 'iransans',
-            'margin_left' => 2,
-            'margin_right' => 2,
-            'margin_top' => 2,
-            'margin_bottom' => 2,
-        ]);
+        $pdfs = PDF::loadView('pdfs', ['orders' => $orders, 'fonts' => $fonts, 'locations' => $locations], [], $settings);
         $fileName = $order->id . '(' . sizeof($ids) . ').pdf';
         $pdfs->getMpdf()->OutputFile('pdf/' . $fileName);
         return 'pdf/' . $fileName;
