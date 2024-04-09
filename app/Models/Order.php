@@ -115,7 +115,7 @@ class Order extends Model
 
     }
 
-    public function payMethods($index): array
+    public function payMethods(): array
     {
         return ['پرداخت نشده', 'پرداخت نقدی', 'پرداخت چکی', 'پرداخت در محل', 'امانی', 'پرداخت در تاریخ توضیحات', 'فاکتور به فاکتور', 'شیوه پرداخت نامغلوم'];
     }

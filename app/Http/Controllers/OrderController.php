@@ -322,14 +322,10 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
         $order = Order::findOrFail($id);
-//        if ($order->admin != $this->userId() && $order->admin && $order->paymentMethod == 'admin')
-//            return [$order->state, $order->admin];
+
         $user = $order->user()->first();
         $order->state = +$req->sendMethod;
-        if (!$order->state)
-            $order->admin = null;
-        else
-            $order->admin = auth()->user()->id;
+
         if ($order->paymentMethod == 'onDelivery') {
             if ($order->state) {
                 $user->balance += $order->customerCost - $order->total;
@@ -354,7 +350,7 @@ class OrderController extends Controller
         $order->save();
         $user->save();
         DB::commit();
-        return [+$order->state, $order->admin];
+        return +$order->state;
     }
 
     public function pdfs($ids)

@@ -163,7 +163,7 @@
             paskerayeh: 'پسکرایه',
             admin: 'ادمین',
         }
-        let sendMethod = sendMethods[order.state%10];
+        let sendMethod = sendMethods[order.state % 10];
         if (order.state)
             sendMethod += ' - ارسال شده در : ' + FarsiDate(updatedDate);
         let dialog = `
@@ -261,16 +261,16 @@
             res += generatePDF
 
         if (creatorRole !== 'user') {
-            if (!order.confirm) {
+            if (order.confirm) {
+                res += invoice;
+                if (!print && !order.state)
+                    res += cancelInvoice;
+
+            } else {
                 res += preInvoice;
                 if (!print)
                     res += confirmInvoice;
-            } else if (!order.state) {
-                res += invoice;
-                if (!print)
-                    res += cancelInvoice;
-            } else
-                res += invoice;
+            }
         }
         @endif
             return res;
@@ -322,7 +322,6 @@
         $.post('change_state/' + id, {_token: token, sendMethod: sendMethod})
             .done(res => {
                 orders[id].state = res[0];
-                orders[id].admin = res[1];
                 $('#view_order_' + id).parent().html(operations(orders[id]));
                 $('#state_' + id).parent().html(createdTime(orders[id]))
             })
