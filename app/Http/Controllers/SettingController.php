@@ -35,6 +35,7 @@ class SettingController extends Controller
     public function clearRoute()
     {
         \Artisan::call('route:cache');
+        \Artisan::call('config:clear');
     }
 
 
