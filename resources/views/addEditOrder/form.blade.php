@@ -43,7 +43,7 @@
                            value="{{old('city_id')?:$customer->city()->first()->id}}">
                     <div class="input-group-append" style="min-width: 120px">
                         <span id="province" onclick="$('#city').change()"
-                               class="input-group-text w-100">{{$customer->city()->first()->province()->first()->name}}</span>
+                              class="input-group-text w-100">{{$customer->city()->first()->province()->first()->name}}</span>
                     </div>
                 </div>
             </div>
@@ -102,7 +102,7 @@
                         @for($ii=0;$ii<11;$ii++)
                             <option value="{{$ii}}"
                                     @if($ii == $customer->category)
-                                    selected
+                                        selected
                                 @endif
                             >{{$customer->categoryText($ii)}}</option>
                         @endfor
@@ -120,51 +120,49 @@
             <h4>نحوه پرداخت</h4>
             @if(!$edit)
                 <input type="radio" name="paymentMethod" value="credit" id="credit" checked>
-                <label for="credit">پرداخت اعتباری</label><br>
+                <label for="credit">{{$payMethods['credit']}}</label><br>
 
                 <input type="radio" name="paymentMethod" value="receipt" id="receipt">
-                <label for="receipt">تصویر رسید بانکی</label>
+                <label for="receipt">{{$payMethods['receipt']}}</label>
                 <input type="file" id="receiptPhoto" name="receipt"><br>
 
                 <input type="radio" name="paymentMethod" value="onDelivery" id="onDelivery">
-                <label for="onDelivery">پرداخت در محل</label>
+                <label for="onDelivery">{{$payMethods['onDelivery']}}</label>
                 <label for="customerDiscount">درصد تخفیف به مشتری</label>
                 <input type="number" style="max-width: 60px" min="0" max="50" id="customerDiscount"
                        name="customerDiscount" value="{{old('customerDiscount')}}" onchange="refreshProducts()"><br>
             @else
-                <div id="edit-payment-method"></div>
+                <div id="edit-payment-method"><p>{{$payMethods[$order->paymentMethod]}}</p>
+                    @if($order->receipt)
+                    <a href="/receipt/{{$order->receipt}}" target="_blank"><img
+                            style="max-width: 200px; max-height: 200px"
+                            src="/receipt/{{$order->receipt}}"></a>
+                    @endif
+                </div>
             @endif
         </div>
 
-        <input type="hidden" name="paymentMethod" value="credit">
+
 
         <div class="p-3 m-2 border">
             <h4>شیوه ارسال</h4>
             @if(!$edit)
                 <input type="radio" name="deliveryMethod" value="peyk" id="peyk" checked>
-                <label for="peyk">ارسال با تیپاکس</label> <span
+                <label for="peyk">{{$sendMethods['peyk']}}</label> <span
                     class="deliveryDesc"> <span>{{number_format($settings->peykCost)}}</span> ریال</span><br>
 
                 <input type="radio" name="deliveryMethod" value="post" id="post">
-                <label for="post">ارسال با پست</label><span class="deliveryDesc"> {{number_format($settings->postCost)}} ریال</span>
+                <label for="post">{{$sendMethods['post']}}</label><span class="deliveryDesc"> {{number_format($settings->postCost)}} ریال</span>
                 <br>
 
                 <input type="radio" name="deliveryMethod" value="paskerayeh" id="paskerayeh">
-                <label for="paskerayeh">ارسال پس کرایه(ویژه تهران)</label><span class="deliveryDesc">هزینه ارسال به عهده مشتری</span>
+                <label for="paskerayeh">{{$sendMethods['paskerayeh']}}</label><span class="deliveryDesc">هزینه ارسال به عهده مشتری</span>
                 <br>
 
             @else
-                @switch($order->deliveryMethod)
-                    @case('peyk')
-                    <p>ارسال با تیپاکس</p>
-                    @break
-                    @case('post')
-                    <p>ارسال با پست</p>
-                    @break
-                    @case('paskerayeh')
-                    <p>ارسال پس کرایه(ویژه تهران)</p>
-                    @break
-                @endswitch
+                <p>
+                    {{$sendMethods[$order->deliveryMethod]}}
+                </p>
             @endif
         </div>
 
@@ -184,7 +182,8 @@
                     id="safirShare">{{$edit?$order->customerCost-$order->total:''}}</span><span>  ریال </span><br>
             </span>
         </div>
-
+    @else
+{{--        <input type="hidden" name="paymentMethod" value="credit">--}}
     @endif
 
     <input type="checkbox" name="addToCustomers" id="addToCustomers" @if($creator) checked @endif

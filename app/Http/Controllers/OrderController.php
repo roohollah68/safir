@@ -359,14 +359,14 @@ class OrderController extends Controller
         $fonts = array();
         $orders = array();
         $locations = array();
-        $settings = [
-            'format' => [200, 100],
-            'default_font' => 'iransans',
-            'margin_left' => 2,
-            'margin_right' => 2,
-            'margin_top' => 2,
-            'margin_bottom' => 2,
-        ];
+//        $settings = [
+//            'format' => [200, 100],
+//            'default_font' => 'iransans',
+//            'margin_left' => 2,
+//            'margin_right' => 2,
+//            'margin_top' => 2,
+//            'margin_bottom' => 2,
+//        ];
         foreach ($ids as $id) {
             $order = Order::findOrFail($id);
             if (!$order->state)
@@ -394,7 +394,7 @@ class OrderController extends Controller
                     if ($city->id > 0)
                         $location = $city->province()->first()->name . '- ' . $city->name . '- ';
                 }
-                $pdf = PDF::loadView('pdfs', ['orders' => [$order], 'locations' => [$location], 'fonts' => [$font]], [], $settings);
+                $pdf = PDF::loadView('pdfs', ['orders' => [$order], 'locations' => [$location], 'fonts' => [$font]], []);
                 $mpdf = $pdf->getMpdf();
 
             } while ($mpdf->page > 1);
@@ -404,7 +404,7 @@ class OrderController extends Controller
 
         }
 
-        $pdfs = PDF::loadView('pdfs', ['orders' => $orders, 'fonts' => $fonts, 'locations' => $locations], [], $settings);
+        $pdfs = PDF::loadView('pdfs', ['orders' => $orders, 'fonts' => $fonts, 'locations' => $locations], []);
         $fileName = $order->id . '(' . sizeof($ids) . ').pdf';
         $pdfs->getMpdf()->OutputFile('pdf/' . $fileName);
         return 'pdf/' . $fileName;

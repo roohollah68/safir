@@ -211,8 +211,9 @@
         let diff = (Date.now() - timestamp) / 1000;
         timestamp = `<span class="d-none" id="state_${order.id}">${timestamp}</span>`;
         let text = '';
+        console.log(diff);
         if (diff < 60) {
-            res += `<span>لحظاتی پیش</span>`;
+            text += `<span>لحظاتی پیش</span>`;
         } else if (diff < 3600) {
             let minute = Math.floor(diff / 60);
             text += `<span>${minute} دقیقه قبل </span>`

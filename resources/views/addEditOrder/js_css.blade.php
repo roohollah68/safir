@@ -12,9 +12,6 @@
     let province = {!!json_encode($province)!!};
     let submit = false;
     let creator = !!'{{$creator}}';
-    let totalPages = 1;
-    let currentPage = 1;
-    let firstPageItems = 40;
     $(function () {
         setTimeout(function () {
             $("#errors").hide()
@@ -40,8 +37,8 @@
             }
         });
         refreshProducts()
-        $('input[name=paymentMethod]').click(paymentAction);
-        $('input[name=deliveryMethod]').click(deliveryAction);
+        // $('input[name=paymentMethod]').on('click',paymentAction);
+        $('input[name=deliveryMethod]').on('click',deliveryAction);
 
         $("#city").autocomplete({
             source: Object.keys(cities),
@@ -69,7 +66,6 @@
 
     function paymentAction() {
         paymentMethod = $('input[name="paymentMethod"]:checked').val();
-        $('input[name=paymentMethod]').val(paymentMethod);
         $('#receiptPhoto,#customerDiscount,label[for=customerDiscount]').hide();
         if (paymentMethod == 'receipt') {
             $('#receiptPhoto').show();
@@ -82,7 +78,6 @@
     function deliveryAction() {
         $('.deliveryDesc').hide();
         deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
-        $('input[name="deliveryMethod"]').val(deliveryMethod);
         $('#' + deliveryMethod).next().next().show();
         refreshProducts();
     }
@@ -92,42 +87,23 @@
         let hasProduct = false;
         let ordersText = ''; //عبارت مربوط به قسمت محصولات
         let ordersListText = ''; // عبارت مربوط به فاکتور سفیران
-        let invoiceOrders = ''; //مربوط به پیش فاکتور
-        let ii = 1;
         $.each(cart, (id, number) => {
             if (number > 0) {
                 let price = products[id].priceWithDiscount * number; //قیمت با تخفیف
                 let Price = products[id].price * number;  //قیمت بدون تخفیف
                 $('#product_' + id).val(number);
                 ordersText = ordersText.concat(products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + '<br>');
-                let page = (ii > firstPageItems ? 'last-page' : 'first-page');
-                invoiceOrders = invoiceOrders.concat(
-                    `<tr class="invoice-list ${page}">
-                    <td>${ii}</td>
-                    <td>${products[id].name}</td>
-                    <td>${number}</td>
-                    <td>${priceFormat(products[id].price)}</td>
-                    <td>${products[id].coupon}</td>
-                    <td>${priceFormat(products[id].priceWithDiscount)}</td>
-                    <td>${priceFormat(price)}</td>
-                </tr>`);
                 ordersListText = ordersListText.concat('<li>' + products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + ': ' + num(price) + '</li>');
 
                 total += price; //جمع قیمت با تخفیف
                 Total += Price; // جمع قیمت بدون تخفیف
                 hasProduct = true;
-                ii++;
             } else {
                 $('#product_' + id).val('');
                 delete cart[id];
             }
         })
         $('#orders').html(ordersText);
-        $('.invoice-list').remove();
-        $('#invoice-head').after(invoiceOrders);
-        $('#invoice-total-no-discount').html(priceFormat(Total));
-        $('#invoice-total-discount').html(priceFormat(Total - total));
-        $('#invoice-total-with-discount').html(priceFormat(total));
 
         @if($safir)
         $('#order-list').html(ordersListText)
@@ -227,51 +203,9 @@
             alert('محصولی انتخاب نشده است');
             return false;
         }
+        console.log($('input[name="paymentMethod"]:checked').val());
+        // return false;
         return true;
-        @if(!$creator)
-            return true;
-        @else
-        if (submit)
-            return submit
-        $('#invoice-wrapper').show();
-        $('#invoice-name').text($('#name').val());
-        $('#invoice-phone').text($('#phone').val());
-        $('#invoice-address').text($('#address').val());
-        $('#invoice-zip_code').text($('#zip_code').val());
-        if (!$('#zip_code').val())
-            $('#invoice-zip').text('');
-        $('#invoice-description').text($('#desc').val());
-
-        if ($('#invoice-content')[0].offsetHeight > 2900) {
-            totalPages = 2;
-            if (currentPage === 1) {
-                while ($('#invoice-content')[0].offsetHeight > 2950){
-                    refreshProducts();
-                    $('#invoice .last-page').hide();
-                    firstPageItems = firstPageItems-1;
-                }
-            } else {
-                $('#invoice .first-page').hide();
-                $('#invoice .last-page').show();
-            }
-        }
-
-        $('#total-pages').html(totalPages);
-        $('#current-page').html(currentPage);
-
-        domtoimage.toJpeg(document.getElementById('invoice'), {width: 2100, height: 2970})
-            .then(function (dataUrl) {
-                var link = document.createElement('a');
-                link.download = 'invoice.jpeg';
-                link.href = dataUrl;
-                link.click();
-                if (currentPage === totalPages)
-                    submit = true;
-                currentPage++;
-                $('#form').submit();
-            });
-        return false;
-        @endif
     }
 
     function calculate_discount(id, value) {
@@ -292,7 +226,10 @@
     function startEditProccess() {
 
         @if($errors->count())
-        setOldValue();
+        $.each(products,function (id){
+            $('#product_'+id).change();
+        });
+        refreshProducts();
         @if($safir)
         $('#{{old("paymentMethod")}}').click();
         $('#{{old("deliveryMethod")}}').click();
@@ -300,25 +237,7 @@
         @elseif($edit)
         deliveryMethod = `{{$order->deliveryMethod}}`;
         paymentMethod = `{{$order->paymentMethod}}`;
-
-        @if($order->paymentMethod == 'receipt')
-        $('#edit-payment-method').html(`<p>نحوه پرداخت: کارت به کارت با رسید بانکی .</p>
-                <a href="/receipt/{{$order->receipt}}" target="_blank"><img
-                    style="max-width: 200px; max-height: 200px"
-                    src="/receipt/{{$order->receipt}}"></a>`);
-        @elseif($order->paymentMethod == 'credit')
-        $('#edit-payment-method').html(`<p>نحوه پرداخت اعتباری است.</p>`);
-        @elseif($order->paymentMethod == 'onDelivery')
-        $('#edit-payment-method').html(`<p>نحوه پرداخت ، پرداخت در محل است.</p>`);
         @endif
-        @endif
-    }
-
-    function setOldValue(){
-        $.each(products,function (id){
-            $('#product_'+id).change();
-            refreshProducts();
-        });
     }
 
 </script>

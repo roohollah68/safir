@@ -1,4 +1,31 @@
 <?php
+return [
+    'format' => [200, 100],
+    'default_font' => 'iransans',
+    'margin_left' => 2,
+    'margin_right' => 2,
+    'margin_top' => 2,
+    'margin_bottom' => 2,
+    'custom_font_dir'  => base_path('public/css/'), // don't forget the trailing slash!
+    'custom_font_data' => [
+        'iransans' => [ // must be lowercase and snake_case
+            'R'  => 'IRANSans/ttf/IRANSansWeb(FaNum).ttf',    // regular font
+            'B'  => 'IRANSans/ttf/IRANSansWeb(FaNum)_Bold.ttf',       // optional: bold font
+            'I'  => 'IRANSans/ttf/IRANSansWeb(FaNum).ttf',     // optional: italic font
+            'BI' => 'IRANSans/ttf/IRANSansWeb(FaNum)_Bold.ttf', // optional: bold-italic font
+            'useOTL' => 0xFF,
+            'useKashida' => 75,
+        ],
+        'bnazanin' => [ // must be lowercase and snake_case
+            'R'  => 'BNAZANIN.ttf',    // regular font
+            'B'  => 'BNAZANIN.ttf',       // optional: bold font
+            'I'  => 'BNAZANIN.ttf',     // optional: italic font
+            'BI' => 'BNAZANIN.ttf',     // optional: bold-italic font
+            'useOTL' => 0xFF,
+            'useKashida' => 75,
+        ],
+    ]
+];
 
 return [
     'mode'                     => '',
@@ -48,7 +75,6 @@ return [
             'useOTL' => 0xFF,
             'useKashida' => 75,
         ],
-
-
     ]
 ];
+
