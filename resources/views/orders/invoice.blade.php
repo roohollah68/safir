@@ -99,9 +99,9 @@
             </div>
             <div class="w-100 normal {{$lastPage}}">
                 نحوه پرداخت: {{$order->payMethod()}}
-                <br>
+                /
                 نحوه ارسال: {{$order->sendMethod()}}
-                <br>
+                /
                 توضیحات: {{$order->desc}}
                 <br>
             </div>
