@@ -33,7 +33,7 @@ class OrderController extends Controller
             'orders' => $orders,
             'userId' => auth()->user()->id,
             'limit' => $this->settings()->loadOrders,
-            'sendMethods' => $orders->first()->sendMethods(),
+//            'sendMethods' => $orders->first()->sendMethods(),
         ]);
     }
 
@@ -145,11 +145,12 @@ class OrderController extends Controller
                 $request->desc .= '- پرداخت در محل';
                 $request->customerCost = round($Total * (100 - $request->customerDiscount) / 100 + $deliveryCost);
             } else
-                return $this->errorBack('مشکلی پیش آمده!');
-        } else {
-            $request->paymentMethod = 'admin';
-            $request->deliveryMethod = 'admin';
+                return $this->errorBack('روش پرداخت به درستی انتخاب نشده است!');
         }
+//        else {
+//            $request->paymentMethod = 'admin';
+//            $request->deliveryMethod = 'admin';
+//        }
         $request->total = $total;
 
         $request->customerId = $this->addToCustomers($request);
@@ -322,9 +323,9 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
         $order = Order::findOrFail($id);
-
         $user = $order->user()->first();
-        $order->state = +$req->sendMethod;
+        $order->state = +$req->state;
+        $order->deliveryMethod = $req->sendMethod;
 
         if ($order->paymentMethod == 'onDelivery') {
             if ($order->state) {
@@ -374,12 +375,11 @@ class OrderController extends Controller
             $order->update([
                 'state' => $order->state % 10 + 10
             ]);
-            $order->desc .= '- ' . $order->sendMethod();
 
-            if ($order->confirm != 3)
-                if (is_int(strpos($order->desc, '***')))
-                    $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
-
+//            if ($order->confirm != 3)
+//                if (is_int(strpos($order->desc, '***')))
+//                    $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
+//
 
             $font = 32;
             do {
@@ -459,33 +459,12 @@ class OrderController extends Controller
     public function confirmInvoice($id, Request $request)
     {
         DB::beginTransaction();
-        $pay = +$request->pay;
+
         $order = Order::findOrFail($id);
         if ($order->confirm || $order->state)
             return $order;
-        $order->confirm = $pay;
-        $desc = 'شیوه پرداخت نامغلوم';
-        switch ($pay) {
-            case 1:
-                $desc = 'پرداخت نقدی';
-                break;
-            case 2:
-                $desc = 'پرداخت چکی';
-                break;
-            case 3:
-                $desc = 'پرداخت در محل';
-                break;
-            case 4:
-                $desc = 'امانی';
-                break;
-            case 5:
-                $desc = ' پرداخت در تاریخ ' . $request->date;
-                break;
-            case 6:
-                $desc = 'فاکتور به فاکتور';
-                break;
-        }
-        $order->desc .= '***' . $desc;
+        $order->paymentMethod = $request->pay;
+        $order->confirm = +$request->confirm;
         $order->save();
         $orderProducts = $order->orderProducts();
         $orderProducts->update(['verified' => true]);
@@ -721,5 +700,14 @@ class OrderController extends Controller
                 ->get()->keyBy('id');
         }
         return $orders;
+    }
+
+    public function viewOrder($id)
+    {
+        if ($this->superAdmin())
+            $order = Order::withTrashed()->findOrFail($id);
+        else
+            $order = auth()->user()->orders()->withTrashed()->findOrFail($id);
+        return view('orders.view', ['order' => $order]);
     }
 }

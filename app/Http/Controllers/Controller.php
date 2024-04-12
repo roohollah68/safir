@@ -96,7 +96,7 @@ class Controller extends BaseController
     {
         $bot = new BaleAPIv2(env('BaleToken'));
         $array = array('chat_id' =>$chatId , "text" => $text);
-        $bot->sendText($array);
+        return json_decode($bot->sendText($array));
     }
 
     public function sendPhotoToBale($array, $chatId)
@@ -110,19 +110,19 @@ class Controller extends BaseController
     {
         $bot = new BaleAPIv2(env('BaleToken'));
         $array["chat_id"] = $chatId;
-        return $bot->sendDocument($array);
+        return json_decode($bot->sendDocument($array));
     }
 
     public function deleteFromBale($chatId , $message_id){
         $bot = new BaleAPIv2(env('BaleToken'));
-        return $bot->deleteMessage([
+        return json_decode($bot->deleteMessage([
         "message_id"=>$message_id,
         "chat_id"=>$chatId,
-        ]);
+        ]));
     }
 
     public function editText($content){
         $bot = new BaleAPIv2(env('BaleToken'));
-        return $bot->editText($content);
+        return json_decode($bot->editText($content));
     }
 }

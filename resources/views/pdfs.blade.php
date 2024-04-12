@@ -23,6 +23,9 @@
             @if($order->desc)
                 <br><span>توضیحات </span>: <b>{{$order->desc}}</b>
             @endif
+{{--            <br>--}}
+{{--            <span>نحوه ارسال </span>: <b>{{$order->sendMethod()}}</b>--}}
+
         </div>
     </div>
 

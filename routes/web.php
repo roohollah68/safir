@@ -73,6 +73,10 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'admin', 'safir',
     Route::post('/invoice/{id}', [OrderController::class, 'invoice']);
     Route::post('/orders/dateFilter', [OrderController::class, 'dateFilter']);
 
+    Route::post('/viewOrder/{id}', [OrderController::class, 'viewOrder']);
+
+
+
 });
 
 Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'safir', 'role']], function () {

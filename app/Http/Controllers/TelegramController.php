@@ -229,18 +229,6 @@ class TelegramController extends Controller
 
     public function createOrderMessage($order)
     {
-        $paymentMethods = [
-            'credit' => 'اعتباری',
-            'receipt' => 'رسید واریز',
-            'onDelivery' => 'پرداخت در محل',
-            'admin' => 'ادمین',
-        ];
-        $deliveryMethods = [
-            'peyk' => 'پیک',
-            'post' => 'پست',
-            'paskerayeh' => 'پسکرایه',
-            'admin' => 'ادمین',
-        ];
         $total = number_format($order->total);
         $customerCost = number_format($order->customerCost);
         $time = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
@@ -254,8 +242,8 @@ class TelegramController extends Controller
 توضیحات: {$order->desc}
 مبلغ کل: {$total} ریال
 پرداختی مشتری: {$customerCost} ریال
-نحوه پرداخت: {$paymentMethods[$order->paymentMethod]}
-نحوه ارسال: {$deliveryMethods[$order->deliveryMethod]}
+نحوه پرداخت: {$order->payMethod()}
+نحوه ارسال: {$order->sendMethod()}
 زمان ثبت: {$time}
 سفیر: {$order->user()->first()->name}";
 

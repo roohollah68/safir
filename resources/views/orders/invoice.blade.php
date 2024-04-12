@@ -1,9 +1,9 @@
 <div id="invoice" style="background: white; width: 2100px;height: 2970px;" class="bg-white m-3">
     <div id="invoice-content" class="m-3 p-3">
-        <div>
-                <span class="m-3" style="font-size: 35px; display: flex;position: fixed">&nbsp; صفحه&nbsp;
+        <div class="d-flex">
+                <span class="m-3 w-25" style="font-size: 35px; display:flex;">&nbsp; صفحه&nbsp;
                     {{$page}}  &nbsp;از&nbsp; {{$pages}}</span>
-            <h4 class="text-center m-3 title" id="invoice-title">
+            <h4 class="text-center m-3 title w-50 " id="invoice-title">
                 @if($order->confirm)
                     فاکتور فروش
                 @else
@@ -98,6 +98,10 @@
 
             </div>
             <div class="w-100 normal {{$lastPage}}">
+                نحوه پرداخت: {{$order->payMethod()}}
+                <br>
+                نحوه ارسال: {{$order->sendMethod()}}
+                <br>
                 توضیحات: {{$order->desc}}
                 <br>
             </div>

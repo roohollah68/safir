@@ -30,9 +30,18 @@
     </form>
 
 
-    <label for="deleted_orders">مشاهده سفارشات حذف شده</label>
-    <input type="checkbox" id="deleted_orders"
-           onclick="deleted = $('#deleted_orders').prop('checked');prepare_data()">
+    <label for="deleted_orders"> سفارشات حذف شده</label>
+    <input type="checkbox" id="deleted_orders" class="checkboxradio"
+           onclick="deleted = this.checked;prepare_data()">
+    @if(!$safir)
+        <label for="print-wait"> در انتظار پرینت</label>
+        <input type="checkbox" id="print-wait" class="checkboxradio"
+               onclick="printWait = this.checked;prepare_data()">
+
+        <label for="confirm-wait"> در انتظار تایید</label>
+        <input type="checkbox" id="confirm-wait" class="checkboxradio"
+               onclick="confirmWait = this.checked;prepare_data()">
+    @endif
     <br>
     @if($superAdmin || $print)
         <div class="my-3">

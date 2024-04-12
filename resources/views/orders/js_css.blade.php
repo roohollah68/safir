@@ -10,13 +10,15 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let deleted, user = 'all';
+    let deleted, printWait, confirmWait, user = 'all';
     let role = users[userId].role;
     let globalElement;
     let dtp1Instance;
     let sendMethods = {!!json_encode($sendMethods)!!}
+        let
+    payMethods = {!!json_encode($payMethods)!!}
     $(() => {
-        $("#deleted_orders").checkboxradio();
+        $(".checkboxradio").checkboxradio();
         prepare_data();
 
         const dtp1Instance2 = new mds.MdsPersianDateTimePicker(document.getElementById('date1'), {
@@ -39,8 +41,10 @@
                 return
             if (deleted ^ !!order.deleted_at)
                 return
-            // if (safir && !order.confirm)
-            //     return
+            if (confirmWait && order.confirm)
+                return
+            if (printWait && (!order.confirm || order.state >= 10))
+                return
             if (print && !order.confirm)
                 return
             counter++;
@@ -147,61 +151,18 @@
     }
 
     function view_order(id) {
-        let order = orders[id]
-        let createdDate = new Date(order.created_at);
-        let updatedDate = new Date(order.updated_at);
-        let deletedDate = new Date(order.deleted_at);
-        let paymentMethods = {
-            credit: 'اعتباری',
-            receipt: 'رسید واریز',
-            onDelivery: 'پرداخت در محل',
-            admin: 'ادمین',
-        }
-        let deliveryMethods = {
-            peyk: 'تیپاکس',
-            post: 'پست',
-            paskerayeh: 'پسکرایه',
-            admin: 'ادمین',
-        }
-        let sendMethod = sendMethods[order.state % 10];
-        if (order.state)
-            sendMethod += ' - ارسال شده در : ' + FarsiDate(updatedDate);
-        let dialog = `
-    <div title="مشاهده سفارش" class="dialogs">` +
-            (order.receipt ?
-                `<a href="receipt/${order.receipt}" target="_blank"><img style="width: 300px" src="receipt/${order.receipt}"></a>`
-                :
-                "")
-            + `<span>نام و نام خانوادگی:</span> <b>${order.name}</b> <br>
-    <span>شماره تماس:</span> <b>${order.phone}</b> <br>
-    <span>آدرس:</span> <b>${order.address}</b> <br>
-    <span>کد پستی:</span> <b>${order.zip_code ? order.zip_code : ''}</b> <br>
-    <span>سفارشات:</span> <b>${order.orders}</b> <br>
-    <span>مبلغ کل:</span> <b>${num(order.total)}</b> <b> ریال</b> <br>
-    <span>پرداختی مشتری:</span> <b>${num(order.customerCost)}</b> <b> ریال</b> <br>
-    <span>نحوه پرداخت:</span> <b>${paymentMethods[order.paymentMethod]}</b> <br>
-    <span>نحوه ارسال:</span> <b>${deliveryMethods[order.deliveryMethod]} - ${sendMethod}</b> <br>
-    <span>توضیحات:</span> <b>${order.desc ? order.desc : ''}</b> <br>
-    <span>زمان ثبت:</span> <b>${FarsiDate(createdDate)}</b> <br>
-    <span>زمان آخرین ویرایش:</span> <b>${FarsiDate(updatedDate)}</b> <br>` +
-            (order.deleted_at ?
-                    `<span>زمان حذف:</span> <b>${FarsiDate(deletedDate)}</b> <br>`
-                    :
-                    ""
-            ) + `
-
-</div>
-    `;
-        $(dialog).dialog({
-            modal: true,
-            open: () => {
-                $('.ui-dialog-titlebar-close').hide();
-                $('.ui-widget-overlay').bind('click', function () {
-                    $(".dialogs").dialog('close');
+        $.post('/viewOrder/' + id, {_token: token})
+            .done(res => {
+                $(res).dialog({
+                    modal: true,
+                    open: () => {
+                        $('.ui-dialog-titlebar-close').hide();
+                        $('.ui-widget-overlay').bind('click', function () {
+                            $(".dialogs").dialog('close');
+                        });
+                    }
                 });
-            }
-        });
-
+            })
     }
 
     function createdTime(order) {
@@ -211,7 +172,6 @@
         let diff = (Date.now() - timestamp) / 1000;
         timestamp = `<span class="d-none" id="state_${order.id}">${timestamp}</span>`;
         let text = '';
-        console.log(diff);
         if (diff < 60) {
             text += `<span>لحظاتی پیش</span>`;
         } else if (diff < 3600) {
@@ -250,7 +210,7 @@
         let creatorRole = users[order.user_id].role
 
         let cancelInvoice = `<a class="fa-regular fa-xmark btn btn-danger" onclick="cancelInvoice(${id},this)" title=" رد فاکتور"> </a> `;
-        let generatePDF = `<i class="fa fa-file-pdf btn btn-${order.state > 10 ? 'success' : 'secondary'}" onclick="generatePDF([${id}])" title="دانلود لیبل"></i> `;
+        let generatePDF = `<i class="fa fa-file-pdf btn btn-${+order.state >= 10 ? 'success' : 'secondary'}" onclick="generatePDF([${id}])" title="دانلود لیبل"></i> `;
         let confirmInvoice = `<a class="fa fa-check btn btn-success" onclick="confirmInvoice(${id},this)" title=" تایید فاکتور"></a> `;
         let invoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title=" فاکتور"></a> `;
         let preInvoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title="پیش فاکتور"></a> `;
@@ -300,13 +260,21 @@
             change_state(id, 0);
             return;
         }
-        let dialog = `<div title="نحوه ارسال" class="dialogs">`;
-        dialog += `<p class="btn btn-success" onclick="change_state(${id},1)">${sendMethods[1]}</p><br>`;
-        dialog += `<p class="btn btn-info" onclick="change_state(${id},2)">${sendMethods[2]}</p><br>`;
-        dialog += `<p class="btn btn-primary" onclick="change_state(${id},3)">${sendMethods[3]}</p><br>`;
-        dialog += `<p class="btn btn-secondary" onclick="change_state(${id},4)">${sendMethods[4]}</p><br>`;
-        dialog += `<p class="btn btn-warning" onclick="change_state(${id},5)">${sendMethods[5]}</p><br>`;
-        dialog += `<p class="btn btn-warning" onclick="change_state(${id},6)">${sendMethods[6]}</p><br>`;
+        let dialog = `<div title="نحوه ارسال" class="dialogs" >`;
+        dialog += `@csrf`;
+        dialog += `<p class="btn btn-success" onclick="change_state(${id},1)">${sendMethods[1]}</p> `;
+        dialog += `<p class="btn btn-info" onclick="change_state(${id},2)">${sendMethods[2]}</p> `;
+        dialog += `<p class="btn btn-primary" onclick="change_state(${id},3)">${sendMethods[3]}</p> `;
+        dialog += `<p class="btn btn-secondary" onclick="change_state(${id},4)">${sendMethods[4]}</p> `;
+        dialog += `<p class="btn btn-warning" onclick="change_state(${id},5)">${sendMethods[5]}</p> `;
+        dialog += `<p class="btn btn-warning" onclick="change_state(${id},6)">${sendMethods[6]}</p><br><br><br>`;
+        dialog += `<label for="send-note">یادداشت:</label>`;
+        dialog += `<input id="send-note" name="note" type="text" class="w-100"><br><br>`;
+        // dialog += `<label for="send-file">فایل الحاقی:</label>`;
+        // dialog += `<input id="send-file" name="file" type="file" ><br>`;
+        // dialog += `<input  value="submit" type="submit" ><br>`;
+        dialog += `</div>`;
+
         $(dialog).dialog({
             modal: true,
             open: () => {
@@ -318,14 +286,22 @@
         });
     }
 
-    function change_state(id, sendMethod) {
+    function change_state(id, index) {
+        let note = $('#send-note').val();
+        if (note)
+            note = ' - یادداشت: ' + note;
         $(".dialogs").dialog('destroy').remove();
-        $.post('change_state/' + id, {_token: token, sendMethod: sendMethod})
+
+        $.post('change_state/' + id, {
+            _token: token,
+            state: index,
+            sendMethod: sendMethods[index] + note,
+        })
             .done(res => {
-                orders[id].state = res[0];
+                orders[id].state = +res;
                 $('#view_order_' + id).parent().html(operations(orders[id]));
-                $('#state_' + id).parent().html(createdTime(orders[id]))
-            })
+                $('#state_' + id).parent().html(createdTime(orders[id]));
+            });
     }
 
     function generatePDF(Ids) {
@@ -333,11 +309,11 @@
         $.get('pdfs/' + Ids.toString())
             .done(res => {
                 $('#pdf-link').html("لینک دانلود").attr('href', "{{env('APP_URL')}}" + res)[0].click();
-                $.each(ids, function (index, id) {
+                $.each(Ids, function (index, id) {
                     orders[id].state = orders[id].state % 10 + 10
                     $('#view_order_' + id).parent().html(operations(orders[id]));
                 });
-            })
+            });
     }
 
     function generatePDFs() {
@@ -368,13 +344,18 @@
             return
         globalElement = element;
         let dialog = `<div title="نحوه پرداخت" class="dialogs">`;
-        dialog += `<p class="btn btn-success" onclick="sendConfirm(${id},1)">نقدی</p><br>`;
-        dialog += `<p class="btn btn-info" onclick="sendConfirm(${id},2)">چک</p><br>`;
-        dialog += `<p class="btn btn-primary" onclick="sendConfirm(${id},3)">پرداخت در محل</p><br>`;
-        dialog += `<p class="btn btn-secondary" onclick="sendConfirm(${id},6)">فاکتور به فاکتور</p><br>`;
-        dialog += `<p class="btn btn-warning" onclick="sendConfirm(${id},4)">امانی</p><br>`;
-        dialog += `<p class="btn btn-danger" id="dtp1">پرداخت در تاریخ</p>`;
+        dialog += `<p class="btn btn-success" onclick="sendConfirm(${id},1)">${payMethods[1]}</p><br>`;
+        dialog += `<p class="btn btn-info" onclick="sendConfirm(${id},2)">${payMethods[2]}</p><br>`;
+        dialog += `<p class="btn btn-primary" onclick="sendConfirm(${id},3)">${payMethods[3]}</p><br>`;
+        dialog += `<p class="btn btn-secondary" onclick="sendConfirm(${id},6)">${payMethods[6]}</p><br>`;
+        dialog += `<p class="btn btn-warning" onclick="sendConfirm(${id},4)">${payMethods[4]}</p><br>`;
+        dialog += `<p class="btn btn-danger" id="dtp1">${payMethods[5]}</p>`;
         dialog += `<input type="text" id="dateOfPayment" class="form-control d-none" placeholder="تاریخ پرداخت" data-name="dtp1-text">`;
+
+        dialog += `<br><label for="send-note">یادداشت:</label>`;
+        dialog += `<input id="send-note" name="note" type="text" class="w-100">`;
+
+        dialog += `</div>`;
 
         $(dialog).dialog({
             modal: true,
@@ -395,10 +376,16 @@
         });
     }
 
-    function sendConfirm(id, pay) {
+    function sendConfirm(id, index) {
         let date = $('#dateOfPayment').val();
+        let pay = payMethods[index];
+        if (date)
+            pay = pay + ' ' + date;
+        let note = $('#send-note').val();
+        if (note)
+            pay = pay + ' - یادداشت: ' + note;
         $(".dialogs").dialog('destroy').remove();
-        $.post('confirm_invoice/' + id, {_token: token, pay: pay, date: date})
+        $.post('confirm_invoice/' + id, {_token: token, confirm: index, pay: pay})
             .done(res => {
                 orders[id] = res;
                 $(globalElement).parent().html(operations(orders[id]));

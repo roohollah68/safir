@@ -14,9 +14,11 @@ class WoocommerceController extends Controller
 
         DB::beginTransaction();
 
+        $test = false;
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
         $request = json_decode(file_get_contents('php://input'));
-//        $request = json_decode(file_get_contents('woo/woo' . '605781' . '.html'));
+        if($test)
+            $request = json_decode(file_get_contents('woo/woo' . '463594' . '.html'));
         file_put_contents('woo/woo' . rand(100000, 1000000) . '.html', file_get_contents('php://input'));
         $orders = '';
         $products = array();
@@ -75,8 +77,8 @@ class WoocommerceController extends Controller
             'desc' => $request->customer_note . ' - ' . $request->shipping_lines[0]->method_title . ' - ' . $desc,
             'total' => $request->total,
             'customerCost' => 0,
-            'paymentMethod' => 'admin',
-            'deliveryMethod' => 'admin',
+            'paymentMethod' => $request->payment_method_title,
+            'deliveryMethod' => $request->shipping_lines[0]->method_title,
         ]);
 
 
