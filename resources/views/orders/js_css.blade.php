@@ -10,13 +10,12 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let deleted, printWait, confirmWait, user = 'all';
+    let deleted, printWait, confirmWait, proccessWait, user = 'all';
     let role = users[userId].role;
     let globalElement;
     let dtp1Instance;
-    let sendMethods = {!!json_encode($sendMethods)!!}
-        let
-    payMethods = {!!json_encode($payMethods)!!}
+    let sendMethods = {!!json_encode($sendMethods)!!};
+    let payMethods = {!!json_encode($payMethods)!!};
     $(() => {
         $(".checkboxradio").checkboxradio();
         prepare_data();
@@ -43,7 +42,9 @@
                 return
             if (confirmWait && order.confirm)
                 return
-            if (printWait && (!order.confirm || order.state >= 10))
+            if (printWait && (!order.confirm || order.state))
+                return
+            if (proccessWait && (order.state > 2 || order.state < 1 ))
                 return
             if (print && !order.confirm)
                 return
@@ -76,7 +77,7 @@
                 id
 
             ])
-        })
+        });
         create_table(res);
     }
 
@@ -188,9 +189,11 @@
             text += `<span>${month} ماه قبل </span>`
         }
         if (!order.state || order.deleted_at) {
-            res = timestamp + `<span class="btn btn-secondary" onclick="selectSendMethod(${order.id})">${text}</span>`
+            res = timestamp + `<span class="btn btn-secondary" onclick="change_state(${order.id}, 1)">${text}</span>`
+        } else if (order.state < 3) {
+            res = timestamp + `<span class="btn btn-warning" onclick="selectSendMethod(${order.id})">${text}<i class="fas fa-check"></i></span>`
         } else {
-            res = timestamp + `<span class="btn btn-success" onclick="selectSendMethod(${order.id})">${text}<i class="fas fa-check"></i></span>`
+            res = timestamp + `<span class="btn btn-success" onclick="change_state(${order.id}, 0)">${text}<i class="fas fa-check-double"></i></span>`
         }
         return res;
     }
@@ -210,7 +213,7 @@
         let creatorRole = users[order.user_id].role
 
         let cancelInvoice = `<a class="fa-regular fa-xmark btn btn-danger" onclick="cancelInvoice(${id},this)" title=" رد فاکتور"> </a> `;
-        let generatePDF = `<i class="fa fa-file-pdf btn btn-${+order.state >= 10 ? 'success' : 'secondary'}" onclick="generatePDF([${id}])" title="دانلود لیبل"></i> `;
+        let generatePDF = `<i class="fa fa-file-pdf btn btn-${+order.state > 1 ? 'success' : 'secondary'}" onclick="generatePDF([${id}])" title="دانلود لیبل"></i> `;
         let confirmInvoice = `<a class="fa fa-check btn btn-success" onclick="confirmInvoice(${id},this)" title=" تایید فاکتور"></a> `;
         let invoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title=" فاکتور"></a> `;
         let preInvoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title="پیش فاکتور"></a> `;
@@ -256,20 +259,16 @@
             alert('ابتدا فاکتور باید تایید شود!');
             return;
         }
-        if (orders[id].state) {
-            change_state(id, 0);
-            return;
-        }
         let dialog = `<div title="نحوه ارسال" class="dialogs" >`;
         dialog += `@csrf`;
-        dialog += `<p class="btn btn-success" onclick="change_state(${id},1)">${sendMethods[1]}</p> `;
-        dialog += `<p class="btn btn-info" onclick="change_state(${id},2)">${sendMethods[2]}</p> `;
-        dialog += `<p class="btn btn-primary" onclick="change_state(${id},3)">${sendMethods[3]}</p> `;
-        dialog += `<p class="btn btn-secondary" onclick="change_state(${id},4)">${sendMethods[4]}</p> `;
-        dialog += `<p class="btn btn-warning" onclick="change_state(${id},5)">${sendMethods[5]}</p> `;
-        dialog += `<p class="btn btn-warning" onclick="change_state(${id},6)">${sendMethods[6]}</p><br><br><br>`;
-        dialog += `<label for="send-note">یادداشت:</label>`;
-        dialog += `<input id="send-note" name="note" type="text" class="w-100"><br><br>`;
+        dialog += `<p class="btn btn-success" onclick="setSendMethod(${id},1)">${sendMethods[1]}</p> `;
+        dialog += `<p class="btn btn-info" onclick="setSendMethod(${id},2)">${sendMethods[2]}</p> `;
+        dialog += `<p class="btn btn-secondary" onclick="setSendMethod(${id},4)">${sendMethods[4]}</p> `;
+        dialog += `<p class="btn btn-warning" onclick="setSendMethod(${id},5)">${sendMethods[5]}</p> `;
+        dialog += `<p class="btn btn-warning" onclick="setSendMethod(${id},6)">${sendMethods[6]}</p><br><br><br>`;
+        dialog += `<label for="postCode">کد مرسوله:</label>`;
+        dialog += `<input id="postCode" name="note" type="text" class="w-100"><br>`;
+        dialog += `<p class="btn btn-primary" onclick="setSendMethod(${id},3)">${sendMethods[3]}</p><br> `;
         // dialog += `<label for="send-file">فایل الحاقی:</label>`;
         // dialog += `<input id="send-file" name="file" type="file" ><br>`;
         // dialog += `<input  value="submit" type="submit" ><br>`;
@@ -286,19 +285,33 @@
         });
     }
 
-    function change_state(id, index) {
-        let note = $('#send-note').val();
+    function setSendMethod(id, method) {
+        let note = $('#postCode').val();
         if (note)
-            note = ' - یادداشت: ' + note;
+            note = ' - کد مرسوله: ' + note;
         $(".dialogs").dialog('destroy').remove();
 
-        $.post('change_state/' + id, {
+        $.post('/set_send_method/' + id, {
             _token: token,
-            state: index,
-            sendMethod: sendMethods[index] + note,
+            sendMethod: sendMethods[method] + note,
         })
-            .done(res => {
-                orders[id].state = +res;
+            .done(order => {
+                orders[id] = order;
+                change_state(id, 3)
+            });
+    }
+
+    function change_state(id, state) {
+        if (!orders[id].confirm) {
+            alert('ابتدا فاکتور باید تایید شود!');
+            return;
+        }
+        $.post('/change_state/' + id, {
+            _token: token,
+            state: state,
+        })
+            .done(state => {
+                orders[id].state = +state;
                 $('#view_order_' + id).parent().html(operations(orders[id]));
                 $('#state_' + id).parent().html(createdTime(orders[id]));
             });
@@ -435,11 +448,12 @@
                                     link.href = dataUrl;
                                     link.click();
                                     $('#invoice-wrapper').html('');
+                                    totalPages = 1;
+                                    firstPageItems = 40;
                                 });
                         }
                     });
             })
-
 
     }
     @endif

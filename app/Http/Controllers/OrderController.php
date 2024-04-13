@@ -12,7 +12,7 @@ use App\Models\Province;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PDF;
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 
 class OrderController extends Controller
 {
@@ -147,10 +147,7 @@ class OrderController extends Controller
             } else
                 return $this->errorBack('روش پرداخت به درستی انتخاب نشده است!');
         }
-//        else {
-//            $request->paymentMethod = 'admin';
-//            $request->deliveryMethod = 'admin';
-//        }
+
         $request->total = $total;
 
         $request->customerId = $this->addToCustomers($request);
@@ -325,10 +322,9 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $user = $order->user()->first();
         $order->state = +$req->state;
-        $order->deliveryMethod = $req->sendMethod;
 
         if ($order->paymentMethod == 'onDelivery') {
-            if ($order->state) {
+            if ($order->state == 1) {
                 $user->balance += $order->customerCost - $order->total;
                 $order->transactions()->create([
                     'user_id' => $user->id,
@@ -337,7 +333,7 @@ class OrderController extends Controller
                     'type' => true,
                     'description' => 'سهم سفیر(پرداخت در محل)',
                 ]);
-            } else {
+            } elseif ($order->state == 0) {
                 $user->balance -= $order->customerCost - $order->total;
                 $order->transactions()->create([
                     'user_id' => $user->id,
@@ -354,32 +350,17 @@ class OrderController extends Controller
         return +$order->state;
     }
 
-    public function pdfs($ids)
+    public function pdfs($ids): string
     {
-        $ids = explode(",", $ids);
+        $idArray = explode(",", $ids);
         $fonts = array();
         $orders = array();
-        $locations = array();
-//        $settings = [
-//            'format' => [200, 100],
-//            'default_font' => 'iransans',
-//            'margin_left' => 2,
-//            'margin_right' => 2,
-//            'margin_top' => 2,
-//            'margin_bottom' => 2,
-//        ];
-        foreach ($ids as $id) {
+        foreach ($idArray as $id) {
             $order = Order::findOrFail($id);
-            if (!$order->state)
-                continue;
-            $order->update([
-                'state' => $order->state % 10 + 10
-            ]);
-
-//            if ($order->confirm != 3)
-//                if (is_int(strpos($order->desc, '***')))
-//                    $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
-//
+            if ($order->state == 1)
+                $order->update([
+                    'state' => 2
+                ]);
 
             $font = 32;
             do {
@@ -388,24 +369,17 @@ class OrderController extends Controller
                     $font = 32;
                 }
                 $font = $font - 1;
-                $location = '';
-                if ($order->customer_id) {
-                    $city = $order->customer()->first()->city()->first();
-                    if ($city->id > 0)
-                        $location = $city->province()->first()->name . '- ' . $city->name . '- ';
-                }
-                $pdf = PDF::loadView('pdfs', ['orders' => [$order], 'locations' => [$location], 'fonts' => [$font]], []);
+                $order = $this->addCityToAddress($order);
+                $pdf = PDF::loadView('pdfs', ['orders' => [$order], 'fonts' => [$font]], []);
                 $mpdf = $pdf->getMpdf();
-
-            } while ($mpdf->page > 1);
-            array_push($fonts, $font);
-            array_push($orders, $order);
-            array_push($locations, $location);
+            } while ($mpdf->page > 1 || $font < 5);
+            $fonts[] = $font;
+            $orders[] = $order;
 
         }
 
-        $pdfs = PDF::loadView('pdfs', ['orders' => $orders, 'fonts' => $fonts, 'locations' => $locations], []);
-        $fileName = $order->id . '(' . sizeof($ids) . ').pdf';
+        $pdfs = PDF::loadView('pdfs', ['orders' => $orders, 'fonts' => $fonts], []);
+        $fileName = $ids . '(' . sizeof($idArray) . ').pdf';
         $pdfs->getMpdf()->OutputFile('pdf/' . $fileName);
         return 'pdf/' . $fileName;
     }
@@ -416,9 +390,11 @@ class OrderController extends Controller
             $order = Order::findOrFail($id);
         else
             $order = auth()->user()->orders()->findOrFail($id);
+        $order = $this->addCityToAddress($order);
         if ($request->onlyOrderData) {
             return $order;
         }
+
         $firstPageItems = $request->firstPageItems;
         $totalPages = $request->totalPages;
         $orderProducts = OrderProduct::where('order_id', $id)->get();
@@ -708,6 +684,19 @@ class OrderController extends Controller
             $order = Order::withTrashed()->findOrFail($id);
         else
             $order = auth()->user()->orders()->withTrashed()->findOrFail($id);
+        $order = $this->addCityToAddress($order);
         return view('orders.view', ['order' => $order]);
+    }
+
+    public function setSendMethod($id, Request $req)
+    {
+        DB::beginTransaction();
+        $order = Order::findOrFail($id);
+        if (!$order->deliveryMethod)
+            $order->deliveryMethod = '';
+        $order->deliveryMethod .= ' - ' . $req->sendMethod;
+        $order->save();
+        DB::commit();
+        return $order;
     }
 }

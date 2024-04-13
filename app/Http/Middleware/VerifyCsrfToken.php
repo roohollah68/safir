@@ -15,6 +15,5 @@ class VerifyCsrfToken extends Middleware
         'telegram',
         'deposit/telegram',
         'woocommerce/*',
-        '*'
     ];
 }

@@ -18,8 +18,8 @@ class WoocommerceController extends Controller
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
         $request = json_decode(file_get_contents('php://input'));
         if($test)
-            $request = json_decode(file_get_contents('woo/woo' . '463594' . '.html'));
-        file_put_contents('woo/woo' . rand(100000, 1000000) . '.html', file_get_contents('php://input'));
+            $request = json_decode(file_get_contents('woo/woo' . '968142' . '.html'));
+        file_put_contents('woo/' .verta(null,"Asia/Tehran")->format('Y-n-j_H-i').' _ '.$website.' _ '. $request->billing->first_name . ' ' . $request->billing->last_name . '.txt', file_get_contents('php://input'));
         $orders = '';
         $products = array();
         $text = 'بررسی مطابقت محصولات: ' . $website . ' ' . $request->billing->first_name . ' ' . $request->billing->last_name . '

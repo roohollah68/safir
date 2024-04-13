@@ -35,30 +35,40 @@ class Controller extends BaseController
         return auth()->user()->role;
     }
 
-    public function superAdmin(){
+    public function superAdmin()
+    {
         return auth()->user()->superAdmin();
     }
 
-    public function admin(){
+    public function admin()
+    {
         return auth()->user()->admin();
     }
 
-    public function safir(){
+    public function safir()
+    {
         return auth()->user()->safir();
     }
 
-    public function print(){
+    public function print()
+    {
         return auth()->user()->print();
     }
 
-    public function warehouse(){
+    public function warehouse()
+    {
         return auth()->user()->warehouse();
     }
 
-//    public function userId()
-//    {
-//        return auth()->user()->id;
-//    }
+    public function addCityToAddress($order)
+    {
+        if ($order->customer_id) {
+            $city = $order->customer()->first()->city()->first();
+            if ($city->id > 0)
+                $order->address = $city->province()->first()->name . '- ' . $city->name . '- ' . $order->address;
+        }
+        return $order;
+    }
 
     public function settings()
     {
@@ -95,7 +105,7 @@ class Controller extends BaseController
     public function sendTextToBale($text, $chatId)
     {
         $bot = new BaleAPIv2(env('BaleToken'));
-        $array = array('chat_id' =>$chatId , "text" => $text);
+        $array = array('chat_id' => $chatId, "text" => $text);
         return json_decode($bot->sendText($array));
     }
 
@@ -113,15 +123,17 @@ class Controller extends BaseController
         return json_decode($bot->sendDocument($array));
     }
 
-    public function deleteFromBale($chatId , $message_id){
+    public function deleteFromBale($chatId, $message_id)
+    {
         $bot = new BaleAPIv2(env('BaleToken'));
         return json_decode($bot->deleteMessage([
-        "message_id"=>$message_id,
-        "chat_id"=>$chatId,
+            "message_id" => $message_id,
+            "chat_id" => $chatId,
         ]));
     }
 
-    public function editText($content){
+    public function editText($content)
+    {
         $bot = new BaleAPIv2(env('BaleToken'));
         return json_decode($bot->editText($content));
     }

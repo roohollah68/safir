@@ -93,6 +93,7 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'safir', 'role']]
 Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'print', 'role']], function () {
 
     Route::post('change_state/{id}', [OrderController::class, 'changeState']);
+    Route::post('/set_send_method/{id}', [OrderController::class, 'setSendMethod']);
 
     Route::post('pdf/{id}', [OrderController::class, 'pdf']);
     Route::get('pdfs/{ids}', [OrderController::class, 'pdfs']);

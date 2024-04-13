@@ -41,6 +41,10 @@
         <label for="confirm-wait"> در انتظار تایید</label>
         <input type="checkbox" id="confirm-wait" class="checkboxradio"
                onclick="confirmWait = this.checked;prepare_data()">
+
+        <label for="proccess-wait"> در حال پردازش</label>
+        <input type="checkbox" id="proccess-wait" class="checkboxradio"
+               onclick="proccessWait = this.checked;prepare_data()">
     @endif
     <br>
     @if($superAdmin || $print)
