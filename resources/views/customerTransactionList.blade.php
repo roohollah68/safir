@@ -55,8 +55,9 @@
                                title="مشاهده فاکتور"></a>
                             <a class="fa fa-file-invoice-dollar btn btn-secondary"
                                onclick="invoice({{$tran->order_id}})" title=" فاکتور"></a>
-                            <a class="btn btn-danger fa fa-trash" onclick="cancelInvoice({{$tran->order_id}})"
-                               title="حذف فاکتور"></a>
+
+{{--                            <a class="btn btn-danger fa fa-trash" onclick="cancelInvoice({{$tran->order_id}})"--}}
+{{--                               title="حذف فاکتور"></a>--}}
                             @if(!$tran->paymentLink)
                                 <a class="btn btn-outline-success"
                                    href="/customerDeposit/add/{{$customer->id}}/{{$tran->id}}">پرداخت فاکتور </a>

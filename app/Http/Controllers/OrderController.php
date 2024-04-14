@@ -471,7 +471,6 @@ class OrderController extends Controller
         if (!$order->confirm || $order->state)
             return $order;
         $order->confirm = false;
-        $order->desc = substr($order->desc, 0, strpos($order->desc, '***'));
         $order->save();
         $order->orderProducts()->update(['verified' => false]);
         foreach ($order->productChange()->get() as $productChange) {
