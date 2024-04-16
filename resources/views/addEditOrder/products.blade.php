@@ -1,4 +1,19 @@
 @if( $creator || !$edit)
+    <br>
+    <span>مکان انبار: </span>
+    <a class="btn btn-info location-key"
+       onclick="$('.product-row').hide();$('.location-t').show();$('.location-key').addClass('btn-outline-info').removeClass('btn-info'); $(this).addClass('btn-info').removeClass('btn-outline-info')">تهران</a>
+    <a class="btn btn-outline-info location-key"
+       onclick="$('.product-row').hide();$('.location-f').show();$('.location-key').addClass('btn-outline-info').removeClass('btn-info'); $(this).addClass('btn-info').removeClass('btn-outline-info')">فریمان</a>
+    <a class="btn btn-outline-info location-key"
+       onclick="$('.product-row').hide();$('.location-m').show();$('.location-key').addClass('btn-outline-info').removeClass('btn-info'); $(this).addClass('btn-info').removeClass('btn-outline-info')">مشهد</a>
+    <style>
+        .location-m, .location-f {
+            display: none;
+        }
+    </style>
+    <br>
+
     <div id="products" class="my-4">
         <table class="stripe" id="product-table">
             <thead>
@@ -12,7 +27,7 @@
             <tbody>
             @foreach($products as $product)
                 @if($product->available)
-                    <tr>
+                    <tr class="product-row location-{{$product->location}}">
                         {{--محصول--}}
                         <td>{{$product->name}}</td>
 
@@ -21,7 +36,7 @@
                         <td>
                             <span class="btn btn-primary fa fa-plus" onclick="num_plus({{$product->id}})"></span>
                             <input class="product-number"
-                            name="product_{{$product->id}}" id="product_{{$product->id}}"
+                                   name="product_{{$product->id}}" id="product_{{$product->id}}"
                                    onchange="num_product({{$product->id}},this.value)"
                                    type="number" value="{{old("product_".$product->id)}}" style="width: 50px" min="0">
                             <span class="btn btn-primary fa fa-minus" onclick="num_minus({{$product->id}})"></span>
@@ -35,15 +50,15 @@
                                    value="{{$product->priceWithDiscount}}"
                                    onchange="calculate_discount({{$product->id}},this.value)"
                                    @if(!$creator)
-                                   disabled
+                                       disabled
                                 @endif
                             >
                             <span class=" btn text-danger original"
                                   @if($product->priceWithDiscount!=$product->price)
-                                  style="text-decoration: line-through"
+                                      style="text-decoration: line-through"
                                   @endif
                                   @if($creator)
-                                  onclick="$('#price_{{$product->id}} .discount').val('{{number_format($product->price)}}').change()"
+                                      onclick="$('#price_{{$product->id}} .discount').val('{{number_format($product->price)}}').change()"
                                             @endif
                                         >
                                             {{number_format($product->price)}}
@@ -60,13 +75,13 @@
                                    style="width: 80px"
                                    onchange="changeDiscount({{$product->id}},this.value)"
                                    @if(!$creator)
-                                   disabled
+                                       disabled
                                    @endif
                                    min="0" max="100" step="0.25">
                             @if($creator)
                                 <a class="btn btn-outline-info fa fa-plus" dir="ltr"
                                    onclick="$('#discount_{{$product->id}}').val(+$('#discount_{{$product->id}}').val()+5).change()">5
-                                <i class="fa fa-percent"></i>
+                                    <i class="fa fa-percent"></i>
                                 </a>
                             @endif
                         </td>

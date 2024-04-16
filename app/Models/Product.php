@@ -19,6 +19,7 @@ class Product extends Model
         'category',
         'high_alarm',
         'productPrice',
+        'location'
     ];
 
     public function orderProducts()

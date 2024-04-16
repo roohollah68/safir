@@ -28,9 +28,9 @@
                     </div>
                     <input type="text" id="name" class="form-control" name="name"
                            @if($product)
-                           value="{{$product->name}}"
+                               value="{{$product->name}}"
                            @else
-                           value="{{old('name')}}"
+                               value="{{old('name')}}"
                            @endif required>
                 </div>
             </div>
@@ -42,9 +42,9 @@
                     </div>
                     <input type="text" id="price" class="form-control price-input" name="price"
                            @if($product)
-                           value="{{old('price')?:$product->price}}"
+                               value="{{old('price')?:$product->price}}"
                            @else
-                           value="{{old('price')}}"
+                               value="{{old('price')}}"
                            @endif required>
                     <div class="input-group-append" style="min-width: 120px">
                         <label for="price" class="input-group-text w-100">ریال</label>
@@ -59,13 +59,33 @@
                     </div>
                     <input type="text" id="PPrice" class="form-control price-input" name="PPrice"
                            @if($product)
-                           value="{{old('PPrice')?:$product->productPrice}}"
+                               value="{{old('PPrice')?:$product->productPrice}}"
                            @else
-                           value="{{old('PPrice')}}"
-                           @endif>
+                               value="{{old('PPrice')}}"
+                        @endif>
                     <div class="input-group-append" style="min-width: 120px">
                         <label for="PPrice" class="input-group-text w-100">ریال</label>
                     </div>
+                </div>
+            </div>
+            {{--مکان انبار--}}
+            <div class="col-md-6">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="PPrice" class="input-group-text w-100">مکان انبار:</label>
+                    </div>
+                    <select name="location" id="location" >
+                        @if($product)
+                            <option value="t" @if($product->location == 't') selected @endif>تهران</option>
+                            <option value="m" @if($product->location == 'm') selected @endif>مشهد</option>
+                            <option value="f" @if($product->location == 'f') selected @endif>فریمان</option>
+                        @else
+                            <option value="t" selected>تهران</option>
+                            <option value="m">مشهد</option>
+                            <option value="f">فریمان</option>
+                        @endif
+                    </select>
+
                 </div>
             </div>
             {{--اصلاح موجودی--}}
@@ -237,6 +257,7 @@
 
             @endif
         });
+
         function deleteRecord(id) {
             if (confirm('آیا از حذف رکورد اطمینان دارید؟')) {
                 // $.get('/productQuantity/delete/'+id);
@@ -248,7 +269,8 @@
         #navailable.ui-state-active {
             background: #ff0000;
         }
-        .deleted{
+
+        .deleted {
             display: none;
         }
     </style>

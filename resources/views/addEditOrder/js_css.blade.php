@@ -12,6 +12,7 @@
     let province = {!!json_encode($province)!!};
     let submit = false;
     let creator = !!'{{$creator}}';
+
     $(function () {
         setTimeout(function () {
             $("#errors").hide()

@@ -65,6 +65,7 @@ class ProductController extends Controller
             'quantity' => $req->quantity,
             'alarm' => $req->alarm,
             'high_alarm' => $req->high_alarm,
+            'location' => $req->location,
         ]);
         if ($req->quantity > 0) {
             $product->productChange()->create([
@@ -111,6 +112,7 @@ class ProductController extends Controller
         $product->high_alarm = $req->high_alarm;
         $product->available = ($req->available == 'true');
         $product->category = $req->category;
+        $product->location = $req->location;
         $product->save();
         if ($productChange->change != 0)
             $productChange->save();
