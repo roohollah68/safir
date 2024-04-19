@@ -555,7 +555,7 @@ class OrderController extends Controller
             'phone' => $request->phone,
             'address' => $request->address,
             'zip_code' => $request->zip_code,
-            'category' => $request->category,
+            'category' => $request->category?:0,
             'city_id' => $request->city_id,
         ];
         if (!$request->addToCustomers && ($this->superAdmin() || $this->admin())) {

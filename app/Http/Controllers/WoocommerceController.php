@@ -14,12 +14,11 @@ class WoocommerceController extends Controller
 
         DB::beginTransaction();
 
-        $test = false;
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
         $request = json_decode(file_get_contents('php://input'));
-        if($test)
-            $request = json_decode(file_get_contents('woo/woo' . '968142' . '.html'));
-        file_put_contents('woo/' .verta(null,"Asia/Tehran")->format('Y-n-j_H-i').' _ '.$website.' _ '. $request->billing->first_name . ' ' . $request->billing->last_name . '.txt', file_get_contents('php://input'));
+        if (env('APP_ENV') == 'local')
+            $request = json_decode(file_get_contents('woo/1403-1-31_12-45 _ berrynocom _ مرتضی اسکندرپور.txt'));
+        file_put_contents('woo/' . verta(null, "Asia/Tehran")->format('Y-n-j_H-i') . ' _ ' . $website . ' _ ' . $request->billing->first_name . ' ' . $request->billing->last_name . '.txt', file_get_contents('php://input'));
         $orders = '';
         $products = array();
         $text = 'بررسی مطابقت محصولات: ' . $website . ' ' . $request->billing->first_name . ' ' . $request->billing->last_name . '
@@ -74,7 +73,7 @@ class WoocommerceController extends Controller
             'address' => $request->billing->city . ' ' . $request->billing->address_1,
             'zip_code' => $request->billing->postcode,
             'orders' => $orders,
-            'desc' => $request->customer_note . ' - '  . $desc,
+            'desc' => $request->customer_note . ($desc ? ' - ' . $desc : ''),
             'total' => $request->total,
             'customerCost' => 0,
             'paymentMethod' => $request->payment_method_title,
