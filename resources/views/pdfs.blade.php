@@ -1,36 +1,37 @@
 @foreach($orders as $index => $order)
     @if($index != 0)
         <pagebreak>
-    @endif
-    <html lang="fa" dir="rtl">
-    <div style="font-size: {{$fonts[$index]}}pt;">
-        <div style=" line-height: {{round($fonts[$index]*1.33*1.5)}}px ;">
-            <span>نام و نام خانوادگی </span>: <b>{{$order->name}}</b> <br>
-            <span>شماره تماس </span>: <b>{{$order->phone}}</b>&nbsp;&nbsp;&nbsp;
-
-            @if($order->zip_code)
-
-                <span>کد پستی </span>: <b>{{$order->zip_code}}</b>
             @endif
-            <br>
+            <html lang="fa" dir="rtl">
+            <div style="font-size: {{$fonts[$index]}}pt;">
+                <div style=" line-height: {{round($fonts[$index]*1.33*1.5)}}px ;">
+                    <span>نام و نام خانوادگی </span>: <b>{{$order->name}}</b> <br>
+                    <span>شماره تماس </span>: <b>{{$order->phone}}</b>&nbsp;&nbsp;&nbsp;
 
-            <span>آدرس </span>: <b>{{$order->address}}</b>
-            <br>
-            @if($order->orders)
-                <span>سفارشات </span>: <b>{{$order->orders}}</b>
-            @endif
+                    @if($order->zip_code)
 
-            @if($order->desc)
-                <br><span>توضیحات </span>: <b>{{$order->desc}}</b>
-            @endif
-{{--            <br>--}}
-{{--            <span>نحوه ارسال </span>: <b>{{$order->sendMethod()}}</b>--}}
+                        <span>کد پستی </span>: <b>{{$order->zip_code}}</b>
+                    @endif
+                    <br>
 
-        </div>
-    </div>
+                    <span>آدرس </span>: <b>{{$order->address}}</b>
+                    <br>
+                    @if($order->orders)
+                        <span>سفارشات </span>: <b>{{$order->orders}}</b>
+                    @endif
 
-    </html>
+                    @if($order->desc)
+                        <br><span>توضیحات </span>: <b>{{$order->desc}}</b>
+                    @endif
+                    @if($order->user()->first()->safir())
+                        <br>
+                        <span>نحوه ارسال </span>: <b>{{$order->sendMethod()}}</b>
+                    @endif
+                </div>
+            </div>
 
-@endforeach
+            </html>
+
+        @endforeach
 
 

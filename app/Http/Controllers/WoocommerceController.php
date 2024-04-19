@@ -74,7 +74,7 @@ class WoocommerceController extends Controller
             'address' => $request->billing->city . ' ' . $request->billing->address_1,
             'zip_code' => $request->billing->postcode,
             'orders' => $orders,
-            'desc' => $request->customer_note . ' - ' . $request->shipping_lines[0]->method_title . ' - ' . $desc,
+            'desc' => $request->customer_note . ' - '  . $desc,
             'total' => $request->total,
             'customerCost' => 0,
             'paymentMethod' => $request->payment_method_title,
