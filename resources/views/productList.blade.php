@@ -60,8 +60,8 @@
     <input type="checkbox" name="col-quantity" id="col-quantity" checked>
     <label class="btn btn-secondary" for="col-quantity">موجودی</label>
 
-    <input type="checkbox" name="col-location" id="col-location" >
-    <label class="btn btn-secondary" for="col-location">مکان انبار</label>
+{{--    <input type="checkbox" name="col-location" id="col-location" >--}}
+{{--    <label class="btn btn-secondary" for="col-location">مکان انبار</label>--}}
 
     <input type="checkbox" name="col-alarm" id="col-alarm">
     <label class="btn btn-secondary" for="col-alarm">حد پایین</label>
@@ -82,7 +82,7 @@
             <th class="col-price">قیمت(ریال)</th>
             <th class="col-productPrice">قیمت تولید</th>
             <th class="col-quantity">موجودی</th>
-            <th class="col-quantity">مکان انبار</th>
+{{--            <th class="col-quantity">مکان انبار</th>--}}
             <th class="col-alarm">حد پایین</th>
             <th class="col-high_alarm">حد بالا</th>
             <th class="col-available">وضعیت</th>
@@ -115,13 +115,13 @@
                         <input type="number" name="quantity" value="{{+$product->quantity}}" style="width: 60px;"
                                disabled>
                     </td>
-                    <td class="col-location">
-                        <select name="location" id="location" disabled>
-                            <option value="t" @if($product->location == 't') selected @endif>تهران</option>
-                            <option value="m" @if($product->location == 'm') selected @endif>مشهد</option>
-                            <option value="f" @if($product->location == 'f') selected @endif>فریمان</option>
-                        </select>
-                    </td>
+{{--                    <td class="col-location">--}}
+{{--                        <select name="location" id="location" disabled>--}}
+{{--                            <option value="t" @if($product->location == 't') selected @endif>تهران</option>--}}
+{{--                            <option value="m" @if($product->location == 'm') selected @endif>مشهد</option>--}}
+{{--                            <option value="f" @if($product->location == 'f') selected @endif>فریمان</option>--}}
+{{--                        </select>--}}
+{{--                    </td>--}}
                     <td class="col-alarm">
                         <input type="number" name="alarm" value="{{$product->alarm}}" style="width: 60px;" disabled>
                     </td>
@@ -175,7 +175,7 @@
         function draw() {
             $('#product-table').DataTable({
                 order: [[3, "desc"]],
-                paging: false,
+                pageLength: 100,
                 destroy: true,
             });
         }
@@ -205,7 +205,7 @@
             $('#col-price')[0].checked ? '' : $('.col-price').hide();
             $('#col-productPrice')[0].checked ? '' : $('.col-productPrice').hide();
             $('#col-quantity')[0].checked ? '' : $('.col-quantity').hide();
-            $('#col-location')[0].checked ? '' : $('.col-location').hide();
+            // $('#col-location')[0].checked ? '' : $('.col-location').hide();
             $('#col-alarm')[0].checked ? '' : $('.col-alarm').hide();
             $('#col-high_alarm')[0].checked ? '' : $('.col-high_alarm').hide();
             $('#col-available')[0].checked ? '' : $('.col-available').hide();
@@ -232,7 +232,7 @@
                 high_alarm: $(tag + ' input[name=high_alarm]').val(),
                 available: $(tag + ' input[name=available]').prop('checked'),
                 category: $(tag + ' input[name=category]').val(),
-                location:$(tag + ' select[name=location]').val(),
+                // location:$(tag + ' select[name=location]').val(),
                 addType: 'value',
                 fast: true,
             })

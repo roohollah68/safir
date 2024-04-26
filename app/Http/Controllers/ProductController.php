@@ -13,8 +13,15 @@ class ProductController extends Controller
     {
         $city = $req->city?:'t';
 
-//        $products = Product::all()->keyBy('id');
-        $products = Product::where('location',$city)->get()->keyBy('id');
+        $products = Product::all()->keyBy('id');
+        foreach ($products as $index=>$product) {
+            if ($city == 'm') {
+                $products[$index]->quantity = $product->quantity_m;
+            } else if ($city == 'f') {
+                $products[$index]->quantity = $product->quantity_f;
+            }
+        }
+//        $products = Product::where('location',$city)->get()->keyBy('id');
         return view('productList', [
             'products' => $products,
             'location' => $city,

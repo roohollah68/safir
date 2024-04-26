@@ -33,13 +33,15 @@ class OrderController extends Controller
             'orders' => $orders,
             'userId' => auth()->user()->id,
             'limit' => $this->settings()->loadOrders,
-//            'sendMethods' => $orders->first()->sendMethods(),
         ]);
     }
 
     public function newForm()
     {
         $user = auth()->user();
+        $order = new Order();
+
+        //استثنا آقای عبدی
         if (($this->superAdmin() || $this->admin()) && $user->id != 57) {
             $products = Product::where('category', '<>', 'pack')->get()->keyBy('id');
             $customersData = Customer::all();
@@ -51,7 +53,7 @@ class OrderController extends Controller
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
         }
-        $order = new Order();
+
         $customers = $customersData->keyBy('name');
         $customersId = $customersData->keyBy('id');
         $customer = new Customer();
@@ -85,6 +87,7 @@ class OrderController extends Controller
             'address' => 'required|string|min:3',
             'phone' => 'required|string|min:11,max:11',
         ]);
+
         $request->phone = $this->number_Fa_En($request->phone); //تبدیل اعداد فارسی به انگلیسی
         $request->zip_code = $this->number_Fa_En($request->zip_code); //تبدیل اعداد فارسی به انگلیسی
 
@@ -94,18 +97,18 @@ class OrderController extends Controller
         $Total = 0;     //جمع بدون احتساب تخفیف
         $total = 0;  //جمع با احتساب تخفیف
         $request->customerCost = 0;
-        $admin = $this->superAdmin() || $this->admin();
         $request->orderList = [];
-        $counter = 0;
+
         foreach ($products as $id => $product) {
             $number = $request['product_' . $id];
             if ($number > 0) {
                 $request->orders .= ' ' . $product->name . ' ' . +$number . 'عدد' . '،';
-                $counter++;
-                $coupon = $this->calculateDis($id);
-                if ($admin)
-                    $coupon = $request['discount_' . $id];
-                $price = round((100 - $coupon) * $product->price / 100);
+                $discount = +$this->calculateDis($id);
+                if ($this->superAdmin() || $this->admin())
+                    $discount = +$request['discount_' . $id];
+                $price = round((100 - $discount) * $product->price / 100);
+                if ($this->superAdmin() && $discount == 0)
+                    $price = +str_replace(",", "", $request['price_' . $id]);
                 $total += $price * $number;
                 $Total += $product->price * $number;
                 $request->orderList[$id] = [
@@ -114,12 +117,12 @@ class OrderController extends Controller
                     'photo' => $product->photo,
                     'product_id' => $product->id,
                     'number' => $number,
-                    'discount' => $coupon,
-                    'verified' => !$admin,
+                    'discount' => $discount,
+                    'verified' => $this->safir(),
                 ];
             }
         }
-        if (!count($request->orderList)) {
+        if ($request->orders == '') {
             return $this->errorBack('محصولی انتخاب نشده است!');
         }
 
@@ -188,11 +191,12 @@ class OrderController extends Controller
             $order = Order::findOrFail($id);
         else
             $order = $user->orders()->findOrFail($id);
-        $creator = !$order->user()->first()->safir();
+        $creatorIsAdmin = !$order->user()->first()->safir();
 
-        if ($order->state || ($order->confirm && $creator))
+        if ($order->state || ($order->confirm && $creatorIsAdmin))
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
 
+        //استثنا آقای عبدی
         if (($this->superAdmin() || $this->admin()) && $user->id != 57) {
             $products = Product::where('category', '<>', 'pack')->get()->keyBy('id');
             $customersData = Customer::all();
@@ -233,7 +237,7 @@ class OrderController extends Controller
             'settings' => $this->settings(),
             'id' => $user->id,
             'cart' => $cart,
-            'creator' => $creator,
+            'creator' => $creatorIsAdmin,
             'customer' => $customer,
             'cities' => $cities,
             'citiesId' => $citiesId,
@@ -265,25 +269,28 @@ class OrderController extends Controller
             $products = Product::where('available', true)->get()->keyBy('id');
             $productOrders = $order->orderProducts()->get()->keyBy('product_id');
             $total = 0;
-            $counter = 0;
+
             foreach ($products as $id => $product) {
                 $number = $request['product_' . $id];
                 if ($number > 0) {
-                    $coupon = $request['discount_' . $id];
-                    $total += round((100 - $coupon) * $product->price * $number / 100);
-                    $counter++;
+                    $coupon = +$request['discount_' . $id];
+                    $price = round((100 - $coupon) * $product->price / 100);
+                    if ($this->superAdmin() && $coupon == 0) {
+                        $price = +str_replace(",", "", $request['price_' . $id]);
+                    }
+                    $total += $price * $number;
                     $orders .= ' ' . $product->name . ' ' . +$number . 'عدد' . '،';
                     if (isset($productOrders[$id]))
                         $productOrders[$id]->update([
                             'discount' => $request['discount_' . $id],
                             'number' => $number,
-                            'price' => round((100 - $request['discount_' . $id]) * $product->price / 100),
+                            'price' => $price,
                         ]);
                     else
                         $order->orderProducts()->create([
                             'discount' => $request['discount_' . $id],
                             'number' => $number,
-                            'price' => round((100 - $request['discount_' . $id]) * $product->price / 100),
+                            'price' => $price,
                             'name' => $product->name,
                             'product_id' => $id,
                         ]);
@@ -555,7 +562,7 @@ class OrderController extends Controller
             'phone' => $request->phone,
             'address' => $request->address,
             'zip_code' => $request->zip_code,
-            'category' => $request->category?:0,
+            'category' => $request->category ?: 0,
             'city_id' => $request->city_id,
         ];
         if (!$request->addToCustomers && ($this->superAdmin() || $this->admin())) {

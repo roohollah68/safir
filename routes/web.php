@@ -149,4 +149,7 @@ Route::get('/list', [ProductController::class, 'productsList']);
 
 Route::get('/clear/route', [SettingController::class, 'clearRoute']);
 
+Route::get('/command', [SettingController::class, 'command']);
+
+
 require __DIR__ . '/auth.php';

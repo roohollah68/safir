@@ -2,18 +2,24 @@
     <br>
     <span>مکان انبار: </span>
     <a class="btn btn-info location-key"
-       onclick="$('.product-row').hide();$('.location-t').show();$('.location-key').addClass('btn-outline-info').removeClass('btn-info'); $(this).addClass('btn-info').removeClass('btn-outline-info')">تهران</a>
+       onclick="$('.WA').hide();$('.WT').show();highlightKey(this,'t');">تهران</a>
     <a class="btn btn-outline-info location-key"
-       onclick="$('.product-row').hide();$('.location-f').show();$('.location-key').addClass('btn-outline-info').removeClass('btn-info'); $(this).addClass('btn-info').removeClass('btn-outline-info')">فریمان</a>
+       onclick="$('.WA').hide();$('.WF').show();highlightKey(this,'f');">فریمان</a>
     <a class="btn btn-outline-info location-key"
-       onclick="$('.product-row').hide();$('.location-m').show();$('.location-key').addClass('btn-outline-info').removeClass('btn-info'); $(this).addClass('btn-info').removeClass('btn-outline-info')">مشهد</a>
+       onclick="$('.WA').hide();$('.WM').show();highlightKey(this,'m');">مشهد</a>
     <style>
-        .location-m, .location-f {
+        .WF, .WM {
             display: none;
         }
     </style>
     <br>
-
+    <script>
+        function highlightKey(e,city){
+            $('.location-key').addClass('btn-outline-info').removeClass('btn-info'); $(e).addClass('btn-info').removeClass('btn-outline-info')
+            $('#city').val(city);
+        }
+    </script>
+<input id="city" type="hidden" name="city" value="t">
     <div id="products" class="my-4">
         <table class="stripe" id="product-table">
             <thead>
@@ -27,7 +33,7 @@
             <tbody>
             @foreach($products as $product)
                 @if($product->available)
-                    <tr class="product-row location-{{$product->location}}">
+                    <tr>
                         {{--محصول--}}
                         <td>{{$product->name}}</td>
 
@@ -40,25 +46,28 @@
                                    onchange="num_product({{$product->id}},this.value)"
                                    type="number" value="{{old("product_".$product->id)}}" style="width: 50px" min="0">
                             <span class="btn btn-primary fa fa-minus" onclick="num_minus({{$product->id}})"></span>
-                            <span class="btn btn-outline-info">{{+$product->quantity}}</span>
+                            <span class="btn btn-outline-info WA WT">{{+$product->quantity}}</span>
+                            <span class="btn btn-outline-info WA WM">{{+$product->quantity_m}}</span>
+                            <span class="btn btn-outline-info WA WF">{{+$product->quantity_f}}</span>
                         </td>
 
                         {{--قیمت(ریال)--}}
                         <td id="price_{{$product->id}}">
 
                             <input type="text" class="price-input text-success discount" style="width: 80px;"
+                                   name="price_{{$product->id}}"
                                    value="{{$product->priceWithDiscount}}"
                                    onchange="calculate_discount({{$product->id}},this.value)"
-                                   @if(!$creator)
-                                       disabled
+                                   @if(!$superAdmin)
+                                   disabled
                                 @endif
                             >
                             <span class=" btn text-danger original"
                                   @if($product->priceWithDiscount!=$product->price)
-                                      style="text-decoration: line-through"
+                                  style="text-decoration: line-through"
                                   @endif
                                   @if($creator)
-                                      onclick="$('#price_{{$product->id}} .discount').val('{{number_format($product->price)}}').change()"
+                                  onclick="$('#price_{{$product->id}} .discount').val('{{number_format($product->price)}}').change(); $('#discount_{{$product->id}}').val(0).change();"
                                             @endif
                                         >
                                             {{number_format($product->price)}}
@@ -75,7 +84,7 @@
                                    style="width: 80px"
                                    onchange="changeDiscount({{$product->id}},this.value)"
                                    @if(!$creator)
-                                       disabled
+                                   disabled
                                    @endif
                                    min="0" max="100" step="0.25">
                             @if($creator)
