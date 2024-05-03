@@ -13,7 +13,7 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            @if($superAdmin || $admin || $safir)
+            @if( $admin || $safir)
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('newOrder')}}">ایجاد سفارش</a>
                 </li>
@@ -78,7 +78,7 @@
         }
     }
     #navbar .nav-link:hover , #navbar .navbar-brand:hover{
-        color: green;
+        color: black;
     }
 
     #navbar {

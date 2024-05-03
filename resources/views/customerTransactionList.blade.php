@@ -9,8 +9,12 @@
     <br>
     <div class="w-100 m-2 p-2 bg-info rounded">
         <span>نام مشتری:</span> <b>{{$customer->name}}</b><br>
+        @if($superAdmin)
+        <span>نام کاربر مرتبط:</span> <b>{{$customer->user()->first()->name}}</b><br>
+        @endif
         <span>شماره مشتری:</span> <b>{{$customer->id}}</b><br>
         <span>شماره تماس:</span> <b>{{$customer->phone}}</b><br>
+        <span>شهر:</span> <b>{{$customer->cityName()}}</b><br>
         <span>آدرس:</span> <b>{{$customer->address}}</b><br>
         <span>کد پستی:</span> <b>{{$customer->zip_code}}</b><br>
         <span class="h3">بدهکاری:</span> <b dir="ltr"

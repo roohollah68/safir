@@ -14,6 +14,12 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    public $city = [
+        't'=>['تهران' , 'quantity'],
+        'm'=>['مشهد','quantity_m'],
+        'f'=>['فریمان', 'quantity_f']
+    ];
+
     public function number_Fa_En($Number)
     {
         foreach (['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'] as $en => $fa) {
@@ -78,6 +84,17 @@ class Controller extends BaseController
             $res[$set->name] = $set->value;
         }
         return (object)$res;
+    }
+
+    public function city($user)
+    {
+        if($user->city == 't')
+            return ['تهران' , 'quantity'];
+        if($user->city == 'f')
+            return ['فریمان', 'quantity_f'];
+        if($user->city == 'm')
+            return ['مشهد','quantity_m'];
+        return ['',''];
     }
 
     public function errorBack($error)

@@ -12,12 +12,20 @@ class CouponController extends Controller
 {
     public function couponList()
     {
-        return view('coupons', ['coupons' => Coupon::with('couponLinks')->get(), 'users' => User::all()->keyBy('id'), 'products' => Product::all()->keyBy('id')]);
+        return view('coupons', [
+            'coupons' => Coupon::with('couponLinks')->get(),
+            'users' => User::all()->keyBy('id'),
+            'products' => Product::where('location', 't')->get()->keyBy('id')
+        ]);
     }
 
     public function newForm()
     {
-        return view('addEditCoupon', ['coupon' => false, 'users' => User::all(), 'products' => Product::all()]);
+        return view('addEditCoupon', [
+            'coupon' => false,
+            'users' => User::where('role','user')->get(),
+            'products' => Product::where('location', 't')->where('category', 'final')->get(),
+        ]);
     }
 
     public function storeNew(Request $req)
@@ -31,10 +39,10 @@ class CouponController extends Controller
         ]);
 
         $users = User::all();
-        $products = Product::all();
+        $products = Product::where('location', 't')->get();
         foreach ($users as $user) {
             foreach ($products as $product) {
-                if ($req['user_'.$user->id] && $req['product_'.$product->id]) {
+                if ($req['user_' . $user->id] && $req['product_' . $product->id]) {
                     $coupon->couponLinks()->create([
                         'user_id' => $user->id,
                         'product_id' => $product->id,
@@ -48,10 +56,14 @@ class CouponController extends Controller
 
     public function editForm($id)
     {
-        return view('addEditCoupon', ['coupon' => Coupon::with('couponLinks')->find($id), 'users' => User::all(), 'products' => Product::all()]);
+        return view('addEditCoupon', [
+            'coupon' => Coupon::with('couponLinks')->find($id),
+            'users' => User::all(),
+            'products' => Product::where('location', 't')->get()
+        ]);
     }
 
-    public function update(Request $req , $id)
+    public function update(Request $req, $id)
     {
         request()->validate([
             'percent' => 'required|numeric|min:0|max:99'
@@ -61,13 +73,13 @@ class CouponController extends Controller
             'percent' => $req->percent
         ]);
 
-        CouponLink::where('coupon_id' , $id)->delete();
+        CouponLink::where('coupon_id', $id)->delete();
 
         $users = User::all();
-        $products = Product::all();
+        $products = Product::where('location', 't')->get();
         foreach ($users as $user) {
             foreach ($products as $product) {
-                if ($req['user_'.$user->id] && $req['product_'.$product->id]) {
+                if ($req['user_' . $user->id] && $req['product_' . $product->id]) {
                     $coupon->couponLinks()->create([
                         'user_id' => $user->id,
                         'product_id' => $product->id,
@@ -82,6 +94,6 @@ class CouponController extends Controller
     public function deleteCoupon($id)
     {
         Coupon::destroy($id);
-        CouponLink::where('coupon_id' , $id)->delete();
+        CouponLink::where('coupon_id', $id)->delete();
     }
 }

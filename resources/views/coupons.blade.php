@@ -37,11 +37,13 @@
                     {{$coupon->percent}}
                 </td>
                 <td>
+
                     @foreach($user_names as $user_name)
                         {{$user_name}},
                     @endforeach
                 </td>
                 <td>
+
                     @foreach($product_names as $product_name)
                         {{$product_name}},
                     @endforeach

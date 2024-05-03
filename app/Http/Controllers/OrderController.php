@@ -36,18 +36,21 @@ class OrderController extends Controller
         ]);
     }
 
-    public function newForm()
+    public function newForm(Request $req)
     {
+        if ($this->superAdmin())
+            return redirect()->back();
+        $city = $req->city ?: 't';
+        if($this->safir())
+            $city = 't';
         $user = auth()->user();
         $order = new Order();
 
-        //استثنا آقای عبدی
+        $customersData = $user->customers()->get();
         if (($this->superAdmin() || $this->admin()) && $user->id != 57) {
-            $products = Product::where('category', '<>', 'pack')->get()->keyBy('id');
-            $customersData = Customer::all();
+            $products = Product::where('category', '<>', 'pack')->where('location', $city)->get()->keyBy('id');
         } else {
-            $products = Product::where('category', 'final')->where('price', '>', '1')->get()->keyBy('id');
-            $customersData = $user->customers()->get();
+            $products = Product::where('category', 'final')->where('location', $city)->where('price', '>', '1')->get()->keyBy('id');
         }
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
@@ -67,7 +70,7 @@ class OrderController extends Controller
             'customersId' => $customersId,
             'products' => $products,
             'settings' => $this->settings(),
-            'id' => $user->id,
+            'user' => $user,
             'cart' => (object)[],
             'creator' => ($this->superAdmin() || $this->admin()),
             'order' => $order,
@@ -75,11 +78,13 @@ class OrderController extends Controller
             'cities' => $cities,
             'citiesId' => $citiesId,
             'province' => $province,
+            'location' => $city,
         ]);
     }
 
     public function insertOrder(Request $request)
     {
+
         DB::beginTransaction();
         request()->validate([
             'receipt' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
@@ -107,8 +112,8 @@ class OrderController extends Controller
                 if ($this->superAdmin() || $this->admin())
                     $discount = +$request['discount_' . $id];
                 $price = round((100 - $discount) * $product->price / 100);
-                if ($this->superAdmin() && $discount == 0)
-                    $price = +str_replace(",", "", $request['price_' . $id]);
+                if (($this->superAdmin() || $this->admin()) && $discount == 0)
+                    $price = max(+str_replace(",", "", $request['price_' . $id]),$product->price);
                 $total += $price * $number;
                 $Total += $product->price * $number;
                 $request->orderList[$id] = [
@@ -196,13 +201,12 @@ class OrderController extends Controller
         if ($order->state || ($order->confirm && $creatorIsAdmin))
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
 
+        $customersData = $user->customers()->get();
         //استثنا آقای عبدی
         if (($this->superAdmin() || $this->admin()) && $user->id != 57) {
-            $products = Product::where('category', '<>', 'pack')->get()->keyBy('id');
-            $customersData = Customer::all();
+            $products = Product::where('category', '<>', 'pack')->where('location', $order->location)->get()->keyBy('id');
         } else {
-            $products = Product::where('category', 'final')->where('price', '>', '1')->get()->keyBy('id');
-            $customersData = $user->customers()->get();
+            $products = Product::where('category', 'final')->where('location', $order->location)->where('price', '>', '1')->get()->keyBy('id');
         }
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
@@ -242,10 +246,11 @@ class OrderController extends Controller
             'cities' => $cities,
             'citiesId' => $citiesId,
             'province' => $province,
+            'location' => $order->location,
         ]);
     }
 
-    public function editOrder($id, Request $request)
+    public function update($id, Request $request)
     {
         DB::beginTransaction();
 
@@ -275,7 +280,7 @@ class OrderController extends Controller
                 if ($number > 0) {
                     $coupon = +$request['discount_' . $id];
                     $price = round((100 - $coupon) * $product->price / 100);
-                    if ($this->superAdmin() && $coupon == 0) {
+                    if (($this->superAdmin()|| $this->admin()) && $coupon == 0) {
                         $price = +str_replace(",", "", $request['price_' . $id]);
                     }
                     $total += $price * $number;
@@ -368,6 +373,8 @@ class OrderController extends Controller
                 $order->update([
                     'state' => 2
                 ]);
+            if ($order->location != 't')
+                $order->desc .= '(انبار ' . $this->city[$order->location][0] . ')';
 
             $font = 32;
             $order = $this->addCityToAddress($order);
@@ -383,7 +390,6 @@ class OrderController extends Controller
             } while ($mpdf->page > 1 || $font < 5);
             $fonts[] = $font;
             $orders[] = $order;
-
         }
 
         $pdfs = PDF::loadView('pdfs', ['orders' => $orders, 'fonts' => $fonts], []);
@@ -392,17 +398,19 @@ class OrderController extends Controller
         return 'pdf/' . $fileName;
     }
 
-    public function invoice($id, Request $request)
+    public function invoice($id, Request $request): array
     {
         if ($this->superAdmin() || $this->print())
             $order = Order::findOrFail($id);
         else
             $order = auth()->user()->orders()->findOrFail($id);
         $order = $this->addCityToAddress($order);
+        if ($order->location != 't')
+            $order->desc .= '(انبار ' . $this->city[$order->location][0] . ')';
         if ($request->onlyOrderData) {
             return $order;
         }
-
+        $order->city = $this->city($order->user()->first())[0];
         $firstPageItems = $request->firstPageItems;
         $totalPages = $request->totalPages;
         $orderProducts = OrderProduct::where('order_id', $id)->get();
@@ -445,7 +453,7 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         $order = Order::findOrFail($id);
-        if ($order->confirm || $order->state)
+        if ($order->confirm)
             return $order;
         $order->paymentMethod = $request->pay;
         $order->confirm = +$request->confirm;
@@ -454,6 +462,7 @@ class OrderController extends Controller
         $orderProducts->update(['verified' => true]);
         foreach ($orderProducts->get() as $orderProduct) {
             $product = $orderProduct->product()->first();
+
             $product->update([
                 'quantity' => $product->quantity - $orderProduct->number,
             ]);
@@ -475,8 +484,10 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
         $order = Order::findOrFail($id);
-        if (!$order->confirm || $order->state)
+        if (!$order->confirm)
             return $order;
+        if ($order->state)
+            $order->state = 4;
         $order->confirm = false;
         $order->save();
         $order->orderProducts()->update(['verified' => false]);
@@ -485,8 +496,16 @@ class OrderController extends Controller
             $product->update([
                 'quantity' => $product->quantity - $productChange->change,
             ]);
+            $productChange->update(['isDeleted' => true]);
+            $order->productChange()->create([
+                'product_id' => $product->id,
+                'change' => -$productChange->change,
+                'quantity' => $product->quantity,
+                'desc' => 'لغو خرید مشتری ' . $order->name,
+                'isDeleted' => true,
+            ]);
         }
-        $order->productChange()->delete();
+//        $order->productChange()->delete();
         $this->removeFromCustomerTransactions($order);
         $this->deleteFromBale(env('GroupId'), $order->bale_id);
         DB::commit();
@@ -662,6 +681,7 @@ class OrderController extends Controller
             'deliveryMethod' => $request->deliveryMethod,
             'customer_id' => $request->customerId,
             'confirm' => $this->safir(),
+            'location' => $request->location,
         ]);
     }
 

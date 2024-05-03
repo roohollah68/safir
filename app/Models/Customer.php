@@ -65,4 +65,9 @@ class Customer extends Model
     {
         return $this->belongsTo(City::class);
     }
+
+    public function cityName()
+    {
+        return $this->city()->first()->name;
+    }
 }

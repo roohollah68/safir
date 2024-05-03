@@ -27,7 +27,8 @@ class Order extends Model
         'deliveryMethod',
         'admin',
         'customer_id',
-        'bale_id'
+        'bale_id',
+        'location',
     ];
 
     public function user()

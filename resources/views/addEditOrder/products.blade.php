@@ -1,25 +1,11 @@
 @if( $creator || !$edit)
     <br>
-    <span>مکان انبار: </span>
-    <a class="btn btn-info location-key"
-       onclick="$('.WA').hide();$('.WT').show();highlightKey(this,'t');">تهران</a>
-    <a class="btn btn-outline-info location-key"
-       onclick="$('.WA').hide();$('.WF').show();highlightKey(this,'f');">فریمان</a>
-    <a class="btn btn-outline-info location-key"
-       onclick="$('.WA').hide();$('.WM').show();highlightKey(this,'m');">مشهد</a>
-    <style>
-        .WF, .WM {
-            display: none;
-        }
-    </style>
-    <br>
-    <script>
-        function highlightKey(e,city){
-            $('.location-key').addClass('btn-outline-info').removeClass('btn-info'); $(e).addClass('btn-info').removeClass('btn-outline-info')
-            $('#city').val(city);
-        }
-    </script>
-<input id="city" type="hidden" name="city" value="t">
+    @if(!$safir)
+        <a class="btn {{$location == 't'?'btn-info':'btn-outline-info'}}" href="/add_order?city=t">تهران</a>
+        <a class="btn {{$location == 'f'?'btn-info':'btn-outline-info'}}" href="/add_order?city=f">فریمان</a>
+        <a class="btn {{$location == 'm'?'btn-info':'btn-outline-info'}}" href="/add_order?city=m">مشهد</a>
+        <br>
+    @endif
     <div id="products" class="my-4">
         <table class="stripe" id="product-table">
             <thead>
@@ -46,9 +32,9 @@
                                    onchange="num_product({{$product->id}},this.value)"
                                    type="number" value="{{old("product_".$product->id)}}" style="width: 50px" min="0">
                             <span class="btn btn-primary fa fa-minus" onclick="num_minus({{$product->id}})"></span>
-                            <span class="btn btn-outline-info WA WT">{{+$product->quantity}}</span>
-                            <span class="btn btn-outline-info WA WM">{{+$product->quantity_m}}</span>
-                            <span class="btn btn-outline-info WA WF">{{+$product->quantity_f}}</span>
+                            <span class="btn btn-outline-info ">{{+$product->quantity}}</span>
+
+
                         </td>
 
                         {{--قیمت(ریال)--}}
@@ -58,16 +44,16 @@
                                    name="price_{{$product->id}}"
                                    value="{{$product->priceWithDiscount}}"
                                    onchange="calculate_discount({{$product->id}},this.value)"
-                                   @if(!$superAdmin)
-                                   disabled
+                                   @if($safir)
+                                       disabled
                                 @endif
                             >
                             <span class=" btn text-danger original"
                                   @if($product->priceWithDiscount!=$product->price)
-                                  style="text-decoration: line-through"
+                                      style="text-decoration: line-through"
                                   @endif
                                   @if($creator)
-                                  onclick="$('#price_{{$product->id}} .discount').val('{{number_format($product->price)}}').change(); $('#discount_{{$product->id}}').val(0).change();"
+                                      onclick="$('#price_{{$product->id}} .discount').val('{{number_format($product->price)}}').change(); $('#discount_{{$product->id}}').val(0).change();"
                                             @endif
                                         >
                                             {{number_format($product->price)}}
@@ -84,7 +70,7 @@
                                    style="width: 80px"
                                    onchange="changeDiscount({{$product->id}},this.value)"
                                    @if(!$creator)
-                                   disabled
+                                       disabled
                                    @endif
                                    min="0" max="100" step="0.25">
                             @if($creator)

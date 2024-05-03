@@ -29,14 +29,14 @@ class Venue extends AbstractInlineQueryResult
      *
      * @var array
      */
-    static protected $requiredParams = ['type', 'id', 'latitude', 'longitude', 'title', 'address'];
+    protected static $requiredParams = ['type', 'id', 'latitude', 'longitude', 'title', 'address'];
 
     /**
      * {@inheritdoc}
      *
      * @var array
      */
-    static protected $map = [
+    protected static $map = [
         'type' => true,
         'id' => true,
         'latitude' => true,
@@ -44,9 +44,9 @@ class Venue extends AbstractInlineQueryResult
         'title' => true,
         'address' => true,
         'foursquare_id' => true,
-        'thumb_url' => true,
-        'thumb_width' => true,
-        'thumb_height' => true,
+        'thumbnail_url' => true,
+        'thumbnail_width' => true,
+        'thumbnail_height' => true,
         'reply_markup' => InlineKeyboardMarkup::class,
         'input_message_content' => InputMessageContent::class,
     ];
@@ -75,35 +75,35 @@ class Venue extends AbstractInlineQueryResult
     /**
      * Optional. Thumbnail width
      *
-     * @var string
+     * @var string|null
      */
     protected $address;
 
     /**
      * Optional. Url of the thumbnail for the result
      *
-     * @var string
+     * @var string|null
      */
-    protected $thumbUrl;
+    protected $thumbnailUrl;
 
     /**
      * Optional. Thumbnail width
      *
-     * @var int
+     * @var int|null
      */
-    protected $thumbWidth;
+    protected $thumbnailWidth;
 
     /**
      * Optional. Thumbnail height
      *
-     * @var int
+     * @var int|null
      */
-    protected $thumbHeight;
+    protected $thumbnailHeight;
 
     /**
      * Optional. Foursquare identifier of the venue if known
      *
-     * @var int
+     * @var string|null
      */
     protected $foursquareId;
 
@@ -115,10 +115,10 @@ class Venue extends AbstractInlineQueryResult
      * @param float $longitude
      * @param string $title
      * @param string $address
-     * @param string $thumbUrl
-     * @param int $thumbWidth
-     * @param int $thumbHeight
-     * @param string $foursquareId
+     * @param string|null $thumbnailUrl
+     * @param int|null $thumbnailWidth
+     * @param int|null $thumbnailHeight
+     * @param string|null $foursquareId
      * @param InlineKeyboardMarkup|null $inlineKeyboardMarkup
      * @param InputMessageContent|null $inputMessageContent
      */
@@ -128,9 +128,9 @@ class Venue extends AbstractInlineQueryResult
         $longitude,
         $title,
         $address,
-        $thumbUrl = null,
-        $thumbWidth = null,
-        $thumbHeight = null,
+        $thumbnailUrl = null,
+        $thumbnailWidth = null,
+        $thumbnailHeight = null,
         $foursquareId = null,
         $inputMessageContent = null,
         $inlineKeyboardMarkup = null
@@ -140,9 +140,9 @@ class Venue extends AbstractInlineQueryResult
         $this->latitude = $latitude;
         $this->longitude = $longitude;
         $this->address = $address;
-        $this->thumbUrl = $thumbUrl;
-        $this->thumbWidth = $thumbWidth;
-        $this->thumbHeight = $thumbHeight;
+        $this->thumbnailUrl = $thumbnailUrl;
+        $this->thumbnailWidth = $thumbnailWidth;
+        $this->thumbnailHeight = $thumbnailHeight;
         $this->foursquareId = $foursquareId;
     }
 
@@ -156,6 +156,8 @@ class Venue extends AbstractInlineQueryResult
 
     /**
      * @param float $latitude
+     *
+     * @return void
      */
     public function setLatitude($latitude)
     {
@@ -172,6 +174,8 @@ class Venue extends AbstractInlineQueryResult
 
     /**
      * @param float $longitude
+     *
+     * @return void
      */
     public function setLongitude($longitude)
     {
@@ -179,7 +183,7 @@ class Venue extends AbstractInlineQueryResult
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAddress()
     {
@@ -187,7 +191,9 @@ class Venue extends AbstractInlineQueryResult
     }
 
     /**
-     * @param string $address
+     * @param string|null $address
+     *
+     * @return void
      */
     public function setAddress($address)
     {
@@ -195,7 +201,7 @@ class Venue extends AbstractInlineQueryResult
     }
 
     /**
-     * @return int
+     * @return string|null
      */
     public function getFoursquareId()
     {
@@ -203,7 +209,9 @@ class Venue extends AbstractInlineQueryResult
     }
 
     /**
-     * @param int $foursquareId
+     * @param string|null $foursquareId
+     *
+     * @return void
      */
     public function setFoursquareId($foursquareId)
     {
@@ -211,50 +219,122 @@ class Venue extends AbstractInlineQueryResult
     }
 
     /**
-     * @return string
+     * @return string|null
+     */
+    public function getThumbnailUrl()
+    {
+        return $this->thumbnailUrl;
+    }
+
+    /**
+     * @param string|null $thumbnailUrl
+     *
+     * @return void
+     */
+    public function setThumbnailUrl($thumbnailUrl)
+    {
+        $this->thumbnailUrl = $thumbnailUrl;
+    }
+
+    /**
+     * @deprecated Use getThumbnailUrl
+     *
+     * @return string|null
      */
     public function getThumbUrl()
     {
-        return $this->thumbUrl;
+        return $this->getThumbnailUrl();
     }
 
     /**
-     * @param string $thumbUrl
+     * @deprecated Use setThumbnailUrl
+     *
+     * @param string|null $thumbUrl
+     *
+     * @return void
      */
     public function setThumbUrl($thumbUrl)
     {
-        $this->thumbUrl = $thumbUrl;
+        $this->setThumbnailUrl($thumbUrl);
     }
 
     /**
-     * @return int
+     * @return int|null
+     */
+    public function getThumbnailWidth()
+    {
+        return $this->thumbnailWidth;
+    }
+
+    /**
+     * @param int|null $thumbnailWidth
+     *
+     * @return void
+     */
+    public function setThumbnailWidth($thumbnailWidth)
+    {
+        $this->thumbnailWidth = $thumbnailWidth;
+    }
+
+    /**
+     * @deprecated Use getThumbnailWidth
+     *
+     * @return int|null
      */
     public function getThumbWidth()
     {
-        return $this->thumbWidth;
+        return $this->getThumbnailWidth();
     }
 
     /**
-     * @param int $thumbWidth
+     * @deprecated Use setThumbnailWidth
+     *
+     * @param int|null $thumbWidth
+     *
+     * @return void
      */
     public function setThumbWidth($thumbWidth)
     {
-        $this->thumbWidth = $thumbWidth;
+        $this->setThumbnailWidth($thumbWidth);
     }
 
     /**
-     * @return int
+     * @return int|null
+     */
+    public function getThumbnailHeight()
+    {
+        return $this->thumbnailHeight;
+    }
+
+    /**
+     * @param int|null $thumbnailHeight
+     *
+     * @return void
+     */
+    public function setThumbnailHeight($thumbnailHeight)
+    {
+        $this->thumbnailHeight = $thumbnailHeight;
+    }
+
+    /**
+     * @deprecated Use getThumbnailHeight
+     *
+     * @return int|null
      */
     public function getThumbHeight()
     {
-        return $this->thumbHeight;
+        return $this->getThumbnailHeight();
     }
 
     /**
-     * @param int $thumbHeight
+     * @deprecated Use setThumbnailWidth
+     *
+     * @param int|null $thumbHeight
+     *
+     * @return void
      */
     public function setThumbHeight($thumbHeight)
     {
-        $this->thumbHeight = $thumbHeight;
+        $this->setThumbnailHeight($thumbHeight);
     }
 }

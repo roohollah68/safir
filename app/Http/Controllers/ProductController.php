@@ -11,17 +11,8 @@ class ProductController extends Controller
 {
     public function showProducts(Request $req)
     {
-        $city = $req->city?:'t';
-
-        $products = Product::all()->keyBy('id');
-        foreach ($products as $index=>$product) {
-            if ($city == 'm') {
-                $products[$index]->quantity = $product->quantity_m;
-            } else if ($city == 'f') {
-                $products[$index]->quantity = $product->quantity_f;
-            }
-        }
-//        $products = Product::where('location',$city)->get()->keyBy('id');
+        $city = $req->city ?: 't';
+        $products = Product::where('location', $city)->get()->keyBy('id');
         return view('productList', [
             'products' => $products,
             'location' => $city,
@@ -30,18 +21,19 @@ class ProductController extends Controller
 
     public function showAddForm()
     {
-        return view('addEditProduct', ['product' => false]);
+        $product = new Product();
+        return view('addEditProduct', [
+            'product' => $product,
+            'edit' => false,
+        ]);
     }
 
     public function showEditForm($id)
     {
         $product = Product::findOrfail($id);
-        $productChanges = $product->productChange()->get()->keyBy('id');
-        foreach ($productChanges as $id => $productChange)
-            $productChanges[$id]->created_at = verta($productChange->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
         return view('addEditProduct', [
             'product' => $product,
-            'productChanges' => $productChanges,
+            'edit' => true,
         ]);
     }
 
@@ -59,9 +51,8 @@ class ProductController extends Controller
             $photo = $req->file("photo")->store("", 'p-photo');
         }
 
-        $available = false;
-        if ($req->available == 'true')
-            $available = true;
+        $available = $req->available == 'true';
+
         $product = Product::create([
             'name' => $req->name,
             'price' => $req->price,
@@ -69,10 +60,10 @@ class ProductController extends Controller
             'available' => $available,
             'photo' => $photo,
             'category' => $req->category,
+            'location' => $req->location,
             'quantity' => $req->quantity,
             'alarm' => $req->alarm,
             'high_alarm' => $req->high_alarm,
-            'location' => $req->location,
         ]);
         if ($req->quantity > 0) {
             $product->productChange()->create([

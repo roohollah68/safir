@@ -44,7 +44,7 @@
                 return
             if (printWait && (!order.confirm || order.state))
                 return
-            if (proccessWait && (order.state > 2 || order.state < 1 ))
+            if (proccessWait && (order.state > 4 || order.state < 1))
                 return
             if (print && !order.confirm)
                 return
@@ -188,10 +188,15 @@
             let month = Math.floor(diff / (3600 * 24 * 30));
             text += `<span>${month} ماه قبل </span>`
         }
-        if (!order.state || order.deleted_at) {
+
+        if (order.deleted_at) {
+            res = timestamp + `<span class="btn btn-secondary">${text}</span>`
+        } else if (!order.state) {
             res = timestamp + `<span class="btn btn-secondary" onclick="change_state(${order.id}, 1)">${text}</span>`
         } else if (order.state < 3) {
             res = timestamp + `<span class="btn btn-warning" onclick="selectSendMethod(${order.id})">${text}<i class="fas fa-check"></i></span>`
+        } else if (+order.state === 4) {
+            res = timestamp + `<span class="btn btn-danger" onclick="change_state(${order.id}, ${order.confirm ? 1 : 0})">${text}<i class="fas fa-question"></i></span>`
         } else {
             res = timestamp + `<span class="btn btn-success" onclick="change_state(${order.id}, 0)">${text}<i class="fas fa-check-double"></i></span>`
         }
@@ -218,8 +223,10 @@
         let invoice = `<a class="fa fa-file-invoice-dollar btn btn-info text-success" onclick="invoice(${id})" title=" فاکتور"></a> `;
         let preInvoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title="پیش فاکتور"></a> `;
 
-        if (!order.state && (!order.confirm || creatorRole === 'user') && !print)
-            res += deleteOrder + editOrder;
+        if (!order.state)
+            res += deleteOrder;
+        if (!order.confirm || creatorRole === 'user')
+            res += editOrder;
 
         if ((print || superAdmin) && order.state)
             res += generatePDF
@@ -227,13 +234,12 @@
         if (creatorRole !== 'user') {
             if (order.confirm) {
                 res += invoice;
-                if (!print && !order.state)
+                if (order.state < 10)
                     res += cancelInvoice;
 
             } else {
                 res += preInvoice;
-                if (!print)
-                    res += confirmInvoice;
+                res += confirmInvoice;
             }
         }
         @endif
@@ -297,12 +303,12 @@
         })
             .done(order => {
                 orders[id] = order;
-                change_state(id, 3)
+                change_state(id, 10)
             });
     }
 
     function change_state(id, state) {
-        if (!orders[id].confirm) {
+        if (!orders[id].confirm && +orders[id].state !== 4) {
             alert('ابتدا فاکتور باید تایید شود!');
             return;
         }
@@ -353,7 +359,7 @@
     @if($admin || $superAdmin)
 
     function confirmInvoice(id, element) {
-        if (orders[id].state)
+        if (orders[id].confirm)
             return
         globalElement = element;
         let dialog = `<div title="نحوه پرداخت" class="dialogs">`;
@@ -401,7 +407,8 @@
         $.post('confirm_invoice/' + id, {_token: token, confirm: index, pay: pay})
             .done(res => {
                 orders[id] = res;
-                $(globalElement).parent().html(operations(orders[id]));
+                $('#view_order_' + id).parent().html(operations(orders[id]));
+                $('#state_' + id).parent().html(createdTime(orders[id]));
             })
     }
 
@@ -410,7 +417,8 @@
             $.post('cancel_invoice/' + id, {_token: token})
                 .done(res => {
                     orders[id] = res;
-                    $(element).parent().html(operations(orders[id]));
+                    $('#view_order_' + id).parent().html(operations(orders[id]));
+                    $('#state_' + id).parent().html(createdTime(orders[id]));
                 });
         }
 

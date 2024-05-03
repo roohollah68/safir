@@ -18,19 +18,19 @@ class Video extends AbstractInlineQueryResult
      *
      * @var array
      */
-    static protected $requiredParams = ['type', 'id', 'video_url', 'mime_type', 'thumb_url', 'title'];
+    protected static $requiredParams = ['type', 'id', 'video_url', 'mime_type', 'thumbnail_url', 'title'];
 
     /**
      * {@inheritdoc}
      *
      * @var array
      */
-    static protected $map = [
+    protected static $map = [
         'type' => true,
         'id' => true,
         'video_url' => true,
         'mime_type' => true,
-        'thumb_url' => true,
+        'thumbnail_url' => true,
         'title' => true,
         'caption' => true,
         'description' => true,
@@ -65,21 +65,21 @@ class Video extends AbstractInlineQueryResult
     /**
      * Optional. Video width
      *
-     * @var int
+     * @var int|null
      */
     protected $videoWidth;
 
     /**
      * Optional. Video height
      *
-     * @var int
+     * @var int|null
      */
     protected $videoHeight;
 
     /**
      * Optional. Video duration in seconds
      *
-     * @var int
+     * @var int|null
      */
     protected $videoDuration;
 
@@ -88,29 +88,28 @@ class Video extends AbstractInlineQueryResult
      *
      * @var string
      */
-    protected $thumbUrl;
+    protected $thumbnailUrl;
 
     /**
      * Optional. Short description of the result
      *
-     * @var string
+     * @var string|null
      */
     protected $caption;
 
     /**
      * Optional. Short description of the result
      *
-     * @var string
+     * @var string|null
      */
     protected $description;
-
 
     /**
      * Video constructor
      *
      * @param string $id
      * @param string $videoUrl
-     * @param string $thumbUrl
+     * @param string $thumbnailUrl
      * @param string $mimeType
      * @param string $title
      * @param string|null $caption
@@ -124,7 +123,7 @@ class Video extends AbstractInlineQueryResult
     public function __construct(
         $id,
         $videoUrl,
-        $thumbUrl,
+        $thumbnailUrl,
         $mimeType,
         $title,
         $caption = null,
@@ -136,9 +135,9 @@ class Video extends AbstractInlineQueryResult
         $inlineKeyboardMarkup = null
     ) {
         parent::__construct($id, $title, $inputMessageContent, $inlineKeyboardMarkup);
-        
+
         $this->videoUrl = $videoUrl;
-        $this->thumbUrl = $thumbUrl;
+        $this->thumbnailUrl = $thumbnailUrl;
         $this->caption = $caption;
         $this->description = $description;
         $this->mimeType = $mimeType;
@@ -146,7 +145,6 @@ class Video extends AbstractInlineQueryResult
         $this->videoHeight = $videoHeight;
         $this->videoDuration = $videoDuration;
     }
-
 
     /**
      * @return string
@@ -158,6 +156,8 @@ class Video extends AbstractInlineQueryResult
 
     /**
      * @param string $videoUrl
+     *
+     * @return void
      */
     public function setVideoUrl($videoUrl)
     {
@@ -174,6 +174,8 @@ class Video extends AbstractInlineQueryResult
 
     /**
      * @param string $mimeType
+     *
+     * @return void
      */
     public function setMimeType($mimeType)
     {
@@ -181,7 +183,7 @@ class Video extends AbstractInlineQueryResult
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getVideoWidth()
     {
@@ -189,7 +191,9 @@ class Video extends AbstractInlineQueryResult
     }
 
     /**
-     * @param int $videoWidth
+     * @param int|null $videoWidth
+     *
+     * @return void
      */
     public function setVideoWidth($videoWidth)
     {
@@ -197,7 +201,7 @@ class Video extends AbstractInlineQueryResult
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getVideoHeight()
     {
@@ -205,7 +209,9 @@ class Video extends AbstractInlineQueryResult
     }
 
     /**
-     * @param int $videoHeight
+     * @param int|null $videoHeight
+     *
+     * @return void
      */
     public function setVideoHeight($videoHeight)
     {
@@ -213,7 +219,7 @@ class Video extends AbstractInlineQueryResult
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getVideoDuration()
     {
@@ -221,7 +227,9 @@ class Video extends AbstractInlineQueryResult
     }
 
     /**
-     * @param int $videoDuration
+     * @param int|null $videoDuration
+     *
+     * @return void
      */
     public function setVideoDuration($videoDuration)
     {
@@ -229,23 +237,47 @@ class Video extends AbstractInlineQueryResult
     }
 
     /**
-     * @return mixed
+     * @return string
+     */
+    public function getThumbnailUrl()
+    {
+        return $this->thumbnailUrl;
+    }
+
+    /**
+     * @param string $thumbnailUrl
+     *
+     * @return void
+     */
+    public function setThumbnailUrl($thumbnailUrl)
+    {
+        $this->thumbnailUrl = $thumbnailUrl;
+    }
+
+    /**
+     * @deprecated Use getThumbnailUrl
+     *
+     * @return string
      */
     public function getThumbUrl()
     {
-        return $this->thumbUrl;
+        return $this->getThumbnailUrl();
     }
 
     /**
-     * @param mixed $thumbUrl
+     * @deprecated Use setThumbnailUrl
+     *
+     * @param string $thumbUrl
+     *
+     * @return void
      */
     public function setThumbUrl($thumbUrl)
     {
-        $this->thumbUrl = $thumbUrl;
+        $this->setThumbnailUrl($thumbUrl);
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCaption()
     {
@@ -253,7 +285,9 @@ class Video extends AbstractInlineQueryResult
     }
 
     /**
-     * @param string $caption
+     * @param string|null $caption
+     *
+     * @return void
      */
     public function setCaption($caption)
     {
@@ -261,7 +295,7 @@ class Video extends AbstractInlineQueryResult
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -269,7 +303,9 @@ class Video extends AbstractInlineQueryResult
     }
 
     /**
-     * @param string $description
+     * @param string|null $description
+     *
+     * @return void
      */
     public function setDescription($description)
     {

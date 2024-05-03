@@ -54,7 +54,7 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'admin', 'safir',
     Route::post('add_order', [OrderController::class, 'insertOrder']);
 
     Route::get('edit_order/{id}', [OrderController::class, 'editForm']);
-    Route::post('edit_order/{id}', [OrderController::class, 'editOrder']);
+    Route::post('edit_order/{id}', [OrderController::class, 'update']);
 
     Route::post('delete_order/{id}', [OrderController::class, 'deleteOrder']);
 

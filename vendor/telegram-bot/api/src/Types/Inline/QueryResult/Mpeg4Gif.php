@@ -20,20 +20,20 @@ class Mpeg4Gif extends AbstractInlineQueryResult
      *
      * @var array
      */
-    static protected $requiredParams = ['type', 'id', 'mpeg4_url', 'thumb_url'];
+    protected static $requiredParams = ['type', 'id', 'mpeg4_url', 'thumbnail_url'];
 
     /**
      * {@inheritdoc}
      *
      * @var array
      */
-    static protected $map = [
+    protected static $map = [
         'type' => true,
         'id' => true,
         'mpeg4_url' => true,
         'mpeg4_width' => true,
         'mpeg4_height' => true,
-        'thumb_url' => true,
+        'thumbnail_url' => true,
         'title' => true,
         'caption' => true,
         'reply_markup' => InlineKeyboardMarkup::class,
@@ -57,14 +57,14 @@ class Mpeg4Gif extends AbstractInlineQueryResult
     /**
      * Optional. Video width
      *
-     * @var int
+     * @var int|null
      */
     protected $mpeg4Width;
 
     /**
      * Optional. Video height
      *
-     * @var int
+     * @var int|null
      */
     protected $mpeg4Height;
 
@@ -73,12 +73,12 @@ class Mpeg4Gif extends AbstractInlineQueryResult
      *
      * @var string
      */
-    protected $thumbUrl;
+    protected $thumbnailUrl;
 
     /**
      * Optional. Caption of the MPEG-4 file to be sent, 0-200 characters
      *
-     * @var string
+     * @var string|null
      */
     protected $caption;
 
@@ -87,7 +87,7 @@ class Mpeg4Gif extends AbstractInlineQueryResult
      *
      * @param string $id
      * @param string $mpeg4Url
-     * @param string $thumbUrl
+     * @param string $thumbnailUrl
      * @param int|null $mpeg4Width
      * @param int|null $mpeg4Height
      * @param string|null $caption
@@ -98,7 +98,7 @@ class Mpeg4Gif extends AbstractInlineQueryResult
     public function __construct(
         $id,
         $mpeg4Url,
-        $thumbUrl,
+        $thumbnailUrl,
         $title = null,
         $caption = null,
         $mpeg4Width = null,
@@ -109,12 +109,11 @@ class Mpeg4Gif extends AbstractInlineQueryResult
         parent::__construct($id, $title, $inputMessageContent, $inlineKeyboardMarkup);
 
         $this->mpeg4Url = $mpeg4Url;
-        $this->thumbUrl = $thumbUrl;
+        $this->thumbnailUrl = $thumbnailUrl;
         $this->mpeg4Width = $mpeg4Width;
         $this->mpeg4Height = $mpeg4Height;
         $this->caption = $caption;
     }
-
 
     /**
      * @return string
@@ -126,6 +125,8 @@ class Mpeg4Gif extends AbstractInlineQueryResult
 
     /**
      * @param string $mpeg4Url
+     *
+     * @return void
      */
     public function setMpeg4Url($mpeg4Url)
     {
@@ -133,7 +134,7 @@ class Mpeg4Gif extends AbstractInlineQueryResult
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getMpeg4Width()
     {
@@ -141,7 +142,9 @@ class Mpeg4Gif extends AbstractInlineQueryResult
     }
 
     /**
-     * @param int $mpeg4Width
+     * @param int|null $mpeg4Width
+     *
+     * @return void
      */
     public function setMpeg4Width($mpeg4Width)
     {
@@ -149,7 +152,7 @@ class Mpeg4Gif extends AbstractInlineQueryResult
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getMpeg4Height()
     {
@@ -157,7 +160,9 @@ class Mpeg4Gif extends AbstractInlineQueryResult
     }
 
     /**
-     * @param int $mpeg4Height
+     * @param int|null $mpeg4Height
+     *
+     * @return void
      */
     public function setMpeg4Height($mpeg4Height)
     {
@@ -167,21 +172,45 @@ class Mpeg4Gif extends AbstractInlineQueryResult
     /**
      * @return string
      */
-    public function getThumbUrl()
+    public function getThumbnailUrl()
     {
-        return $this->thumbUrl;
+        return $this->thumbnailUrl;
     }
 
     /**
+     * @param string $thumbnailUrl
+     *
+     * @return void
+     */
+    public function setThumbnailUrl($thumbnailUrl)
+    {
+        $this->thumbnailUrl = $thumbnailUrl;
+    }
+
+    /**
+     * @deprecated Use getThumbnailUrl
+     *
+     * @return string
+     */
+    public function getThumbUrl()
+    {
+        return $this->getThumbnailUrl();
+    }
+
+    /**
+     * @deprecated Use setThumbnailUrl
+     *
      * @param string $thumbUrl
+     *
+     * @return void
      */
     public function setThumbUrl($thumbUrl)
     {
-        $this->thumbUrl = $thumbUrl;
+        $this->setThumbnailUrl($thumbUrl);
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCaption()
     {
@@ -189,7 +218,9 @@ class Mpeg4Gif extends AbstractInlineQueryResult
     }
 
     /**
-     * @param string $caption
+     * @param string|null $caption
+     *
+     * @return void
      */
     public function setCaption($caption)
     {

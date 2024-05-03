@@ -39,7 +39,7 @@
         });
         refreshProducts()
         // $('input[name=paymentMethod]').on('click',paymentAction);
-        $('input[name=deliveryMethod]').on('click',deliveryAction);
+        $('input[name=deliveryMethod]').on('click', deliveryAction);
 
         $("#city").autocomplete({
             source: Object.keys(cities),
@@ -48,18 +48,17 @@
             }
         });
 
-        $('#city').change(function (){
+        $('#city').change(function () {
             let city = cities[this.value];
-            if(city) {
+            if (city) {
                 $('#city_id').val(city.id);
                 $('#province').html(province[city.province_id].name);
-            }
-            else {
+            } else {
                 let city = citiesId[$('#city_id').val()];
                 $('#city').val(city.name)
                 $('#province').html(province[city.province_id].name);
             }
-        }).click(function (){
+        }).click(function () {
             this.value = '';
             $('#province').html('<sapn class="fa fa-arrow-rotate-back"></span>');
         });
@@ -109,7 +108,7 @@
         @if($safir)
         $('#order-list').html(ordersListText)
         let deliveryCost = 0;
-        if (Total < {{$settings->freeDelivery}} || {{$id}} == 10)
+        if (Total < {{$settings->freeDelivery}} || '{{$user->id}}' == '10')
             if (deliveryMethod == 'peyk')
                 deliveryCost = {{$settings->peykCost}};
             else if (deliveryMethod == 'post')
@@ -210,12 +209,16 @@
     }
 
     function calculate_discount(id, value) {
-        $('#discount_' + id).val(0);
-        return ;
-        // value = +(value.replaceAll(',', ''));
-        // value = Math.min(products[id].price, +value);
-        // value = Math.max(0, +value);
-        // $('#discount_' + id).val((1 - value / products[id].price) * 100).change();
+        // $('#discount_' + id).val(0);
+        // return;
+        value = +(value.replaceAll(',', ''));
+        if (value <= products[id].price) {
+            // value = Math.min(products[id].price, +value);
+            value = Math.max(0, +value);
+            $('#discount_' + id).val((1 - value / products[id].price) * 100).change();
+        }else{
+            $('#discount_' + id).val(0);
+        }
     }
 
     @else
@@ -229,16 +232,16 @@
     function startEditProccess() {
 
         @if($errors->count())
-        $.each(products,function (id){
-            $('#product_'+id).change();
+        $.each(products, function (id) {
+            $('#product_' + id).change();
         });
         refreshProducts();
         @if($safir)
         $('#{{old("paymentMethod")}}').click();
         $('#{{old("deliveryMethod")}}').click();
         @endif
-        @elseif($edit)
-        deliveryMethod = `{{$order->deliveryMethod}}`;
+            @elseif($edit)
+            deliveryMethod = `{{$order->deliveryMethod}}`;
         paymentMethod = `{{$order->paymentMethod}}`;
         @endif
     }

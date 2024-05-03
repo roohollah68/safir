@@ -19,18 +19,18 @@ class Photo extends AbstractInlineQueryResult
      *
      * @var array
      */
-    static protected $requiredParams = ['type', 'id', 'photo_url', 'thumb_url'];
+    protected static $requiredParams = ['type', 'id', 'photo_url', 'thumbnail_url'];
 
     /**
      * {@inheritdoc}
      *
      * @var array
      */
-    static protected $map = [
+    protected static $map = [
         'type' => true,
         'id' => true,
         'photo_url' => true,
-        'thumb_url' => true,
+        'thumbnail_url' => true,
         'photo_width' => true,
         'photo_height' => true,
         'title' => true,
@@ -57,35 +57,35 @@ class Photo extends AbstractInlineQueryResult
     /**
      * Optional. Width of the photo
      *
-     * @var int
+     * @var int|null
      */
     protected $photoWidth;
 
     /**
      * Optional. Height of the photo
      *
-     * @var int
+     * @var int|null
      */
     protected $photoHeight;
 
     /**
      * URL of the thumbnail for the photo
      *
-     * @var
+     * @var string
      */
-    protected $thumbUrl;
+    protected $thumbnailUrl;
 
     /**
      * Optional. Short description of the result
      *
-     * @var string
+     * @var string|null
      */
     protected $description;
 
     /**
      * Optional. Caption of the photo to be sent, 0-200 characters
      *
-     * @var string
+     * @var string|null
      */
     protected $caption;
 
@@ -94,7 +94,7 @@ class Photo extends AbstractInlineQueryResult
      *
      * @param string $id
      * @param string $photoUrl
-     * @param string $thumbUrl
+     * @param string $thumbnailUrl
      * @param int|null $photoWidth
      * @param int|null $photoHeight
      * @param string|null $title
@@ -106,7 +106,7 @@ class Photo extends AbstractInlineQueryResult
     public function __construct(
         $id,
         $photoUrl,
-        $thumbUrl,
+        $thumbnailUrl,
         $photoWidth = null,
         $photoHeight = null,
         $title = null,
@@ -118,13 +118,12 @@ class Photo extends AbstractInlineQueryResult
         parent::__construct($id, $title, $inputMessageContent, $inlineKeyboardMarkup);
 
         $this->photoUrl = $photoUrl;
-        $this->thumbUrl = $thumbUrl;
+        $this->thumbnailUrl = $thumbnailUrl;
         $this->photoWidth = $photoWidth;
         $this->photoHeight = $photoHeight;
         $this->description = $description;
         $this->caption = $caption;
     }
-
 
     /**
      * @return string
@@ -136,6 +135,8 @@ class Photo extends AbstractInlineQueryResult
 
     /**
      * @param string $photoUrl
+     *
+     * @return void
      */
     public function setPhotoUrl($photoUrl)
     {
@@ -143,7 +144,7 @@ class Photo extends AbstractInlineQueryResult
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getPhotoWidth()
     {
@@ -151,7 +152,9 @@ class Photo extends AbstractInlineQueryResult
     }
 
     /**
-     * @param int $photoWidth
+     * @param int|null $photoWidth
+     *
+     * @return void
      */
     public function setPhotoWidth($photoWidth)
     {
@@ -159,7 +162,7 @@ class Photo extends AbstractInlineQueryResult
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getPhotoHeight()
     {
@@ -167,7 +170,9 @@ class Photo extends AbstractInlineQueryResult
     }
 
     /**
-     * @param int $photoHeight
+     * @param int|null $photoHeight
+     *
+     * @return void
      */
     public function setPhotoHeight($photoHeight)
     {
@@ -175,23 +180,47 @@ class Photo extends AbstractInlineQueryResult
     }
 
     /**
-     * @return mixed
+     * @return string
+     */
+    public function getThumbnailUrl()
+    {
+        return $this->thumbnailUrl;
+    }
+
+    /**
+     * @param string $thumbnailUrl
+     *
+     * @return void
+     */
+    public function setThumbnailUrl($thumbnailUrl)
+    {
+        $this->thumbnailUrl = $thumbnailUrl;
+    }
+
+    /**
+     * @deprecated Use getThumbnailUrl
+     *
+     * @return string
      */
     public function getThumbUrl()
     {
-        return $this->thumbUrl;
+        return $this->getThumbnailUrl();
     }
 
     /**
-     * @param mixed $thumbUrl
+     * @deprecated Use setThumbnailUrl
+     *
+     * @param string $thumbUrl
+     *
+     * @return void
      */
     public function setThumbUrl($thumbUrl)
     {
-        $this->thumbUrl = $thumbUrl;
+        $this->setThumbnailUrl($thumbUrl);
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -199,7 +228,9 @@ class Photo extends AbstractInlineQueryResult
     }
 
     /**
-     * @param string $description
+     * @param string|null $description
+     *
+     * @return void
      */
     public function setDescription($description)
     {
@@ -207,7 +238,7 @@ class Photo extends AbstractInlineQueryResult
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCaption()
     {
@@ -215,7 +246,9 @@ class Photo extends AbstractInlineQueryResult
     }
 
     /**
-     * @param string $caption
+     * @param string|null $caption
+     *
+     * @return void
      */
     public function setCaption($caption)
     {

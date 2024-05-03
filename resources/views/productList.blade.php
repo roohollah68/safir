@@ -60,9 +60,6 @@
     <input type="checkbox" name="col-quantity" id="col-quantity" checked>
     <label class="btn btn-secondary" for="col-quantity">موجودی</label>
 
-{{--    <input type="checkbox" name="col-location" id="col-location" >--}}
-{{--    <label class="btn btn-secondary" for="col-location">مکان انبار</label>--}}
-
     <input type="checkbox" name="col-alarm" id="col-alarm">
     <label class="btn btn-secondary" for="col-alarm">حد پایین</label>
 
@@ -104,32 +101,31 @@
                         <input type="text" name="name" value="{{$product->name}}" style="width: 300px;" disabled>
                     </td>
                     <td class="col-price">
+                        <span class="d-none">{{$product->price}}</span>
                         <input type="text" name="price" class="price-input" value="{{$product->price}}"
                                style="width: 110px;" disabled>
                     </td>
                     <td class="col-productPrice">
+                        <span class="d-none">{{$product->productPrice}}</span>
                         <input type="text" name="PPrice" class="price-input" value="{{$product->productPrice}}"
                                style="width: 110px;" disabled>
                     </td>
                     <td class="col-quantity">
+                        <span class="d-none">{{$product->quantity}}</span>
                         <input type="number" name="quantity" value="{{+$product->quantity}}" style="width: 60px;"
                                disabled>
                     </td>
-{{--                    <td class="col-location">--}}
-{{--                        <select name="location" id="location" disabled>--}}
-{{--                            <option value="t" @if($product->location == 't') selected @endif>تهران</option>--}}
-{{--                            <option value="m" @if($product->location == 'm') selected @endif>مشهد</option>--}}
-{{--                            <option value="f" @if($product->location == 'f') selected @endif>فریمان</option>--}}
-{{--                        </select>--}}
-{{--                    </td>--}}
                     <td class="col-alarm">
+                        <span class="d-none">{{$product->alarm}}</span>
                         <input type="number" name="alarm" value="{{$product->alarm}}" style="width: 60px;" disabled>
                     </td>
                     <td class="col-high_alarm">
+                        <span class="d-none">{{$product->high_alarm}}</span>
                         <input type="number" name="high_alarm" value="{{$product->high_alarm}}" style="width: 60px;"
                                disabled>
                     </td>
                     <td class="col-available" style="width: 110px;">
+                        <span class="d-none">{{$product->available}}</span>
                         <input type="checkbox" id="{{$product->id}}" name="available" disabled
                                @if($product->available) checked @endif>
 
@@ -175,7 +171,7 @@
         function draw() {
             $('#product-table').DataTable({
                 order: [[3, "desc"]],
-                pageLength: 100,
+                pageLength: 1000,
                 destroy: true,
             });
         }
@@ -205,7 +201,6 @@
             $('#col-price')[0].checked ? '' : $('.col-price').hide();
             $('#col-productPrice')[0].checked ? '' : $('.col-productPrice').hide();
             $('#col-quantity')[0].checked ? '' : $('.col-quantity').hide();
-            // $('#col-location')[0].checked ? '' : $('.col-location').hide();
             $('#col-alarm')[0].checked ? '' : $('.col-alarm').hide();
             $('#col-high_alarm')[0].checked ? '' : $('.col-high_alarm').hide();
             $('#col-available')[0].checked ? '' : $('.col-available').hide();

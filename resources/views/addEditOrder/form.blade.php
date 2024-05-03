@@ -6,6 +6,7 @@
            style="width: 70px"
            onchange="customerFind()">
 @endif
+<input type="hidden" name="location" value="{{$location}}">
 <div id="formElements" class="bg-white">
     <div class="row">
         <div class="col-md-6">

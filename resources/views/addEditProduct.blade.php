@@ -1,19 +1,22 @@
 @extends('layout.main')
 
 @section('title')
-    @if(!$product)
-        افزودن محصول
-    @else
+    @if($edit)
         ویرایش محصول
+    @else
+        افزودن محصول
     @endif
 @endsection
 
 @section('content')
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
-    @if($product)
+    @if($edit)
         <h4 class="">{{$product->name}}</h4>
-        <h4 class="">تعداد موجود در انبار: {{+$product->quantity}}</h4>
-        <a class="btn btn-danger" href="{{route('productList')}}">بازگشت</a>
+        <h4 class="">تعداد موجود در انبار
+            {{+$product->quantity}}
+        </h4>
+
+        <a class="btn btn-danger" href="{{url()->previous()}}">بازگشت</a>
         <hr>
     @endif
     <form action="" method="post" enctype="multipart/form-data">
@@ -27,11 +30,7 @@
                         <label for="name" class="input-group-text w-100">نام محصول:</label>
                     </div>
                     <input type="text" id="name" class="form-control" name="name"
-                           @if($product)
-                               value="{{$product->name}}"
-                           @else
-                               value="{{old('name')}}"
-                           @endif required>
+                           value="{{old('name')?:$product->name}}" required>
                 </div>
             </div>
             {{--قیمت محصول--}}
@@ -41,11 +40,7 @@
                         <label for="price" class="input-group-text w-100">قیمت:</label>
                     </div>
                     <input type="text" id="price" class="form-control price-input" name="price"
-                           @if($product)
-                               value="{{old('price')?:$product->price}}"
-                           @else
-                               value="{{old('price')}}"
-                           @endif required>
+                           value="{{old('price')?:$product->price}}" required>
                     <div class="input-group-append" style="min-width: 120px">
                         <label for="price" class="input-group-text w-100">ریال</label>
                     </div>
@@ -58,11 +53,7 @@
                         <label for="PPrice" class="input-group-text w-100">قیمت تولید:</label>
                     </div>
                     <input type="text" id="PPrice" class="form-control price-input" name="PPrice"
-                           @if($product)
-                               value="{{old('PPrice')?:$product->productPrice}}"
-                           @else
-                               value="{{old('PPrice')}}"
-                        @endif>
+                           value="{{old('PPrice')?:$product->productPrice}}">
                     <div class="input-group-append" style="min-width: 120px">
                         <label for="PPrice" class="input-group-text w-100">ریال</label>
                     </div>
@@ -74,22 +65,16 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="PPrice" class="input-group-text w-100">مکان انبار:</label>
                     </div>
-                    <select name="location" id="location" >
-                        @if($product)
-                            <option value="t" @if($product->location == 't') selected @endif>تهران</option>
-                            <option value="m" @if($product->location == 'm') selected @endif>مشهد</option>
-                            <option value="f" @if($product->location == 'f') selected @endif>فریمان</option>
-                        @else
-                            <option value="t" selected>تهران</option>
-                            <option value="m">مشهد</option>
-                            <option value="f">فریمان</option>
-                        @endif
+                    <select name="location" id="location">
+                        <option value="t" selected>تهران</option>
+                        <option value="m">مشهد</option>
+                        <option value="f">فریمان</option>
                     </select>
 
                 </div>
             </div>
             {{--اصلاح موجودی--}}
-            @if($product)
+            @if($edit)
                 <div class="col-md-6 my-2">
                     <div class="form-group input-group">
                         <div class="input-group-text">
@@ -134,7 +119,7 @@
                         <label for="alarm" class="input-group-text w-100">حد پایین:</label>
                     </div>
                     <input type="number" id="alarm" class="form-control" name="alarm"
-                           value="{{$product?$product->alarm:'10'}}"
+                           value="{{$product->alarm?:10}}"
                            required>
 
                 </div>
@@ -144,7 +129,7 @@
                         <label for="high_alarm" class="input-group-text w-100">حد بالا:</label>
                     </div>
                     <input type="number" id="high_alarm" class="form-control" name="high_alarm"
-                           value="{{$product?$product->high_alarm:'100'}}"
+                           value="{{$product->high_alarm?:100}}"
                            required>
 
                 </div>
@@ -173,6 +158,7 @@
                 </div>
             </div>
             {{--تصویر محصول--}}
+            {{--
             <div class="col-md-6 d-none">
                 <div class="form-group input-group ">
                     <div class="input-group-append" style="width: 160px">
@@ -180,7 +166,7 @@
                     </div>
                     <input type="file" id="photo" class="" name="photo" value="{{old('photo')}}">
                 </div>
-                @if($product && $product->photo)
+                @if($product->photo)
                     <div id="product-image">
                         <img style="max-height: 200px;max-width: 200px;" src="/product_photo/{{$product->photo}}">
                         <i class="fa fa-trash-alt btn btn-danger" onclick="delete_photo({{$product->id}})"
@@ -196,18 +182,19 @@
                     </div>
                 @endif
             </div>
-
+        --}}
         </div>
-        @if($product)
+
+        @if($edit)
             <input type="submit" class="btn btn-success" value="ویرایش">
         @else
             <input type="submit" class="btn btn-success" value="افزودن">
         @endif
         &nbsp;
-        <a href="{{route('productList')}}" class="btn btn-danger">بازگشت</a>
+        <a href="{{url()->previous()}}" class="btn btn-danger">بازگشت</a>
 
     </form>
-    @if($product)
+    @if($edit)
         <hr>
         <span class="btn btn-warning m-2" onclick="$('.deleted').toggle()"><span class="deleted fa fa-check"></span>نمایش حذف شده ها</span>
         <table id="table1" class="stripe">
@@ -221,9 +208,9 @@
             </tr>
             </thead>
             <tbody>
-            @foreach($productChanges as $productChange)
+            @foreach($product->productChange()->get()->keyBy('id') as $productChange)
                 <tr class="{{$productChange->isDeleted?'deleted':''}}">
-                    <td>{{$productChange->created_at}}</td>
+                    <td dir="ltr">{{verta($productChange->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
                     <td>{{$productChange->desc}}</td>
                     <td dir="ltr">{{+$productChange->change}}</td>
                     <td dir="ltr">{{+$productChange->quantity}}</td>
@@ -231,6 +218,9 @@
                         @if(!$productChange->order_id && !$productChange->isDeleted)
                             <span class="btn btn-danger fa fa-trash-alt"
                                   onclick="deleteRecord({{$productChange->id}})"></span>
+                        @endif
+                        @if($productChange->order_id)
+                            <i id="view_order_${id}" class="fa fa-eye btn btn-info" onclick="view_order({{$productChange->order_id}})"></i>
                         @endif
                     </td>
                 </tr>
@@ -244,7 +234,7 @@
     <script>
         $(function () {
             $('input[name="available"], input[name="category"]').checkboxradio();
-            @if($product)
+            @if($edit)
             if (!({{$product->available}}))
                 $('#notavailable').click();
             if (!!'{{$product->category}}')
@@ -253,17 +243,31 @@
                 order: [[0, "desc"]],
                 pageLength: 100,
             });
-
-
+            $('select#location').val('{{$product->location}}')
             @endif
         });
 
         function deleteRecord(id) {
             if (confirm('آیا از حذف رکورد اطمینان دارید؟')) {
-                // $.get('/productQuantity/delete/'+id);
                 window.location.replace('/productQuantity/delete/' + id)
             }
         }
+
+        function view_order(id) {
+            $.post('/viewOrder/' + id, {_token: "{{ csrf_token() }}"})
+                .done(res => {
+                    $(res).dialog({
+                        modal: true,
+                        open: () => {
+                            $('.ui-dialog-titlebar-close').hide();
+                            $('.ui-widget-overlay').bind('click', function () {
+                                $(".dialogs").dialog('close');
+                            });
+                        }
+                    });
+                })
+        }
+
     </script>
     <style>
         #navailable.ui-state-active {
