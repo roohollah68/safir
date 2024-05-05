@@ -146,7 +146,8 @@
                         <i class="fa fa-trash-alt btn btn-danger" onclick="delete_product({{$product->id}})"
                            title="حذف محصول"></i>
                     </td>
-                    <input type="hidden" name="category" value="{{$product->category}}">
+                    <input type="hidden" name="category" value="{{$product->category}}" disabled>
+                    <input type="hidden" name="location" value="{{$product->location}}" disabled>
                 </form>
             </tr>
 
@@ -227,6 +228,7 @@
                 high_alarm: $(tag + ' input[name=high_alarm]').val(),
                 available: $(tag + ' input[name=available]').prop('checked'),
                 category: $(tag + ' input[name=category]').val(),
+                location: $(tag + ' input[name=location]').val(),
                 // location:$(tag + ' select[name=location]').val(),
                 addType: 'value',
                 fast: true,

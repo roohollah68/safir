@@ -16,7 +16,7 @@
             {{+$product->quantity}}
         </h4>
 
-        <a class="btn btn-danger" href="{{url()->previous()}}">بازگشت</a>
+        <a class="btn btn-danger" href="{{route('productList')}}">بازگشت</a>
         <hr>
     @endif
     <form action="" method="post" enctype="multipart/form-data">
@@ -191,7 +191,7 @@
             <input type="submit" class="btn btn-success" value="افزودن">
         @endif
         &nbsp;
-        <a href="{{url()->previous()}}" class="btn btn-danger">بازگشت</a>
+        <a href="{{route('productList')}}" class="btn btn-danger">بازگشت</a>
 
     </form>
     @if($edit)
