@@ -5,6 +5,7 @@
 /public/pdf
 /public/woo
 /storage/*.key
+/vendor
 .idea
 .git
 .env
