@@ -2,7 +2,7 @@
     <br>
     @if(!$safir)
         <a class="btn {{$location == 't'?'btn-info':'btn-outline-info'}}" href="/add_order?city=t">تهران</a>
-        <a class="btn {{$location == 'f'?'btn-info':'btn-outline-info'}}" href="/add_order?city=f">فریمان</a>
+{{--        <a class="btn {{$location == 'f'?'btn-info':'btn-outline-info'}}" href="/add_order?city=f">فریمان</a>--}}
         <a class="btn {{$location == 'm'?'btn-info':'btn-outline-info'}}" href="/add_order?city=m">مشهد</a>
         <br>
     @endif

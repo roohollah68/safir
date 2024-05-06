@@ -10,7 +10,7 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let deleted, printWait, confirmWait, proccessWait, user = 'all';
+    let deleted, printWait, confirmWait, proccessWait, user = 'all',Location='t';
     let role = users[userId].role;
     let globalElement;
     let dtp1Instance;
@@ -48,6 +48,8 @@
                 return
             if (print && !order.confirm)
                 return
+            if (Location !== order.location)
+                return;
             counter++;
             res.push([
                 `<input type="checkbox" class="orders_checkbox" onclick="ids.includes(${id})?removeFromIds(${id}):ids.push(${id})">`,

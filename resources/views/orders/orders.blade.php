@@ -45,6 +45,13 @@
         <label for="proccess-wait"> در حال پردازش</label>
         <input type="checkbox" id="proccess-wait" class="checkboxradio"
                onclick="proccessWait = this.checked;prepare_data()">
+        <br>
+        <label for="location-t">تهران</label>
+        <input type="radio" id="location-t" name="location" value="t" class="checkboxradio"
+               onclick="Location = 't';prepare_data()" checked>
+    <label for="location-m">مشهد</label>
+        <input type="radio" id="location-m" name="location" value="m" class="checkboxradio"
+               onclick="Location = 'm';prepare_data()">
     @endif
     <br>
     @if($superAdmin || $print)
