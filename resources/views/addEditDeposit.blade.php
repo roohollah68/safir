@@ -72,6 +72,7 @@
             <a href="/deposit/{{$deposit->photo}}" target="_blank"><img style="width: 300px"
                                                                         src="/deposit/{{$deposit->photo}}"></a>
         @endif
+
     </form>
 
 @endsection
