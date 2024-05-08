@@ -41,7 +41,7 @@ class OrderController extends Controller
         if ($this->superAdmin())
             return redirect()->back();
         $city = $req->city ?: 't';
-        if($this->safir())
+        if ($this->safir())
             $city = 't';
         $user = auth()->user();
         $order = new Order();
@@ -113,7 +113,7 @@ class OrderController extends Controller
                     $discount = +$request['discount_' . $id];
                 $price = round((100 - $discount) * $product->price / 100);
                 if (($this->superAdmin() || $this->admin()) && $discount == 0)
-                    $price = max(+str_replace(",", "", $request['price_' . $id]),$product->price);
+                    $price = max(+str_replace(",", "", $request['price_' . $id]), $product->price);
                 $total += $price * $number;
                 $Total += $product->price * $number;
                 $request->orderList[$id] = [
@@ -217,9 +217,11 @@ class OrderController extends Controller
         $selectedProducts = $order->orderProducts()->get();
         $cart = [];
         foreach ($selectedProducts as $product) {
-            $cart[$product->product_id] = +$product->number;
-            $products[$product->product_id]->coupon = +$product->discount;
-            $products[$product->product_id]->priceWithDiscount = round((100 - +$product->discount) * $product->price / 100);
+            if (isset($products[$product->product_id])) {
+                $cart[$product->product_id] = +$product->number;
+                $products[$product->product_id]->coupon = +$product->discount;
+                $products[$product->product_id]->priceWithDiscount = round((100 - +$product->discount) * $product->price / 100);
+            }
         }
 //        $customer = null;
 //        if($creator)
@@ -280,7 +282,7 @@ class OrderController extends Controller
                 if ($number > 0) {
                     $coupon = +$request['discount_' . $id];
                     $price = round((100 - $coupon) * $product->price / 100);
-                    if (($this->superAdmin()|| $this->admin()) && $coupon == 0) {
+                    if (($this->superAdmin() || $this->admin()) && $coupon == 0) {
                         $price = +str_replace(",", "", $request['price_' . $id]);
                     }
                     $total += $price * $number;
