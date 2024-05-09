@@ -18,7 +18,10 @@ class WoocommerceController extends Controller
         $request = json_decode(file_get_contents('php://input'));
         if (env('APP_ENV') == 'local')
             $request = json_decode(file_get_contents('woo/1403-1-31_12-45 _ berrynocom _ مرتضی اسکندرپور.txt'));
+        if(!isset($request->billing))
+            return 'not used';
         file_put_contents('woo/' . verta(null, "Asia/Tehran")->format('Y-n-j_H-i') . ' _ ' . $website . ' _ ' . $request->billing->first_name . ' ' . $request->billing->last_name . '.txt', file_get_contents('php://input'));
+
         $orders = '';
         $products = array();
         $text = 'بررسی مطابقت محصولات: ' . $website . ' ' . $request->billing->first_name . ' ' . $request->billing->last_name . '
