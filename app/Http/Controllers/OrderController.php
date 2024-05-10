@@ -47,6 +47,8 @@ class OrderController extends Controller
         $order = new Order();
 
         $customersData = $user->customers()->get();
+        if ($user->id == 53 || $user->id == 61) // پخش ماچانو و پپتینا
+            $customersData = Customer::all();
         if (($this->superAdmin() || $this->admin()) && $user->id != 57) {
             $products = Product::where('category', '<>', 'pack')->where('location', $city)->get()->keyBy('id');
         } else {
@@ -72,7 +74,7 @@ class OrderController extends Controller
             'settings' => $this->settings(),
             'user' => $user,
             'cart' => (object)[],
-            'creator' => ($this->superAdmin() || $this->admin()),
+            'creatorIsAdmin' => ($this->superAdmin() || $this->admin()),
             'order' => $order,
             'customer' => $customer,
             'cities' => $cities,
@@ -198,10 +200,12 @@ class OrderController extends Controller
             $order = $user->orders()->findOrFail($id);
         $creatorIsAdmin = !$order->user()->first()->safir();
 
-        if ($order->state || ($order->confirm && $creatorIsAdmin))
+        if (($order->state && !$creatorIsAdmin) || ($order->confirm && $creatorIsAdmin))
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
 
         $customersData = $user->customers()->get();
+        if ($user->id == 53 || $user->id == 61) // پخش ماچانو و پپتینا
+            $customersData = Customer::all();
         //استثنا آقای عبدی
         if (($this->superAdmin() || $this->admin()) && $user->id != 57) {
             $products = Product::where('category', '<>', 'pack')->where('location', $order->location)->get()->keyBy('id');
@@ -235,20 +239,20 @@ class OrderController extends Controller
         $province = Province::all()->keyBy('id');
 
         return view('addEditOrder.addEditOrder')->with([
-            'edit' => true,
-            'order' => $order,
-            'customers' => $customers,
-            'customersId' => $customersId,
-            'products' => $products,
-            'settings' => $this->settings(),
-            'id' => $user->id,
             'cart' => $cart,
-            'creator' => $creatorIsAdmin,
-            'customer' => $customer,
             'cities' => $cities,
             'citiesId' => $citiesId,
-            'province' => $province,
+            'creatorIsAdmin' => $creatorIsAdmin,
+            'customer' => $customer,
+            'customers' => $customers,
+            'customersId' => $customersId,
+            'edit' => true,
+            'id' => $user->id,
             'location' => $order->location,
+            'order' => $order,
+            'products' => $products,
+            'province' => $province,
+            'settings' => $this->settings(),
         ]);
     }
 

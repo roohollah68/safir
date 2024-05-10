@@ -1,4 +1,4 @@
-@if( $creator || !$edit)
+@if( $creatorIsAdmin || !$edit)
     <br>
     @if(!$safir)
         <a class="btn {{$location == 't'?'btn-info':'btn-outline-info'}}" href="/add_order?city=t">تهران</a>
@@ -52,7 +52,7 @@
                                   @if($product->priceWithDiscount!=$product->price)
                                       style="text-decoration: line-through"
                                   @endif
-                                  @if($creator)
+                                  @if($creatorIsAdmin)
                                       onclick="$('#price_{{$product->id}} .discount').val('{{number_format($product->price)}}').change(); $('#discount_{{$product->id}}').val(0).change();"
                                             @endif
                                         >
@@ -69,11 +69,11 @@
                                    value="{{old("discount_".$product->id)?:+$product->coupon}}"
                                    style="width: 80px"
                                    onchange="changeDiscount({{$product->id}},this.value)"
-                                   @if(!$creator)
+                                   @if(!$creatorIsAdmin)
                                        disabled
                                    @endif
                                    min="0" max="100" step="0.25">
-                            @if($creator)
+                            @if($creatorIsAdmin)
                                 <a class="btn btn-outline-info fa fa-plus" dir="ltr"
                                    onclick="$('#discount_{{$product->id}}').val(+$('#discount_{{$product->id}}').val()+5).change()">5
                                     <i class="fa fa-percent"></i>

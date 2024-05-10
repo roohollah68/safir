@@ -1,10 +1,10 @@
 @csrf
-@if($creator)
+@if($creatorIsAdmin)
     <label for="customerId">شماره مشتری:</label>
     <input type="number" value="{{old('customerId')?:$order->customer_id}}" min="0" step="1" name="customerId"
            id="customerId"
            style="width: 70px"
-           onchange="customerFind()">
+           onchange="customerFind()" disabled>
 @endif
 <input type="hidden" name="location" value="{{$location}}">
 <div id="formElements" class="bg-white">
@@ -32,7 +32,7 @@
                        oninput="this.setCustomValidity('')" placeholder="مانند 09123456789">
             </div>
         </div>
-        @if($creator)
+        @if($creatorIsAdmin)
             <div class="col-md-6">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
@@ -93,7 +93,7 @@
                 <textarea name="desc" id="desc" class="form-control" rows="2">{{old('desc')?:$order->desc}}</textarea>
             </div>
         </div>
-        @if($creator)
+        @if($creatorIsAdmin)
             <div class="col-md-6">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
@@ -187,7 +187,7 @@
 {{--        <input type="hidden" name="paymentMethod" value="credit">--}}
     @endif
 
-    <input type="checkbox" name="addToCustomers" id="addToCustomers" @if($creator) checked @endif
+    <input type="checkbox" name="addToCustomers" id="addToCustomers" @if($creatorIsAdmin) checked @endif
     onclick="$('#city, #category').prop('disabled', (i, v) => !v);">
     <label for="addToCustomers">افزودن/ ویرایش مشتری</label><br>
 

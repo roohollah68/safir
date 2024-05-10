@@ -11,7 +11,7 @@
     let citiesId = {!!json_encode($citiesId)!!};
     let province = {!!json_encode($province)!!};
     let submit = false;
-    let creator = !!'{{$creator}}';
+    let creatorIsAdmin = !!'{{$creatorIsAdmin}}';
 
     $(function () {
         setTimeout(function () {
@@ -23,7 +23,7 @@
         $("#addToCustomers").checkboxradio();
     });
 
-    @if($creator || !$edit)
+    @if($creatorIsAdmin || !$edit)
     $(function () {
         product_table = $('#product-table').DataTable({
             autoWidth: false,
@@ -135,7 +135,7 @@
     }
 
     function deleteBTN(id) {
-        @if($creator || !$edit)
+        @if($creatorIsAdmin || !$edit)
             return '<span class="btn btn-danger mx-1 fa fa-xmark" ' +
             'onclick="$(`#product_' + id + '`).val(0);cart[' + id + '] =0 ;refreshProducts()"></span>'
         @else
