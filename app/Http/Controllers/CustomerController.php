@@ -177,10 +177,13 @@ class CustomerController extends Controller
                 'paymentLink' => $newTransaction->id,
             ]);
         $req->amount = number_format($req->amount);
+
         $message = "ثبت سند واریزی مشتری
         نام:{$customer->name}
         مبلغ: {$req->amount} ریال
+         توضیحات:{$newTransaction->description}
         ";
+        dd($message);
         $array = array("caption" => $message, "photo" => env('APP_URL') . "deposit/{$photo}");
         $this->sendPhotoToBale($array, '4538199149');
 

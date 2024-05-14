@@ -104,6 +104,9 @@
                 /
                 توضیحات: {{$order->desc}}
                 <br>
+                @if(!$order->confirm)
+                    <<اعتبار این پیش فاکتور برای ۴۸ ساعت است>>
+                @endif
             </div>
            <div class="{{$lastPage}}">
             <div class="w-100 normal d-flex justify-content-around">
