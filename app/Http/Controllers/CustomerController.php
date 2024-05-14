@@ -183,7 +183,7 @@ class CustomerController extends Controller
         مبلغ: {$req->amount} ریال
          توضیحات:{$newTransaction->description}
         ";
-        dd($message);
+        
         $array = array("caption" => $message, "photo" => env('APP_URL') . "deposit/{$photo}");
         $this->sendPhotoToBale($array, '4538199149');
 
