@@ -115,7 +115,8 @@ class OrderController extends Controller
                     $discount = +$request['discount_' . $id];
                 $price = round((100 - $discount) * $product->price / 100);
                 if (($this->superAdmin() || $this->admin()) && $discount == 0)
-                    $price = max(+str_replace(",", "", $request['price_' . $id]), $product->price);
+//                    $price = max(+str_replace(",", "", $request['price_' . $id]), $product->price);
+                    $price = +str_replace(",", "", $request['price_' . $id]);
                 $total += $price * $number;
                 $Total += $product->price * $number;
                 $request->orderList[$id] = [
@@ -253,6 +254,7 @@ class OrderController extends Controller
             'products' => $products,
             'province' => $province,
             'settings' => $this->settings(),
+            'user' => $user,
         ]);
     }
 

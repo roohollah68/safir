@@ -211,8 +211,8 @@
     function calculate_discount(id, value) {
         // $('#discount_' + id).val(0);
         // return;
-        value = +(value.replaceAll(',', ''));
-        if (value <= products[id].price) {
+        value = +(value.replaceAll(',', '') );
+        if (value <= products[id].price && '{{$user->id}}' !== '61') {
             // value = Math.min(products[id].price, +value);
             value = Math.max(0, +value);
             $('#discount_' + id).val((1 - value / products[id].price) * 100).change();
