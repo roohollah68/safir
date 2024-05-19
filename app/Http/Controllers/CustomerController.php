@@ -13,17 +13,25 @@ use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
-    public function customersList()
+    public function customersList(Request $req)
     {
-        if ($this->superAdmin())
-            $customers = Customer::all()->keyBy("id");
-        else
+
+        if ($this->superAdmin()) {
+            if (!$req->user || $req->user == 'all')
+                $customers = Customer::all()->keyBy("id");
+            else
+                $customers = Customer::where('user_id', $req->user)->get();
+        } else
             $customers = auth()->user()->customers()->get()->keyBy("id");
         $total = 0;
         foreach ($customers as $customer) {
             $total += $customer->balance;
         }
-        return view('customerList', ['customers' => $customers, 'total' => $total]);
+        return view('customerList', [
+            'customers' => $customers,
+            'total' => $total,
+            'users' => User::where('verified', true)->get(),
+        ]);
     }
 
     public function customersTransactionList($id)

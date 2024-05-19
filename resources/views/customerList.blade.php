@@ -10,8 +10,30 @@
         <span class="h3 btn btn-danger" dir="ltr" onclick="$('#table-container ,#brief-table ').toggle(); ">
             {{number_format($total)}}
         </span>
-        <span
-            class="h5">ریال</span><br><br>
+        <span class="h5">ریال</span><br><br>
+        <form method="get" action="">
+            <div class="col-md-6">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="user" class="input-group-text w-100">کاربر مرتبط:</label>
+                    </div>
+                    <select class="form-control" name="user" id="user">
+                        <option value="all"
+                                selected
+                        >همه
+                        </option>
+                        @foreach($users as $user)
+                            <option value="{{$user->id}}"
+                                    @if( isset($_GET['user']) && $user->id == $_GET['user'])
+                                    selected
+                                @endif
+                            >{{$user->name}}</option>
+                        @endforeach
+                    </select> <input type="submit" class="btn btn-primary" value="فیلتر">
+                </div>
+            </div>
+
+        </form>
     @endif
     <a class="btn btn-info" href="{{route('newCustomer')}}">افزودن مشتری جدید</a>
     <br>
@@ -31,7 +53,9 @@
                     <th>آدرس</th>
                     <th>کد پستی</th>
                 @endif
-
+                @if($superAdmin)
+                    <th>کاربر مرتبط</th>
+                @endif
                 <th>عملیات</th>
             </tr>
             </thead>
@@ -49,6 +73,10 @@
                     @else
                         <td>{{$customer->address}}</td>
                         <td>{{$customer->zip_code}}</td>
+                    @endif
+
+                    @if($superAdmin)
+                        <th>{{$customer->user()->first()->name}}</th>
                     @endif
 
                     <td>
