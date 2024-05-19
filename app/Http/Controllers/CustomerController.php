@@ -14,7 +14,7 @@ class CustomerController extends Controller
 {
     public function customersList()
     {
-        if ($this->superAdmin() || auth()->user()->id == 53 || auth()->user()->id == 61)//پخش ماچانو و پپتینا
+        if ($this->superAdmin())
             $customers = Customer::all()->keyBy("id");
         else
             $customers = auth()->user()->customers()->get()->keyBy("id");

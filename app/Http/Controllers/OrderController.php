@@ -47,8 +47,7 @@ class OrderController extends Controller
         $order = new Order();
 
         $customersData = $user->customers()->get();
-        if ($user->id == 53 || $user->id == 61) // پخش ماچانو و پپتینا
-            $customersData = Customer::all();
+
         if (($this->superAdmin() || $this->admin()) && $user->id != 57) {
             $products = Product::where('category', '<>', 'pack')->where('location', $city)->get()->keyBy('id');
         } else {
@@ -205,7 +204,7 @@ class OrderController extends Controller
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
 
         $customersData = $user->customers()->get();
-        if ($user->id == 53 || $user->id == 61) // پخش ماچانو و پپتینا
+        if ($this->superAdmin())
             $customersData = Customer::all();
         //استثنا آقای عبدی
         if (($this->superAdmin() || $this->admin()) && $user->id != 57) {
