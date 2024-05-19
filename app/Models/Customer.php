@@ -16,7 +16,8 @@ class Customer extends Model
         'zip_code',
         'balance',
         'category',
-        'city_id'
+        'city_id',
+        'user_id',
     ];
 
     public function user()

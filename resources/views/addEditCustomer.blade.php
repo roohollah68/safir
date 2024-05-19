@@ -117,14 +117,32 @@
                     <select class="form-control" name="category" id="category">
                         @for($ii=0;$ii<11;$ii++)
                             <option value="{{$ii}}"
-                            @if($ii == $customer->category)
-                                selected
+                                    @if($ii == $customer->category)
+                                    selected
                                 @endif
-                                >{{$customer->categoryText($ii)}}</option>
+                            >{{$customer->categoryText($ii)}}</option>
                         @endfor
                     </select>
                 </div>
             </div>
+            @if($superAdmin && $customer->name)
+            <div class="col-md-6">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="user" class="input-group-text w-100">کاربر مرتبط:</label>
+                    </div>
+                    <select class="form-control" name="user" id="user">
+                        @foreach($users as $user)
+                            <option value="{{$user->id}}"
+                                    @if($user->id == $customer->user_id)
+                                    selected
+                                @endif
+                            >{{$user->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            @endif
         </div>
 
         @if($customer->name)

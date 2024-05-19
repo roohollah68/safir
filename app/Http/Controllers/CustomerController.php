@@ -7,6 +7,7 @@ use App\Models\City;
 use App\Models\Customer;
 use App\Models\CustomerTransactions;
 use App\Models\Province;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -43,14 +44,12 @@ class CustomerController extends Controller
     {
         $customer = new Customer;
         $customer->city_id = 301;
-        $cities = City::all()->keyBy('name');
-        $citiesId = $cities->keyBy('id');
-        $province = Province::all()->keyBy('id');
+
         return view('addEditCustomer', [
             'customer' => $customer,
-            'cities' => $cities,
-            'citiesId' => $citiesId,
-            'province' => $province,
+            'cities' => City::all()->keyBy('name'),
+            'citiesId' => City::all()->keyBy('id'),
+            'province' => Province::all()->keyBy('id'),
         ]);
     }
 
@@ -81,15 +80,13 @@ class CustomerController extends Controller
             $customer = Customer::findOrFail($id);
         else
             $customer = auth()->user()->customers()->findOrFail($id);
-        $cities = City::all()->keyBy('name');
-        $citiesId = $cities->keyBy('id');
-        $province = Province::all()->keyBy('id');
 
         return view('addEditCustomer', [
             'customer' => $customer,
-            'cities' => $cities,
-            'citiesId' => $citiesId,
-            'province' => $province,
+            'cities' => City::all()->keyBy('name'),
+            'citiesId' => City::all()->keyBy('id'),
+            'province' => Province::all()->keyBy('id'),
+            'users' => User::where('verified', true)->get(),
         ]);
     }
 
@@ -116,6 +113,7 @@ class CustomerController extends Controller
             'zip_code' => $request->zip_code,
             'category' => $request->category,
             'city_id' => $request->city_id,
+            'user_id' => $request->user,
         ]);
         return redirect()->route('CustomerList');
     }
