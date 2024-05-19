@@ -45,11 +45,26 @@
         <label for="proccess-wait"> در حال پردازش</label>
         <input type="checkbox" id="proccess-wait" class="checkboxradio"
                onclick="proccessWait = this.checked;prepare_data()">
+
+        @if($superAdmin)
+            <br>
+            <label for="safir-orders">سفیران</label>
+            <input type="checkbox" id="safir-orders" class="checkboxradio"
+                   onclick="safirOrders = this.checked;prepare_data()" checked>
+
+            <label for="site-orders">سایت ها</label>
+            <input type="checkbox" id="site-orders" class="checkboxradio"
+                   onclick="siteOrders = this.checked;prepare_data()" checked>
+
+            <label for="admin-orders">فروشگاه ها</label>
+            <input type="checkbox" id="admin-orders" class="checkboxradio"
+                   onclick="adminOrders = this.checked;prepare_data()" checked>
+        @endif
         <br>
         <label for="location-t">تهران</label>
         <input type="radio" id="location-t" name="location" value="t" class="checkboxradio"
                onclick="Location = 't';prepare_data()" checked>
-    <label for="location-m">مشهد</label>
+        <label for="location-m">مشهد</label>
         <input type="radio" id="location-m" name="location" value="m" class="checkboxradio"
                onclick="Location = 'm';prepare_data()">
     @endif

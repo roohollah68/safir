@@ -10,7 +10,8 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let deleted, printWait, confirmWait, proccessWait, user = 'all',Location='t';
+    let deleted, printWait, confirmWait, proccessWait, user = 'all', Location = 't';
+    let safirOrders = true, siteOrders = true, adminOrders = true;
     let role = users[userId].role;
     let globalElement;
     let dtp1Instance;
@@ -50,6 +51,15 @@
                 return
             if (Location !== order.location)
                 return;
+            let website = false;
+            if (order.user_id === 30 || order.user_id === 32 || order.user_id === 33)
+                website = true;
+            if (users[order.user_id].role === 'admin' && !adminOrders)
+                return
+            if (users[order.user_id].role === 'user' && !website && !safirOrders)
+                return
+            if (website && !siteOrders)
+                return
             counter++;
             res.push([
                 `<input type="checkbox" class="orders_checkbox" onclick="ids.includes(${id})?removeFromIds(${id}):ids.push(${id})">`,
