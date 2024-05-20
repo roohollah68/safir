@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductData;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -75,28 +76,33 @@ class SettingController extends Controller
 //            }
 //        }
 
+        $users = User::all();
+        foreach ($users as $user) {
 //        $customers = Customer::where('user_id','<>' , 61)->get()->keyBy('id');
-////        $customers = Customer::where('user_id',57)->get()->keyBy('id');
-//
-//        foreach ($customers as $customer) {
-//            foreach ($customers as $id => $customer2) {
-//                if ($customer->id < $customer2->id &&
-//                    $customer->user_id == $customer2->user_id &&
-//                    $customer->name == $customer2->name) {
-//                    CustomerTransactions::where('customer_id', $customer2->id)->update([
-//                        'customer_id' => $customer->id
-//                    ]);
-//                    Order::where('customer_id', $customer2->id)->update([
-//                        'customer_id' => $customer->id,
-//                    ]);
-//                    $customer->update([
-//                        'balance' => $customer->balance + $customer2->balance,
-//                    ]);
-//                    $customer2->delete();
-//                    $customers[$id]->delete();
-//                }
-//            }
-//        }
+        $customers = Customer::where('user_id',$user->id)->get()->keyBy('id');
+//            $customers = $user->customers();
+            
+            foreach ($customers as $customer) {
+
+                foreach ($customers as $id => $customer2) {
+                    if ($customer->id < $customer2->id &&
+                        $customer->name == $customer2->name) {
+                        CustomerTransactions::where('customer_id', $customer2->id)->update([
+                            'customer_id' => $customer->id
+                        ]);
+                        Order::where('customer_id', $customer2->id)->update([
+                            'customer_id' => $customer->id,
+                        ]);
+                        $customer->update([
+                            'balance' => $customer->balance + $customer2->balance,
+                        ]);
+                        $customer2->delete();
+                        $customers[$id]->delete();
+                    }
+                }
+            }
+        }
+
 
 //        $products = Product::all();
 //        foreach ($products as $product){
@@ -109,22 +115,32 @@ class SettingController extends Controller
 //            $productData->save();
 //        }
 
-        $products = Product::where('location', 't')->get();
-        foreach ($products as $product) {
-            $product2 = Product::where('name', $product->name)->where('location', 'm')->get()->first();
-            if ($product2) {
-                $product2->update([
-                    'price' => $product->price,
-                    'productPrice' => $product->productPrice,
-                    'photo'=>$product->photo,
-                ]);
-            } else {
-                $product2 = $product->replicate();
-                $product2->created_at = Carbon::now();
-                $product2->location = 'm';
-                $product2->save();
-            }
-        }
+//        $products = Product::where('location', 't')->get();
+//        foreach ($products as $product) {
+//            $product2 = Product::where('name', $product->name)->where('location', 'm')->get()->first();
+//            if ($product2) {
+//                $product2->update([
+//                    'price' => $product->price,
+//                    'productPrice' => $product->productPrice,
+//                    'photo'=>$product->photo,
+//                ]);
+//            } else {
+//                $product2 = $product->replicate();
+//                $product2->created_at = Carbon::now();
+//                $product2->location = 'm';
+//                $product2->save();
+//            }
+//        }
+
+
+//        $products = Product::where('location', 'm')->get();
+//        foreach ($products as $product) {
+//            $product2 = Product::where('name', $product->name)->where('location', 't')->get()->first();
+//            if (!$product2) {
+//                echo $product->name . '<br>';
+//            }
+//        }
+
 
 //        DB::commit();
         return 'ok';
