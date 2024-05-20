@@ -43,7 +43,7 @@ class ProductController extends Controller
         $req->PPrice = +str_replace(",", "", $req->PPrice);
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
-            'name' => 'unique:products,name|required|string|max:255|min:4',
+            'name' => 'required|string|max:255|min:4',
             'price' => 'required',
         ]);
         $photo = '';
@@ -53,18 +53,22 @@ class ProductController extends Controller
 
         $available = $req->available == 'true';
 
-        $product = Product::create([
-            'name' => $req->name,
-            'price' => $req->price,
-            'productPrice' => $req->PPrice,
-            'available' => $available,
-            'photo' => $photo,
-            'category' => $req->category,
-            'location' => $req->location,
-            'quantity' => $req->quantity,
-            'alarm' => $req->alarm,
-            'high_alarm' => $req->high_alarm,
-        ]);
+        $product = Product::where('name', $req->name)->where('location', $req->location)->get();
+        if ($product) {
+            return $this->errorBack('این محصول تکراری است.');
+        } else
+            $product = Product::create([
+                'name' => $req->name,
+                'price' => $req->price,
+                'productPrice' => $req->PPrice,
+                'available' => $available,
+                'photo' => $photo,
+                'category' => $req->category,
+                'location' => $req->location,
+                'quantity' => $req->quantity,
+                'alarm' => $req->alarm,
+                'high_alarm' => $req->high_alarm,
+            ]);
         if ($req->quantity > 0) {
             $product->productChange()->create([
                 'change' => $product->quantity,
@@ -88,11 +92,11 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $productChange = new ProductChange();
         $productChange->product_id = $product->id;
-        if (!$product->photo)
-            $product->photo = '';
-        if ($req->file("photo")) {
-            $product->photo = $req->file("photo")->store("", 'p-photo');
-        }
+//        if (!$product->photo)
+//            $product->photo = '';
+//        if ($req->file("photo")) {
+//            $product->photo = $req->file("photo")->store("", 'p-photo');
+//        }
         $product->name = $req->name;
         $product->price = $req->price;
         $product->productPrice = $req->PPrice;
@@ -112,6 +116,11 @@ class ProductController extends Controller
         $product->category = $req->category;
         $product->location = $req->location;
         $product->save();
+        Product::where('name', $product->name)->update([
+            'price' => $product->price,
+            'productPrice' => $product->productPrice,
+            'category' => $product->category,
+        ]);
         if ($productChange->change != 0)
             $productChange->save();
         DB::commit();

@@ -15,8 +15,6 @@ class Product extends Model
         'photo',
         'available',
         'quantity',
-        'quantity_m',
-        'quantity_f',
         'alarm',
         'category',
         'high_alarm',
