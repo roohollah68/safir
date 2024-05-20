@@ -76,33 +76,30 @@ class SettingController extends Controller
 //            }
 //        }
 
-        $users = User::all();
-        foreach ($users as $user) {
-//        $customers = Customer::where('user_id','<>' , 61)->get()->keyBy('id');
-        $customers = Customer::where('user_id',$user->id)->get()->keyBy('id');
-//            $customers = $user->customers();
-            
-            foreach ($customers as $customer) {
-
-                foreach ($customers as $id => $customer2) {
-                    if ($customer->id < $customer2->id &&
-                        $customer->name == $customer2->name) {
-                        CustomerTransactions::where('customer_id', $customer2->id)->update([
-                            'customer_id' => $customer->id
-                        ]);
-                        Order::where('customer_id', $customer2->id)->update([
-                            'customer_id' => $customer->id,
-                        ]);
-                        $customer->update([
-                            'balance' => $customer->balance + $customer2->balance,
-                        ]);
-                        $customer2->delete();
-                        $customers[$id]->delete();
-                    }
-                }
-            }
-        }
-
+//        $users = User::all();
+//        foreach ($users as $user) {
+////        $customers = Customer::where('user_id','<>' , 61)->get()->keyBy('id');
+//        $customers = Customer::where('user_id',$user->id)->get()->keyBy('id');
+////            $customers = $user->customers();
+//            foreach ($customers as $customer) {
+//                foreach ($customers as $id => $customer2) {
+//                    if ($customer->id < $customer2->id &&
+//                        $customer->name == $customer2->name) {
+//                        CustomerTransactions::where('customer_id', $customer2->id)->update([
+//                            'customer_id' => $customer->id
+//                        ]);
+//                        Order::where('customer_id', $customer2->id)->update([
+//                            'customer_id' => $customer->id,
+//                        ]);
+//                        $customer->update([
+//                            'balance' => $customer->balance + $customer2->balance,
+//                        ]);
+//                        $customer2->delete();
+//                        $customers[$id]->delete();
+//                    }
+//                }
+//            }
+//        }
 
 //        $products = Product::all();
 //        foreach ($products as $product){
@@ -132,7 +129,6 @@ class SettingController extends Controller
 //            }
 //        }
 
-
 //        $products = Product::where('location', 'm')->get();
 //        foreach ($products as $product) {
 //            $product2 = Product::where('name', $product->name)->where('location', 't')->get()->first();
@@ -141,6 +137,20 @@ class SettingController extends Controller
 //            }
 //        }
 
+        $customers = Customer::all();
+        foreach ($customers as $customer){
+            $trans = CustomerTransactions::where('customer_id' , $customer->id)->get();
+            $balance = 0;
+            foreach ($trans as $tran){
+                if(!$tran->type)
+                    $amount = -$tran->amount;
+                else
+                    $amount = +$tran->amount;
+                $balance += $amount;
+                $tran->balance = $balance;
+                $tran->save();
+            }
+        }
 
 //        DB::commit();
         return 'ok';
