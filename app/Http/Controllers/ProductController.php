@@ -53,7 +53,7 @@ class ProductController extends Controller
 
         $available = $req->available == 'true';
 
-        $product = Product::where('name', $req->name)->where('location', $req->location)->get();
+        $product = Product::where('name', $req->name)->where('location', $req->location)->first();
         if ($product) {
             return $this->errorBack('این محصول تکراری است.');
         } else
