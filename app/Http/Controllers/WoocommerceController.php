@@ -5,22 +5,24 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\User;
 
+use App\Models\Websites;
 use Illuminate\Support\Facades\DB;
 
 class WoocommerceController extends Controller
 {
     public function addWebsiteOrder($website)
     {
-
         DB::beginTransaction();
 
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
         $request = json_decode(file_get_contents('php://input'));
         if (env('APP_ENV') == 'local')
-            $request = json_decode(file_get_contents('woo/1403-1-31_12-45 _ berrynocom _ مرتضی اسکندرپور.txt'));
-        if(!isset($request->billing))
+            $request = json_decode(file_get_contents('woo/1403-2-31_23-24 _ berrynocom _ سیداحسان حسینی.txt'));
+        if (!isset($request->billing))
             return 'not used';
-        file_put_contents('woo/' . verta(null, "Asia/Tehran")->format('Y-n-j_H-i') . ' _ ' . $website . ' _ ' . $request->billing->first_name . ' ' . $request->billing->last_name . '.txt', file_get_contents('php://input'));
+        file_put_contents('woo/' . verta(null, "Asia/Tehran")->
+            format('Y-n-j_H-i') . ' _ ' . $website . ' _ ' . $request->billing->first_name .
+            ' ' . $request->billing->last_name . '.txt', file_get_contents('php://input'));
 
         $orders = '';
         $products = array();
@@ -70,47 +72,138 @@ class WoocommerceController extends Controller
         }
 
         $user = User::where('username', $website)->first();
-        $order = $user->orders()->create([
-            'name' => $request->billing->first_name . ' ' . $request->billing->last_name,
-            'phone' => $request->billing->phone,
-            'address' => $request->billing->city . ' ' . $request->billing->address_1,
-            'zip_code' => $request->billing->postcode,
-            'orders' => $orders,
-            'desc' => $request->customer_note . ($desc ? ' - ' . $desc : ''),
-            'total' => $request->total,
-            'customerCost' => 0,
-            'paymentMethod' => $request->payment_method_title,
-            'deliveryMethod' => $request->shipping_lines[0]->method_title,
-        ]);
 
+        $web = Websites::where('website_id', $request->id)->where('website', $website)->first();
 
-        if ($request->status == 'processing') {
-            $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
-            $order->save();
-            foreach ($products as $id => $data) {
-                $product = $data[1];
-                $order->orderProducts()->create([
-                    'product_id' => $product->id,
-                    'verified' => true,
-                    'name' => $product->name,
-                    'number' => $data[0],
-                    'price' => $product->price,
-                ]);
-                $product->update([
-                    'quantity' => $product->quantity - $data[0],
-                ]);
-                $product->productChange()->create([
-                    'order_id' => $order->id,
-                    'change' => -$data[0],
-                    'quantity' => $product->quantity,
-                    'desc' => 'خرید اینترنتی سایت ' . $websiteTitle . ' خریدار: ' . $order->name,
-                ]);
+        if ($web) {
+            $web->update([
+                'status' => $request->status,
+            ]);
+            if ($request->status == 'processing' || $request->status == 'completed') {
+                $order = $web->order()->withTrashed()->first();
+                if ($order->deleted_at) {
+                    app('Telegram')->deleteOrderFromBale($order, '5742084958');
+                    $order->restore();
+                    $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+                    $order->save();
+                    foreach ($products as $id => $data) {
+                        $product = $data[1];
+                        $order->orderProducts()->create([
+                            'product_id' => $product->id,
+                            'verified' => true,
+                            'name' => $product->name,
+                            'number' => $data[0],
+                            'price' => $product->price,
+                        ]);
+                        $product->update([
+                            'quantity' => $product->quantity - $data[0],
+                        ]);
+                        $product->productChange()->create([
+                            'order_id' => $order->id,
+                            'change' => -$data[0],
+                            'quantity' => $product->quantity,
+                            'desc' => 'خرید اینترنتی سایت ' . $websiteTitle . ' خریدار: ' . $order->name,
+                        ]);
+                    }
+                }
+            } else {
+                $order = $web->order()->first();
+                if (!$order->deleted_at) {
+                    app('Telegram')->deleteOrderFromBale($order, env('GroupId'));
+                    $order->delete();
+                    $order->bale_id = app('Telegram')->sendOrderToBale($order, '5742084958')->result->message_id;
+                    $order->save();
+                    $order->orderProducts()->delete();
+                    foreach ($products as $id => $data) {
+                        $product = $data[1];
+                        $product->update([
+                            'quantity' => $product->quantity + $data[0],
+                        ]);
+                        $product->productChange()->create([
+                            'order_id' => $order->id,
+                            'change' => $data[0],
+                            'quantity' => $product->quantity,
+                            'desc' => 'لغو خرید اینترنتی سایت ' . $websiteTitle . ' خریدار: ' . $order->name,
+                        ]);
+                    }
+                }
             }
         } else {
-            if ($request->status != 'pending')
-                app('Telegram')->sendOrderToBale($order, '5742084958');
-            $order->forceDelete();
+            $order = $user->orders()->create([
+                'name' => $request->billing->first_name . ' ' . $request->billing->last_name,
+                'phone' => $request->billing->phone,
+                'address' => $request->billing->city . ' ' . $request->billing->address_1,
+                'zip_code' => $request->billing->postcode,
+                'orders' => $orders,
+                'desc' => $request->customer_note . ($desc ? ' - ' . $desc : ''),
+                'total' => $request->total,
+                'customerCost' => 0,
+                'paymentMethod' => $request->payment_method_title,
+                'deliveryMethod' => $request->shipping_lines[0]->method_title,
+            ]);
+
+            $web = $order->website()->create([
+                'website' => $website,
+                'website_id' => $request->id,
+                'status' => $request->status,
+            ]);
+
+            if ($request->status == 'processing' || $request->status == 'completed') {
+                $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+                $order->save();
+                foreach ($products as $id => $data) {
+                    $product = $data[1];
+                    $order->orderProducts()->create([
+                        'product_id' => $product->id,
+                        'verified' => true,
+                        'name' => $product->name,
+                        'number' => $data[0],
+                        'price' => $product->price,
+                    ]);
+                    $product->update([
+                        'quantity' => $product->quantity - $data[0],
+                    ]);
+                    $product->productChange()->create([
+                        'order_id' => $order->id,
+                        'change' => -$data[0],
+                        'quantity' => $product->quantity,
+                        'desc' => 'خرید اینترنتی سایت ' . $websiteTitle . ' خریدار: ' . $order->name,
+                    ]);
+                }
+
+            } else {
+                $order->delete();
+                $order->bale_id = app('Telegram')->sendOrderToBale($order, '5742084958');
+                $order->save();
+            }
         }
+//        if ($request->status == 'processing') {
+//            $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+//            $order->save();
+//            foreach ($products as $id => $data) {
+//                $product = $data[1];
+//                $order->orderProducts()->create([
+//                    'product_id' => $product->id,
+//                    'verified' => true,
+//                    'name' => $product->name,
+//                    'number' => $data[0],
+//                    'price' => $product->price,
+//                ]);
+//                $product->update([
+//                    'quantity' => $product->quantity - $data[0],
+//                ]);
+//                $product->productChange()->create([
+//                    'order_id' => $order->id,
+//                    'change' => -$data[0],
+//                    'quantity' => $product->quantity,
+//                    'desc' => 'خرید اینترنتی سایت ' . $websiteTitle . ' خریدار: ' . $order->name,
+//                ]);
+//            }
+//        } else {
+//            if ($request->status != 'pending')
+//                app('Telegram')->sendOrderToBale($order, '5742084958');
+//            $order->forceDelete();
+//        }
         DB::commit();
         return 'order saved!';
     }

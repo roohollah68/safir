@@ -222,9 +222,15 @@ class TelegramController extends Controller
     public function editOrderInBale($order, $chatId)
     {
         $message = $this->createOrderMessage($order);
-        $content = array("message_id" => $order->bale_id, "text" => $message,"chat_id"=>$chatId);
+        $content = array("message_id" => $order->bale_id, "text" => $message, "chat_id" => $chatId);
         return $this->editText($content);
 
+    }
+
+    public function deleteOrderFromBale($order, $chatId)
+    {
+        if ($order->bale_id)
+            $this->deleteFromBale($chatId, $order->bale_id);
     }
 
     public function createOrderMessage($order)

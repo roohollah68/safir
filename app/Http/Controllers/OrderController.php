@@ -557,7 +557,8 @@ class OrderController extends Controller
                 ]);
 
             }
-            $this->deleteFromBale(env('GroupId'), $order->bale_id);
+            app('Telegram')->deleteOrderFromBale($order, env('GroupId'));
+//            $this->deleteFromBale(env('GroupId'), $order->bale_id);
             DB::commit();
             return ['با موفقیت حذف شد', $order];
         };

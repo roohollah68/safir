@@ -95,4 +95,9 @@ class Order extends Model
         else
             return config('payMethods')[$this->confirm];
     }
+
+    public function website()
+    {
+        return $this->hasOne(Websites::class);
+    }
 }
