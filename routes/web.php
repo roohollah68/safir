@@ -139,8 +139,8 @@ Route::group(['middleware' => ['auth', 'verify', 'safir', 'role']], function () 
     Route::get('/transactions', [TransactionController::class, 'show'])->name('transactions');
 });
 
-Route::post('/woocommerce/{website}', [WoocommerceController::class, 'addPeptinaOrder']);
-Route::get('/woocommerce/{website}', [WoocommerceController::class, 'addPeptinaOrder']);
+Route::post('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteOrder']);
+Route::get('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteOrder']);
 Route::get('/backup', [TelegramController::class, 'backUpDatabase']);
 
 Route::get('/product/alarm', [ProductChangeController::class, 'productAlarm']);

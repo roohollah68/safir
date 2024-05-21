@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class WoocommerceController extends Controller
 {
-    public function addPeptinaOrder($website)
+    public function addWebsiteOrder($website)
     {
 
         DB::beginTransaction();
