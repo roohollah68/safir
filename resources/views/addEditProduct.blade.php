@@ -220,7 +220,7 @@
                                   onclick="deleteRecord({{$productChange->id}})"></span>
                         @endif
                         @if($productChange->order_id)
-                            <i id="view_order_${id}" class="fa fa-eye btn btn-info" onclick="view_order({{$productChange->order_id}})"></i>
+                            <i id="view_order_{{$productChange->order_id}}" class="fa fa-eye btn btn-info" onclick="view_order({{$productChange->order_id}})"></i>
                         @endif
                     </td>
                 </tr>
