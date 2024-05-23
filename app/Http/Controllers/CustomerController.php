@@ -30,7 +30,7 @@ class CustomerController extends Controller
         return view('customerList', [
             'customers' => $customers,
             'total' => $total,
-            'users' => User::where('verified', true)->get(),
+            'users' => User::where('role', 'admin')->where('verified', true)->get(),
         ]);
     }
 
@@ -233,12 +233,12 @@ class CustomerController extends Controller
         DB::commit();
     }
 
-    public function customersDepositList()
+    public function customersDepositList(Request $req)
     {
-//        $users = User::where('role','admin')->where('verified',true)->get();
-        $transactions = CustomerTransactions::where('photo', '<>', null)->get();
         return view('customersDepositList', [
-            'transactions' => $transactions,
+            'transactions' => CustomerTransactions::where('photo', '<>', null)->get(),
+            'users' => User::where('role', 'admin')->where('verified', true)->get(),
+            'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
         ]);
     }
 }

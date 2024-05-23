@@ -6,37 +6,37 @@
 
 @section('content')
     @csrf
-    <br>
-{{--    <div class="w-100 m-2 p-2 bg-info rounded">--}}
-{{--        <span>نام مشتری:</span> <b>{{$customer->name}}</b><br>--}}
-{{--        @if($superAdmin)--}}
-{{--        <span>نام کاربر مرتبط:</span> <b>{{$customer->user()->first()->name}}</b><br>--}}
-{{--        @endif--}}
-{{--        <span>شماره مشتری:</span> <b>{{$customer->id}}</b><br>--}}
-{{--        <span>شماره تماس:</span> <b>{{$customer->phone}}</b><br>--}}
-{{--        <span>شهر:</span> <b>{{$customer->cityName()}}</b><br>--}}
-{{--        <span>آدرس:</span> <b>{{$customer->address}}</b><br>--}}
-{{--        <span>کد پستی:</span> <b>{{$customer->zip_code}}</b><br>--}}
-{{--        <span class="h3">بدهکاری:</span> <b dir="ltr"--}}
-{{--                                            class="h3 text-danger">{{number_format($customer->balance)}}</b><span--}}
-{{--            class="h3">ریال</span><br>--}}
-{{--        <a class="fa fa-edit btn btn-primary"--}}
-{{--           href="/customer/edit/{{$customer->id}}"--}}
-{{--           title="ویرایش مشتری">--}}
-{{--        </a>--}}
-{{--    </div>--}}
 
-{{--    <a class="btn btn-info" href="/customerDeposit/add/{{$customer->id}}">ثبت واریزی</a>--}}
-{{--    <a class="btn btn-secondary" href="{{route('CustomerList')}}">بازگشت</a>--}}
-{{--    <br>--}}
-{{--    <span class="btn btn-warning" onclick="$('.deleted').toggle()"><span class="fa fa-check deleted"></span> نمایش موارد حذف شده</span>--}}
-{{--    <br>--}}
+    <form method="get" action="">
+        <div class="col-md-6">
+            <div class="form-group input-group required">
+                <div class="input-group-append" style="min-width: 160px">
+                    <label for="user" class="input-group-text w-100">کاربر مرتبط:</label>
+                </div>
+                <select class="form-control" name="user" id="user">
+                    <option value="all"
+                            selected
+                    >همه
+                    </option>
+                    @foreach($users as $user)
+                        <option value="{{$user->id}}"
+                                @if( isset($_GET['user']) && $user->id == $_GET['user'])
+                                selected
+                            @endif
+                        >{{$user->name}}</option>
+                    @endforeach
+                </select> <input type="submit" class="btn btn-primary" value="فیلتر">
+            </div>
+        </div>
+    </form>
+    <br>
+
     <table class="stripe" id="transaction-table">
         <br>
         <thead>
         <tr>
-            <th>id</th>
             <th>زمان</th>
+            <th>مبلغ(ریال)</th>
             <th>توضیح</th>
             <th>مشتری</th>
             <th>کاربر مرتبط</th>
@@ -45,12 +45,13 @@
         </thead>
         <tbody>
         @foreach($transactions as $tran)
+            @if($selectedUser == 'all' || $tran->customer()->first()->user()->first()->id== $selectedUser)
             <tr class="{{$tran->deleted?'deleted':''}}">
-                <td>{{$tran->id}}</td>
-                <td>{{verta($tran->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
+                <td><span class="d-none">{{verta($tran->created_at)->timestamp}}</span>{{verta($tran->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
+                <td dir="ltr">{{number_format($tran->amount)}}</td>
                 <td>{{$tran->description}}</td>
-                <td dir="ltr"><a href="/customer/transaction/{{$tran->customer()->first()->id}}">{{$tran->customer()->first()->name}}</a> </td>
-                <td dir="ltr">{{$tran->customer()->first()->user()->first()->name}}</td>
+                <td ><a href="/customer/transaction/{{$tran->customer()->first()->id}}">{{$tran->customer()->first()->name}}</a> </td>
+                <td >{{$tran->customer()->first()->user()->first()->name}}</td>
                 <td>
                     @if($tran->order_id)
                             <a class="btn btn-info fa fa-eye" onclick="view_order({{$tran->order_id}})"
@@ -65,6 +66,7 @@
 
                 </td>
             </tr>
+            @endif
         @endforeach
         </tbody>
     </table>
@@ -77,17 +79,6 @@
         let token;
         $(function () {
             $('#transaction-table').DataTable({
-                columnDefs: [
-                    {
-                        targets: [2, 3, 4],
-                        orderable: false
-                    },
-
-                    {
-                        targets: [0],
-                        visible: false
-                    }
-                ],
                 order: [[0, "desc"]],
                 paging: false,
             });
