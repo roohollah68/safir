@@ -232,4 +232,13 @@ class CustomerController extends Controller
         ]);
         DB::commit();
     }
+
+    public function customersDepositList()
+    {
+//        $users = User::where('role','admin')->where('verified',true)->get();
+        $transactions = CustomerTransactions::where('photo', '<>', null)->get();
+        return view('customersDepositList', [
+            'transactions' => $transactions,
+        ]);
+    }
 }

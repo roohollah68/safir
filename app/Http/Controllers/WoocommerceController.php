@@ -17,7 +17,7 @@ class WoocommerceController extends Controller
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
         $request = json_decode(file_get_contents('php://input'));
         if (env('APP_ENV') == 'local')
-            $request = json_decode(file_get_contents('woo/1403-2-31_23-24 _ berrynocom _ سیداحسان حسینی.txt'));
+            $request = json_decode(file_get_contents('woo/1403-3-3_00-02 _ peptina _ مرجان محبوبی آرانی.txt'));
         if (!isset($request->billing))
             return 'not used';
         file_put_contents('woo/' . verta(null, "Asia/Tehran")->

@@ -38,6 +38,8 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'role']], functio
     Route::post('coupon/delete/{id}', [CouponController::class, 'deleteCoupon']);
 
     Route::get('statistic', [OrderProductController::class, 'showStatistic'])->name('statistic');
+
+    Route::get('customers_deposit_list', [CustomerController::class, 'customersDepositList'])->name('customersDepositList');
 });
 
 Route::group(['middleware' => ['auth', 'verify']], function () {
