@@ -76,7 +76,7 @@
                     @endif
 
                     @if($superAdmin)
-                        <th>{{$customer->user()->first()->name}}</th>
+                        <th>{{$customer->user->name}}</th>
                     @endif
 
                     <td>
@@ -131,7 +131,7 @@
             });
             $('#brief-table table').DataTable({
                 order: [[2, "asc"]],
-                pageLength: 100,
+                pageLength: 50,
             });
             $('#brief-table').hide();
 

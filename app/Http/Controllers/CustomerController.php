@@ -18,9 +18,9 @@ class CustomerController extends Controller
 
         if ($this->superAdmin()) {
             if (!$req->user || $req->user == 'all')
-                $customers = Customer::all()->keyBy("id");
+                $customers = Customer::with('user')->get()->keyBy("id");
             else
-                $customers = Customer::where('user_id', $req->user)->get();
+                $customers = Customer::where('user_id', $req->user)->with('user')->get();
         } else
             $customers = auth()->user()->customers()->get()->keyBy("id");
         $total = 0;
@@ -236,8 +236,8 @@ class CustomerController extends Controller
     public function customersDepositList(Request $req)
     {
         return view('customersDepositList', [
-            'transactions' => CustomerTransactions::where('photo', '<>', null)->get(),
-            'users' => User::where('role', 'admin')->where('verified', true)->get(),
+            'transactions' => CustomerTransactions::where('photo', '<>', null)->with('customer.user')->get(),
+            'users' => User::where('role', 'admin')->where('verified', true)->select('id','name')->get(),
             'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
         ]);
     }

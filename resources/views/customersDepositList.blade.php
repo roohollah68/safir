@@ -50,8 +50,8 @@
                 <td><span class="d-none">{{verta($tran->created_at)->timestamp}}</span>{{verta($tran->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
                 <td dir="ltr">{{number_format($tran->amount)}}</td>
                 <td>{{$tran->description}}</td>
-                <td ><a href="/customer/transaction/{{$tran->customer()->first()->id}}">{{$tran->customer()->first()->name}}</a> </td>
-                <td >{{$tran->customer()->first()->user()->first()->name}}</td>
+                <td ><a href="/customer/transaction/{{$tran->customer_id}}">{{$tran->customer->name}}</a> </td>
+                <td >{{$tran->customer->user->name}}</td>
                 <td>
                     @if($tran->order_id)
                             <a class="btn btn-info fa fa-eye" onclick="view_order({{$tran->order_id}})"
