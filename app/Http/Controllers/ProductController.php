@@ -50,7 +50,6 @@ class ProductController extends Controller
         if ($req->file("photo")) {
             $photo = $req->file("photo")->store("", 'p-photo');
         }
-
         $available = $req->available == 'true';
 
         $product = Product::where('name', $req->name)->where('location', $req->location)->first();

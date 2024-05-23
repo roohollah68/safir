@@ -21,7 +21,7 @@ class WoocommerceController extends Controller
         if (!isset($request->billing))
             return 'not used';
         file_put_contents('woo/' . verta(null, "Asia/Tehran")->
-            format('Y-n-j_H-i') . ' _ ' . $website . ' _ ' . $request->billing->first_name .
+            format('Y-n-j_H-i-s') . ' _ ' . $website . ' _ ' . $request->billing->first_name .
             ' ' . $request->billing->last_name . '.txt', file_get_contents('php://input'));
 
         $orders = '';
@@ -173,8 +173,10 @@ class WoocommerceController extends Controller
 
             } else {
                 $order->delete();
-                $order->bale_id = app('Telegram')->sendOrderToBale($order, '5742084958');
-                $order->save();
+                if ($request->status != 'pending') {
+                    $order->bale_id = app('Telegram')->sendOrderToBale($order, '5742084958');
+                    $order->save();
+                }
             }
         }
 //        if ($request->status == 'processing') {
