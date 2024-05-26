@@ -160,7 +160,6 @@ class OrderController extends Controller
 
         $request->total = $total;
 
-        dd($request->customerId);
         $request->customerId = $this->addToCustomers($request);
         if ($request->customerId == 'not match')
             return $this->errorBack('نام مشتری مطابقت ندارد!');
