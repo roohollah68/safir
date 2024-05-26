@@ -4,7 +4,7 @@
     <input type="number" value="{{old('customerId')?:$order->customer_id}}" min="0" step="1" name="customerId"
            id="customerId"
            style="width: 70px"
-           onchange="customerFind()" disabled>
+           onchange="customerFind()">
 @endif
 <input type="hidden" name="location" value="{{$location}}">
 <div id="formElements" class="bg-white">
