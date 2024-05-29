@@ -262,9 +262,9 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         if ($this->superAdmin())
-            $order = Order::findOrFail($id);
+            $order = Order::with('user')->with('orderProducts')->findOrFail($id);
         else
-            $order = auth()->user()->orders()->findOrFail($id);
+            $order = auth()->user()->orders()->with('orderProducts')->with('user')->findOrFail($id);
 
         request()->validate([
             'receipt' => 'mimes:jpeg,jpg,png,bmp|max:2048',
@@ -276,22 +276,22 @@ class OrderController extends Controller
         $request->phone = $this->number_Fa_En($request->phone);
         $request->zip_code = $this->number_Fa_En($request->zip_code);
 
-        if (!$order->user()->first()->safir()) {
+        if (!$order->user->safir()) {
             $orders = '';
-            $products = Product::where('available', true)->get()->keyBy('id');
-            $productOrders = $order->orderProducts()->get()->keyBy('product_id');
+            $products = Product::where('available', true)->where('location', $request->location)->get()->keyBy('id');
+            $productOrders = $order->orderProducts->keyBy('product_id');
             $total = 0;
-
             foreach ($products as $id => $product) {
                 $number = $request['product_' . $id];
                 if ($number > 0) {
                     $coupon = +$request['discount_' . $id];
-                    $price = round((100 - $coupon) * $product->price / 100);
-                    if (($this->superAdmin() || $this->admin()) && $coupon == 0) {
+                    if ($coupon == 0)
                         $price = +str_replace(",", "", $request['price_' . $id]);
-                    }
+                    else
+                        $price = round((100 - $coupon) * $product->price / 100);
                     $total += $price * $number;
                     $orders .= ' ' . $product->name . ' ' . +$number . 'عدد' . '،';
+
                     if (isset($productOrders[$id]))
                         $productOrders[$id]->update([
                             'discount' => $request['discount_' . $id],
@@ -319,7 +319,7 @@ class OrderController extends Controller
         }
 
         $order->update([
-            'name' => $request->name,
+            'name' => $order->user->safir() ? $request->name : $order->name,
             'phone' => $request->phone,
             'address' => $request->address,
             'zip_code' => $request->zip_code,

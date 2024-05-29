@@ -4,7 +4,7 @@
     <input type="number" value="{{old('customerId')?:$order->customer_id}}" min="0" step="1" name="customerId"
            id="customerId"
            style="width: 70px"
-           onchange="customerFind()">
+           onchange="customerFind()" @if($edit) readonly @endif>
 @endif
 <input type="hidden" name="location" value="{{$location}}">
 <div id="formElements" class="bg-white">
@@ -15,7 +15,7 @@
                     <label for="name" class="input-group-text w-100">نام و نام خانوادگی:</label>
                 </div>
                 <input value="{{old('name')?:$order->name}}" type="text" id="name" class="form-control" name="name"
-                       required="">
+                       required="" @if($edit && $creatorIsAdmin) readonly @endif>
             </div>
         </div>
         <div class="col-md-6">
