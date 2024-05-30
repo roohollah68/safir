@@ -13,10 +13,9 @@
     let deleted, printWait, confirmWait, proccessWait, user = 'all', Location = 't';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     let role = users[userId].role;
-    let globalElement;
     let dtp1Instance;
-    let sendMethods = {!!json_encode($sendMethods)!!};
-    let payMethods = {!!json_encode($payMethods)!!};
+    let sendMethods = {!!json_encode(config('sendMethods'))!!};
+    let payMethods = {!!json_encode(config('payMethods'))!!};
     $(() => {
         $(".checkboxradio").checkboxradio();
         prepare_data();
@@ -373,20 +372,38 @@
     function confirmInvoice(id, element) {
         if (orders[id].confirm)
             return
-        globalElement = element;
-        let dialog = `<div title="نحوه پرداخت" class="dialogs">`;
-        dialog += `<p class="btn btn-success" onclick="sendConfirm(${id},1)">${payMethods[1]}</p><br>`;
-        dialog += `<p class="btn btn-info" onclick="sendConfirm(${id},2)">${payMethods[2]}</p><br>`;
-        dialog += `<p class="btn btn-primary" onclick="sendConfirm(${id},3)">${payMethods[3]}</p><br>`;
-        dialog += `<p class="btn btn-secondary" onclick="sendConfirm(${id},6)">${payMethods[6]}</p><br>`;
-        dialog += `<p class="btn btn-warning" onclick="sendConfirm(${id},4)">${payMethods[4]}</p><br>`;
-        dialog += `<p class="btn btn-danger" id="dtp1">${payMethods[5]}</p>`;
-        dialog += `<input type="text" id="dateOfPayment" class="form-control d-none" placeholder="تاریخ پرداخت" data-name="dtp1-text">`;
 
-        dialog += `<br><label for="send-note">یادداشت:</label>`;
-        dialog += `<input id="send-note" name="note" type="text" class="w-100">`;
 
-        dialog += `</div>`;
+        dialog = `
+<div title="نحوه پرداخت" class="dialogs">
+
+<input type="radio" id="cash" value="1" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('.cashPhoto').show()">
+<label for='cash' class="btn btn-success my-1">پرداخت نقدی</label>
+<label for='cashPhoto' class="btn btn-info m-2 hide cashPhoto" >بارگذاری رسید بانکی  <i class="fa fa-image"></i></label>
+<input type="file" class="hide" name="cashPhoto" id="cashPhoto">
+<br>
+<input type="radio" id="cheque" value="2" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('.chequePhoto').show()">
+<label for='cheque' class="btn btn-info my-1">پرداخت چکی</label>
+<label for='chequePhoto' class="btn btn-info m-2 hide chequePhoto">بارگذاری تصویر چک  <i class="fa fa-image"></i></label>
+<input type="file" class="hide" name="chequePhoto" id="chequePhoto">
+<br>
+<input type="radio" id="cod" value="3" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">
+<label for='cod' class="btn btn-primary my-1">پرداخت در محل</label>
+<br>
+<input type="radio" id="factor" value="4" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">
+<label for='factor' class="btn btn-secondary my-1">فاکتور به فاکتور</label>
+<br>
+<input type="radio" id="barrow" value="5" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">
+<label for='barrow' class="btn btn-warning my-1">امانی</label>
+<br>
+<input type="radio" id="payInDate" value="6" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('#dateOfPayment').show()">
+<label for='payInDate' class="btn btn-danger my-1">پرداخت در تاریخ</label>
+<input type="text" id="dateOfPayment" class="form-control hide" placeholder="تاریخ پرداخت" data-name="dtp1-text">
+
+<br><label for="send-note">یادداشت:</label>
+<input id="send-note" name="note" type="text" class="w-100">
+</div>
+        `;
 
         $(dialog).dialog({
             modal: true,
@@ -397,13 +414,13 @@
                 });
             }
         });
-
-        dtp1Instance = new mds.MdsPersianDateTimePicker(document.getElementById('dtp1'), {
+        $(".checkboxradio").checkboxradio();
+        dtp1Instance = new mds.MdsPersianDateTimePicker(document.getElementById('payInDate'), {
             targetTextSelector: '[data-name="dtp1-text"]',
             persianNumber: true,
-            onDayClick: function () {
-                sendConfirm(id, 5);
-            }
+            // onDayClick: function () {
+            //     sendConfirm(id, 5);
+            // }
         });
     }
 

@@ -59,4 +59,8 @@
     .dataTables_wrapper {
         overflow-x: scroll;
     }
+
+    .hide{
+        display: none;
+    }
 </style>
