@@ -22,6 +22,8 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'role']], functio
     Route::get('/users', [UserController::class, 'show'])->name('manageUsers');
     Route::get('/confirm_user/{id}', [UserController::class, 'confirm']);
     Route::get('/suspend_user/{id}', [UserController::class, 'suspend']);
+    Route::get('/add_user', [UserController::class, 'addUser']);
+    Route::post('/add_user', [UserController::class, 'insertUser']);
     Route::get('/edit_user/{id}', [UserController::class, 'edit']);
     Route::post('/edit_user/{id}', [UserController::class, 'update']);
 
@@ -112,6 +114,8 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'admin', 'role']]
     Route::get('/customerDeposit/add/{id}/{linkId}', [CustomerController::class, 'newForm']);
     Route::post('/customerDeposit/add/{id}', [CustomerController::class, 'storeNew']);
     Route::post('/customerDeposit/delete/{id}', [CustomerController::class, 'deleteDeposit']);
+
+    Route::post('/orders/paymentMethod/{id}', [OrderController::class, 'paymentMethod']);
 });
 
 //**************************************  superAdmin  *****  warehouse  *******************

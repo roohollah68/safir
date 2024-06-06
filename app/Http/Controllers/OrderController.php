@@ -465,10 +465,10 @@ class OrderController extends Controller
         $order->paymentMethod = $request->pay;
         $order->confirm = +$request->confirm;
         $order->save();
-        $orderProducts = $order->orderProducts();
+        $orderProducts = $order->orderProducts()->with('product');
         $orderProducts->update(['verified' => true]);
         foreach ($orderProducts->get() as $orderProduct) {
-            $product = $orderProduct->product()->first();
+            $product = $orderProduct->product;
 
             $product->update([
                 'quantity' => $product->quantity - $orderProduct->number,
@@ -496,25 +496,31 @@ class OrderController extends Controller
         if ($order->state)
             $order->state = 4;
         $order->confirm = false;
-        $order->save();
-        $order->orderProducts()->update(['verified' => false]);
-        foreach ($order->productChange()->get() as $productChange) {
-            $product = $productChange->product()->first();
-            $product->update([
-                'quantity' => $product->quantity - $productChange->change,
-            ]);
-            $productChange->update(['isDeleted' => true]);
-            $order->productChange()->create([
-                'product_id' => $product->id,
-                'change' => -$productChange->change,
-                'quantity' => $product->quantity,
-                'desc' => 'لغو خرید مشتری ' . $order->name,
-                'isDeleted' => true,
-            ]);
+        if ($order->counter == 'approved') {
+            $order->orderProducts()->update(['verified' => false]);
+            foreach ($order->productChange()->get() as $productChange) {
+                $product = $productChange->product()->first();
+                $product->update([
+                    'quantity' => $product->quantity - $productChange->change,
+                ]);
+                $productChange->update(['isDeleted' => true]);
+                $order->productChange()->create([
+                    'product_id' => $product->id,
+                    'change' => -$productChange->change,
+                    'quantity' => $product->quantity,
+                    'desc' => 'لغو خرید مشتری ' . $order->name,
+                    'isDeleted' => true,
+                ]);
+            }
+            $this->deleteFromBale(env('GroupId'), $order->bale_id);
         }
-//        $order->productChange()->delete();
         $this->removeFromCustomerTransactions($order);
-        $this->deleteFromBale(env('GroupId'), $order->bale_id);
+        $order->counter = 'waiting';
+        $order->paymentMethod = null;
+        $order->payInDate = null;
+        $order->paymentNote = null;
+        $order->save();
+
         DB::commit();
         return $order;
     }
@@ -633,14 +639,14 @@ class OrderController extends Controller
         $customer->update([
             'balance' => $customer->balance - $order->total,
         ]);
-        $customer->transactions()->create([
+        $trans = $customer->transactions()->create([
             'order_id' => $order->id,
             'amount' => $order->total,
-            'balance' => $customer->balance,
             'type' => false,
             'description' => 'تایید سفارش ' . $order->id . ' - ' . auth()->user()->name,
         ]);
         DB::commit();
+        return $trans;
     }
 
     public function removeFromCustomerTransactions($order)
@@ -652,7 +658,6 @@ class OrderController extends Controller
             'amount' => $customerTransaction->amount,
             'description' => 'ابطال سفارش  ' . $order->id . ' - ' . auth()->user()->name,
             'type' => true,
-            'balance' => $customer->balance + $customerTransaction->amount,
             'customer_id' => $customer->id,
             'deleted' => true,
         ]);
@@ -689,6 +694,7 @@ class OrderController extends Controller
             'deliveryMethod' => $request->deliveryMethod,
             'customer_id' => $request->customerId,
             'confirm' => $this->safir(),
+            'counter' => $this->safir() ? 'approved' : 'waiting',
             'location' => $request->location,
         ]);
     }
@@ -734,4 +740,60 @@ class OrderController extends Controller
         DB::commit();
         return $order;
     }
+
+    public function paymentMethod($id, Request $req)
+    {
+        if ($this->superAdmin())
+            $order = Order::with('customer')->findOrFail($id);
+        else
+            $order = auth()->user()->orders()->with('customer')->findOrFail($id);
+        request()->validate([
+            'paymentMethod' => 'required',
+            'cashPhoto' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
+            'chequePhoto' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
+        ]);
+        DB::beginTransaction();
+        $paymentMethod = $req->paymentMethod;
+        $photo = null;
+        $date = null;
+        if ($paymentMethod == 'cash') {
+            if (!$req->file("cashPhoto"))
+                return ['error', 'باید عکس رسید بانکی بارگذاری شود.'];
+            $photo = $req->file("cashPhoto")->store("", 'deposit');
+
+        }
+        if ($paymentMethod == 'cheque') {
+            if ($req->file("chequePhoto"))
+                $photo = $req->file("chequePhoto")->store("", 'deposit');
+        }
+        if ($paymentMethod == 'payInDate') {
+            if (strlen($req->payInDate) != 10)
+                return ['error', 'تاریخ باید مشخص شود.'];
+        }
+        $order->update([
+            'confirm' => 1,
+            'paymentMethod' => $paymentMethod,
+            'payInDate' => $req->payInDate,
+            'paymentNote' => $req->note,
+            'counter' => 'waiting',
+        ]);
+        $trans1 = $this->addToCustomerTransactions($order);
+        if ($photo) {
+            $trans2 = $order->customer->transactions()->create([
+                'amount' => $order->total,
+                'type' => true,
+                'verified' => false,
+                'description' => $req->note . '/ ' . $order->payMethod(),
+                'photo' => $photo,
+                'paymentLink' => $trans1->id,
+            ]);
+            $trans1->update([
+                'paymentLink' => $trans2->id,
+            ]);
+        }
+
+        DB::commit();
+        return ['ok', $order];
+    }
 }
+

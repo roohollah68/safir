@@ -27,7 +27,8 @@ class User extends Authenticatable
         'password',
         'telegram_id',
         'telegram_code',
-        'balance'
+        'balance',
+        'role',
     ];
 
     /**
@@ -69,6 +70,11 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     public function admin()
     {
         return $this->role == "admin";
@@ -91,6 +97,11 @@ class User extends Authenticatable
         return $this->role == 'user';
     }
 
+    public function counter(){
+        return $this->role == 'counter';
+    }
 
-
+    public function account(){
+        return $this->role == 'account';
+    }
 }

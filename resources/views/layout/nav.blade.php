@@ -35,9 +35,6 @@
                 </li>
             @endif
             @if($superAdmin)
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{route('customersDepositList')}}">واریزی مشتریان</a>
-                </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
                        data-bs-toggle="dropdown"
@@ -49,6 +46,15 @@
                         <a class="dropdown-item" href="{{route('settings')}}">تنظیمات </a>
                     </div>
                 </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown"
+                           aria-haspopup="true" aria-expanded="false">حسابداری</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="">بررسی سفارشات</a>
+                            <a class="dropdown-item" href="{{route('customersDepositList')}}">بررسی واریزی ها</a>
+                        </div>
+                    </li>
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('statistic')}}">آمار</a>
                 </li>

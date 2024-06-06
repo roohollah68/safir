@@ -10,12 +10,13 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let deleted, printWait, confirmWait, proccessWait, user = 'all', Location = 't';
+    let deleted, printWait, confirmWait, counterWait, proccessWait, user = 'all', Location = 't';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     let role = users[userId].role;
     let dtp1Instance;
     let sendMethods = {!!json_encode(config('sendMethods'))!!};
     let payMethods = {!!json_encode(config('payMethods'))!!};
+    let dialog;
     $(() => {
         $(".checkboxradio").checkboxradio();
         prepare_data();
@@ -42,7 +43,9 @@
                 return
             if (confirmWait && order.confirm)
                 return
-            if (printWait && (!order.confirm || order.state))
+            if (counterWait && (order.counter !== 'waiting' || !order.confirm || order.state))
+                return
+            if (printWait && (!order.confirm || order.state || order.counter !== 'approved'))
                 return
             if (proccessWait && (order.state > 4 || order.state < 1))
                 return
@@ -75,6 +78,8 @@
 
                 operations(order),
 
+                `<span id='orderCondition_${id}'>` + orderCondition(order) + '</span>',
+
                 order.address,
 
                 order.desc,
@@ -98,7 +103,7 @@
             table.rows.add(data);
             table.draw();
         } else {
-            let hideRows = (print || superAdmin) ? [1, 7, 8, 9, 10, 11, 12] : [0, 1, 3, 7, 8, 9, 10, 11, 12]
+            let hideRows = (print || superAdmin) ? [1, 8, 9, 10, 11, 12, 13] : [0, 1, 3, 8, 9, 10, 11, 12, 13]
             table = $('#main-table').DataTable({
                 columns: [
                     {title: "انتخاب"},
@@ -108,6 +113,7 @@
                     {title: "سفارش"},
                     {title: "زمان ثبت"},
                     {title: "عملیات"},
+                    {title: "وضعیت"},
                     {title: "آدرس"},
                     {title: "توضیحات"},
                     {title: "سفارشات"},
@@ -132,7 +138,7 @@
                 ],
                 pageLength: 100,
                 data: data,
-                order: [[12, "desc"]],
+                order: [[13, "desc"]],
                 language: {
                     "decimal": "",
                     "emptyTable": "هیچ سفارشی موجود نیست",
@@ -165,12 +171,12 @@
     function view_order(id) {
         $.post('/viewOrder/' + id, {_token: token})
             .done(res => {
-                $(res).dialog({
+                dialog = $(res).dialog({
                     modal: true,
                     open: () => {
                         $('.ui-dialog-titlebar-close').hide();
                         $('.ui-widget-overlay').bind('click', function () {
-                            $(".dialogs").dialog('close');
+                            dialog.remove();
                         });
                     }
                 });
@@ -207,7 +213,7 @@
         } else if (order.state < 3) {
             res = timestamp + `<span class="btn btn-warning" onclick="selectSendMethod(${order.id})">${text}<i class="fas fa-check"></i></span>`
         } else if (+order.state === 4) {
-            res = timestamp + `<span class="btn btn-danger" onclick="change_state(${order.id}, ${order.confirm ? 1 : 0})">${text}<i class="fas fa-question"></i></span>`
+            res = timestamp + `<span class="btn btn-danger" onclick="change_state(${order.id}, 0)">${text}<i class="fas fa-question"></i></span>`
         } else {
             res = timestamp + `<span class="btn btn-success" onclick="change_state(${order.id}, 0)">${text}<i class="fas fa-check-double"></i></span>`
         }
@@ -228,9 +234,9 @@
         @else
         let creatorRole = users[order.user_id].role
 
-        let cancelInvoice = `<a class="fa-regular fa-xmark btn btn-danger" onclick="cancelInvoice(${id},this)" title=" رد فاکتور"> </a> `;
+        let cancelInvoice = `<a class="fa-regular fa-xmark btn btn-danger" onclick="cancelInvoice(${id})" title=" رد فاکتور"> </a> `;
         let generatePDF = `<i class="fa fa-file-pdf btn btn-${+order.state > 1 ? 'success' : 'secondary'}" onclick="generatePDF([${id}])" title="دانلود لیبل"></i> `;
-        let confirmInvoice = `<a class="fa fa-check btn btn-success" onclick="confirmInvoice(${id},this)" title=" تایید فاکتور"></a> `;
+        let selectPayment = `<a class="fa fa-check btn btn-success" onclick="selectPayment(${id})" title=" تایید فاکتور"></a> `;
         let invoice = `<a class="fa fa-file-invoice-dollar btn btn-info text-success" onclick="invoice(${id})" title=" فاکتور"></a> `;
         let preInvoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title="پیش فاکتور"></a> `;
 
@@ -247,14 +253,31 @@
                 res += invoice;
                 if (order.state < 10)
                     res += cancelInvoice;
-
             } else {
                 res += preInvoice;
-                res += confirmInvoice;
+                res += selectPayment;
             }
         }
         @endif
             return res;
+    }
+
+    function orderCondition(order) {
+        if (order.state === 10)
+            return 'ارسال شده';
+        if (order.counter === 'rejected')
+            return 'رد شده در حسابداری';
+        if (!order.confirm)
+            return 'منتظر تایید کاربر';
+        if (order.confirm && order.counter === 'waiting') {
+            return 'منتظر تایید حسابدار';
+        }
+        if (order.confirm && order.counter === 'approved' && order.state === 0)
+            return 'در انتظار پرینت';
+        if (order.state === 1 || order.state === 2)
+            return 'در حال پردازش برای ارسال';
+        if (order.state === 4)
+            return 'در انتظار پرینت';
     }
 
     function delete_order(id, element) {
@@ -276,27 +299,24 @@
             alert('ابتدا فاکتور باید تایید شود!');
             return;
         }
-        let dialog = `<div title="نحوه ارسال" class="dialogs" >`;
-        dialog += `@csrf`;
-        dialog += `<p class="btn btn-success" onclick="setSendMethod(${id},1)">${sendMethods[1]}</p> `;
-        dialog += `<p class="btn btn-info" onclick="setSendMethod(${id},2)">${sendMethods[2]}</p> `;
-        dialog += `<p class="btn btn-secondary" onclick="setSendMethod(${id},4)">${sendMethods[4]}</p> `;
-        dialog += `<p class="btn btn-warning" onclick="setSendMethod(${id},5)">${sendMethods[5]}</p> `;
-        dialog += `<p class="btn btn-warning" onclick="setSendMethod(${id},6)">${sendMethods[6]}</p><br><br><br>`;
-        dialog += `<label for="postCode">کد مرسوله:</label>`;
-        dialog += `<input id="postCode" name="note" type="text" class="w-100"><br>`;
-        dialog += `<p class="btn btn-primary" onclick="setSendMethod(${id},3)">${sendMethods[3]}</p><br> `;
-        // dialog += `<label for="send-file">فایل الحاقی:</label>`;
-        // dialog += `<input id="send-file" name="file" type="file" ><br>`;
-        // dialog += `<input  value="submit" type="submit" ><br>`;
-        dialog += `</div>`;
+        let text = `<div title="نحوه ارسال" class="dialogs" >
+            @csrf
+        <p class="btn btn-success" onclick="setSendMethod(${id},1)">${sendMethods[1]}</p>
+            <p class="btn btn-info" onclick="setSendMethod(${id},2)">${sendMethods[2]}</p>
+            <p class="btn btn-secondary" onclick="setSendMethod(${id},4)">${sendMethods[4]}</p>
+            <p class="btn btn-warning" onclick="setSendMethod(${id},5)">${sendMethods[5]}</p>
+            <p class="btn btn-warning" onclick="setSendMethod(${id},6)">${sendMethods[6]}</p><br><br><br>
+            <label for="postCode">کد مرسوله:</label>
+            <input id="postCode" name="note" type="text" class="w-100"><br>
+            <p class="btn btn-primary" onclick="setSendMethod(${id},3)">${sendMethods[3]}</p><br>
+            </div>`;
 
-        $(dialog).dialog({
+        dialog = $(text).dialog({
             modal: true,
             open: () => {
                 $('.ui-dialog-titlebar-close').hide();
                 $('.ui-widget-overlay').bind('click', function () {
-                    $(".dialogs").dialog('destroy').remove()
+                    dialog.remove()
                 });
             }
         });
@@ -306,7 +326,7 @@
         let note = $('#postCode').val();
         if (note)
             note = ' - کد مرسوله: ' + note;
-        $(".dialogs").dialog('destroy').remove();
+        dialog.remove();
 
         $.post('/set_send_method/' + id, {
             _token: token,
@@ -319,7 +339,7 @@
     }
 
     function change_state(id, state) {
-        if (!orders[id].confirm && +orders[id].state !== 4) {
+        if ((!orders[id].confirm || orders[id].counter !== "approved") && +orders[id].state !== 4) {
             alert('ابتدا فاکتور باید تایید شود!');
             return;
         }
@@ -331,6 +351,8 @@
                 orders[id].state = +state;
                 $('#view_order_' + id).parent().html(operations(orders[id]));
                 $('#state_' + id).parent().html(createdTime(orders[id]));
+                $('#orderCondition_' + id).html(orderCondition(orders[id]));
+
             });
     }
 
@@ -369,85 +391,102 @@
 
     @if($admin || $superAdmin)
 
-    function confirmInvoice(id, element) {
+    function selectPayment(id) {
         if (orders[id].confirm)
             return
 
 
-        dialog = `
+        let text = `
 <div title="نحوه پرداخت" class="dialogs">
+<form method="post" id="paymentForm" action="" enctype="multipart/form-data">
+@csrf
+        <input type="radio" id="cash" value="cash" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('.cashPhoto').show()">
+        <label for='cash' class="btn btn-success my-1">پرداخت نقدی</label>
+        <label for='cashPhoto' class="btn btn-info m-2 hide cashPhoto" >بارگذاری رسید بانکی  <i class="fa fa-image"></i></label>
+        <input type="file" class="hide" name="cashPhoto" id="cashPhoto">
+        <br>
+        <input type="radio" id="cheque" value="cheque" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('.chequePhoto').show()">
+        <label for='cheque' class="btn btn-info my-1">پرداخت چکی</label>
+        <label for='chequePhoto' class="btn btn-info m-2 hide chequePhoto">بارگذاری تصویر چک  <i class="fa fa-image"></i></label>
+        <input type="file" class="hide" name="chequePhoto" id="chequePhoto">
+        <br>
+        <input type="radio" id="cod" value="cod" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">
+        <label for='cod' class="btn btn-primary my-1">پرداخت در محل</label>
+        <br>
+        <input type="radio" id="factor" value="factorFactor" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">
+        <label for='factor' class="btn btn-secondary my-1">فاکتور به فاکتور</label>
+        <br>
+        <input type="radio" id="barrow" value="barrow" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">
+        <label for='barrow' class="btn btn-warning my-1">امانی</label>
+        <br>
+        <input type="radio" id="payInDate" value="payInDate" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('#dateOfPayment').show()">
+        <label for="payInDate" class="btn btn-danger my-1">پرداخت در تاریخ</label>
+        <input type="text" name="" id="dateOfPayment" class="form-control hide" placeholder="تاریخ پرداخت" data-name="dtp1-text">
+        <input type="hidden" name="payInDate" data-name="payInDate">
 
-<input type="radio" id="cash" value="1" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('.cashPhoto').show()">
-<label for='cash' class="btn btn-success my-1">پرداخت نقدی</label>
-<label for='cashPhoto' class="btn btn-info m-2 hide cashPhoto" >بارگذاری رسید بانکی  <i class="fa fa-image"></i></label>
-<input type="file" class="hide" name="cashPhoto" id="cashPhoto">
-<br>
-<input type="radio" id="cheque" value="2" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('.chequePhoto').show()">
-<label for='cheque' class="btn btn-info my-1">پرداخت چکی</label>
-<label for='chequePhoto' class="btn btn-info m-2 hide chequePhoto">بارگذاری تصویر چک  <i class="fa fa-image"></i></label>
-<input type="file" class="hide" name="chequePhoto" id="chequePhoto">
-<br>
-<input type="radio" id="cod" value="3" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">
-<label for='cod' class="btn btn-primary my-1">پرداخت در محل</label>
-<br>
-<input type="radio" id="factor" value="4" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">
-<label for='factor' class="btn btn-secondary my-1">فاکتور به فاکتور</label>
-<br>
-<input type="radio" id="barrow" value="5" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">
-<label for='barrow' class="btn btn-warning my-1">امانی</label>
-<br>
-<input type="radio" id="payInDate" value="6" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('#dateOfPayment').show()">
-<label for='payInDate' class="btn btn-danger my-1">پرداخت در تاریخ</label>
-<input type="text" id="dateOfPayment" class="form-control hide" placeholder="تاریخ پرداخت" data-name="dtp1-text">
+        <br><label for="send-note">یادداشت:</label>
+        <input id="send-note" name="note" type="text" class="w-100">
 
-<br><label for="send-note">یادداشت:</label>
-<input id="send-note" name="note" type="text" class="w-100">
-</div>
-        `;
+        <input type="submit" class="btn btn-success" value="ارسال">
+        <form>
+        </div>
+`;
 
-        $(dialog).dialog({
+        dialog = $(text).dialog({
             modal: true,
             open: () => {
                 $('.ui-dialog-titlebar-close').hide();
                 $('.ui-widget-overlay').bind('click', function () {
-                    $(".dialogs").dialog('destroy').remove()
+                    dialog.remove()
                 });
             }
         });
+
         $(".checkboxradio").checkboxradio();
+
         dtp1Instance = new mds.MdsPersianDateTimePicker(document.getElementById('payInDate'), {
             targetTextSelector: '[data-name="dtp1-text"]',
+            targetDateSelector: '[data-name="payInDate"]',
             persianNumber: true,
-            // onDayClick: function () {
-            //     sendConfirm(id, 5);
-            // }
+        });
+
+        $("#paymentForm").submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: '/orders/paymentMethod/' + id,
+                data: new FormData(this),
+                contentType: "multipart/form-data",
+                processData: false,
+                contentType: false,
+                headers: {
+                    "Accept": "application/json"
+                }
+            }).done(function (res) {
+                if (res[0] === "error")
+                    $.notify(res[1], 'warn');
+                else if (res[0] === "ok") {
+                    $.notify("با موفقیت ذخیره شد.", "success");
+                    dialog.remove();
+                    orders[id] = res[1];
+                    $('#view_order_' + id).parent().html(operations(orders[id]));
+                    $('#state_' + id).parent().html(createdTime(orders[id]));
+                    $('#orderCondition_' + id).html(orderCondition(orders[id]));
+                }
+            }).fail(function () {
+                $.notify('خطایی رخ داده است.', 'warn');
+            });
         });
     }
 
-    function sendConfirm(id, index) {
-        let date = $('#dateOfPayment').val();
-        let pay = payMethods[index];
-        if (date)
-            pay = pay + ' ' + date;
-        let note = $('#send-note').val();
-        if (note)
-            pay = pay + ' - یادداشت: ' + note;
-        $(".dialogs").dialog('destroy').remove();
-        $.post('confirm_invoice/' + id, {_token: token, confirm: index, pay: pay})
-            .done(res => {
-                orders[id] = res;
-                $('#view_order_' + id).parent().html(operations(orders[id]));
-                $('#state_' + id).parent().html(createdTime(orders[id]));
-            })
-    }
-
-    function cancelInvoice(id, element) {
+    function cancelInvoice(id) {
         if (confirm('آیا از حذف کردن فاکتور مطمئن هستید؟')) {
             $.post('cancel_invoice/' + id, {_token: token})
                 .done(res => {
                     orders[id] = res;
                     $('#view_order_' + id).parent().html(operations(orders[id]));
                     $('#state_' + id).parent().html(createdTime(orders[id]));
+                    $('#orderCondition_' + id).html(orderCondition(orders[id]));
                 });
         }
 

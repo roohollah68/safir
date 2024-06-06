@@ -44,6 +44,7 @@
         </tr>
         </thead>
         <tbody>
+
         @foreach($transactions as $tran)
             <tr style="color:{{$tran->type?'green':'red'}}" class="{{$tran->deleted?'deleted':''}}">
                 <td>{{$tran->id}}</td>
@@ -54,9 +55,9 @@
                 <td dir="ltr">{{number_format($tran->balance)}}</td>
                 <td>
                     @if($tran->order_id)
+                        <a class="btn btn-info fa fa-eye" onclick="view_order({{$tran->order_id}})"
+                           title="مشاهده فاکتور"></a>
                         @if(!$tran->deleted)
-                            <a class="btn btn-info fa fa-eye" onclick="view_order({{$tran->order_id}})"
-                               title="مشاهده فاکتور"></a>
                             <a class="fa fa-file-invoice-dollar btn btn-secondary"
                                onclick="invoice({{$tran->order_id}})" title=" فاکتور"></a>
 

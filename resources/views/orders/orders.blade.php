@@ -34,13 +34,18 @@
     <input type="checkbox" id="deleted_orders" class="checkboxradio"
            onclick="deleted = this.checked;prepare_data()">
     @if(!$safir)
+
+        <label for="confirm-wait"> در انتظار تایید کاربر</label>
+        <input type="checkbox" id="confirm-wait" class="checkboxradio"
+               onclick="confirmWait = this.checked;prepare_data()">
+
+        <label for="counter-wait"> در انتظار تایید حسابدار</label>
+        <input type="checkbox" id="counter-wait" class="checkboxradio"
+               onclick="counterWait = this.checked;prepare_data()">
+
         <label for="print-wait"> در انتظار پرینت</label>
         <input type="checkbox" id="print-wait" class="checkboxradio"
                onclick="printWait = this.checked;prepare_data()">
-
-        <label for="confirm-wait"> در انتظار تایید</label>
-        <input type="checkbox" id="confirm-wait" class="checkboxradio"
-               onclick="confirmWait = this.checked;prepare_data()">
 
         <label for="proccess-wait"> در حال پردازش</label>
         <input type="checkbox" id="proccess-wait" class="checkboxradio"

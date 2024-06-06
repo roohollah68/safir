@@ -74,13 +74,25 @@ class WoocommerceController extends Controller
         $user = User::where('username', $website)->first();
 
         $web = Websites::where('website_id', $request->id)->where('website', $website)->first();
-
+        $orderData = [
+            'name' => $request->billing->first_name . ' ' . $request->billing->last_name,
+            'phone' => $request->billing->phone,
+            'address' => $request->billing->city . ' ' . $request->billing->address_1,
+            'zip_code' => $request->billing->postcode,
+            'orders' => $orders,
+            'desc' => $request->customer_note . ($desc ? ' - ' . $desc : ''),
+            'total' => $request->total,
+            'customerCost' => 0,
+            'paymentMethod' => $request->payment_method_title,
+            'deliveryMethod' => $request->shipping_lines[0]->method_title,
+        ];
         if ($web) {
             $web->update([
                 'status' => $request->status,
             ]);
             if ($request->status == 'processing' || $request->status == 'completed') {
                 $order = $web->order()->withTrashed()->first();
+                $order = $order->update($orderData);
                 if ($order->deleted_at) {
                     app('Telegram')->deleteOrderFromBale($order, '5742084958');
                     $order->restore();
@@ -108,6 +120,7 @@ class WoocommerceController extends Controller
                 }
             } else {
                 $order = $web->order()->first();
+                $order = $order->update($orderData);
                 if (!$order->deleted_at) {
                     app('Telegram')->deleteOrderFromBale($order, env('GroupId'));
                     $order->delete();
@@ -129,18 +142,7 @@ class WoocommerceController extends Controller
                 }
             }
         } else {
-            $order = $user->orders()->create([
-                'name' => $request->billing->first_name . ' ' . $request->billing->last_name,
-                'phone' => $request->billing->phone,
-                'address' => $request->billing->city . ' ' . $request->billing->address_1,
-                'zip_code' => $request->billing->postcode,
-                'orders' => $orders,
-                'desc' => $request->customer_note . ($desc ? ' - ' . $desc : ''),
-                'total' => $request->total,
-                'customerCost' => 0,
-                'paymentMethod' => $request->payment_method_title,
-                'deliveryMethod' => $request->shipping_lines[0]->method_title,
-            ]);
+            $order = $user->orders()->create($orderData);
 
             $web = $order->website()->create([
                 'website' => $website,
@@ -179,33 +181,7 @@ class WoocommerceController extends Controller
                 }
             }
         }
-//        if ($request->status == 'processing') {
-//            $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
-//            $order->save();
-//            foreach ($products as $id => $data) {
-//                $product = $data[1];
-//                $order->orderProducts()->create([
-//                    'product_id' => $product->id,
-//                    'verified' => true,
-//                    'name' => $product->name,
-//                    'number' => $data[0],
-//                    'price' => $product->price,
-//                ]);
-//                $product->update([
-//                    'quantity' => $product->quantity - $data[0],
-//                ]);
-//                $product->productChange()->create([
-//                    'order_id' => $order->id,
-//                    'change' => -$data[0],
-//                    'quantity' => $product->quantity,
-//                    'desc' => 'خرید اینترنتی سایت ' . $websiteTitle . ' خریدار: ' . $order->name,
-//                ]);
-//            }
-//        } else {
-//            if ($request->status != 'pending')
-//                app('Telegram')->sendOrderToBale($order, '5742084958');
-//            $order->forceDelete();
-//        }
+
         DB::commit();
         return 'order saved!';
     }

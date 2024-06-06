@@ -31,7 +31,7 @@
     </form>
     <br>
 
-    <table class="stripe" id="transaction-table">
+    <table  id="transaction-table">
         <br>
         <thead>
         <tr>
@@ -46,7 +46,7 @@
         <tbody>
         @foreach($transactions as $tran)
             @if($selectedUser == 'all' || $tran->customer()->first()->user()->first()->id== $selectedUser)
-            <tr class="{{$tran->deleted?'deleted':''}}">
+            <tr class="test {{$tran->deleted?'deleted':''}} {{$tran->verified}}">
                 <td><span class="d-none">{{verta($tran->created_at)->timestamp}}</span>{{verta($tran->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
                 <td dir="ltr">{{number_format($tran->amount)}}</td>
                 <td>{{$tran->description}}</td>
@@ -80,7 +80,7 @@
         $(function () {
             $('#transaction-table').DataTable({
                 order: [[0, "desc"]],
-                paging: false,
+                pageLength: 100,
             });
             token = $('input[name=_token]').val();
         });
@@ -142,6 +142,18 @@
     <style>
         .deleted {
             display: none;
+        }
+
+        .waiting{
+            background-color: lightblue;
+        }
+
+        .approved{
+            background-color: lightgreen;
+        }
+
+        .rejected{
+            background-color: lightyellow;
         }
     </style>
 @endsection

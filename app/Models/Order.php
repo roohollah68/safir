@@ -29,6 +29,9 @@ class Order extends Model
         'customer_id',
         'bale_id',
         'location',
+        'payInDate',
+        'paymentNote',
+        'counter',
     ];
 
     public function user()
@@ -64,6 +67,11 @@ class Order extends Model
     public function productChange()
     {
         return $this->hasMany(ProductChange::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 
     public function sendMethod()

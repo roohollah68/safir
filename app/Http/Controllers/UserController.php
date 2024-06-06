@@ -34,12 +34,49 @@ class UserController extends Controller
         return redirect()->route('manageUsers');
     }
 
+    public function addUser()
+    {
+        $user = new User();
+        return view('editUser', [
+            'user' => $user,
+            'edit' => false,
+        ]);
+    }
+
     public function edit($id = null)
     {
         if ($this->superAdmin() && $id)
-            return view('editUser', ['user' => User::find($id)]);
+            return view('editUser', [
+                'user' => User::find($id),
+                'edit' => true,
+            ]);
         else
-            return view('editUser', ['user' => auth()->user()]);
+            return view('editUser', [
+                'user' => auth()->user(),
+                'edit' => true,
+            ]);
+    }
+
+    public function insertUser(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|min:5',
+            'phone' => 'required|string|max:11|min:11',
+            'password' => 'required|string|min:8',
+        ]);
+        $request->phone = $this->number_Fa_En($request->phone);
+
+        User::create([
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'username' => $request->username,
+            'role' => $request->role,
+            'password' => Hash::make($request->password),
+            'verified' => true,
+        ]);
+
+        return redirect()->route('listOrders');
     }
 
     public function update(Request $request, $id = null)
@@ -55,7 +92,6 @@ class UserController extends Controller
 
         User::find($id)->update([
             'name' => $request->name,
-            'username' => $request->username,
             'phone' => $request->phone,
         ]);
 
@@ -67,8 +103,13 @@ class UserController extends Controller
                 'password' => Hash::make($request->password),
             ]);
         }
-        if ($this->superAdmin())
+        if ($this->superAdmin()) {
+            User::find($id)->update([
+                'username' => $request->username,
+                'role' => $request->role,
+            ]);
             return redirect()->route('manageUsers');
+        }
         return redirect()->route('listOrders');
     }
 }

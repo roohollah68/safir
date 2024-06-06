@@ -19,6 +19,9 @@ class CustomerTransactions extends Model
         'photo',
         'deleted',
         'paymentLink',
+        'verified',
+        'date',
+        'paymentMethod',
     ];
 
     public function customer()

@@ -10,7 +10,10 @@
 
 @section('content')
     @csrf
-
+    @if($superAdmin)
+        <a href="/add_user" class="btn btn-outline-info fa fa-plus mb-4">افزودن کاربر</a>
+    @endif
+    <br>
     <h3>لیست کاربران تایید شده:</h3>
     <table class="table">
         <thead>
@@ -27,11 +30,21 @@
             @if($user->verified)
                 <tr>
                     <td>{{$user->name}}
-                        @if($user->superAdmin())( سوپر ادمین )@endif
-                        @if($user->admin())( فروشنده با فاکتور )@endif
-                        @if($user->safir())( سفیر )@endif
-                        @if($user->print())( ارسال سفارش )@endif
-                        @if($user->warehouse())( انباردار )@endif
+                        @if($user->superAdmin())
+                            ( سوپر ادمین )
+                        @elseif($user->admin())
+                            ( فروشنده با فاکتور )
+                        @elseif($user->safir())
+                            ( سفیر )
+                        @elseif($user->print())
+                            ( ارسال سفارش )
+                        @elseif($user->warehouse())
+                            ( انباردار )
+                        @elseif($user->counter())
+                            ( حسابدار )
+                        @elseif($user->account())
+                            ( صاحب حساب بانکی )
+                        @endif
                     </td>
                     <td>{{$user->username}}</td>
                     <td>{{$user->phone}}</td>

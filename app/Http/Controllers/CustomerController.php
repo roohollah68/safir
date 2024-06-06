@@ -41,6 +41,14 @@ class CustomerController extends Controller
         else
             $customer = auth()->user()->customers()->findOrFail($id);
         $transactions = $customer->transactions()->get();
+        $balance = 0;
+        foreach ($transactions as $index=>$transaction){
+            if($transaction->type)
+                $balance += $transaction->amount;
+            else
+                $balance -= $transaction->amount;
+            $transactions[$index]->balance = $balance;
+        }
         $orders = $customer->orders()->get();
 
         return view('customerTransactionList',
@@ -171,8 +179,8 @@ class CustomerController extends Controller
             'description' => 'واریزی ' . $order_id . ' * ' . $req->desc . ' - ' . auth()->user()->name,
             'type' => true,
             'photo' => $photo,
-            'balance' => $customer->balance + $req->amount,
             'paymentLink' => $req->link,
+            'verified' => false,
         ]);
 
         $customer->update([
