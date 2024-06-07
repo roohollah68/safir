@@ -240,7 +240,7 @@
         let invoice = `<a class="fa fa-file-invoice-dollar btn btn-info text-success" onclick="invoice(${id})" title=" فاکتور"></a> `;
         let preInvoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title="پیش فاکتور"></a> `;
 
-        if (!order.state)
+        if (!order.state && !order.confirm)
             res += deleteOrder;
         if (!order.confirm || creatorRole === 'user')
             res += editOrder;

@@ -207,12 +207,12 @@
 
         function approveButton(id) {
             return `<span class="btn btn-success fa fa-check"
-          onclick="approveDeposit(${id})"></span>`;
+          onclick="approveOrder(${id})"></span>`;
         }
 
         function rejectButton(id) {
             return `<span class="btn btn-danger fa fa-x"
-onclick="rejectDeposit(${id})"></span>`;
+onclick="rejectOrder(${id})"></span>`;
         }
 
 
