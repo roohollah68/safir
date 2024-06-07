@@ -235,6 +235,9 @@ class TelegramController extends Controller
 
     public function createOrderMessage($order)
     {
+//        $order = $this->addCityToAddress($order);
+//        return view('orders.view', ['order' => $order])->render();
+
         $total = number_format($order->total);
         $customerCost = number_format($order->customerCost);
         $time = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();

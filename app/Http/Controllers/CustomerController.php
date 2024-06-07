@@ -6,6 +6,7 @@ use App\BaleAPIv2;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\CustomerTransactions;
+use App\Models\Order;
 use App\Models\Province;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -40,15 +41,7 @@ class CustomerController extends Controller
             $customer = Customer::findOrFail($id);
         else
             $customer = auth()->user()->customers()->findOrFail($id);
-        $transactions = $customer->transactions()->get();
-        $balance = 0;
-        foreach ($transactions as $index=>$transaction){
-            if($transaction->type)
-                $balance += $transaction->amount;
-            else
-                $balance -= $transaction->amount;
-            $transactions[$index]->balance = $balance;
-        }
+        $transactions = $customer->transactions()->get()->keyBy('id');
         $orders = $customer->orders()->get();
 
         return view('customerTransactionList',
@@ -186,10 +179,15 @@ class CustomerController extends Controller
         $customer->update([
             'balance' => $customer->balance + $req->amount,
         ]);
-        if ($req->link)
-            $customer->transactions()->find($req->link)->update([
+        if ($req->link) {
+            $transaction = $customer->transactions()->find($req->link);
+            $transaction->update([
                 'paymentLink' => $newTransaction->id,
             ]);
+            Order::find($transaction->order_id)->update([
+                'receipt' => $photo,
+            ]);
+        }
         $req->amount = number_format($req->amount);
 
         $message = "ثبت سند واریزی مشتری
@@ -221,8 +219,8 @@ class CustomerController extends Controller
             'amount' => $transaction->amount,
             'description' => 'ابطال ثبت واریزی - ' . $transaction->desc . ' - ' . auth()->user()->name,
             'type' => false,
+            'verified' => 'rejected',
             'photo' => $transaction->photo,
-            'balance' => $customer->balance - $transaction->amount,
             'deleted' => true,
         ]);
         if ($transaction->paymentLink) {
@@ -233,20 +231,130 @@ class CustomerController extends Controller
         $transaction->update([
             'paymentLink' => null,
             'deleted' => true,
+            'verified' => 'rejected',
             'description' => $transaction->description . '* باطل شد',
         ]);
-        $customer->update([
-            'balance' => $customer->balance - $transaction->amount,
-        ]);
+
         DB::commit();
     }
 
     public function customersDepositList(Request $req)
     {
+        if (!$req->waiting && !$req->approved && !$req->rejected) {
+            $req->waiting = true;
+            $req->approved = true;
+            $req->rejected = true;
+        }
         return view('customersDepositList', [
-            'transactions' => CustomerTransactions::where('photo', '<>', null)->with('customer.user')->get(),
-            'users' => User::where('role', 'admin')->where('verified', true)->select('id','name')->get(),
+            'transactions' => CustomerTransactions::with('customer.user')->get()->keyBy('id'),
+            'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
             'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
+            'waiting' => $req->waiting,
+            'approved' => $req->approved,
+            'rejected' => $req->rejected,
         ]);
     }
+
+    public function approveDeposit($id)
+    {
+        $trans = CustomerTransactions::with('customer')->findOrFail($id);
+        if ($trans->verified == 'approved')
+            return;
+        $trans->customer->update([
+            'balance' => $trans->customer->balance + $trans->amount,
+        ]);
+        $trans->update([
+            'verified' => 'approved',
+        ]);
+    }
+
+    public function rejectDeposit($id)
+    {
+        $trans = CustomerTransactions::with('customer')->findOrFail($id);
+
+        if ($trans->verified == 'rejected')
+            return;
+        if ($trans->verified == 'approved')
+            $trans->customer->update([
+                'balance' => $trans->customer->balance - $trans->amount,
+            ]);
+        $trans->update([
+            'verified' => 'rejected',
+        ]);
+    }
+
+    public function customersOrderList(Request $req)
+    {
+        if (!$req->waiting && !$req->approved && !$req->rejected) {
+            $req->waiting = true;
+            $req->approved = true;
+            $req->rejected = true;
+        }
+        return view('customersOrderList', [
+            'orders' => Order::where('confirm',true)->where('customer_id','>','0')
+                ->where('state',false)->with('user')->get()->keyBy('id'),
+            'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
+            'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
+            'waiting' => $req->waiting,
+            'approved' => $req->approved,
+            'rejected' => $req->rejected,
+        ]);
+    }
+
+    public function approveOrder($id)
+    {
+        DB::beginTransaction();
+        $order = Order::findOrFail($id);
+        if ($order->counter == 'approved')
+            return;
+        $order->counter = 'approved';
+        $orderProducts = $order->orderProducts()->with('product');
+        $orderProducts->update(['verified' => true]);
+        foreach ($orderProducts->get() as $orderProduct) {
+            $product = $orderProduct->product;
+
+            $product->update([
+                'quantity' => $product->quantity - $orderProduct->number,
+            ]);
+            $order->productChange()->create([
+                'product_id' => $product->id,
+                'change' => -$orderProduct->number,
+                'quantity' => $product->quantity,
+                'desc' => ' خرید مشتری ' . $order->name,
+            ]);
+        }
+        //$order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+        $order->save();
+        DB::commit();
+    }
+
+    public function rejectOrder($id)
+    {
+        DB::beginTransaction();
+        $order = Order::findOrFail($id);
+        if ($order->counter == 'rejected')
+            return;
+        if($order->counter == 'approved'){
+            $order->orderProducts()->update(['verified' => false]);
+            foreach ($order->productChange()->get() as $productChange) {
+                $product = $productChange->product()->first();
+                $product->update([
+                    'quantity' => $product->quantity - $productChange->change,
+                ]);
+                $productChange->update(['isDeleted' => true]);
+                $order->productChange()->create([
+                    'product_id' => $product->id,
+                    'change' => -$productChange->change,
+                    'quantity' => $product->quantity,
+                    'desc' => 'لغو خرید مشتری ' . $order->name,
+                    'isDeleted' => true,
+                ]);
+            }
+            //$this->deleteFromBale(env('GroupId'), $order->bale_id);
+        }
+        $order->counter = 'rejected';
+        $order->save();
+        DB::commit();
+    }
+
 }

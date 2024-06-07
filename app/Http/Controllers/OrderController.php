@@ -455,37 +455,37 @@ class OrderController extends Controller
         }
     }
 
-    public function confirmInvoice($id, Request $request)
-    {
-        DB::beginTransaction();
-
-        $order = Order::findOrFail($id);
-        if ($order->confirm)
-            return $order;
-        $order->paymentMethod = $request->pay;
-        $order->confirm = +$request->confirm;
-        $order->save();
-        $orderProducts = $order->orderProducts()->with('product');
-        $orderProducts->update(['verified' => true]);
-        foreach ($orderProducts->get() as $orderProduct) {
-            $product = $orderProduct->product;
-
-            $product->update([
-                'quantity' => $product->quantity - $orderProduct->number,
-            ]);
-            $order->productChange()->create([
-                'product_id' => $product->id,
-                'change' => -$orderProduct->number,
-                'quantity' => $product->quantity,
-                'desc' => ' خرید مشتری ' . $order->name,
-            ]);
-        }
-        $this->addToCustomerTransactions($order);
-        $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
-        $order->save();
-        DB::commit();
-        return $order;
-    }
+//    public function confirmInvoice($id, Request $request)
+//    {
+//        DB::beginTransaction();
+//
+//        $order = Order::findOrFail($id);
+//        if ($order->confirm)
+//            return $order;
+//        $order->paymentMethod = $request->pay;
+//        $order->confirm = +$request->confirm;
+//        $order->save();
+//        $orderProducts = $order->orderProducts()->with('product');
+//        $orderProducts->update(['verified' => true]);
+//        foreach ($orderProducts->get() as $orderProduct) {
+//            $product = $orderProduct->product;
+//
+//            $product->update([
+//                'quantity' => $product->quantity - $orderProduct->number,
+//            ]);
+//            $order->productChange()->create([
+//                'product_id' => $product->id,
+//                'change' => -$orderProduct->number,
+//                'quantity' => $product->quantity,
+//                'desc' => ' خرید مشتری ' . $order->name,
+//            ]);
+//        }
+//        $this->addToCustomerTransactions($order);
+//        $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+//        $order->save();
+//        DB::commit();
+//        return $order;
+//    }
 
     public function cancelInvoice($id)
     {
@@ -497,22 +497,8 @@ class OrderController extends Controller
             $order->state = 4;
         $order->confirm = false;
         if ($order->counter == 'approved') {
-            $order->orderProducts()->update(['verified' => false]);
-            foreach ($order->productChange()->get() as $productChange) {
-                $product = $productChange->product()->first();
-                $product->update([
-                    'quantity' => $product->quantity - $productChange->change,
-                ]);
-                $productChange->update(['isDeleted' => true]);
-                $order->productChange()->create([
-                    'product_id' => $product->id,
-                    'change' => -$productChange->change,
-                    'quantity' => $product->quantity,
-                    'desc' => 'لغو خرید مشتری ' . $order->name,
-                    'isDeleted' => true,
-                ]);
-            }
-            $this->deleteFromBale(env('GroupId'), $order->bale_id);
+            $customerController = new CustomerController();
+            $customerController->rejectOrder($id);
         }
         $this->removeFromCustomerTransactions($order);
         $order->counter = 'waiting';
@@ -760,11 +746,13 @@ class OrderController extends Controller
             if (!$req->file("cashPhoto"))
                 return ['error', 'باید عکس رسید بانکی بارگذاری شود.'];
             $photo = $req->file("cashPhoto")->store("", 'deposit');
+            $photo2 = $req->file("cashPhoto")->store("", 'receipt');
 
         }
         if ($paymentMethod == 'cheque') {
             if ($req->file("chequePhoto"))
                 $photo = $req->file("chequePhoto")->store("", 'deposit');
+                $photo2 = $req->file("chequePhoto")->store("", 'receipt');
         }
         if ($paymentMethod == 'payInDate') {
             if (strlen($req->payInDate) != 10)
@@ -782,13 +770,16 @@ class OrderController extends Controller
             $trans2 = $order->customer->transactions()->create([
                 'amount' => $order->total,
                 'type' => true,
-                'verified' => false,
+                'verified' => 'waiting',
                 'description' => $req->note . '/ ' . $order->payMethod(),
                 'photo' => $photo,
                 'paymentLink' => $trans1->id,
             ]);
             $trans1->update([
                 'paymentLink' => $trans2->id,
+            ]);
+            $order->update([
+                'receipt' => $photo2,
             ]);
         }
 

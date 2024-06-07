@@ -10,7 +10,7 @@
     <div class="w-100 m-2 p-2 bg-info rounded">
         <span>نام مشتری:</span> <b>{{$customer->name}}</b><br>
         @if($superAdmin)
-        <span>نام کاربر مرتبط:</span> <b>{{$customer->user()->first()->name}}</b><br>
+            <span>نام کاربر مرتبط:</span> <b>{{$customer->user()->first()->name}}</b><br>
         @endif
         <span>شماره مشتری:</span> <b>{{$customer->id}}</b><br>
         <span>شماره تماس:</span> <b>{{$customer->phone}}</b><br>
@@ -37,9 +37,10 @@
             <th>id</th>
             <th>زمان</th>
             <th>توضیح</th>
+            <th>وضعیت</th>
             <th>بستانکاری(ریال)</th>
             <th>بدهکاری(ریال)</th>
-            <th>بدهی کل(ریال)</th>
+            {{--            <th>بدهی کل(ریال)</th>--}}
             <th>عملیات</th>
         </tr>
         </thead>
@@ -50,9 +51,20 @@
                 <td>{{$tran->id}}</td>
                 <td>{{verta($tran->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
                 <td>{{$tran->description}}</td>
+                <td>
+                    @if(!$tran->order_id)
+                        @if($tran->verified == 'waiting')
+                            <i class="btn btn-info">در انتظار بررسی</i>
+                        @elseif($tran->verified == 'approved')
+                            <i class="btn btn-success">تایید شده</i>
+                        @elseif($tran->verified == 'rejected')
+                            <i class="btn btn-danger">رد شده</i>
+                        @endif
+                    @endif
+                </td>
                 <td dir="ltr">{{$tran->type?number_format($tran->amount):'0'}}</td>
                 <td dir="ltr">{{!$tran->type?number_format($tran->amount):'0'}}</td>
-                <td dir="ltr">{{number_format($tran->balance)}}</td>
+                {{--                <td dir="ltr">{{number_format($tran->balance)}}</td>--}}
                 <td>
                     @if($tran->order_id)
                         <a class="btn btn-info fa fa-eye" onclick="view_order({{$tran->order_id}})"
@@ -60,24 +72,21 @@
                         @if(!$tran->deleted)
                             <a class="fa fa-file-invoice-dollar btn btn-secondary"
                                onclick="invoice({{$tran->order_id}})" title=" فاکتور"></a>
-
-{{--                            <a class="btn btn-danger fa fa-trash" onclick="cancelInvoice({{$tran->order_id}})"--}}
-{{--                               title="حذف فاکتور"></a>--}}
                             @if(!$tran->paymentLink)
                                 <a class="btn btn-outline-success"
                                    href="/customerDeposit/add/{{$customer->id}}/{{$tran->id}}">پرداخت فاکتور </a>
-                            @else
+                            @elseif($transactions[$tran->paymentLink]->verified == 'approved')
                                 <a class="btn btn-success fa fa-check" title="پرداخت شده"></a>
                             @endif
                         @endif
                     @else
-                        @if($tran->type && !$tran->deleted)
+                        @if($tran->type && !$tran->deleted && $tran->verified != 'approved')
                             <a class="btn btn-danger fa fa-trash" onclick="deleteDeposit({{$tran->id}})"></a>
                         @endif
                     @endif
-                        @if($tran->photo)
-                            <a class="btn btn-info fa fa-image" href="/deposit/{{$tran->photo}}" target="_blank"></a>
-                        @endif
+                    @if($tran->photo)
+                        <a class="btn btn-info fa fa-image" href="/deposit/{{$tran->photo}}" target="_blank"></a>
+                    @endif
                 </td>
             </tr>
         @endforeach

@@ -51,7 +51,7 @@
                            data-bs-toggle="dropdown"
                            aria-haspopup="true" aria-expanded="false">حسابداری</a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="">بررسی سفارشات</a>
+                            <a class="dropdown-item" href="{{route('customersOrderList')}}">بررسی سفارشات</a>
                             <a class="dropdown-item" href="{{route('customersDepositList')}}">بررسی واریزی ها</a>
                         </div>
                     </li>

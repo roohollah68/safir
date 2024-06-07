@@ -42,6 +42,11 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'role']], functio
     Route::get('statistic', [OrderProductController::class, 'showStatistic'])->name('statistic');
 
     Route::get('customers_deposit_list', [CustomerController::class, 'customersDepositList'])->name('customersDepositList');
+    Route::get('customers_order_list', [CustomerController::class, 'customersOrderList'])->name('customersOrderList');
+    Route::post('approveDeposit/{id}', [CustomerController::class, 'approveDeposit']);
+    Route::post('rejectDeposit/{id}', [CustomerController::class, 'rejectDeposit']);
+    Route::post('approveOrder/{id}', [CustomerController::class, 'approveOrder']);
+    Route::post('rejectOrder/{id}', [CustomerController::class, 'rejectOrder']);
 });
 
 Route::group(['middleware' => ['auth', 'verify']], function () {

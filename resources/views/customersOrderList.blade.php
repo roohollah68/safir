@@ -1,7 +1,7 @@
 @extends('layout.main')
 
 @section('title')
-    بررسی واریزی مشتریان
+    بررسی سفارشات مشتریان
 @endsection
 
 @section('content')
@@ -50,6 +50,7 @@
         <tr>
             <th>زمان</th>
             <th>مبلغ(ریال)</th>
+            <th>نحوه پرداخت</th>
             <th>توضیح</th>
             <th>وضعیت</th>
             <th>مشتری</th>
@@ -58,59 +59,61 @@
         </tr>
         </thead>
         <tbody>
-        @foreach($transactions as $tran)
-            @if(($tran->verified == 'waiting' && !$waiting) ||
-                        ($tran->verified == 'approved' && !$approved)||
-                        ($tran->verified == 'rejected' && !$rejected)|| $tran->deleted)
+        @foreach($orders as $order)
+            @if(($order->counter == 'waiting' && !$waiting) ||
+                        ($order->counter == 'approved' && !$approved)||
+                        ($order->counter == 'rejected' && !$rejected))
                 @continue
             @endif
 
-            @if(!$tran->order_id && ($selectedUser == 'all' || $tran->customer->user->id == $selectedUser))
+            @if($order->confirm && (!$order->status || $order->status==4) &&
+                    $order->user->admin() &&
+                    ($selectedUser == 'all' || $order->customer->user->id == $selectedUser))
 
                 <tr>
                     <td>
                         <span class="d-none">
-                            {{verta($tran->created_at)->getTimestamp()}}
+                            {{verta($order->created_at)->getTimestamp()}}
                         </span>
-                        {{verta($tran->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}
+                        {{verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}
                     </td>
-                    <td dir="ltr">{{number_format($tran->amount)}}</td>
-                    <td>{{$tran->description}}</td>
-                    <td id="status_{{$tran->id}}">
-                        @if($tran->verified == 'waiting')
+                    <td dir="ltr">{{number_format($order->total)}}</td>
+                    <td>{{$order->payMethod()}}</td>
+                    <td>{{$order->paymentNote}}</td>
+                    <td id="status_{{$order->id}}">
+                        @if($order->counter == 'waiting')
                             <i class="btn btn-info">در انتظار بررسی</i>
-                        @elseif($tran->verified == 'approved')
+                        @elseif($order->counter == 'approved')
                             <i class="btn btn-success">تایید شده</i>
-                        @elseif($tran->verified == 'rejected')
+                        @elseif($order->counter == 'rejected')
                             <i class="btn btn-danger">رد شده</i>
                         @endif
                     </td>
-                    <td><a href="/customer/transaction/{{$tran->customer_id}}">{{$tran->customer->name}}</a></td>
-                    <td>{{$tran->customer->user->name}}</td>
+                    <td><a href="/customer/transaction/{{$order->customer_id}}">{{$order->customer->name}}</a></td>
+                    <td>{{$order->user->name}}</td>
                     <td>
-                        @if($tran->paymentLink)
-                            <a class="btn btn-info fa fa-eye"
-                               onclick="view_order({{$transactions[$tran->paymentLink]->order_id}})"
-                               title="مشاهده سفارش"></a>
-                            <a class="fa fa-file-invoice-dollar btn btn-secondary"
-                               onclick="invoice({{$transactions[$tran->paymentLink]->order_id}})"
-                               title=" فاکتور"></a>
-
+                        <a class="btn btn-info fa fa-eye"
+                           onclick="view_order({{$order->id}})"
+                           title="مشاهده سفارش"></a>
+                        <a class="fa fa-file-invoice-dollar btn btn-secondary"
+                           onclick="invoice({{$order->id}})"
+                           title=" فاکتور"></a>
+                        @if($order->receipt)
+                            <a class="btn btn-info fa fa-image" href="/deposit/{{$order->receipt}}" target="_blank"></a>
+                            <span id="button_{{$order->id}}">
                         @endif
-                        <a class="btn btn-info fa fa-image" href="/deposit/{{$tran->photo}}" target="_blank"></a>
-                            <span id="button_{{$tran->id}}">
-                        @if($tran->verified == 'waiting')
-                            <span id="" class="btn btn-success fa fa-check"
-                                  onclick="approveDeposit({{$tran->id}})"></span>
-                            <span class="btn btn-danger fa fa-x"
-                                  onclick="rejectDeposit({{$tran->id}})"></span>
-                        @elseif($tran->verified == 'rejected')
-                            <span class="btn btn-success fa fa-check"
-                                  onclick="approveDeposit({{$tran->id}})"></span>
-                        @elseif($tran->verified == 'approved')
-                            <span class="btn btn-danger fa fa-x"
-                                  onclick="rejectDeposit({{$tran->id}})"></span>
-                        @endif
+                                @if($order->counter == 'waiting')
+                                    <span id="" class="btn btn-success fa fa-check"
+                                          onclick="approveOrder({{$order->id}})"></span>
+                                    <span class="btn btn-danger fa fa-x"
+                                          onclick="rejectOrder({{$order->id}})"></span>
+                                @elseif($order->counter == 'rejected')
+                                    <span class="btn btn-success fa fa-check"
+                                          onclick="approveOrder({{$order->id}})"></span>
+                                @elseif($order->counter == 'approved')
+                                    <span class="btn btn-danger fa fa-x"
+                                          onclick="rejectOrder({{$order->id}})"></span>
+                                @endif
                             </span>
                     </td>
                 </tr>
@@ -186,19 +189,19 @@
                 })
         }
 
-        function approveDeposit(id) {
-            $.post('/approveDeposit/' + id, {_token: token})
+        function approveOrder(id) {
+            $.post('/approveOrder/' + id, {_token: token})
                 .done(res => {
-                    $('#button_'+id).html(rejectButton(id));
-                    $('#status_'+id).html('<i class="btn btn-success">تایید شده</i>');
+                    $('#button_' + id).html(rejectButton(id));
+                    $('#status_' + id).html('<i class="btn btn-success">تایید شده</i>');
                 })
         }
 
-        function rejectDeposit(id) {
-            $.post('/rejectDeposit/' + id, {_token: token})
+        function rejectOrder(id) {
+            $.post('/rejectOrder/' + id, {_token: token})
                 .done(res => {
-                    $('#button_'+id).html(approveButton(id));
-                    $('#status_'+id).html('<i class="btn btn-danger">رد شده</i>');
+                    $('#button_' + id).html(approveButton(id));
+                    $('#status_' + id).html('<i class="btn btn-danger">رد شده</i>');
                 })
         }
 
