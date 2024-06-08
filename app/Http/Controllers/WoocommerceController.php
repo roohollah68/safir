@@ -17,7 +17,7 @@ class WoocommerceController extends Controller
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
         $request = json_decode(file_get_contents('php://input'));
         if (env('APP_ENV') == 'local')
-            $request = json_decode(file_get_contents('woo/1403-1-26_17-45 _ peptina _ اوا تاتایی.txt'));
+            $request = json_decode(file_get_contents('woo/1403-3-18_20-44-07 _ peptina _ الهام براتی.txt'));
         if (!isset($request->billing))
             return 'not used';
         file_put_contents('woo/' . verta(null, "Asia/Tehran")->
@@ -94,7 +94,7 @@ class WoocommerceController extends Controller
             ]);
             if ($request->status == 'processing' || $request->status == 'completed') {
                 $order = $web->order()->withTrashed()->first();
-                $order = $order->update($orderData);
+                $order->update($orderData);
                 if ($order->deleted_at) {
                     app('Telegram')->deleteOrderFromBale($order, '5742084958');
                     $order->restore();
