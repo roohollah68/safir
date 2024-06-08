@@ -240,18 +240,11 @@ class CustomerController extends Controller
 
     public function customersDepositList(Request $req)
     {
-        if (!$req->waiting && !$req->approved && !$req->rejected) {
-            $req->waiting = true;
-            $req->approved = true;
-            $req->rejected = true;
-        }
+
         return view('customersDepositList', [
             'transactions' => CustomerTransactions::with('customer.user')->get()->keyBy('id'),
             'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
             'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
-            'waiting' => $req->waiting,
-            'approved' => $req->approved,
-            'rejected' => $req->rejected,
         ]);
     }
 
@@ -285,19 +278,13 @@ class CustomerController extends Controller
 
     public function customersOrderList(Request $req)
     {
-        if (!$req->waiting && !$req->approved && !$req->rejected) {
-            $req->waiting = true;
-            $req->approved = true;
-            $req->rejected = true;
-        }
+
         return view('customersOrderList', [
             'orders' => Order::where('confirm',true)->where('customer_id','>','0')
                 ->where('state',false)->with('user')->get()->keyBy('id'),
             'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
             'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
-            'waiting' => $req->waiting,
-            'approved' => $req->approved,
-            'rejected' => $req->rejected,
+
         ]);
     }
 

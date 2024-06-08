@@ -22,7 +22,7 @@
                         @foreach($users as $user)
                             <option value="{{$user->id}}"
                                     @if( isset($_GET['user']) && $user->id == $_GET['user'])
-                                    selected
+                                        selected
                                 @endif
                             >{{$user->name}}</option>
                         @endforeach
@@ -31,11 +31,12 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group input-group">
-                    <input type="checkbox" id="waiting" name="waiting" @if($waiting) checked @endif>
+                    <input type="radio" id="waiting" name="verified" onclick="$('.hide').hide();$('.waiting').show()"
+                           checked>
                     <label for="waiting">در انتظار بررسی</label>
-                    <input type="checkbox" id="approved" name="approved" @if($approved) checked @endif>
+                    <input type="radio" id="approved" name="verified" onclick="$('.hide').hide();$('.approved').show()">
                     <label for="approved">تایید شده</label>
-                    <input type="checkbox" id="rejected" name="rejected" @if($rejected) checked @endif>
+                    <input type="radio" id="rejected" name="verified" onclick="$('.hide').hide();$('.rejected').show()">
                     <label for="rejected">رد شده</label>
                 </div>
             </div>
@@ -60,17 +61,12 @@
         </thead>
         <tbody>
         @foreach($orders as $order)
-            @if(($order->counter == 'waiting' && !$waiting) ||
-                        ($order->counter == 'approved' && !$approved)||
-                        ($order->counter == 'rejected' && !$rejected))
-                @continue
-            @endif
 
             @if($order->confirm && (!$order->status || $order->status==4) &&
                     $order->user->admin() &&
                     ($selectedUser == 'all' || $order->customer->user->id == $selectedUser))
 
-                <tr>
+                <tr class="hide {{$order->counter}}">
                     <td>
                         <span class="d-none">
                             {{verta($order->created_at)->getTimestamp()}}
@@ -100,20 +96,21 @@
                            title=" فاکتور"></a>
                         @if($order->receipt)
                             <a class="btn btn-info fa fa-image" href="/deposit/{{$order->receipt}}" target="_blank"></a>
-                            <span id="button_{{$order->id}}">
+
                         @endif
+                        <span id="button_{{$order->id}}">
                                 @if($order->counter == 'waiting')
-                                    <span id="" class="btn btn-success fa fa-check"
-                                          onclick="approveOrder({{$order->id}})"></span>
-                                    <span class="btn btn-danger fa fa-x"
-                                          onclick="rejectOrder({{$order->id}})"></span>
-                                @elseif($order->counter == 'rejected')
-                                    <span class="btn btn-success fa fa-check"
-                                          onclick="approveOrder({{$order->id}})"></span>
-                                @elseif($order->counter == 'approved')
-                                    <span class="btn btn-danger fa fa-x"
-                                          onclick="rejectOrder({{$order->id}})"></span>
-                                @endif
+                                <span id="" class="btn btn-success fa fa-check"
+                                      onclick="approveOrder({{$order->id}})"></span>
+                                <span class="btn btn-danger fa fa-x"
+                                      onclick="rejectOrder({{$order->id}})"></span>
+                            @elseif($order->counter == 'rejected')
+                                <span class="btn btn-success fa fa-check"
+                                      onclick="approveOrder({{$order->id}})"></span>
+                            @elseif($order->counter == 'approved')
+                                <span class="btn btn-danger fa fa-x"
+                                      onclick="rejectOrder({{$order->id}})"></span>
+                            @endif
                             </span>
                     </td>
                 </tr>
@@ -134,7 +131,7 @@
                 pageLength: 100,
             });
             token = $('input[name=_token]').val();
-            $('input[type=checkbox]').checkboxradio();
+            $('input[type=radio]').checkboxradio();
         });
 
         let totalPages = 1;
@@ -219,8 +216,8 @@ onclick="rejectOrder(${id})"></span>`;
     </script>
     <script src="/js/dom-to-image.min.js"></script>
     <style>
-        .deleted {
-            display: none;
+        .waiting {
+            display: table-row;
         }
     </style>
 @endsection
