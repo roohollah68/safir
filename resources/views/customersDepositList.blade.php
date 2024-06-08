@@ -6,7 +6,6 @@
 
 @section('content')
     @csrf
-
     <form method="get" action="">
         <div class="row">
             <div class="col-md-6">
