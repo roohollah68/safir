@@ -173,7 +173,7 @@ class CustomerController extends Controller
             'type' => true,
             'photo' => $photo,
             'paymentLink' => $req->link,
-            'verified' => false,
+            'verified' => 'waiting',
         ]);
 
         $customer->update([
