@@ -175,10 +175,6 @@ class CustomerController extends Controller
             'paymentLink' => $req->link,
             'verified' => 'waiting',
         ]);
-
-//        $customer->update([
-//            'balance' => $customer->balance + $req->amount,
-//        ]);
         if ($req->link) {
             $transaction = $customer->transactions()->find($req->link);
             $transaction->update([
