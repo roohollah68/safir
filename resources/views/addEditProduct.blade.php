@@ -253,21 +253,6 @@
             }
         }
 
-        function view_order(id) {
-            $.post('/viewOrder/' + id, {_token: "{{ csrf_token() }}"})
-                .done(res => {
-                    $(res).dialog({
-                        modal: true,
-                        open: () => {
-                            $('.ui-dialog-titlebar-close').hide();
-                            $('.ui-widget-overlay').bind('click', function () {
-                                $(".dialogs").dialog('close');
-                            });
-                        }
-                    });
-                })
-        }
-
     </script>
     <style>
         #navailable.ui-state-active {

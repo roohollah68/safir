@@ -20,6 +20,5 @@
 
 @section('files')
     @include('addEditOrder.js_css')
-    <script src="/js/dom-to-image.min.js"></script>
 @endsection
 

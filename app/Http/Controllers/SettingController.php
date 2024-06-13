@@ -137,24 +137,24 @@ class SettingController extends Controller
 //            }
 //        }
 
-        $customers = Customer::all();
-        foreach ($customers as $customer){
-            $trans = CustomerTransactions::where('customer_id' , $customer->id)->get();
-            $balance = 0;
-            foreach ($trans as $tran){
-                if(($tran->type && $tran->verified != 'approved')||$tran->deleted)
-                    continue;
-                if(!$tran->type) {
-                    $amount = -$tran->amount;
-                }else {
-                    $amount = +$tran->amount;
-                }
-                $balance += $amount;
-                $tran->save();
-            }
-            $customer->balance = $balance;
-            $customer->save();
-        }
+//        $customers = Customer::all();
+//        foreach ($customers as $customer){
+//            $trans = CustomerTransactions::where('customer_id' , $customer->id)->get();
+//            $balance = 0;
+//            foreach ($trans as $tran){
+//                if(($tran->type && $tran->verified != 'approved')||$tran->deleted)
+//                    continue;
+//                if(!$tran->type) {
+//                    $amount = -$tran->amount;
+//                }else {
+//                    $amount = +$tran->amount;
+//                }
+//                $balance += $amount;
+//                $tran->save();
+//            }
+//            $customer->balance = $balance;
+//            $customer->save();
+//        }
 
 
 //        DB::commit();

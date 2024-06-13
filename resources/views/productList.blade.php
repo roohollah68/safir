@@ -241,5 +241,4 @@
         }
 
     </script>
-    {{--    <script src="/js/dom-to-image.min.js"></script>--}}
 @endsection
