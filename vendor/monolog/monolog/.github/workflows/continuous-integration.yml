@@ -18,10 +18,6 @@ jobs:
 
       matrix:
         php-version:
-          - "7.2"
-          - "7.3"
-          - "7.4"
-          - "8.0"
           - "8.1"
           - "8.2"
           - "8.3"
@@ -34,7 +30,7 @@ jobs:
           - "ubuntu-latest"
 
         include:
-          - php-version: "7.2"
+          - php-version: "8.1"
             dependencies: lowest
             operating-system: ubuntu-latest
           - php-version: "8.4"
@@ -82,7 +78,7 @@ jobs:
           composer-options: "${{ matrix.composer-options }}"
 
       - name: "Run tests"
-        run: "composer exec phpunit -- --exclude-group Elasticsearch,Elastica --verbose"
+        run: "composer exec phpunit -- --exclude-group Elasticsearch,Elastica"
 
       - name: "Run tests with psr/log 3"
         if: "contains(matrix.dependencies, 'highest') && matrix.php-version >= '8.0'"
@@ -90,7 +86,7 @@ jobs:
           composer remove --no-update --dev graylog2/gelf-php ruflin/elastica elasticsearch/elasticsearch rollbar/rollbar
           composer require --no-update psr/log:^3
           composer update ${{ matrix.composer-options }}
-          composer exec phpunit -- --exclude-group Elasticsearch,Elastica --verbose
+          composer exec phpunit -- --exclude-group Elasticsearch,Elastica
 
   tests-es-7:
     name: "CI with ES ${{ matrix.es-version }} on PHP ${{ matrix.php-version }}"
@@ -107,10 +103,6 @@ jobs:
           - "ubuntu-latest"
 
         php-version:
-          - "7.2"
-          - "7.3"
-          - "7.4"
-          - "8.0"
           - "8.1"
 
         dependencies:
@@ -120,16 +112,6 @@ jobs:
         es-version:
           - "7.0.0"
           - "7.17.0"
-
-        exclude:
-          # php 7.3 is required
-          - php-version: "7.2"
-            es-version: "7.17.0"
-          # tests failing due an error in deprecated guzzlehttp/ringphp
-          - php-version: "7.3"
-            es-version: "7.0.0"
-          - php-version: "7.4"
-            es-version: "7.0.0"
 
     steps:
       - name: "Checkout"
@@ -171,7 +153,7 @@ jobs:
           dependency-versions: "${{ matrix.dependencies }}"
 
       - name: "Run tests"
-        run: "composer exec phpunit -- --group Elasticsearch,Elastica --verbose"
+        run: "composer exec phpunit -- --group Elasticsearch,Elastica"
 
       - name: "Run tests with psr/log 3"
         if: "contains(matrix.dependencies, 'highest') && matrix.php-version >= '8.0'"
@@ -180,7 +162,7 @@ jobs:
           composer require --no-update --no-interaction --dev ruflin/elastica elasticsearch/elasticsearch:^7
           composer require --no-update psr/log:^3
           composer update -W
-          composer exec phpunit -- --group Elasticsearch,Elastica --verbose
+          composer exec phpunit -- --group Elasticsearch,Elastica
 
   tests-es-8:
     name: "CI with ES ${{ matrix.es-version }} on PHP ${{ matrix.php-version }}"
@@ -197,9 +179,6 @@ jobs:
           - "ubuntu-latest"
 
         php-version:
-          # ES 8 requires PHP 7.4+
-          - "7.4"
-          - "8.0"
           - "8.1"
 
         dependencies:
@@ -252,11 +231,11 @@ jobs:
           dependency-versions: "${{ matrix.dependencies }}"
 
       - name: "Run tests"
-        run: "composer exec phpunit -- --group Elasticsearch,Elastica --verbose"
+        run: "composer exec phpunit -- --group Elasticsearch,Elastica"
 
       - name: "Run tests with psr/log 3"
         if: "contains(matrix.dependencies, 'highest') && matrix.php-version >= '8.0'"
         run: |
           composer require --no-update psr/log:^3
           composer update -W
-          composer exec phpunit -- --group Elasticsearch,Elastica --verbose
+          composer exec phpunit -- --group Elasticsearch,Elastica

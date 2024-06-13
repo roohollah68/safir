@@ -15,10 +15,13 @@ namespace Tests\Factory;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Carbon\Factory;
 use Carbon\FactoryImmutable;
 use DateTimeImmutable;
 use Psr\Clock\ClockInterface;
+use ReflectionFunction;
+use RuntimeException;
 use Tests\AbstractTestCase;
 use Tests\Carbon\Fixtures\MyCarbon;
 
@@ -151,9 +154,100 @@ class FactoryTest extends AbstractTestCase
 
     public function testPsrClock()
     {
+        FactoryImmutable::setCurrentClock(null);
+        FactoryImmutable::getDefaultInstance()->setTestNow(null);
+        $initial = Carbon::now('UTC');
         $factory = new FactoryImmutable();
+        $factory->setTestNow($initial);
         $this->assertInstanceOf(ClockInterface::class, $factory);
         $this->assertInstanceOf(DateTimeImmutable::class, $factory->now());
         $this->assertInstanceOf(CarbonImmutable::class, $factory->now());
+        $this->assertSame('America/Toronto', $factory->now()->tzName);
+        $this->assertSame('UTC', $factory->now('UTC')->tzName);
+
+        $timezonedFactory = $factory->withTimeZone('Asia/Tokyo');
+        $this->assertInstanceOf(CarbonImmutable::class, $timezonedFactory->now());
+        $this->assertSame('Asia/Tokyo', $timezonedFactory->now()->tzName);
+        $this->assertSame('America/Toronto', $timezonedFactory->now('America/Toronto')->tzName);
+
+        $this->assertSame(
+            $initial->format('Y-m-d H:i:s.u'),
+            $factory->now('UTC')->format('Y-m-d H:i:s.u'),
+        );
+
+        $before = microtime(true);
+        $factory->sleep(5);
+        $factory->sleep(20);
+        $after = microtime(true);
+
+        $this->assertLessThan(0.1, $after - $before);
+
+        $this->assertSame(
+            $initial->copy()->addSeconds(25)->format('Y-m-d H:i:s.u'),
+            $factory->now('UTC')->format('Y-m-d H:i:s.u'),
+        );
+
+        $factory = new FactoryImmutable();
+        $factory->setTestNow(null);
+        $before = new DateTimeImmutable('now UTC');
+        $now = $factory->now('UTC');
+        $after = new DateTimeImmutable('now UTC');
+
+        $this->assertGreaterThanOrEqual($before, $now);
+        $this->assertLessThanOrEqual($after, $now);
+
+        $before = new DateTimeImmutable('now UTC');
+        $factory->sleep(0.5);
+        $after = new DateTimeImmutable('now UTC');
+
+        $this->assertSame(
+            5,
+            (int) round(10 * ((float) $after->format('U.u') - ((float) $before->format('U.u')))),
+        );
+    }
+
+    public function testIsolation(): void
+    {
+        CarbonImmutable::setTestNow('1990-07-31 23:59:59');
+
+        $libAFactory = new FactoryImmutable();
+        $libAFactory->setTestNow('2000-02-05 15:20:00');
+
+        $libBFactory = new FactoryImmutable();
+        $libBFactory->setTestNow('2050-12-01 00:00:00');
+
+        $this->assertSame('2000-02-05 15:20:00', (string) $libAFactory->now());
+        $this->assertSame('2050-12-01 00:00:00', (string) $libBFactory->now());
+        $this->assertSame('1990-07-31 23:59:59', (string) CarbonImmutable::now());
+
+        CarbonImmutable::setTestNow();
+    }
+
+    public function testClosureMock(): void
+    {
+        $factory = new Factory();
+        $now = Carbon::parse('2024-01-18 00:00:00');
+        $factory->setTestNow(static fn () => $now);
+
+        $result = $factory->now();
+
+        $this->assertNotSame($now, $result);
+        $this->assertSame($now->format('Y-m-d H:i:s.u e'), $result->format('Y-m-d H:i:s.u e'));
+    }
+
+    public function testClosureMockTypeFailure(): void
+    {
+        $factory = new Factory();
+        $closure = static fn () => 42;
+        $factory->setTestNow($closure);
+        $function = new ReflectionFunction($closure);
+
+        $this->expectExceptionObject(new RuntimeException(
+            'The test closure defined in '.$function->getFileName().
+            ' at line '.$function->getStartLine().' returned integer'.
+            '; expected '.CarbonInterface::class.'|null',
+        ));
+
+        $factory->now();
     }
 }

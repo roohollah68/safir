@@ -27,7 +27,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
         Model::$encrypter = null;
     }
 
-    protected function defineDatabaseMigrationsAfterDatabaseRefreshed()
+    protected function afterRefreshingDatabase()
     {
         Schema::create('encrypted_casts', function (Blueprint $table) {
             $table->increments('id');
@@ -188,7 +188,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             ->with('{"key1":"value1"}')
             ->andReturn('encrypted-secret-collection-string-1');
         $this->encrypter->expects('encryptString')
-            ->times(12)
+            ->times(10)
             ->with('{"key1":"value1","key2":"value2"}')
             ->andReturn('encrypted-secret-collection-string-2');
         $this->encrypter->expects('decryptString')
@@ -242,7 +242,7 @@ class EloquentModelEncryptedCastingTest extends DatabaseTestCase
             ->with('encrypted-secret-array-string-1')
             ->andReturn('{"key1":"value1"}');
         $this->encrypter->expects('encryptString')
-            ->times(12)
+            ->times(10)
             ->with('{"key1":"value1","key2":"value2"}')
             ->andReturn('encrypted-secret-array-string-2');
         $this->encrypter->expects('decryptString')

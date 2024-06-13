@@ -23,6 +23,7 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Events\EventDispatcher;
 use Illuminate\Support\Carbon as SupportCarbon;
 use Illuminate\Support\Facades\Date;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -42,10 +43,8 @@ class ServiceProviderTest extends TestCase
         yield [new EventDispatcher()];
     }
 
-    /**
-     * @dataProvider \Tests\Laravel\ServiceProviderTest::dataForDispatchers
-     */
-    public function testBoot($dispatcher)
+    #[DataProvider('dataForDispatchers')]
+    public function testBoot(EventDispatcherBase $dispatcher)
     {
         // Reset language
         Carbon::setLocale('en');
@@ -134,22 +133,16 @@ class ServiceProviderTest extends TestCase
         $this->assertSame('fr', CarbonPeriod::getLocale());
         $this->assertSame('fr', CarbonInterval::getLocale());
 
-        $service->setAppGetter(static function () use ($app) {
-            return $app;
-        });
+        $service->setAppGetter(static fn () => $app);
         $this->assertSame('fr', Carbon::getLocale());
         $service->updateLocale();
         $this->assertSame('de_DE', Carbon::getLocale());
-        $service->setLocaleGetter(static function () {
-            return 'ckb';
-        });
+        $service->setLocaleGetter(static fn () => 'ckb');
         $this->assertSame('de_DE', Carbon::getLocale());
         $service->updateLocale();
         $this->assertSame('ckb', Carbon::getLocale());
         $service->setLocaleGetter(null);
-        $service->setAppGetter(static function () {
-            return null;
-        });
+        $service->setAppGetter(static fn () => null);
         $service->updateLocale();
         $this->assertSame('ckb', Carbon::getLocale());
     }

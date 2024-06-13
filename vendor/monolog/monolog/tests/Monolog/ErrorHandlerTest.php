@@ -12,6 +12,8 @@
 namespace Monolog;
 
 use Monolog\Handler\TestHandler;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use Psr\Log\LogLevel;
 
 class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
@@ -23,6 +25,7 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(ErrorHandler::class, ErrorHandler::register($logger, false, false, false));
     }
 
+    #[WithoutErrorHandler]
     public function testHandleError()
     {
         $logger = new Logger('test', [$handler = new TestHandler]);
@@ -37,21 +40,23 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
             $this->assertTrue(is_callable($prop));
             $this->assertSame($prevHandler, $prop);
 
-            $resHandler = $errHandler->registerErrorHandler([E_USER_NOTICE => Logger::EMERGENCY], false);
+            $resHandler = $errHandler->registerErrorHandler([E_USER_NOTICE => LogLevel::EMERGENCY], false);
             $this->assertSame($errHandler, $resHandler);
             trigger_error('Foo', E_USER_ERROR);
             $this->assertCount(1, $handler->getRecords());
             $this->assertTrue($handler->hasErrorRecords());
             trigger_error('Foo', E_USER_NOTICE);
             $this->assertCount(2, $handler->getRecords());
+            // check that the remapping of notice to emergency above worked
             $this->assertTrue($handler->hasEmergencyRecords());
+            $this->assertFalse($handler->hasNoticeRecords());
         } finally {
             // restore previous handler
             set_error_handler($phpunitHandler);
         }
     }
 
-    public function fatalHandlerProvider()
+    public static function fatalHandlerProvider()
     {
         return [
             [null, 10, str_repeat(' ', 1024 * 10), LogLevel::ALERT],
@@ -68,9 +73,8 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         return $prop->getValue($instance);
     }
 
-    /**
-     * @dataProvider fatalHandlerProvider
-     */
+    #[DataProvider('fatalHandlerProvider')]
+    #[WithoutErrorHandler]
     public function testFatalHandler(
         $level,
         $reservedMemorySize,
@@ -125,7 +129,6 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('E_DEPRECATED', $method->invokeArgs(null, [E_DEPRECATED]));
         $this->assertEquals('E_USER_DEPRECATED', $method->invokeArgs(null, [E_USER_DEPRECATED]));
 
-        $this->assertEquals('Unknown PHP error', $method->invokeArgs(null, ['RANDOM_TEXT']));
         $this->assertEquals('Unknown PHP error', $method->invokeArgs(null, [E_ALL]));
     }
 }

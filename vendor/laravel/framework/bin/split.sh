@@ -3,7 +3,7 @@
 set -e
 set -x
 
-CURRENT_BRANCH="8.x"
+CURRENT_BRANCH="11.x"
 
 function split()
 {
@@ -23,6 +23,7 @@ remote broadcasting git@github.com:illuminate/broadcasting.git
 remote bus git@github.com:illuminate/bus.git
 remote cache git@github.com:illuminate/cache.git
 remote collections git@github.com:illuminate/collections.git
+remote conditionable git@github.com:illuminate/conditionable.git
 remote config git@github.com:illuminate/config.git
 remote console git@github.com:illuminate/console.git
 remote container git@github.com:illuminate/container.git
@@ -40,6 +41,7 @@ remote mail git@github.com:illuminate/mail.git
 remote notifications git@github.com:illuminate/notifications.git
 remote pagination git@github.com:illuminate/pagination.git
 remote pipeline git@github.com:illuminate/pipeline.git
+remote process git@github.com:illuminate/process.git
 remote queue git@github.com:illuminate/queue.git
 remote redis git@github.com:illuminate/redis.git
 remote routing git@github.com:illuminate/routing.git
@@ -55,6 +57,7 @@ split 'src/Illuminate/Broadcasting' broadcasting
 split 'src/Illuminate/Bus' bus
 split 'src/Illuminate/Cache' cache
 split 'src/Illuminate/Collections' collections
+split 'src/Illuminate/Conditionable' conditionable
 split 'src/Illuminate/Config' config
 split 'src/Illuminate/Console' console
 split 'src/Illuminate/Container' container
@@ -72,6 +75,7 @@ split 'src/Illuminate/Mail' mail
 split 'src/Illuminate/Notifications' notifications
 split 'src/Illuminate/Pagination' pagination
 split 'src/Illuminate/Pipeline' pipeline
+split 'src/Illuminate/Process' process
 split 'src/Illuminate/Queue' queue
 split 'src/Illuminate/Redis' redis
 split 'src/Illuminate/Routing' routing

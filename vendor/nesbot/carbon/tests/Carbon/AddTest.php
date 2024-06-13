@@ -15,6 +15,7 @@ namespace Tests\Carbon;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
+use Carbon\Unit;
 use DateTime;
 use Tests\AbstractTestCase;
 
@@ -24,6 +25,8 @@ class AddTest extends AbstractTestCase
     {
         $this->assertSame(1977, Carbon::createFromDate(1975)->add(2, 'year')->year);
         $this->assertSame(1977, Carbon::createFromDate(1975)->add('year', 2)->year);
+        $this->assertSame(1977, Carbon::createFromDate(1975)->add(2, Unit::Year)->year);
+        $this->assertSame(1977, Carbon::createFromDate(1975)->add(Unit::Year, 2)->year);
         $this->assertSame(1977, Carbon::createFromDate(1975)->add('2 years')->year);
         $lastNegated = null;
         $date = Carbon::createFromDate(1975)->add(
@@ -31,7 +34,7 @@ class AddTest extends AbstractTestCase
                 $lastNegated = $negated;
 
                 return new DateTime($date->format('Y-m-d H:i:s').' + 2 years');
-            }
+            },
         );
         $this->assertInstanceOf(Carbon::class, $date);
         $this->assertSame(1977, $date->year);
@@ -92,15 +95,15 @@ class AddTest extends AbstractTestCase
     {
         $this->assertSame(
             '2021-03-03',
-            Carbon::parse('2021-01-31')->add(1, 'months', true)->format('Y-m-d')
+            Carbon::parse('2021-01-31')->add(1, 'months', true)->format('Y-m-d'),
         );
         $this->assertSame(
             '2021-03-03',
-            Carbon::parse('2021-01-31')->add(1, 'months')->format('Y-m-d')
+            Carbon::parse('2021-01-31')->add(1, 'months')->format('Y-m-d'),
         );
         $this->assertSame(
             '2021-02-28',
-            Carbon::parse('2021-01-31')->add(1, 'months', false)->format('Y-m-d')
+            Carbon::parse('2021-01-31')->add(1, 'months', false)->format('Y-m-d'),
         );
     }
 
@@ -238,6 +241,26 @@ class AddTest extends AbstractTestCase
     public function testAddSecondsNegative()
     {
         $this->assertSame(59, Carbon::createFromTime(0, 0, 0)->addSeconds(-1)->second);
+    }
+
+    public function testAddDecimalSeconds()
+    {
+        $this->assertSame(
+            '1999-12-31 23:59:58.500000',
+            Carbon::parse('2000-01-01 00:00:00')->addSeconds(-1.5)->format('Y-m-d H:i:s.u'),
+        );
+        $this->assertSame(
+            '2000-01-01 00:00:01.500000',
+            Carbon::parse('2000-01-01 00:00:00')->addSeconds(1.5)->format('Y-m-d H:i:s.u'),
+        );
+        $this->assertSame(
+            '1999-12-31 23:59:58.500000',
+            Carbon::parse('2000-01-01 00:00:00')->addRealSeconds(-1.5)->format('Y-m-d H:i:s.u'),
+        );
+        $this->assertSame(
+            '2000-01-01 00:00:01.500000',
+            Carbon::parse('2000-01-01 00:00:00')->addRealSeconds(1.5)->format('Y-m-d H:i:s.u'),
+        );
     }
 
     public function testAddSecond()

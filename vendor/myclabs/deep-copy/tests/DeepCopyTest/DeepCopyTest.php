@@ -21,6 +21,7 @@ use DeepCopy\f009;
 use DeepCopy\f011;
 use DeepCopy\f012\Suit;
 use DeepCopy\f013;
+use DeepCopy\f014;
 use DeepCopy\Filter\ChainableFilter;
 use DeepCopy\Filter\Doctrine\DoctrineProxyFilter;
 use DeepCopy\Filter\KeepFilter;
@@ -540,6 +541,23 @@ class DeepCopyTest extends TestCase
         $copy = $deepCopy->copy($object);
 
         $this->assertNotEquals($copy->getFoo(), $object->getFoo());
+    }
+
+    /**
+     * @requires PHP 8.1
+     */
+    public function test_it_can_copy_object_with_readonly_property()
+    {
+        $scalarProperties = new f014\ReadonlyScalarProperty();
+        $objectProperties = new f014\ReadonlyObjectProperty();
+
+        $deepCopy = new DeepCopy();
+
+        $scalarPropertiesCopy = $deepCopy->copy($scalarProperties);
+        $objectPropertiesCopy = $deepCopy->copy($objectProperties);
+
+        $this->assertEqualButNotSame($scalarProperties, $scalarPropertiesCopy);
+        $this->assertEqualButNotSame($objectProperties, $objectPropertiesCopy);
     }
 
     private function assertEqualButNotSame($expected, $val)

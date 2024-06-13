@@ -14,13 +14,15 @@ declare(strict_types=1);
 namespace Tests\CarbonInterval;
 
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Carbon\CarbonInterval;
 use DateInterval;
 use DateTime;
 use DateTimeImmutable;
-use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\TestWith;
 use Tests\AbstractTestCase;
+use Tests\Carbon\Fixtures\MyCarbon;
 
 class AddTest extends AbstractTestCase
 {
@@ -30,36 +32,33 @@ class AddTest extends AbstractTestCase
         $this->assertCarbonInterval($ci, 6, 4, 54, 30, 43, 55);
     }
 
-    /**
-     * @requires PHP >= 8.0
-     */
     public function testNamedParameters()
     {
-        $ci = eval("return \Carbon\CarbonInterval::years(years: 3)->addYears(years: 4);");
+        $ci = CarbonInterval::years(years: 3)->addYears(years: 4);
         $this->assertCarbonInterval($ci, 7);
 
-        $ci = eval("return \Carbon\CarbonInterval::months(months: 3)->addMonths(months: 4);");
+        $ci = CarbonInterval::months(months: 3)->addMonths(months: 4);
         $this->assertCarbonInterval($ci, 0, 7);
 
-        $ci = eval("return \Carbon\CarbonInterval::weeks(weeks: 3)->addWeeks(weeks: 4);");
+        $ci = CarbonInterval::weeks(weeks: 3)->addWeeks(weeks: 4);
         $this->assertCarbonInterval($ci, 0, 0, 7 * 7);
 
-        $ci = eval("return \Carbon\CarbonInterval::days(days: 3)->addDays(days: 4);");
+        $ci = CarbonInterval::days(days: 3)->addDays(days: 4);
         $this->assertCarbonInterval($ci, 0, 0, 7);
 
-        $ci = eval("return \Carbon\CarbonInterval::hours(hours: 3)->addHours(hours: 4);");
+        $ci = CarbonInterval::hours(hours: 3)->addHours(hours: 4);
         $this->assertCarbonInterval($ci, 0, 0, 0, 7);
 
-        $ci = eval("return \Carbon\CarbonInterval::minutes(minutes: 3)->addMinutes(minutes: 4);");
+        $ci = CarbonInterval::minutes(minutes: 3)->addMinutes(minutes: 4);
         $this->assertCarbonInterval($ci, 0, 0, 0, 0, 7);
 
-        $ci = eval("return \Carbon\CarbonInterval::seconds(seconds: 3)->addSeconds(seconds: 4);");
+        $ci = CarbonInterval::seconds(seconds: 3)->addSeconds(seconds: 4);
         $this->assertCarbonInterval($ci, 0, 0, 0, 0, 0, 7);
 
-        $ci = eval("return \Carbon\CarbonInterval::milliseconds(milliseconds: 3)->addMilliseconds(milliseconds: 4);");
+        $ci = CarbonInterval::milliseconds(milliseconds: 3)->addMilliseconds(milliseconds: 4);
         $this->assertCarbonInterval($ci, 0, 0, 0, 0, 0, 0, 7000);
 
-        $ci = eval("return \Carbon\CarbonInterval::microseconds(microseconds: 3)->addMicroseconds(microseconds: 4);");
+        $ci = CarbonInterval::microseconds(microseconds: 3)->addMicroseconds(microseconds: 4);
         $this->assertCarbonInterval($ci, 0, 0, 0, 0, 0, 0, 7);
     }
 
@@ -118,26 +117,15 @@ class AddTest extends AbstractTestCase
         $this->assertCarbonInterval($ci, 4, 3, 28, 8, 10, 11);
     }
 
-    public static function dataForAddsResults(): Generator
-    {
-        yield [5, 2, 7];
-        yield [-5, -2, -7];
-        yield [-5, 2, -3];
-        yield [5, -2, 3];
-        yield [2, 5, 7];
-        yield [-2, -5, -7];
-        yield [-2, 5, 3];
-        yield [2, -5, -3];
-    }
-
-    /**
-     * @dataProvider \Tests\CarbonInterval\AddTest::dataForAddsResults
-     *
-     * @param int $base
-     * @param int $increment
-     * @param int $expectedResult
-     */
-    public function testAddSign($base, $increment, $expectedResult)
+    #[TestWith([5, 2, 7])]
+    #[TestWith([-5, -2, -7])]
+    #[TestWith([-5, 2, -3])]
+    #[TestWith([5, -2, 3])]
+    #[TestWith([2, 5, 7])]
+    #[TestWith([-2, -5, -7])]
+    #[TestWith([-2, 5, 3])]
+    #[TestWith([2, -5, -3])]
+    public function testAddSign(int $base, int $increment, int $expectedResult)
     {
         $interval = new CarbonInterval();
         $interval->hours(abs($base));
@@ -179,7 +167,7 @@ class AddTest extends AbstractTestCase
     public function testAddWrongFormat()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'This type of data cannot be added/subtracted.'
+            'This type of data cannot be added/subtracted.',
         ));
 
         CarbonInterval::day()->add(Carbon::now());
@@ -191,6 +179,12 @@ class AddTest extends AbstractTestCase
         $this->assertCarbon(CarbonInterval::days(3)->convertDate(new DateTimeImmutable('2020-06-14')), 2020, 6, 17, 0, 0, 0);
         $this->assertCarbon(CarbonInterval::days(3)->convertDate(new DateTime('2020-06-14'), true), 2020, 6, 11, 0, 0, 0);
         $this->assertCarbon(CarbonInterval::days(3)->convertDate(new DateTimeImmutable('2020-06-14'), true), 2020, 6, 11, 0, 0, 0);
+
+        $interval = new CarbonInterval(static fn (MyCarbon $carbon) => $carbon->addTwoHours());
+        $result = CarbonImmutable::parse('2024-01-18 08:00')->add($interval);
+
+        $this->assertSame(CarbonImmutable::class, $result::class);
+        $this->assertSame('2024-01-18 10:00:00', $result->format('Y-m-d H:i:s'));
     }
 
     public function testMagicAddAndSubMethods()
@@ -210,14 +204,19 @@ class AddTest extends AbstractTestCase
         $this->assertCarbonInterval($interval, 0, 0, 6, 12, 0, 0);
     }
 
-    /**
-     * @requires PHP >= 8.0
-     */
     public function testPlusWithPHP8Syntax()
     {
-        $interval = eval('use Carbon\CarbonInterval;return CarbonInterval::days(3)->plus(weeks: 2, hours: 26);');
+        $interval = CarbonInterval::days(3)->plus(weeks: 2, hours: 26);
 
         $this->assertCarbonInterval($interval, 0, 0, 17, 26, 0, 0);
+
+        $interval = CarbonInterval::days(3)->plus(hours: 1, minutes: 1.5);
+
+        $this->assertCarbonInterval($interval, 0, 0, 3, 1, 1, 30);
+
+        $interval = CarbonInterval::days(3)->plus(hours: 1, minutes: -1.5);
+
+        $this->assertCarbonInterval($interval, 0, 0, 3, 1, -1, -30);
     }
 
     public function testMinus()
@@ -225,12 +224,9 @@ class AddTest extends AbstractTestCase
         $this->assertCarbonInterval(CarbonInterval::days(3)->minus(0, 0, 2, 0, 26), 0, 0, 11, 26, 0, 0, 0, true);
     }
 
-    /**
-     * @requires PHP >= 8.0
-     */
     public function testMinusWithPHP8Syntax()
     {
-        $interval = eval('use Carbon\CarbonInterval;return CarbonInterval::days(3)->minus(weeks: 2, hours: 26);');
+        $interval = CarbonInterval::days(3)->minus(weeks: 2, hours: 26);
 
         $this->assertCarbonInterval($interval, 0, 0, 11, 26, 0, 0, 0, true);
     }

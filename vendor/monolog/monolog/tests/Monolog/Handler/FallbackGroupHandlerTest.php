@@ -11,7 +11,8 @@
 
 namespace Monolog\Handler;
 
-use Monolog\Logger;
+use Monolog\Level;
+use Monolog\LogRecord;
 use Monolog\Test\TestCase;
 
 class FallbackGroupHandlerTest extends TestCase
@@ -26,8 +27,8 @@ class FallbackGroupHandlerTest extends TestCase
         $testHandlerTwo = new TestHandler();
         $testHandlers = [$testHandlerOne, $testHandlerTwo];
         $handler = new FallbackGroupHandler($testHandlers);
-        $handler->handle($this->getRecord(Logger::DEBUG));
-        $handler->handle($this->getRecord(Logger::INFO));
+        $handler->handle($this->getRecord(Level::Debug));
+        $handler->handle($this->getRecord(Level::Info));
 
         $this->assertCount(2, $testHandlerOne->getRecords());
         $this->assertCount(0, $testHandlerTwo->getRecords());
@@ -43,8 +44,8 @@ class FallbackGroupHandlerTest extends TestCase
         $testHandlerTwo = new TestHandler();
         $testHandlers = [$testHandlerOne, $testHandlerTwo];
         $handler = new FallbackGroupHandler($testHandlers);
-        $handler->handle($this->getRecord(Logger::DEBUG));
-        $handler->handle($this->getRecord(Logger::INFO));
+        $handler->handle($this->getRecord(Level::Debug));
+        $handler->handle($this->getRecord(Level::Info));
 
         $this->assertCount(0, $testHandlerOne->getRecords());
         $this->assertCount(2, $testHandlerTwo->getRecords());
@@ -59,7 +60,7 @@ class FallbackGroupHandlerTest extends TestCase
         $testHandlerTwo = new TestHandler();
         $testHandlers = [$testHandlerOne, $testHandlerTwo];
         $handler = new FallbackGroupHandler($testHandlers);
-        $handler->handleBatch([$this->getRecord(Logger::DEBUG), $this->getRecord(Logger::INFO)]);
+        $handler->handleBatch([$this->getRecord(Level::Debug), $this->getRecord(Level::Info)]);
         $this->assertCount(2, $testHandlerOne->getRecords());
         $this->assertCount(0, $testHandlerTwo->getRecords());
     }
@@ -73,7 +74,7 @@ class FallbackGroupHandlerTest extends TestCase
         $testHandlerTwo = new TestHandler();
         $testHandlers = [$testHandlerOne, $testHandlerTwo];
         $handler = new FallbackGroupHandler($testHandlers);
-        $handler->handleBatch([$this->getRecord(Logger::DEBUG), $this->getRecord(Logger::INFO)]);
+        $handler->handleBatch([$this->getRecord(Level::Debug), $this->getRecord(Level::Info)]);
         $this->assertCount(0, $testHandlerOne->getRecords());
         $this->assertCount(2, $testHandlerTwo->getRecords());
     }
@@ -83,11 +84,11 @@ class FallbackGroupHandlerTest extends TestCase
      */
     public function testIsHandling()
     {
-        $testHandlers = [new TestHandler(Logger::ERROR), new TestHandler(Logger::WARNING)];
+        $testHandlers = [new TestHandler(Level::Error), new TestHandler(Level::Warning)];
         $handler = new FallbackGroupHandler($testHandlers);
-        $this->assertTrue($handler->isHandling($this->getRecord(Logger::ERROR)));
-        $this->assertTrue($handler->isHandling($this->getRecord(Logger::WARNING)));
-        $this->assertFalse($handler->isHandling($this->getRecord(Logger::DEBUG)));
+        $this->assertTrue($handler->isHandling($this->getRecord(Level::Error)));
+        $this->assertTrue($handler->isHandling($this->getRecord(Level::Warning)));
+        $this->assertFalse($handler->isHandling($this->getRecord(Level::Debug)));
     }
 
     /**
@@ -98,11 +99,11 @@ class FallbackGroupHandlerTest extends TestCase
         $test = new TestHandler();
         $handler = new FallbackGroupHandler([$test]);
         $handler->pushProcessor(function ($record) {
-            $record['extra']['foo'] = true;
+            $record->extra['foo'] = true;
 
             return $record;
         });
-        $handler->handle($this->getRecord(Logger::WARNING));
+        $handler->handle($this->getRecord(Level::Warning));
         $this->assertTrue($test->hasWarningRecords());
         $records = $test->getRecords();
         $this->assertTrue($records[0]['extra']['foo']);
@@ -118,16 +119,16 @@ class FallbackGroupHandlerTest extends TestCase
         $testHandlers = [$testHandlerOne, $testHandlerTwo];
         $handler = new FallbackGroupHandler($testHandlers);
         $handler->pushProcessor(function ($record) {
-            $record['extra']['foo'] = true;
+            $record->extra['foo'] = true;
 
             return $record;
         });
         $handler->pushProcessor(function ($record) {
-            $record['extra']['foo2'] = true;
+            $record->extra['foo2'] = true;
 
             return $record;
         });
-        $handler->handleBatch([$this->getRecord(Logger::DEBUG), $this->getRecord(Logger::INFO)]);
+        $handler->handleBatch([$this->getRecord(Level::Debug), $this->getRecord(Level::Info)]);
         $this->assertEmpty($testHandlerOne->getRecords());
         $this->assertTrue($testHandlerTwo->hasDebugRecords());
         $this->assertTrue($testHandlerTwo->hasInfoRecords());
@@ -137,5 +138,38 @@ class FallbackGroupHandlerTest extends TestCase
         $this->assertTrue($records[1]['extra']['foo']);
         $this->assertTrue($records[0]['extra']['foo2']);
         $this->assertTrue($records[1]['extra']['foo2']);
+    }
+
+    public function testProcessorsDoNotInterfereBetweenHandlers()
+    {
+        $t1 = new ExceptionTestHandler();
+        $t2 = new TestHandler();
+        $handler = new FallbackGroupHandler([$t1, $t2]);
+
+        $t1->pushProcessor(function (LogRecord $record) {
+            $record->extra['foo'] = 'bar';
+
+            return $record;
+        });
+        $handler->handle($this->getRecord());
+
+        self::assertSame([], $t2->getRecords()[0]->extra);
+    }
+
+    public function testProcessorsDoNotInterfereBetweenHandlersWithBatch()
+    {
+        $t1 = new ExceptionTestHandler();
+        $t2 = new TestHandler();
+        $handler = new FallbackGroupHandler([$t1, $t2]);
+
+        $t1->pushProcessor(function (LogRecord $record) {
+            $record->extra['foo'] = 'bar';
+
+            return $record;
+        });
+
+        $handler->handleBatch([$this->getRecord()]);
+
+        self::assertSame([], $t2->getRecords()[0]->extra);
     }
 }

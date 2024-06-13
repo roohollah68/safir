@@ -15,6 +15,7 @@ namespace Tests\CarbonImmutable;
 
 use Carbon\CarbonImmutable as Carbon;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\AbstractTestCase;
 
 class GettersTest extends AbstractTestCase
@@ -22,12 +23,23 @@ class GettersTest extends AbstractTestCase
     public function testGettersThrowExceptionOnUnknownGetter()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            "Unknown getter 'doesNotExit'"
+            "Unknown getter 'doesNotExit'",
         ));
 
         /** @var mixed $d */
         $d = Carbon::create(1234, 5, 6, 7, 8, 9);
         $d->doesNotExit;
+    }
+
+    public function testGettersThrowExceptionOnUnknownOfGetter()
+    {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            "Unknown getter 'fooOfBar'",
+        ));
+
+        /** @var mixed $d */
+        $d = Carbon::create(1234, 5, 6, 7, 8, 9);
+        $d->fooOfBar;
     }
 
     public function testYearGetter()
@@ -166,7 +178,7 @@ class GettersTest extends AbstractTestCase
         $this->assertSame($age, $d->age);
     }
 
-    public static function dataForTestQuarter()
+    public static function dataForTestQuarter(): array
     {
         return [
             [1, 1],
@@ -184,37 +196,22 @@ class GettersTest extends AbstractTestCase
         ];
     }
 
-    /**
-     * @dataProvider \Tests\CarbonImmutable\GettersTest::dataForTestQuarter
-     *
-     * @param int $month
-     * @param int $quarter
-     */
-    public function testQuarterFirstOfMonth($month, $quarter)
+    #[DataProvider('dataForTestQuarter')]
+    public function testQuarterFirstOfMonth(int $month, int $quarter)
     {
         $c = Carbon::create(2015, $month, 1)->startOfMonth();
         $this->assertSame($quarter, $c->quarter);
     }
 
-    /**
-     * @dataProvider \Tests\CarbonImmutable\GettersTest::dataForTestQuarter
-     *
-     * @param int $month
-     * @param int $quarter
-     */
-    public function testQuarterMiddleOfMonth($month, $quarter)
+    #[DataProvider('dataForTestQuarter')]
+    public function testQuarterMiddleOfMonth(int $month, int $quarter)
     {
         $c = Carbon::create(2015, $month, 15, 12, 13, 14);
         $this->assertSame($quarter, $c->quarter);
     }
 
-    /**
-     * @dataProvider \Tests\CarbonImmutable\GettersTest::dataForTestQuarter
-     *
-     * @param int $month
-     * @param int $quarter
-     */
-    public function testQuarterLastOfMonth($month, $quarter)
+    #[DataProvider('dataForTestQuarter')]
+    public function testQuarterLastOfMonth(int $month, int $quarter)
     {
         $c = Carbon::create(2015, $month, 1)->endOfMonth();
         $this->assertSame($quarter, $c->quarter);
@@ -436,5 +433,72 @@ class GettersTest extends AbstractTestCase
         ];
 
         $this->assertSame($days, Carbon::getDays());
+    }
+
+    public function testUnitOfUnit()
+    {
+        $date = Carbon::createFromDate(2018, 7, 6);
+        $this->assertSame(6, $date->dayOfQuarter);
+
+        $date = Carbon::createFromDate(2018, 8, 6);
+        $this->assertSame(6 + 31, $date->dayOfQuarter);
+
+        $date = Carbon::create(2018, 4, 6, 4, 50, 0, 'UTC');
+        $this->assertSame((95 * 24 + 4) * 60 + 50, $date->minuteOfYear);
+
+        $date = Carbon::create(2018, 4, 6, 4, 50, 0, 'America/Toronto');
+        $this->assertSame((95 * 24 + 3) * 60 + 50, $date->minuteOfYear);
+
+        $date = Carbon::create(2018, 4, 6, 4, 50, 0, 'America/Toronto');
+        $this->assertSame(0, $date->yearOfMinute);
+
+        $date = Carbon::create(2018, 4, 6, 4, 50, 0, 'America/Toronto');
+        $this->assertSame(1, $date->dayOfMinute);
+    }
+
+    public function testUnitOfUnitMethod()
+    {
+        $date = Carbon::createFromDate(2018, 7, 6);
+
+        $this->assertSame(6, $date->dayOfQuarter());
+
+        $date = Carbon::createFromDate(2018, 8, 6);
+        $this->assertSame(6 + 31, $date->dayOfQuarter());
+
+        $date = Carbon::create(2018, 4, 6, 4, 50, 0, 'UTC');
+        $this->assertSame((95 * 24 + 4) * 60 + 50, $date->minuteOfYear());
+
+        $date = Carbon::create(2018, 4, 6, 4, 50, 0, 'America/Toronto');
+        $this->assertSame((95 * 24 + 3) * 60 + 50, $date->minuteOfYear());
+
+        $date = Carbon::create(2018, 4, 6, 4, 50, 0, 'America/Toronto');
+        $this->assertSame(0, $date->yearOfMinute());
+
+        $date = Carbon::create(2018, 4, 6, 4, 50, 0, 'America/Toronto');
+        $this->assertSame(1, $date->dayOfMinute());
+    }
+
+    public function testUnitInUnit()
+    {
+        $date = Carbon::createFromDate(2018, 7, 6);
+        $this->assertSame(7, $date->daysInWeek);
+
+        $date = Carbon::createFromDate(2018, 8, 6);
+        $this->assertSame(92, $date->daysInQuarter);
+
+        $date = Carbon::create(2018, 4, 6, 4, 50, 0, 'UTC');
+        $this->assertSame(365 * 24 * 60, $date->minutesInYear);
+
+        $date = Carbon::create(2018, 4, 6, 4, 50, 0, 'America/Toronto');
+        $this->assertSame(365 * 24 * 60, $date->minutesInYears);
+
+        $date = Carbon::create(2024, 4, 6, 4, 50, 0, 'America/Toronto');
+        $this->assertSame(366 * 24 * 60, $date->minuteInYear);
+
+        $date = Carbon::create(2024, 4, 6, 4, 50, 0, 'America/Toronto');
+        $this->assertSame(0, $date->yearsInMinute);
+
+        $date = Carbon::create(2024, 4, 6, 4, 50, 0, 'America/Toronto');
+        $this->assertSame(0, $date->daysInMinute);
     }
 }

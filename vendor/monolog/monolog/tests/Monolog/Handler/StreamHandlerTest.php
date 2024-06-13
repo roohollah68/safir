@@ -11,9 +11,9 @@
 
 namespace Monolog\Handler;
 
-use Monolog\Handler\StreamHandler;
 use Monolog\Test\TestCase;
-use Monolog\Logger;
+use Monolog\Level;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class StreamHandlerTest extends TestCase
 {
@@ -26,9 +26,9 @@ class StreamHandlerTest extends TestCase
         $handle = fopen('php://memory', 'a+');
         $handler = new StreamHandler($handle);
         $handler->setFormatter($this->getIdentityFormatter());
-        $handler->handle($this->getRecord(Logger::WARNING, 'test'));
-        $handler->handle($this->getRecord(Logger::WARNING, 'test2'));
-        $handler->handle($this->getRecord(Logger::WARNING, 'test3'));
+        $handler->handle($this->getRecord(Level::Warning, 'test'));
+        $handler->handle($this->getRecord(Level::Warning, 'test2'));
+        $handler->handle($this->getRecord(Level::Warning, 'test3'));
         fseek($handle, 0);
         $this->assertEquals('testtest2test3', fread($handle, 100));
     }
@@ -51,7 +51,7 @@ class StreamHandlerTest extends TestCase
     public function testClose()
     {
         $handler = new StreamHandler('php://memory');
-        $handler->handle($this->getRecord(Logger::WARNING, 'test'));
+        $handler->handle($this->getRecord(Level::Warning, 'test'));
         $stream = $handler->getStream();
 
         $this->assertTrue(is_resource($stream));
@@ -66,7 +66,7 @@ class StreamHandlerTest extends TestCase
     public function testSerialization()
     {
         $handler = new StreamHandler('php://memory');
-        $handler->handle($this->getRecord(Logger::WARNING, 'testfoo'));
+        $handler->handle($this->getRecord(Level::Warning, 'testfoo'));
         $stream = $handler->getStream();
 
         $this->assertTrue(is_resource($stream));
@@ -76,7 +76,7 @@ class StreamHandlerTest extends TestCase
         $this->assertFalse(is_resource($stream));
 
         $handler = unserialize($serialized);
-        $handler->handle($this->getRecord(Logger::WARNING, 'testbar'));
+        $handler->handle($this->getRecord(Level::Warning, 'testbar'));
         $stream = $handler->getStream();
 
         $this->assertTrue(is_resource($stream));
@@ -102,7 +102,7 @@ class StreamHandlerTest extends TestCase
     public function testWriteLocking()
     {
         $temp = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'monolog_locked_log';
-        $handler = new StreamHandler($temp, Logger::DEBUG, true, null, true);
+        $handler = new StreamHandler($temp, Level::Debug, true, null, true);
         $handler->handle($this->getRecord());
     }
 
@@ -118,7 +118,7 @@ class StreamHandlerTest extends TestCase
         $handler->handle($this->getRecord());
     }
 
-    public function invalidArgumentProvider()
+    public static function invalidArgumentProvider()
     {
         return [
             [1],
@@ -128,9 +128,9 @@ class StreamHandlerTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidArgumentProvider
      * @covers Monolog\Handler\StreamHandler::__construct
      */
+    #[DataProvider('invalidArgumentProvider')]
     public function testWriteInvalidArgument($invalidArgument)
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -166,9 +166,10 @@ STRING;
         $this->expectExceptionMessage(($majorVersion >= 8) ? $php8xMessage : $php7xMessage);
 
         $handler = new StreamHandler('bogus://url');
-        $record = $this->getRecord();
-        $record['context'] = ['foo' => 'bar'];
-        $record['extra'] = [1, 2, 3];
+        $record = $this->getRecord(
+            context: ['foo' => 'bar'],
+            extra: [1, 2, 3],
+        );
         $handler->handle($record);
     }
 
@@ -207,8 +208,8 @@ STRING;
     /**
      * @covers Monolog\Handler\StreamHandler::__construct
      * @covers Monolog\Handler\StreamHandler::write
-     * @dataProvider provideNonExistingAndNotCreatablePath
      */
+    #[DataProvider('provideNonExistingAndNotCreatablePath')]
     public function testWriteNonExistingAndNotCreatablePath($nonExistingAndNotCreatablePath)
     {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
@@ -232,7 +233,7 @@ STRING;
         $handler->handle($this->getRecord());
     }
 
-    public function provideNonExistingAndNotCreatablePath()
+    public static function provideNonExistingAndNotCreatablePath()
     {
         return [
             '/foo/bar/…' => [
@@ -244,7 +245,7 @@ STRING;
         ];
     }
 
-    public function provideMemoryValues()
+    public static function provideMemoryValues()
     {
         return [
             ['1M', (int) (1024*1024/10)],
@@ -259,11 +260,8 @@ STRING;
         ];
     }
 
-    /**
-     * @dataProvider provideMemoryValues
-     * @return void
-     */
-    public function testPreventOOMError($phpMemory, $expectedChunkSize)
+    #[DataProvider('provideMemoryValues')]
+    public function testPreventOOMError($phpMemory, $expectedChunkSize): void
     {
         $previousValue = ini_set('memory_limit', $phpMemory);
 
@@ -287,10 +285,7 @@ STRING;
         }
     }
 
-    /**
-     * @return void
-     */
-    public function testSimpleOOMPrevention()
+    public function testSimpleOOMPrevention(): void
     {
         $previousValue = ini_set('memory_limit', '2048M');
 

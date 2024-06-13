@@ -16,10 +16,9 @@ namespace Tests\Localization;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Carbon\CarbonPeriod;
+use PHPUnit\Framework\Attributes\Group;
 
-/**
- * @group localization
- */
+#[Group('localization')]
 class NlTest extends LocalizationTestCase
 {
     public const LOCALE = 'nl'; // Dutch
@@ -242,17 +241,17 @@ class NlTest extends LocalizationTestCase
         $this->assertSame('Elke dag en 5 uur van 2015-09-30 12:50:00 tot 2015-10-03 19:00:00', (string) (CarbonPeriod::create(
             Carbon::parse('2015-09-30 12:50'),
             CarbonInterval::day()->hours(5),
-            Carbon::parse('2015-10-03 19:00')
+            Carbon::parse('2015-10-03 19:00'),
         )));
         $this->assertSame('Elk uur en 30 minuten van 2015-09-30 12:50:00 tot 2015-10-03 19:00:00', (string) (CarbonPeriod::create(
             Carbon::parse('2015-09-30 12:50'),
             CarbonInterval::hour()->minutes(30),
-            Carbon::parse('2015-10-03 19:00')
+            Carbon::parse('2015-10-03 19:00'),
         )));
         $this->assertSame('Elke 4 uur en 30 minuten van 2015-09-30 12:50:00 tot 2015-10-03 19:00:00', (string) (CarbonPeriod::create(
             Carbon::parse('2015-09-30 12:50'),
             CarbonInterval::hours(4)->minutes(30),
-            Carbon::parse('2015-10-03 19:00')
+            Carbon::parse('2015-10-03 19:00'),
         )));
     }
 }

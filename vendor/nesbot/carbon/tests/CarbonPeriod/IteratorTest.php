@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Carbon\CarbonPeriod;
 use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\AbstractTestCase;
 use Tests\CarbonPeriod\Fixtures\CarbonPeriodFactory;
 
@@ -26,7 +27,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testKeyAndCurrentAreCorrectlyInstantiated()
     {
-        $period = CarbonPeriodFactory::withEvenDaysFilter($this->periodClass);
+        $period = CarbonPeriodFactory::withEvenDaysFilter(static::$periodClass);
 
         $this->assertSame(0, $period->key());
         $this->assertInstanceOfCarbon($period->current());
@@ -36,19 +37,22 @@ class IteratorTest extends AbstractTestCase
 
     public function testValidIsCorrectlyInstantiated()
     {
-        $period = CarbonPeriodFactory::withEvenDaysFilter($this->periodClass);
+        $period = CarbonPeriodFactory::withEvenDaysFilter(static::$periodClass);
 
         $this->assertTrue($period->valid());
     }
 
     public function testCurrentIsAlwaysCarbonInstance()
     {
-        $period = CarbonPeriodFactory::withEvenDaysFilter($this->periodClass);
+        $period = CarbonPeriodFactory::withEvenDaysFilter(static::$periodClass);
 
-        foreach ($period as $key => $current) {
+        foreach ($period as $current) {
             $this->assertInstanceOfCarbon($current);
             $this->assertEquals($current, $period->current());
-            $this->assertEquals($current, $period->current);
+
+            if (PHP_VERSION < 8.2) {
+                $this->assertEquals($current, $period->current);
+            }
         }
     }
 
@@ -56,7 +60,7 @@ class IteratorTest extends AbstractTestCase
     {
         $keys = [];
 
-        $period = CarbonPeriodFactory::withEvenDaysFilter($this->periodClass);
+        $period = CarbonPeriodFactory::withEvenDaysFilter(static::$periodClass);
 
         foreach ($period as $key => $current) {
             $this->assertIsInt($keys[] = $key);
@@ -68,7 +72,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testElementsInLoopAreAlwaysValid()
     {
-        $period = CarbonPeriodFactory::withEvenDaysFilter($this->periodClass);
+        $period = CarbonPeriodFactory::withEvenDaysFilter(static::$periodClass);
 
         foreach ($period as $key => $current) {
             $this->assertTrue($period->valid());
@@ -77,7 +81,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testKeyAndCurrentAreCorrectlyIterated()
     {
-        $period = CarbonPeriodFactory::withEvenDaysFilter($this->periodClass);
+        $period = CarbonPeriodFactory::withEvenDaysFilter(static::$periodClass);
 
         $period->next();
 
@@ -88,7 +92,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testKeyAndCurrentAreCorrectlyRewound()
     {
-        $period = CarbonPeriodFactory::withEvenDaysFilter($this->periodClass);
+        $period = CarbonPeriodFactory::withEvenDaysFilter(static::$periodClass);
 
         $period->next();
         $period->rewind();
@@ -100,7 +104,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testKeyAndCurrentAreNullAfterIteration()
     {
-        $period = CarbonPeriodFactory::withEvenDaysFilter($this->periodClass);
+        $period = CarbonPeriodFactory::withEvenDaysFilter(static::$periodClass);
 
         foreach ($period as $key => $current) {
             //
@@ -111,12 +115,10 @@ class IteratorTest extends AbstractTestCase
         $this->assertFalse($period->valid());
     }
 
-    /**
-     * @dataProvider dataForIterateBackwardsArguments
-     */
-    public function testIterateBackwards($arguments, $expected)
+    #[DataProvider('dataForIterateBackwardsArguments')]
+    public function testIterateBackwards(array $arguments, array $expected)
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = $periodClass::create(...$arguments);
 
         $interval = new CarbonInterval('P3D');
@@ -126,7 +128,7 @@ class IteratorTest extends AbstractTestCase
 
         $this->assertSame(
             $this->standardizeDates($expected),
-            $this->standardizeDates($period)
+            $this->standardizeDates($period),
         );
     }
 
@@ -156,7 +158,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testChangingParametersShouldNotCauseInfiniteLoop()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = $periodClass::create()
             ->setStartDate($start = '2012-07-01')
             ->setEndDate($end = '2012-07-20')
@@ -192,7 +194,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testChangeEndDateDuringIteration()
     {
-        $period = CarbonPeriodFactory::withEvenDaysFilter($this->periodClass);
+        $period = CarbonPeriodFactory::withEvenDaysFilter(static::$periodClass);
 
         $results = [];
 
@@ -215,7 +217,7 @@ class IteratorTest extends AbstractTestCase
 
         $this->assertSame(
             ['0 => 2012-07-04', '1 => 2012-07-10', '2 => 2012-07-16'],
-            $results
+            $results,
         );
     }
 
@@ -244,7 +246,7 @@ class IteratorTest extends AbstractTestCase
 
         $this->assertSame(
             ['0 => 2012-07-01', '1 => 2012-07-02', '2 => 2012-07-03', '3 => 2012-07-04'],
-            $results
+            $results,
         );
     }
 
@@ -276,7 +278,7 @@ class IteratorTest extends AbstractTestCase
         $this->assertSame(
             // Note: Results are not affected, because start date is used only for initialization.
             ['0 => 2012-07-01', '1 => 2012-07-02', '2 => 2012-07-03', '3 => 2012-07-04'],
-            $results
+            $results,
         );
     }
 
@@ -303,13 +305,13 @@ class IteratorTest extends AbstractTestCase
 
         $this->assertSame(
             ['0 => 2012-07-01', '1 => 2012-07-04', '2 => 2012-07-07'],
-            $results
+            $results,
         );
     }
 
     public function testValidateOncePerIteration()
     {
-        $period = CarbonPeriodFactory::withCounter($this->periodClass, $counter);
+        $period = CarbonPeriodFactory::withCounter(static::$periodClass, $counter);
 
         $period->key();
         $period->current();
@@ -327,7 +329,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testInvalidateCurrentAfterChangingParameters()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = $periodClass::create('2012-10-01');
 
         $this->assertInstanceOfCarbon($period->current());
@@ -339,7 +341,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testTraversePeriodDynamically()
     {
-        $period = CarbonPeriodFactory::withEvenDaysFilter($this->periodClass);
+        $period = CarbonPeriodFactory::withEvenDaysFilter(static::$periodClass);
 
         $results = [];
 
@@ -355,13 +357,13 @@ class IteratorTest extends AbstractTestCase
 
         $this->assertSame(
             $this->standardizeDates(['2012-07-04', '2012-07-10', '2012-07-16']),
-            $this->standardizeDates($results)
+            $this->standardizeDates($results),
         );
     }
 
     public function testExtendCompletedIteration()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = $periodClass::create('2018-10-10', '2018-10-11');
 
         $results = [];
@@ -382,13 +384,13 @@ class IteratorTest extends AbstractTestCase
 
         $this->assertSame(
             $this->standardizeDates(['2018-10-10', '2018-10-11', '2018-10-12', '2018-10-13']),
-            $this->standardizeDates($results)
+            $this->standardizeDates($results),
         );
     }
 
     public function testRevalidateCurrentAfterChangeOfParameters()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = $periodClass::create()->setStartDate($start = new Carbon('2018-10-28'));
         $this->assertEquals($start, $period->current());
         $this->assertNotSame($start, $period->current());
@@ -405,7 +407,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testRevalidateCurrentAfterEndOfIteration()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = $periodClass::create()->setStartDate($start = new Carbon('2018-10-28'));
         $this->assertEquals($start, $period->current());
         $this->assertNotSame($start, $period->current());
@@ -420,7 +422,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testChangeStartDateBeforeIteration()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = $periodClass::create(new Carbon('2018-10-05'), 3)
             ->setStartDate(new Carbon('2018-10-13'))
             ->toggleOptions($periodClass::EXCLUDE_START_DATE, true);
@@ -430,7 +432,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testChangeStartDateAfterStartedIteration()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = $periodClass::create(new Carbon('2018-10-05'), 3);
 
         $current = $period->current();
@@ -443,7 +445,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testInvertDateIntervalDuringIteration()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass('2018-04-11', 5);
 
         $results = [];
@@ -458,13 +460,13 @@ class IteratorTest extends AbstractTestCase
 
         $this->assertSame(
             $this->standardizeDates(['2018-04-11', '2018-04-12', '2018-04-13', '2018-04-12', '2018-04-11']),
-            $this->standardizeDates($results)
+            $this->standardizeDates($results),
         );
     }
 
     public function testManualIteration()
     {
-        $period = CarbonPeriodFactory::withStackFilter($this->periodClass);
+        $period = CarbonPeriodFactory::withStackFilter(static::$periodClass);
         $period->rewind();
         $str = '';
         while ($period->valid()) {
@@ -480,7 +482,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testSkip()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = $periodClass::create('2018-05-30', '2018-07-13');
         $output = [];
 
@@ -531,7 +533,7 @@ class IteratorTest extends AbstractTestCase
     public function testLocale()
     {
         /** @var CarbonPeriod $period */
-        $period = CarbonPeriodFactory::withStackFilter($this->periodClass)->locale('de');
+        $period = CarbonPeriodFactory::withStackFilter(static::$periodClass)->locale('de');
         $str = '';
 
         foreach ($period as $key => $date) {
@@ -547,7 +549,7 @@ class IteratorTest extends AbstractTestCase
 
     public function testTimezone()
     {
-        $period = CarbonPeriodFactory::withStackFilter($this->periodClass)->shiftTimezone('America/Toronto');
+        $period = CarbonPeriodFactory::withStackFilter(static::$periodClass)->shiftTimezone('America/Toronto');
         $str = null;
 
         foreach ($period as $key => $date) {

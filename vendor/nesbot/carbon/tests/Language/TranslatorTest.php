@@ -76,7 +76,7 @@ class TranslatorTest extends AbstractTestCase
         $exception = new NotLocaleAwareException('foobar');
         $this->assertSame(
             'string does neither implements Symfony\Contracts\Translation\LocaleAwareInterface nor getLocale() method.',
-            $exception->getMessage()
+            $exception->getMessage(),
         );
     }
 
@@ -86,5 +86,26 @@ class TranslatorTest extends AbstractTestCase
             new ImmutableException('setTranslations not allowed on '.TranslatorImmutable::class)
         );
         TranslatorImmutable::get('en')->setTranslations([]);
+    }
+
+    public function testSerializationKeepLocale()
+    {
+        $translator = TranslatorImmutable::get('de');
+
+        $this->assertEquals('de', unserialize(serialize($translator))->getLocale());
+
+        $past = new Carbon('-3 Days');
+        $today = new Carbon('today');
+        $interval = $today->diffAsCarbonInterval($past);
+        $translator = $interval->getLocalTranslator();
+
+        $this->assertEquals('en', unserialize(serialize($translator))->getLocale());
+
+        $past = new Carbon('-3 Days');
+        $today = new Carbon('today');
+        $interval = $today->locale('zh')->diffAsCarbonInterval($past);
+        $translator = $interval->getLocalTranslator();
+
+        $this->assertEquals('zh', unserialize(serialize($translator))->getLocale());
     }
 }

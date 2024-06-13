@@ -15,20 +15,18 @@ namespace Tests\Carbon;
 
 use Carbon\Carbon;
 use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\AbstractTestCase;
 
 class ModifyNearDSTChangeTest extends AbstractTestCase
 {
     /**
-     * Tests transition through DST change hour in non default timezone
-     *
-     * @param string $dateString
-     * @param int    $addHours
-     * @param string $expected
-     *
-     * @dataProvider \Tests\Carbon\ModifyNearDSTChangeTest::dataForTransitionTests
+     * Tests transition through DST change hour in non default timezone.
      */
-    public function testTransitionInNonDefaultTimezone($dateString, $addHours, $expected)
+    #[Group('dst')]
+    #[DataProvider('dataForTransitionTests')]
+    public function testTransitionInNonDefaultTimezone(string $dateString, int $addHours, string $expected)
     {
         date_default_timezone_set('Europe/london');
         $date = Carbon::parse($dateString, 'America/New_York');
@@ -37,15 +35,11 @@ class ModifyNearDSTChangeTest extends AbstractTestCase
     }
 
     /**
-     * Tests transition through DST change hour in default timezone
-     *
-     * @param string $dateString
-     * @param int    $addHours
-     * @param string $expected
-     *
-     * @dataProvider \Tests\Carbon\ModifyNearDSTChangeTest::dataForTransitionTests
+     * Tests transition through DST change hour in default timezone.
      */
-    public function testTransitionInDefaultTimezone($dateString, $addHours, $expected)
+    #[Group('dst')]
+    #[DataProvider('dataForTransitionTests')]
+    public function testTransitionInDefaultTimezone(string $dateString, int $addHours, string $expected)
     {
         date_default_timezone_set('America/New_York');
         $date = Carbon::parse($dateString, 'America/New_York');
@@ -63,11 +57,15 @@ class ModifyNearDSTChangeTest extends AbstractTestCase
         // testForwardTransition
         // When standard time was about to reach 2010-03-14T02:00:00-05:00 clocks were turned forward 1 hour to
         // 2010-03-14T03:00:00-04:00 local daylight time instead
-        yield ['2010-03-14T00:00:00', 24, '2010-03-15T00:00:00-04:00'];
+        yield [
+            '2010-03-14T00:00:00',
+            24,
+            '2010-03-15T01:00:00-04:00',
+        ];
 
         // testBackwardTransition
         // When local daylight time was about to reach 2010-11-07T02:00:00-04:00 clocks were turned backward 1 hour
         // to 2010-11-07T01:00:00-05:00 local standard time instead
-        yield ['2010-11-07T00:00:00', 24, '2010-11-08T00:00:00-05:00'];
+        yield ['2010-11-07T00:00:00', 24, '2010-11-07T23:00:00-05:00'];
     }
 }

@@ -26,7 +26,7 @@ class SettersTest extends AbstractTestCase
 {
     public function testSetStartDate()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass();
 
         $period = $period->setStartDate('2018-03-25');
@@ -36,7 +36,7 @@ class SettersTest extends AbstractTestCase
 
     public function testSetEndDate()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass();
 
         $period = $period->setEndDate('2018-04-25');
@@ -46,7 +46,7 @@ class SettersTest extends AbstractTestCase
 
     public function testSetDateInterval()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass();
 
         $period = $period->setDateInterval('P3D');
@@ -56,7 +56,7 @@ class SettersTest extends AbstractTestCase
 
     public function testSetDateIntervalFromStringFormat()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass();
 
         $period = $period->setDateInterval('1w 3d 4h 32m 23s');
@@ -66,7 +66,7 @@ class SettersTest extends AbstractTestCase
 
     public function testSetRecurrences()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass();
 
         $period = $period->setRecurrences(5);
@@ -76,7 +76,7 @@ class SettersTest extends AbstractTestCase
 
     public function testSetDates()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass();
 
         $period = $period->setDates('2019-04-12', '2019-04-19');
@@ -87,7 +87,7 @@ class SettersTest extends AbstractTestCase
 
     public function testSetOptions()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass();
 
         $period = $period->setOptions($options = $periodClass::EXCLUDE_START_DATE | $periodClass::EXCLUDE_END_DATE);
@@ -97,17 +97,17 @@ class SettersTest extends AbstractTestCase
 
     public function testSetDateClass()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass('2001-01-01', '2001-01-02');
 
         $period = $period->setDateClass(CarbonImmutable::class);
 
-        $this->assertNotSame(0, $period->getOptions() & $periodClass::IMMUTABLE);
+        $this->assertSame($periodClass::IMMUTABLE, $period->getOptions());
         $this->assertInstanceOf(CarbonImmutable::class, $period->toArray()[0]);
 
         $period = $period->setDateClass(Carbon::class);
 
-        $this->assertSame(0, $period->getOptions() & $periodClass::IMMUTABLE);
+        $this->assertSame(0, $period->getOptions());
         $this->assertInstanceOf(Carbon::class, $period->toArray()[0]);
 
         $period = $period->toggleOptions($periodClass::IMMUTABLE, true);
@@ -118,17 +118,19 @@ class SettersTest extends AbstractTestCase
         $this->assertSame(Carbon::class, $period->getDateClass());
         $this->assertInstanceOf(Carbon::class, $period->toArray()[0]);
 
-        $period = $period->setDateClass(AbstractCarbon::class);
-        $this->assertSame(AbstractCarbon::class, $period->getDateClass());
+        if (PHP_VERSION < 8.4) {
+            $period = $period->setDateClass(AbstractCarbon::class);
+            $this->assertSame(AbstractCarbon::class, $period->getDateClass());
+        }
     }
 
     public function testSetDateClassInvalidArgumentException()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Given class does not implement Carbon\CarbonInterface: Carbon\CarbonInterval'
+            'Given class does not implement Carbon\CarbonInterface: Carbon\CarbonInterval',
         ));
 
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass('2001-01-01', '2001-01-02');
 
         $period->setDateClass(CarbonInterval::class);
@@ -137,117 +139,97 @@ class SettersTest extends AbstractTestCase
     public function testInvalidInterval()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Invalid interval.'
+            'Invalid interval.',
         ));
 
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $periodClass::create()->setDateInterval(new DateTime());
     }
 
     public function testEmptyInterval()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Empty interval is not accepted.'
+            'Empty interval is not accepted.',
         ));
 
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $periodClass::create()->setDateInterval(new DateInterval('P0D'));
-    }
-
-    public function testInvalidNumberOfRecurrencesString()
-    {
-        $this->expectExceptionObject(new InvalidArgumentException(
-            'Invalid number of recurrences.'
-        ));
-
-        $periodClass = $this->periodClass;
-        $periodClass::create()->setRecurrences('foo');
     }
 
     public function testInvalidNegativeNumberOfRecurrences()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Invalid number of recurrences.'
+            'Invalid number of recurrences.',
         ));
 
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $periodClass::create()->setRecurrences(-4);
-    }
-
-    public function testInvalidOptions()
-    {
-        $this->expectExceptionObject(new InvalidArgumentException(
-            'Invalid options.'
-        ));
-
-        $periodClass = $this->periodClass;
-        $periodClass::create()->setOptions('1');
     }
 
     public function testInvalidConstructorParameters()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Invalid constructor parameters.'
+            'Invalid constructor parameters.',
         ));
 
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $periodClass::create([]);
     }
 
     public function testInvalidStartDate()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Invalid start date.'
+            'Invalid start date.',
         ));
 
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $periodClass::create()->setStartDate(new DateInterval('P1D'));
     }
 
     public function testInvalidEndDate()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Invalid end date.'
+            'Invalid end date.',
         ));
 
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $periodClass::create()->setEndDate(new DateInterval('P1D'));
     }
 
     public function testToggleOptions()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $start = $periodClass::EXCLUDE_START_DATE;
         $end = $periodClass::EXCLUDE_END_DATE;
 
         $period = new $periodClass();
 
         $period = $period->toggleOptions($start, true);
-        $this->assertSame($start, $period->getOptions());
+        $this->assertPeriodOptions($start, $period);
 
         $period = $period->toggleOptions($end, true);
-        $this->assertSame($start | $end, $period->getOptions());
+        $this->assertPeriodOptions($start | $end, $period);
 
         $period = $period->toggleOptions($start, false);
-        $this->assertSame($end, $period->getOptions());
+        $this->assertPeriodOptions($end, $period);
 
         $period = $period->toggleOptions($end, false);
-        $this->assertEmpty($period->getOptions());
+        $this->assertPeriodOptions(0, $period);
     }
 
     public function testToggleOptionsOnAndOff()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $start = $periodClass::EXCLUDE_START_DATE;
         $end = $periodClass::EXCLUDE_END_DATE;
 
         $period = new $periodClass();
 
         $period = $period->toggleOptions($start);
-        $this->assertSame($start, $period->getOptions());
+        $this->assertPeriodOptions($start, $period);
 
         $period = $period->toggleOptions($start);
-        $this->assertEmpty($period->getOptions());
+        $this->assertPeriodOptions(0, $period);
 
         $period = $period->setOptions($start);
         $period = $period->toggleOptions($start | $end);
@@ -260,12 +242,12 @@ class SettersTest extends AbstractTestCase
         $this->assertSame($start | $end, $period->getOptions());
 
         $period = $period->toggleOptions($start | $end);
-        $this->assertEmpty($period->getOptions());
+        $this->assertSame(0, $period->getOptions());
     }
 
     public function testSetStartDateInclusiveOrExclusive()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass();
 
         $period = $period->setStartDate('2018-03-25');
@@ -280,7 +262,7 @@ class SettersTest extends AbstractTestCase
 
     public function testSetEndDateInclusiveOrExclusive()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass();
 
         $period = $period->setEndDate('2018-04-25');
@@ -295,7 +277,7 @@ class SettersTest extends AbstractTestCase
 
     public function testInvertDateInterval()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass();
 
         $period = $period->invertDateInterval();
@@ -320,37 +302,37 @@ class SettersTest extends AbstractTestCase
 
     public function testExcludeStartDate()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass();
 
         $period = $period->excludeStartDate();
-        $this->assertSame($periodClass::EXCLUDE_START_DATE, $period->getOptions());
+        $this->assertPeriodOptions($periodClass::EXCLUDE_START_DATE, $period);
 
         $period = $period->excludeStartDate(true);
-        $this->assertSame($periodClass::EXCLUDE_START_DATE, $period->getOptions());
+        $this->assertPeriodOptions($periodClass::EXCLUDE_START_DATE, $period);
 
         $period = $period->excludeStartDate(false);
-        $this->assertEmpty($period->getOptions());
+        $this->assertPeriodOptions(0, $period);
     }
 
     public function testExcludeEndDate()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass();
 
         $period = $period->excludeEndDate();
-        $this->assertSame($periodClass::EXCLUDE_END_DATE, $period->getOptions());
+        $this->assertPeriodOptions($periodClass::EXCLUDE_END_DATE, $period);
 
         $period = $period->excludeEndDate(true);
-        $this->assertSame($periodClass::EXCLUDE_END_DATE, $period->getOptions());
+        $this->assertPeriodOptions($periodClass::EXCLUDE_END_DATE, $period);
 
         $period = $period->excludeEndDate(false);
-        $this->assertEmpty($period->getOptions());
+        $this->assertPeriodOptions(0, $period);
     }
 
     public function testSetRelativeDates()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = new $periodClass();
 
         $period = $period->setDates('first monday of may 2018', 'last day of may 2018 noon');
@@ -361,7 +343,7 @@ class SettersTest extends AbstractTestCase
 
     public function testFluentSetters()
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         Carbon::setTestNowAndTimezone(Carbon::now('UTC'));
 
         $period = CarbonInterval::days(3)->toPeriod()->since('2018-04-21')->until('2018-04-27');
@@ -455,11 +437,11 @@ class SettersTest extends AbstractTestCase
 
     public function testSetTimezone(): void
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = $periodClass::create(
             '2018-03-25 00:00 America/Toronto',
             'PT1H',
-            '2018-03-25 12:00 Europe/London'
+            '2018-03-25 12:00 Europe/London',
         )->setTimezone('Europe/Oslo');
 
         $this->assertSame('2018-03-25 06:00 Europe/Oslo', $period->getStartDate()->format('Y-m-d H:i e'));
@@ -468,7 +450,7 @@ class SettersTest extends AbstractTestCase
         $period = $periodClass::create(
             '2018-03-25 00:00 America/Toronto',
             'PT1H',
-            5
+            5,
         )->setTimezone('Europe/Oslo');
 
         $this->assertSame('2018-03-25 06:00 Europe/Oslo', $period->getStartDate()->format('Y-m-d H:i e'));
@@ -478,11 +460,11 @@ class SettersTest extends AbstractTestCase
 
     public function testShiftTimezone(): void
     {
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         $period = $periodClass::create(
             '2018-03-25 00:00 America/Toronto',
             'PT1H',
-            '2018-03-25 12:00 Europe/London'
+            '2018-03-25 12:00 Europe/London',
         )->shiftTimezone('Europe/Oslo');
 
         $this->assertSame('2018-03-25 00:00 Europe/Oslo', $period->getStartDate()->format('Y-m-d H:i e'));
@@ -491,7 +473,7 @@ class SettersTest extends AbstractTestCase
         $period = $periodClass::create(
             '2018-03-26 00:00 America/Toronto',
             'PT1H',
-            5
+            5,
         )->shiftTimezone('Europe/Oslo');
 
         $this->assertSame('2018-03-26 00:00 Europe/Oslo', $period->getStartDate()->format('Y-m-d H:i e'));

@@ -2,9 +2,13 @@
 
 namespace Illuminate\Tests\Support;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterval as Duration;
+use Illuminate\Foundation\Testing\Wormhole;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Sleep;
+use InvalidArgumentException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -46,7 +50,7 @@ class SupportLazyCollectionTest extends TestCase
         $this->assertSame($array, $data->all());
     }
 
-    public function testCanCreateCollectionFromClosure()
+    public function testCanCreateCollectionFromGeneratorFunction()
     {
         $data = LazyCollection::make(function () {
             yield 1;
@@ -67,6 +71,26 @@ class SupportLazyCollectionTest extends TestCase
             'b' => 2,
             'c' => 3,
         ], $data->all());
+    }
+
+    public function testCanCreateCollectionFromNonGeneratorFunction()
+    {
+        $data = LazyCollection::make(function () {
+            return 'laravel';
+        });
+
+        $this->assertSame(['laravel'], $data->all());
+    }
+
+    public function testDoesNotCreateCollectionFromGenerator()
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        $generateNumber = function () {
+            yield 1;
+        };
+
+        LazyCollection::make($generateNumber());
     }
 
     public function testEager()
@@ -164,7 +188,7 @@ class SupportLazyCollectionTest extends TestCase
 
         $results = $mock
             ->times(10)
-            ->pipe(function ($collection) use ($mock, $timeout) {
+            ->tap(function ($collection) use ($mock, $timeout) {
                 tap($collection)
                     ->mockery_init($mock->mockery_getContainer())
                     ->shouldAllowMockingProtectedMethods()
@@ -175,8 +199,6 @@ class SupportLazyCollectionTest extends TestCase
                         (clone $timeout)->sub(1, 'minute')->getTimestamp(),
                         $timeout->getTimestamp()
                     );
-
-                return $collection;
             })
             ->takeUntilTimeout($timeout)
             ->all();
@@ -202,6 +224,58 @@ class SupportLazyCollectionTest extends TestCase
 
         $this->assertSame([1, 2, 3, 4, 5], $data);
         $this->assertSame([1, 2, 3, 4, 5], $tapped);
+    }
+
+    public function testThrottle()
+    {
+        Sleep::fake();
+
+        $data = LazyCollection::times(3)
+            ->throttle(2)
+            ->all();
+
+        Sleep::assertSlept(function (Duration $duration) {
+            $this->assertEqualsWithDelta(
+                2_000_000, $duration->totalMicroseconds, 1_000
+            );
+
+            return true;
+        }, times: 3);
+
+        $this->assertSame([1, 2, 3], $data);
+
+        Sleep::fake(false);
+    }
+
+    public function testThrottleAccountsForTimePassed()
+    {
+        Sleep::fake();
+        Carbon::setTestNow(now());
+
+        $data = LazyCollection::times(3)
+            ->throttle(3)
+            ->tapEach(function ($value, $index) {
+                if ($index == 1) {
+                    // Travel in time...
+                    (new Wormhole(1))->second();
+                }
+            })
+            ->all();
+
+        Sleep::assertSlept(function (Duration $duration, int $index) {
+            $expectation = $index == 1 ? 2_000_000 : 3_000_000;
+
+            $this->assertEqualsWithDelta(
+                $expectation, $duration->totalMicroseconds, 1_000
+            );
+
+            return true;
+        }, times: 3);
+
+        $this->assertSame([1, 2, 3], $data);
+
+        Sleep::fake(false);
+        Carbon::setTestNow();
     }
 
     public function testUniqueDoubleEnumeration()

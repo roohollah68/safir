@@ -3,6 +3,7 @@
 namespace Hekmatinasser\Verta\Laravel;
 
 use Hekmatinasser\Verta\Verta;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 
@@ -11,6 +12,10 @@ class VertaServiceProvider extends ServiceProvider
     private $rules = [
         'jdate' => [
             'extend' => 'validateDate',
+            'replacer' => 'replaceDateOrDatetime',
+        ],
+        'jdate_multi_format' => [
+            'extend' => 'validateDateMultiFormat',
             'replacer' => 'replaceDateOrDatetime',
         ],
         'jdate_equal' => [
@@ -75,6 +80,10 @@ class VertaServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->loadValidators();
+
+        Carbon::macro('toJalali', function ($timezone = null) {
+            return new Verta($this, $timezone);
+        });
     }
 
     /**
@@ -106,7 +115,6 @@ class VertaServiceProvider extends ServiceProvider
         foreach ($this->rules as $name => $methods) {
             if (array_key_exists('extend', $methods) || array_key_exists('replacer', $methods)) {
                 Validator::extend($name, $className . $methods['extend']);
-
                 Validator::replacer($name, $className . $methods['replacer']);
             }
         }

@@ -3,24 +3,37 @@
 namespace Laravel\Breeze\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Console\PromptsForMissingInput;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use RuntimeException;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
-class InstallCommand extends Command
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\multiselect;
+use function Laravel\Prompts\select;
+
+#[AsCommand(name: 'breeze:install')]
+class InstallCommand extends Command implements PromptsForMissingInput
 {
-    use InstallsApiStack, InstallsBladeStack, InstallsInertiaStacks;
+    use InstallsApiStack, InstallsBladeStack, InstallsInertiaStacks, InstallsLivewireStack;
 
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'breeze:install {stack=blade : The development stack that should be installed (blade,react,vue,api)}
-                            {--inertia : Indicate that the Vue Inertia stack should be installed (Deprecated)}
+    protected $signature = 'breeze:install {stack : The development stack that should be installed (blade,livewire,livewire-functional,react,vue,api)}
+                            {--dark : Indicate that dark mode support should be installed}
                             {--pest : Indicate that Pest should be installed}
                             {--ssr : Indicates if Inertia SSR support should be installed}
+                            {--typescript : Indicates if TypeScript is preferred for the Inertia stack}
                             {--composer=global : Absolute path to the Composer binary which should be used to install packages}';
 
     /**
@@ -33,80 +46,146 @@ class InstallCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int|null
      */
     public function handle()
     {
-        if ($this->option('inertia') || $this->argument('stack') === 'vue') {
+        if ($this->argument('stack') === 'vue') {
             return $this->installInertiaVueStack();
         } elseif ($this->argument('stack') === 'react') {
             return $this->installInertiaReactStack();
         } elseif ($this->argument('stack') === 'api') {
             return $this->installApiStack();
-        } else {
+        } elseif ($this->argument('stack') === 'blade') {
             return $this->installBladeStack();
+        } elseif ($this->argument('stack') === 'livewire') {
+            return $this->installLivewireStack();
+        } elseif ($this->argument('stack') === 'livewire-functional') {
+            return $this->installLivewireStack(true);
         }
+
+        $this->components->error('Invalid stack. Supported stacks are [blade], [livewire], [livewire-functional], [react], [vue], and [api].');
+
+        return 1;
     }
 
     /**
      * Install Breeze's tests.
      *
-     * @return void
+     * @return bool
      */
     protected function installTests()
     {
-        (new Filesystem)->ensureDirectoryExists(base_path('tests/Feature/Auth'));
+        (new Filesystem)->ensureDirectoryExists(base_path('tests/Feature'));
 
-        $stubStack = $this->argument('stack') === 'api' ? 'api' : 'default';
+        $stubStack = match ($this->argument('stack')) {
+            'api' => 'api',
+            'livewire' => 'livewire-common',
+            'livewire-functional' => 'livewire-common',
+            default => 'default',
+        };
 
-        if ($this->option('pest')) {
-            $this->requireComposerPackages('pestphp/pest:^1.16', 'pestphp/pest-plugin-laravel:^1.1');
+        if ($this->option('pest') || $this->isUsingPest()) {
+            if ($this->hasComposerPackage('phpunit/phpunit')) {
+                $this->removeComposerPackages(['phpunit/phpunit'], true);
+            }
 
-            (new Filesystem)->copyDirectory(__DIR__.'/../../stubs/'.$stubStack.'/pest-tests/Feature', base_path('tests/Feature/Auth'));
+            if (! $this->requireComposerPackages(['pestphp/pest:^2.0', 'pestphp/pest-plugin-laravel:^2.0'], true)) {
+                return false;
+            }
+
+            (new Filesystem)->copyDirectory(__DIR__.'/../../stubs/'.$stubStack.'/pest-tests/Feature', base_path('tests/Feature'));
             (new Filesystem)->copyDirectory(__DIR__.'/../../stubs/'.$stubStack.'/pest-tests/Unit', base_path('tests/Unit'));
             (new Filesystem)->copy(__DIR__.'/../../stubs/'.$stubStack.'/pest-tests/Pest.php', base_path('tests/Pest.php'));
         } else {
-            (new Filesystem)->copyDirectory(__DIR__.'/../../stubs/'.$stubStack.'/tests/Feature', base_path('tests/Feature/Auth'));
+            (new Filesystem)->copyDirectory(__DIR__.'/../../stubs/'.$stubStack.'/tests/Feature', base_path('tests/Feature'));
         }
+
+        return true;
     }
 
     /**
-     * Install the middleware to a group in the application Http Kernel.
+     * Install the given middleware names into the application.
      *
-     * @param  string  $after
-     * @param  string  $name
+     * @param  array|string  $name
      * @param  string  $group
+     * @param  string  $modifier
      * @return void
      */
-    protected function installMiddlewareAfter($after, $name, $group = 'web')
+    protected function installMiddleware($names, $group = 'web', $modifier = 'append')
     {
-        $httpKernel = file_get_contents(app_path('Http/Kernel.php'));
+        $bootstrapApp = file_get_contents(base_path('bootstrap/app.php'));
 
-        $middlewareGroups = Str::before(Str::after($httpKernel, '$middlewareGroups = ['), '];');
-        $middlewareGroup = Str::before(Str::after($middlewareGroups, "'$group' => ["), '],');
+        $names = collect(Arr::wrap($names))
+            ->filter(fn ($name) => ! Str::contains($bootstrapApp, $name))
+            ->whenNotEmpty(function ($names) use ($bootstrapApp, $group, $modifier) {
+                $names = $names->map(fn ($name) => "$name")->implode(','.PHP_EOL.'            ');
 
-        if (! Str::contains($middlewareGroup, $name)) {
-            $modifiedMiddlewareGroup = str_replace(
-                $after.',',
-                $after.','.PHP_EOL.'            '.$name.',',
-                $middlewareGroup,
-            );
+                $bootstrapApp = str_replace(
+                    '->withMiddleware(function (Middleware $middleware) {',
+                    '->withMiddleware(function (Middleware $middleware) {'
+                        .PHP_EOL."        \$middleware->$group($modifier: ["
+                        .PHP_EOL."            $names,"
+                        .PHP_EOL.'        ]);'
+                        .PHP_EOL,
+                    $bootstrapApp,
+                );
 
-            file_put_contents(app_path('Http/Kernel.php'), str_replace(
-                $middlewareGroups,
-                str_replace($middlewareGroup, $modifiedMiddlewareGroup, $middlewareGroups),
-                $httpKernel
-            ));
-        }
+                file_put_contents(base_path('bootstrap/app.php'), $bootstrapApp);
+            });
+    }
+
+    /**
+     * Install the given middleware aliases into the application.
+     *
+     * @param  array  $aliases
+     * @return void
+     */
+    protected function installMiddlewareAliases($aliases)
+    {
+        $bootstrapApp = file_get_contents(base_path('bootstrap/app.php'));
+
+        $aliases = collect($aliases)
+            ->filter(fn ($alias) => ! Str::contains($bootstrapApp, $alias))
+            ->whenNotEmpty(function ($aliases) use ($bootstrapApp) {
+                $aliases = $aliases->map(fn ($name, $alias) => "'$alias' => $name")->implode(','.PHP_EOL.'            ');
+
+                $bootstrapApp = str_replace(
+                    '->withMiddleware(function (Middleware $middleware) {',
+                    '->withMiddleware(function (Middleware $middleware) {'
+                        .PHP_EOL.'        $middleware->alias(['
+                        .PHP_EOL."            $aliases,"
+                        .PHP_EOL.'        ]);'
+                        .PHP_EOL,
+                    $bootstrapApp,
+                );
+
+                file_put_contents(base_path('bootstrap/app.php'), $bootstrapApp);
+            });
+    }
+
+    /**
+     * Determine if the given Composer package is installed.
+     *
+     * @param  string  $package
+     * @return bool
+     */
+    protected function hasComposerPackage($package)
+    {
+        $packages = json_decode(file_get_contents(base_path('composer.json')), true);
+
+        return array_key_exists($package, $packages['require'] ?? [])
+            || array_key_exists($package, $packages['require-dev'] ?? []);
     }
 
     /**
      * Installs the given Composer Packages into the application.
      *
-     * @param  mixed  $packages
-     * @return void
+     * @param  array  $packages
+     * @param  bool  $asDev
+     * @return bool
      */
-    protected function requireComposerPackages($packages)
+    protected function requireComposerPackages(array $packages, $asDev = false)
     {
         $composer = $this->option('composer');
 
@@ -116,14 +195,43 @@ class InstallCommand extends Command
 
         $command = array_merge(
             $command ?? ['composer', 'require'],
-            is_array($packages) ? $packages : func_get_args()
+            $packages,
+            $asDev ? ['--dev'] : [],
         );
 
-        (new Process($command, base_path(), ['COMPOSER_MEMORY_LIMIT' => '-1']))
+        return (new Process($command, base_path(), ['COMPOSER_MEMORY_LIMIT' => '-1']))
             ->setTimeout(null)
             ->run(function ($type, $output) {
                 $this->output->write($output);
-            });
+            }) === 0;
+    }
+
+    /**
+     * Removes the given Composer Packages from the application.
+     *
+     * @param  array  $packages
+     * @param  bool  $asDev
+     * @return bool
+     */
+    protected function removeComposerPackages(array $packages, $asDev = false)
+    {
+        $composer = $this->option('composer');
+
+        if ($composer !== 'global') {
+            $command = ['php', $composer, 'remove'];
+        }
+
+        $command = array_merge(
+            $command ?? ['composer', 'remove'],
+            $packages,
+            $asDev ? ['--dev'] : [],
+        );
+
+        return (new Process($command, base_path(), ['COMPOSER_MEMORY_LIMIT' => '-1']))
+            ->setTimeout(null)
+            ->run(function ($type, $output) {
+                $this->output->write($output);
+            }) === 0;
     }
 
     /**
@@ -192,5 +300,108 @@ class InstallCommand extends Command
     protected function phpBinary()
     {
         return (new PhpExecutableFinder())->find(false) ?: 'php';
+    }
+
+    /**
+     * Run the given commands.
+     *
+     * @param  array  $commands
+     * @return void
+     */
+    protected function runCommands($commands)
+    {
+        $process = Process::fromShellCommandline(implode(' && ', $commands), null, null, null, null);
+
+        if ('\\' !== DIRECTORY_SEPARATOR && file_exists('/dev/tty') && is_readable('/dev/tty')) {
+            try {
+                $process->setTty(true);
+            } catch (RuntimeException $e) {
+                $this->output->writeln('  <bg=yellow;fg=black> WARN </> '.$e->getMessage().PHP_EOL);
+            }
+        }
+
+        $process->run(function ($type, $line) {
+            $this->output->write('    '.$line);
+        });
+    }
+
+    /**
+     * Remove Tailwind dark classes from the given files.
+     *
+     * @param  \Symfony\Component\Finder\Finder  $finder
+     * @return void
+     */
+    protected function removeDarkClasses(Finder $finder)
+    {
+        foreach ($finder as $file) {
+            file_put_contents($file->getPathname(), preg_replace('/\sdark:[^\s"\']+/', '', $file->getContents()));
+        }
+    }
+
+    /**
+     * Prompt for missing input arguments using the returned questions.
+     *
+     * @return array
+     */
+    protected function promptForMissingArgumentsUsing()
+    {
+        return [
+            'stack' => fn () => select(
+                label: 'Which Breeze stack would you like to install?',
+                options: [
+                    'blade' => 'Blade with Alpine',
+                    'livewire' => 'Livewire (Volt Class API) with Alpine',
+                    'livewire-functional' => 'Livewire (Volt Functional API) with Alpine',
+                    'react' => 'React with Inertia',
+                    'vue' => 'Vue with Inertia',
+                    'api' => 'API only',
+                ],
+                scroll: 6,
+            ),
+        ];
+    }
+
+    /**
+     * Interact further with the user if they were prompted for missing arguments.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @return void
+     */
+    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
+    {
+        $stack = $input->getArgument('stack');
+
+        if (in_array($stack, ['react', 'vue'])) {
+            collect(multiselect(
+                label: 'Would you like any optional features?',
+                options: [
+                    'dark' => 'Dark mode',
+                    'ssr' => 'Inertia SSR',
+                    'typescript' => 'TypeScript',
+                ]
+            ))->each(fn ($option) => $input->setOption($option, true));
+        } elseif (in_array($stack, ['blade', 'livewire', 'livewire-functional'])) {
+            $input->setOption('dark', confirm(
+                label: 'Would you like dark mode support?',
+                default: false
+            ));
+        }
+
+        $input->setOption('pest', select(
+            label: 'Which testing framework do you prefer?',
+            options: ['Pest', 'PHPUnit'],
+            default: $this->isUsingPest() ? 'Pest' : 'PHPUnit',
+        ) === 'Pest');
+    }
+
+    /**
+     * Determine whether the project is already using Pest.
+     *
+     * @return bool
+     */
+    protected function isUsingPest()
+    {
+        return class_exists(\Pest\TestSuite::class);
     }
 }

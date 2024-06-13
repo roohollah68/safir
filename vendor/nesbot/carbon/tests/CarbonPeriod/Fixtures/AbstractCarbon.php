@@ -14,31 +14,38 @@ declare(strict_types=1);
 namespace Tests\CarbonPeriod\Fixtures;
 
 use Carbon\CarbonInterface;
+use Carbon\CarbonInterval;
 use DateTime;
 use ReturnTypeWillChange;
 
 abstract class AbstractCarbon extends DateTime implements CarbonInterface
 {
-    public function __construct($time = null, $tz = null)
+    public function __construct($time = null, $timezone = null)
     {
-        parent::__construct($time, $tz);
+        parent::__construct($time, $timezone);
     }
 
-    public static function __set_state($dump): self
+    public static function __set_state($dump): static
     {
         return new static($dump);
     }
 
     #[ReturnTypeWillChange]
-    public function add($unit, $value = 1, $overflow = null)
+    public function add($unit, $value = 1, ?bool $overflow = null): static
     {
         return parent::add($unit);
     }
 
     #[ReturnTypeWillChange]
-    public function sub($unit, $value = 1, $overflow = null)
+    public function sub($unit, $value = 1, ?bool $overflow = null): static
     {
         return parent::sub($unit);
+    }
+
+    #[ReturnTypeWillChange]
+    public function diff($date = null, $absolute = false): CarbonInterval
+    {
+        return CarbonInterval::instance(parent::diff($date, $absolute));
     }
 
     #[ReturnTypeWillChange]
@@ -47,38 +54,32 @@ abstract class AbstractCarbon extends DateTime implements CarbonInterface
         return parent::modify($modify);
     }
 
-    #[ReturnTypeWillChange]
-    public function setDate($year, $month, $day)
+    public function setDate(int $year, int $month, int $day): static
     {
         return parent::setDate($year, $month, $day);
     }
 
-    #[ReturnTypeWillChange]
-    public function setISODate($year, $month, $day = 1)
+    public function setISODate(int $year, int $week, int $day = 1): static
     {
-        return parent::setISODate($year, $month, $day = 1);
+        return parent::setISODate($year, $week, $day);
     }
 
-    #[ReturnTypeWillChange]
-    public function setTime($hour, $minute, $second = 0, $microseconds = 0)
+    public function setTime($hour, $minute, $second = 0, $microsecond = 0): static
     {
-        return parent::setTime($hour, $minute, $second, $microseconds);
+        return parent::setTime($hour, $minute, $second, $microsecond);
     }
 
-    #[ReturnTypeWillChange]
-    public function setTimestamp($unixTimestamp)
+    public function setTimestamp(int|string|float $timestamp): static
     {
-        return parent::setTimestamp($unixTimestamp);
+        return parent::setTimestamp($timestamp);
     }
 
-    #[ReturnTypeWillChange]
-    public function setTimezone($value)
+    public function setTimezone(\DateTimeZone|string|int $timeZone): static
     {
-        return parent::setTimezone($value);
+        return parent::setTimezone($timeZone);
     }
 
-    #[ReturnTypeWillChange]
-    public static function createFromFormat($format, $time, $tz = null)
+    public static function createFromFormat($format, $time, $tz = null): static
     {
         return parent::createFromFormat($format, $time, $tz);
     }

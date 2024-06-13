@@ -11,8 +11,9 @@
 
 namespace Monolog\Handler;
 
-use Monolog\Logger;
+use Monolog\Level;
 use Monolog\Test\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @author Mazur Alexandr <alexandrmazur96@gmail.com>
@@ -20,10 +21,7 @@ use Monolog\Test\TestCase;
  */
 class TelegramBotHandlerTest extends TestCase
 {
-    /**
-     * @var TelegramBotHandler
-     */
-    private $handler;
+    private TelegramBotHandler&MockObject $handler;
 
     public function testSendTelegramRequest(): void
     {
@@ -31,18 +29,15 @@ class TelegramBotHandlerTest extends TestCase
         $this->handler->handle($this->getRecord());
     }
 
-    /**
-     * @param string $apiKey
-     * @param string $channel
-     */
     private function createHandler(
         string $apiKey = 'testKey',
         string $channel = 'testChannel',
         string $parseMode = 'Markdown',
         bool $disableWebPagePreview = false,
-        bool $disableNotification = true
+        bool $disableNotification = true,
+        int $topic = 1
     ): void {
-        $constructorArgs = [$apiKey, $channel, Logger::DEBUG, true, $parseMode, $disableWebPagePreview, $disableNotification];
+        $constructorArgs = [$apiKey, $channel, Level::Debug, true, $parseMode, $disableWebPagePreview, $disableNotification, $topic];
 
         $this->handler = $this->getMockBuilder(TelegramBotHandler::class)
             ->setConstructorArgs($constructorArgs)

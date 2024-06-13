@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use CarbonTimezoneTrait;
 use DateTime;
+use SubCarbon;
 use Tests\AbstractTestCaseWithOldNow;
 use Tests\Carbon\Fixtures\FooBar;
 use Tests\Carbon\Fixtures\Mixin;
@@ -63,11 +64,11 @@ class MacroTest extends AbstractTestCaseWithOldNow
             /** @var CarbonInterface $date */
             $date = $this;
 
-            return $date->diff(
+            return $date->toDateTime()->diff(
                 Carbon::create($year, 3, 21)
                     ->setTimezone($date->getTimezone())
                     ->addDays(easter_days($year))
-                    ->endOfDay()
+                    ->endOfDay(),
             );
         });
 
@@ -238,7 +239,7 @@ class MacroTest extends AbstractTestCaseWithOldNow
     public function testCarbonRaisesExceptionWhenStaticMacroIsNotFound()
     {
         $this->expectExceptionObject(new BadMethodCallException(
-            'Method Carbon\Carbon::nonExistingStaticMacro does not exist.'
+            'Method Carbon\Carbon::nonExistingStaticMacro does not exist.',
         ));
 
         Carbon::nonExistingStaticMacro();
@@ -247,7 +248,7 @@ class MacroTest extends AbstractTestCaseWithOldNow
     public function testCarbonRaisesExceptionWhenMacroIsNotFound()
     {
         $this->expectExceptionObject(new BadMethodCallException(
-            'Method nonExistingMacro does not exist.'
+            'Method nonExistingMacro does not exist.',
         ));
 
         /** @var mixed $date */
@@ -269,9 +270,6 @@ class MacroTest extends AbstractTestCaseWithOldNow
         $this->assertFalse(Carbon::now()->noThis());
     }
 
-    /**
-     * @requires PHP >= 8.0
-     */
     public function testTraitWithNamedParameters()
     {
         require_once __DIR__.'/../Fixtures/CarbonTimezoneTrait.php';
@@ -328,5 +326,28 @@ class MacroTest extends AbstractTestCaseWithOldNow
         $this->assertSame($mutated, $now);
         $this->assertEquals($mutated, $copy);
         $this->assertNotSame($mutated, $copy);
+    }
+
+    public function testSubClassMacro()
+    {
+        require_once __DIR__.'/../Fixtures/SubCarbon.php';
+
+        $subCarbon = new SubCarbon('2024-01-24 00:00');
+
+        SubCarbon::macro('diffInDecades', function (SubCarbon|string|null $dt = null, $abs = true) {
+            return (int) ($this->diffInYears($dt, $abs) / 10);
+        });
+
+        $this->assertSame(2, $subCarbon->diffInDecades(new SubCarbon('2049-01-24 00:00')));
+        $this->assertSame(2, $subCarbon->diffInDecades('2049-01-24 00:00'));
+
+        SubCarbon::resetMacros();
+    }
+
+    public function testMacroNameCanStartWithDiff()
+    {
+        Carbon::macro('diffInBusinessDays', static fn () => 2);
+
+        $this->assertSame(2, Carbon::now()->diffInBusinessDays());
     }
 }

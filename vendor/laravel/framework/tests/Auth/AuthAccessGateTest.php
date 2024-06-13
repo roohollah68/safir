@@ -8,6 +8,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Container\Container;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -325,6 +326,47 @@ class AuthAccessGateTest extends TestCase
         $this->assertTrue($gate->denies('deny'));
     }
 
+    public function testArrayAbilitiesInAllows()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('allow_1', function ($user) {
+            return true;
+        });
+        $gate->define('allow_2', function ($user) {
+            return true;
+        });
+        $gate->define('deny', function ($user) {
+            return false;
+        });
+
+        $this->assertTrue($gate->allows(['allow_1']));
+        $this->assertTrue($gate->allows(['allow_1', 'allow_2']));
+        $this->assertFalse($gate->allows(['allow_1', 'allow_2', 'deny']));
+        $this->assertFalse($gate->allows(['deny', 'allow_1', 'allow_2']));
+    }
+
+    public function testArrayAbilitiesInDenies()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('deny_1', function ($user) {
+            return false;
+        });
+        $gate->define('deny_2', function ($user) {
+            return false;
+        });
+        $gate->define('allow', function ($user) {
+            return true;
+        });
+
+        $this->assertTrue($gate->denies(['deny_1']));
+        $this->assertTrue($gate->denies(['deny_1', 'deny_2']));
+        $this->assertTrue($gate->denies(['deny_1', 'allow']));
+        $this->assertTrue($gate->denies(['allow', 'deny_1']));
+        $this->assertFalse($gate->denies(['allow']));
+    }
+
     public function testCurrentUserThatIsOnGateAlwaysInjectedIntoClosureCallbacks()
     {
         $gate = $this->getBasicGate();
@@ -555,9 +597,7 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame(3, $counter);
     }
 
-    /**
-     * @dataProvider notCallableDataProvider
-     */
+    #[DataProvider('notCallableDataProvider')]
     public function testDefineSecondParameterShouldBeStringOrCallable($callback)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -570,7 +610,7 @@ class AuthAccessGateTest extends TestCase
     /**
      * @return array
      */
-    public function notCallableDataProvider()
+    public static function notCallableDataProvider()
     {
         return [
             [1],
@@ -584,7 +624,7 @@ class AuthAccessGateTest extends TestCase
     {
         $this->expectException(AuthorizationException::class);
         $this->expectExceptionMessage('You are not an admin.');
-        $this->expectExceptionCode(null);
+        $this->expectExceptionCode(0);
 
         $gate = $this->getBasicGate();
 
@@ -745,7 +785,7 @@ class AuthAccessGateTest extends TestCase
 
     public function testAllowsIfCallbackAcceptsGuestsWhenAuthenticated()
     {
-        $response = $this->getBasicGate()->allowIf(function (stdClass $user = null) {
+        $response = $this->getBasicGate()->allowIf(function (?stdClass $user = null) {
             return $user !== null;
         });
 
@@ -756,7 +796,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate()->forUser(null);
 
-        $response = $gate->allowIf(function (stdClass $user = null) {
+        $response = $gate->allowIf(function (?stdClass $user = null) {
             return $user === null;
         });
 
@@ -883,7 +923,7 @@ class AuthAccessGateTest extends TestCase
 
     public function testDenyIfCallbackAcceptsGuestsWhenAuthenticated()
     {
-        $response = $this->getBasicGate()->denyIf(function (stdClass $user = null) {
+        $response = $this->getBasicGate()->denyIf(function (?stdClass $user = null) {
             return $user === null;
         });
 
@@ -894,7 +934,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate()->forUser(null);
 
-        $response = $gate->denyIf(function (stdClass $user = null) {
+        $response = $gate->denyIf(function (?stdClass $user = null) {
             return $user !== null;
         });
 
@@ -1036,12 +1076,11 @@ class AuthAccessGateTest extends TestCase
     }
 
     /**
-     * @dataProvider hasAbilitiesTestDataProvider
-     *
      * @param  array  $abilitiesToSet
      * @param  array|string  $abilitiesToCheck
      * @param  bool  $expectedHasValue
      */
+    #[DataProvider('hasAbilitiesTestDataProvider')]
     public function testHasAbilities($abilitiesToSet, $abilitiesToCheck, $expectedHasValue)
     {
         $gate = $this->getBasicGate();
@@ -1051,7 +1090,7 @@ class AuthAccessGateTest extends TestCase
         $this->assertEquals($expectedHasValue, $gate->has($abilitiesToCheck));
     }
 
-    public function hasAbilitiesTestDataProvider()
+    public static function hasAbilitiesTestDataProvider()
     {
         $abilities = ['foo' => 'foo', 'bar' => 'bar'];
         $noAbilities = [];
@@ -1108,6 +1147,46 @@ class AuthAccessGateTest extends TestCase
         $this->assertSame('Nullable __invoke was called', AccessGateTestGuestNullableInvokable::$calledMethod);
 
         $this->assertFalse($gate->check('absent_invokable'));
+    }
+
+    public function testCanSetDenialResponseInConstructor()
+    {
+        $gate = new Gate(container: new Container, userResolver: function () {
+            //
+        });
+
+        $gate->defaultDenialResponse(Response::denyWithStatus(999, 'my_message', 'abc'));
+
+        $gate->define('foo', function () {
+            return false;
+        });
+
+        $response = $gate->inspect('foo', new AccessGateTestDummy);
+
+        $this->assertTrue($response->denied());
+        $this->assertFalse($response->allowed());
+        $this->assertSame('my_message', $response->message());
+        $this->assertSame('abc', $response->code());
+        $this->assertSame(999, $response->status());
+    }
+
+    public function testCanSetDenialResponse()
+    {
+        $gate = new Gate(container: new Container, userResolver: function () {
+            //
+        });
+
+        $gate->define('foo', function () {
+            return false;
+        });
+        $gate->defaultDenialResponse(Response::denyWithStatus(404, 'not_found', 'xyz'));
+
+        $response = $gate->inspect('foo', new AccessGateTestDummy);
+        $this->assertTrue($response->denied());
+        $this->assertFalse($response->allowed());
+        $this->assertSame('not_found', $response->message());
+        $this->assertSame('xyz', $response->code());
+        $this->assertSame(404, $response->status());
     }
 }
 

@@ -22,10 +22,10 @@ class StrictModeTest extends AbstractTestCase
     public function testCallWithStrictMode()
     {
         $this->expectExceptionObject(new BadMethodCallException(
-            'Method foobar does not exist.'
+            'Method foobar does not exist.',
         ));
 
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         /** @var mixed $period */
         $period = $periodClass::create();
         $period->foobar();
@@ -34,7 +34,7 @@ class StrictModeTest extends AbstractTestCase
     public function testCallWithoutStrictMode()
     {
         Carbon::useStrictMode(false);
-        $periodClass = $this->periodClass;
+        $periodClass = static::$periodClass;
         /** @var mixed $period */
         $period = $periodClass::create();
         $this->assertSame($period, $period->foobar());

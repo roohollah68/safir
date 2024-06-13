@@ -7,6 +7,8 @@ about: Are you unsure about something?
 
 <!-- Fill in the relevant information below to help triage your issue. -->
 
-|    Q        |   A
-|------------ | ------
-| Version     | x.y.z
+| Q                 | A       |
+|-------------------|---------|
+| Flysystem Version | x.y.z   |
+| Adapter Name      | example |
+| Adapter version   | x.y.z   |

@@ -14,8 +14,11 @@ declare(strict_types=1);
 namespace Tests\Carbon;
 
 use Carbon\Carbon;
+use Carbon\Exceptions\InvalidTimeZoneException;
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
+use SubCarbon;
 use Tests\AbstractTestCase;
 
 class ConstructTest extends AbstractTestCase
@@ -25,6 +28,8 @@ class ConstructTest extends AbstractTestCase
         $c = new Carbon();
         $now = Carbon::now();
         $this->assertInstanceOfCarbon($c);
+        $this->assertInstanceOf(DateTime::class, $c);
+        $this->assertInstanceOf(DateTimeInterface::class, $c);
         $this->assertSame($now->tzName, $c->tzName);
         $this->assertCarbon($c, $now->year, $now->month, $now->day, $now->hour, $now->minute, $now->second);
     }
@@ -50,17 +55,23 @@ class ConstructTest extends AbstractTestCase
         $c = new Carbon(new DateTime('2009-09-09 09:09:09', new DateTimeZone('Asia/Tokyo')), 'Europe/Paris');
 
         $this->assertSame('2009-09-09 02:09:09 Europe/Paris', $c->format('Y-m-d H:i:s e'));
+    }
+
+    public function testCreatesAnInstanceFromADateTimeException()
+    {
+        $this->expectException(InvalidTimeZoneException::class);
 
         Carbon::useStrictMode(false);
 
-        $c = new Carbon(new DateTime('2009-09-09 09:09:09', new DateTimeZone('Asia/Tokyo')), '¤¤ Incorrect Timezone ¤¤');
-
-        $this->assertSame('2009-09-09 09:09:09 America/Toronto', $c->format('Y-m-d H:i:s e'));
+        new Carbon(
+            new DateTime('2009-09-09 09:09:09', new DateTimeZone('Asia/Tokyo')),
+            '¤¤ Incorrect Timezone ¤¤',
+        );
     }
 
     public function testParseCreatesAnInstanceDefaultToNow()
     {
-        $c = Carbon::parse();
+        $c = Carbon::parse('');
         $now = Carbon::now();
         $this->assertInstanceOfCarbon($c);
         $this->assertSame($now->tzName, $c->tzName);
@@ -188,5 +199,15 @@ class ConstructTest extends AbstractTestCase
 
         $date = new Carbon(123.5);
         $this->assertSame('Thursday 1 January 1970 00:02:03.500000', $date->format('l j F Y H:i:s.u'));
+    }
+
+    public function testDifferentType()
+    {
+        require_once __DIR__.'/../Fixtures/SubCarbon.php';
+
+        $subCarbon = new SubCarbon('2024-01-24 00:00');
+        $carbon = new Carbon('2024-01-24 00:00');
+        $this->assertTrue($subCarbon->equalTo($carbon));
+        $this->assertTrue($carbon->equalTo($subCarbon));
     }
 }

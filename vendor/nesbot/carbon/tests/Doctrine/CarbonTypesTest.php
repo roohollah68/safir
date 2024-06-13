@@ -27,7 +27,8 @@ use Doctrine\DBAL\Platforms\MySQL57Platform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
-use Exception;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\AbstractTestCase;
 
 class CarbonTypesTest extends AbstractTestCase
@@ -55,16 +56,9 @@ class CarbonTypesTest extends AbstractTestCase
         return array_combine(array_column($types, 0), $types);
     }
 
-    /**
-     * @group doctrine
-     *
-     * @param string $name
-     *
-     * @dataProvider \Tests\Doctrine\CarbonTypesTest::dataForTypes
-     *
-     * @throws Exception
-     */
-    public function testGetSQLDeclaration(string $name)
+    #[Group('doctrine')]
+    #[DataProvider('dataForTypes')]
+    public function testGetSQLDeclaration(string $name): void
     {
         $type = Type::getType($name);
 
@@ -129,16 +123,8 @@ class CarbonTypesTest extends AbstractTestCase
         DateTimeDefaultPrecision::set($precision);
     }
 
-    /**
-     * @group doctrine
-     *
-     * @param string $name
-     * @param string $class
-     *
-     * @dataProvider \Tests\Doctrine\CarbonTypesTest::dataForTypes
-     *
-     * @throws Exception
-     */
+    #[Group('doctrine')]
+    #[DataProvider('dataForTypes')]
     public function testConvertToPHPValue(string $name, string $class)
     {
         $type = Type::getType($name);
@@ -158,16 +144,8 @@ class CarbonTypesTest extends AbstractTestCase
         $this->assertSame('2020-06-23 18:47:00.000000', $date->format('Y-m-d H:i:s.u'));
     }
 
-    /**
-     * @group doctrine
-     *
-     * @param string $name
-     * @param string $class
-     *
-     * @dataProvider \Tests\Doctrine\CarbonTypesTest::dataForTypes
-     *
-     * @throws Exception
-     */
+    #[Group('doctrine')]
+    #[DataProvider('dataForTypes')]
     public function testConvertToPHPValueFailure(string $name, string $class, string $typeClass)
     {
         $conversion = version_compare(self::getDbalVersion(), '4.0.0', '>=')
@@ -175,21 +153,14 @@ class CarbonTypesTest extends AbstractTestCase
             : "\"2020-0776-23 18:47\" to Doctrine Type $name. Expected format: ";
         $this->expectExceptionObject(new ConversionException(
             'Could not convert database value '.$conversion.
-            "Y-m-d H:i:s.u or any format supported by $class::parse()"
+            "Y-m-d H:i:s.u or any format supported by $class::parse()",
         ));
 
         Type::getType($name)->convertToPHPValue('2020-0776-23 18:47', $this->getMySQLPlatform());
     }
 
-    /**
-     * @group doctrine
-     *
-     * @param string $name
-     *
-     * @dataProvider \Tests\Doctrine\CarbonTypesTest::dataForTypes
-     *
-     * @throws Exception
-     */
+    #[Group('doctrine')]
+    #[DataProvider('dataForTypes')]
     public function testConvertToDatabaseValue(string $name)
     {
         $type = Type::getType($name);
@@ -197,19 +168,12 @@ class CarbonTypesTest extends AbstractTestCase
         $this->assertNull($type->convertToDatabaseValue(null, $this->getMySQLPlatform()));
         $this->assertSame(
             '2020-06-23 18:47:00.000000',
-            $type->convertToDatabaseValue(new DateTimeImmutable('2020-06-23 18:47'), $this->getMySQLPlatform())
+            $type->convertToDatabaseValue(new DateTimeImmutable('2020-06-23 18:47'), $this->getMySQLPlatform()),
         );
     }
 
-    /**
-     * @group doctrine
-     *
-     * @param string $name
-     *
-     * @dataProvider \Tests\Doctrine\CarbonTypesTest::dataForTypes
-     *
-     * @throws Exception
-     */
+    #[Group('doctrine')]
+    #[DataProvider('dataForTypes')]
     public function testConvertToDatabaseValueFailure(string $name, string $class, string $typeClass)
     {
         $quote = class_exists('Doctrine\\DBAL\\Version') ? "'" : '';
@@ -218,24 +182,14 @@ class CarbonTypesTest extends AbstractTestCase
             : "{$quote}array{$quote} to type {$quote}$name{$quote}. ";
         $this->expectExceptionObject(new ConversionException(
             'Could not convert PHP value of type '.$conversion.
-            'Expected one of the following types: null, DateTime, Carbon'
+            'Expected one of the following types: null, DateTime, Carbon',
         ));
 
         Type::getType($name)->convertToDatabaseValue([2020, 06, 23], $this->getMySQLPlatform());
     }
 
-    /**
-     * @group doctrine
-     *
-     * @param string $name
-     * @param string $class
-     * @param string $typeClass
-     * @param bool   $hintRequired
-     *
-     * @dataProvider \Tests\Doctrine\CarbonTypesTest::dataForTypes
-     *
-     * @throws Exception
-     */
+    #[Group('doctrine')]
+    #[DataProvider('dataForTypes')]
     public function testRequiresSQLCommentHint(string $name, string $class, string $typeClass, bool $hintRequired)
     {
         if (version_compare(self::getDbalVersion(), '4.0.0', '>=')) {

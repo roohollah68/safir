@@ -3,9 +3,12 @@
 namespace Illuminate\Tests\Support;
 
 use Exception;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\ItemNotFoundException;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\MultipleItemsFoundException;
+use Illuminate\Support\Sleep;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -27,15 +30,6 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         $this->assertDoesNotEnumerate(function ($collection) {
             LazyCollection::make($collection);
         });
-    }
-
-    public function testMakeWithGeneratorIsNotLazy()
-    {
-        [$closure, $recorder] = $this->makeGeneratorFunctionWithRecorder(5);
-
-        LazyCollection::make($closure());
-
-        $this->assertEquals([1, 2, 3, 4, 5], $recorder->all());
     }
 
     public function testEagerEnumeratesOnce()
@@ -147,6 +141,13 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     {
         $this->assertEnumerates(5, function ($collection) {
             $collection->contains(5);
+        });
+    }
+
+    public function testDoesntContainIsLazy()
+    {
+        $this->assertEnumerates(5, function ($collection) {
+            $collection->doesntContain(5);
         });
     }
 
@@ -508,6 +509,39 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testIntersectUsingIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->intersectUsing([1, 2], 'strcasecmp');
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->intersectUsing([1, 2], 'strcasecmp')->all();
+        });
+    }
+
+    public function testIntersectAssocIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->intersectAssoc([1, 2]);
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->intersectAssoc([1, 2])->all();
+        });
+    }
+
+    public function testIntersectAssocUsingIsLazy()
+    {
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->intersectAssocUsing([1, 2], 'strcasecmp');
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->intersectAssocUsing([1, 2], 'strcasecmp')->all();
+        });
+    }
+
     public function testIntersectByKeysIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
@@ -686,6 +720,13 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     {
         $this->assertEnumeratesOnce(function ($collection) {
             $collection->median();
+        });
+    }
+
+    public function testAvgEnumeratesOnce()
+    {
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->avg();
         });
     }
 
@@ -1049,7 +1090,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
                 $collection->firstOrFail(function ($item) {
                     return $item === 101;
                 });
-            } catch (ItemNotFoundException $e) {
+            } catch (ItemNotFoundException) {
                 //
             }
         });
@@ -1081,7 +1122,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         $this->assertEnumerates(2, function ($collection) {
             try {
                 $collection->sole();
-            } catch (MultipleItemsFoundException $e) {
+            } catch (MultipleItemsFoundException) {
                 //
             }
         });
@@ -1097,7 +1138,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
                 $collection->sole(function ($item) {
                     return $item % 2 === 0;
                 });
-            } catch (MultipleItemsFoundException $e) {
+            } catch (MultipleItemsFoundException) {
                 //
             }
         });
@@ -1223,6 +1264,72 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         });
     }
 
+    public function testTakeUntilTimeoutIsLazy()
+    {
+        tap(m::mock(LazyCollection::class.'[now]')->times(100), function ($mock) {
+            $this->assertDoesNotEnumerateCollection($mock, function ($mock) {
+                $timeout = Carbon::now();
+
+                $results = $mock
+                    ->tap(function ($collection) use ($mock, $timeout) {
+                        tap($collection)
+                            ->mockery_init($mock->mockery_getContainer())
+                            ->shouldAllowMockingProtectedMethods()
+                            ->shouldReceive('now')
+                            ->times(1)
+                            ->andReturn(
+                                $timeout->getTimestamp()
+                            );
+                    })
+                    ->takeUntilTimeout($timeout)
+                    ->all();
+            });
+        });
+
+        tap(m::mock(LazyCollection::class.'[now]')->times(100), function ($mock) {
+            $this->assertEnumeratesCollection($mock, 1, function ($mock) {
+                $timeout = Carbon::now();
+
+                $results = $mock
+                    ->tap(function ($collection) use ($mock, $timeout) {
+                        tap($collection)
+                            ->mockery_init($mock->mockery_getContainer())
+                            ->shouldAllowMockingProtectedMethods()
+                            ->shouldReceive('now')
+                            ->times(2)
+                            ->andReturn(
+                                (clone $timeout)->sub(1, 'minute')->getTimestamp(),
+                                $timeout->getTimestamp()
+                            );
+                    })
+                    ->takeUntilTimeout($timeout)
+                    ->all();
+            });
+        });
+
+        tap(m::mock(LazyCollection::class.'[now]')->times(100), function ($mock) {
+            $this->assertEnumeratesCollectionOnce($mock, function ($mock) {
+                $timeout = Carbon::now();
+
+                $results = $mock
+                    ->tap(function ($collection) use ($mock, $timeout) {
+                        tap($collection)
+                            ->mockery_init($mock->mockery_getContainer())
+                            ->shouldAllowMockingProtectedMethods()
+                            ->shouldReceive('now')
+                            ->times(100)
+                            ->andReturn(
+                                (clone $timeout)->sub(1, 'minute')->getTimestamp()
+                            );
+                    })
+                    ->takeUntilTimeout($timeout)
+                    ->all();
+            });
+        });
+
+        m::close();
+    }
+
     public function testTakeWhileIsLazy()
     {
         $this->assertDoesNotEnumerate(function ($collection) {
@@ -1262,6 +1369,25 @@ class SupportLazyCollectionIsLazyTest extends TestCase
                 // Silence is golden!
             })->all();
         });
+    }
+
+    public function testThrottleIsLazy()
+    {
+        Sleep::fake();
+
+        $this->assertDoesNotEnumerate(function ($collection) {
+            $collection->throttle(10);
+        });
+
+        $this->assertEnumerates(5, function ($collection) {
+            $collection->throttle(10)->take(5)->all();
+        });
+
+        $this->assertEnumeratesOnce(function ($collection) {
+            $collection->throttle(10)->all();
+        });
+
+        Sleep::fake(false);
     }
 
     public function testTimesIsLazy()
@@ -1444,7 +1570,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
         $data = $this->make(['a' => 0])->concat(
             $this->make([['a' => 1], ['a' => 2], ['a' => 3], ['a' => 4]])
                  ->mapInto(stdClass::class)
-         );
+        );
 
         $this->assertDoesNotEnumerateCollection($data, function ($collection) {
             $collection->whereInstanceOf(stdClass::class);
@@ -1604,7 +1730,7 @@ class SupportLazyCollectionIsLazyTest extends TestCase
     {
         try {
             $callback();
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Silence is golden
         }
     }

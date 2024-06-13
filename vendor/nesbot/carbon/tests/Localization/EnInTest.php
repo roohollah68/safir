@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Tests\Localization;
 
-/**
- * @group localization
- */
+use PHPUnit\Framework\Attributes\Group;
+
+#[Group('localization')]
 class EnInTest extends LocalizationTestCase
 {
     public const LOCALE = 'en_IN'; // English
@@ -92,7 +92,7 @@ class EnInTest extends LocalizationTestCase
         // Carbon::parse('2018-01-06 00:00:00')->isoFormat('Do wo')
         '6th 1st',
         // Carbon::parse('2018-01-07 00:00:00')->isoFormat('Do wo')
-        '7th 2nd',
+        '7th 1st',
         // Carbon::parse('2018-01-11 00:00:00')->isoFormat('Do wo')
         '11th 2nd',
         // Carbon::parse('2018-02-09 00:00:00')->isoFormat('DDDo')

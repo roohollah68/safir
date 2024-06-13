@@ -15,6 +15,7 @@ namespace Tests\CarbonImmutable;
 
 use Carbon\CarbonImmutable as Carbon;
 use Carbon\CarbonInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\AbstractTestCase;
 
 class WeekTest extends AbstractTestCase
@@ -5305,7 +5306,7 @@ class WeekTest extends AbstractTestCase
     public function testWeekUtils()
     {
         foreach (static::SAMPLE as $date => [$weekYear, $isoWeekYear, $week, $isoWeek, $weeksInYear, $isoWeeksInYear]) {
-            $carbon = Carbon::parse("$date 00:00:00");
+            $carbon = Carbon::parse("$date 00:00:00")->locale('en_US');
 
             $this->assertSame($weekYear, $carbon->weekYear(), "Carbon::parse(\"$date 00:00:00\")->weekYear() should return $weekYear");
             $this->assertSame($isoWeekYear, $carbon->isoWeekYear(), "Carbon::parse(\"$date 00:00:00\")->isoWeekYear() should return $isoWeekYear");
@@ -5360,7 +5361,7 @@ class WeekTest extends AbstractTestCase
 
         $this->assertSame('2016-08-28', $d->format('Y-m-d'));
 
-        $d = Carbon::parse('2017-01-01');
+        $d = Carbon::parse('2017-01-01')->locale('en_US');
         $d = $d->weekYear(2015);
 
         $this->assertSame('2014-12-28', $d->format('Y-m-d'));
@@ -5370,7 +5371,7 @@ class WeekTest extends AbstractTestCase
 
         $this->assertSame('2012-12-31', $d->format('Y-m-d'));
 
-        $d = Carbon::parse('2012-12-30');
+        $d = Carbon::parse('2012-12-30')->locale('en_US');
         $d = $d->weekYear(2014);
 
         $this->assertSame('2013-12-29', $d->format('Y-m-d'));
@@ -5411,7 +5412,7 @@ class WeekTest extends AbstractTestCase
 
     public function testWeekday()
     {
-        $d = Carbon::parse('2018-08-08');
+        $d = Carbon::parse('2018-08-08')->locale('en_US');
         $this->assertSame(CarbonInterface::WEDNESDAY, $d->weekday());
         $this->assertSame(CarbonInterface::WEDNESDAY, $d->isoWeekday());
         $date = $d->weekday(CarbonInterface::SUNDAY);
@@ -5432,9 +5433,28 @@ class WeekTest extends AbstractTestCase
         $this->assertSame(CarbonInterface::MONDAY, $date->isoWeekday());
     }
 
-    /**
-     * @dataProvider getDaysFromStartOfWeekDataProvider
-     */
+    public function testWeekStartAndEnd()
+    {
+        $this->assertSame(CarbonInterface::MONDAY, Carbon::getWeekStartsAt());
+        $this->assertSame(CarbonInterface::SUNDAY, Carbon::getWeekEndsAt());
+        Carbon::setLocale('en_US');
+        $this->assertSame(CarbonInterface::SUNDAY, Carbon::getWeekStartsAt());
+        $this->assertSame(CarbonInterface::SATURDAY, Carbon::getWeekEndsAt());
+        Carbon::setLocale('ar_AR');
+        $this->assertSame(CarbonInterface::SATURDAY, Carbon::getWeekStartsAt());
+        $this->assertSame(CarbonInterface::FRIDAY, Carbon::getWeekEndsAt());
+        Carbon::setLocale('fr_FR');
+        $this->assertSame(CarbonInterface::MONDAY, Carbon::getWeekStartsAt());
+        $this->assertSame(CarbonInterface::SUNDAY, Carbon::getWeekEndsAt());
+        $this->assertSame(CarbonInterface::SUNDAY, Carbon::getWeekStartsAt('en_US'));
+        $this->assertSame(CarbonInterface::SATURDAY, Carbon::getWeekEndsAt('en_US'));
+        $this->assertSame(CarbonInterface::SATURDAY, Carbon::getWeekStartsAt('ar_AR'));
+        $this->assertSame(CarbonInterface::FRIDAY, Carbon::getWeekEndsAt('ar_AR'));
+        $this->assertSame(CarbonInterface::MONDAY, Carbon::getWeekStartsAt('fr_FR'));
+        $this->assertSame(CarbonInterface::SUNDAY, Carbon::getWeekEndsAt('fr_FR'));
+    }
+
+    #[DataProvider('getDaysFromStartOfWeekDataProvider')]
     public function testGetDaysFromStartOfWeek(string $locale, string $date, int $daysCount)
     {
         $this->assertSame(
@@ -5443,7 +5463,7 @@ class WeekTest extends AbstractTestCase
         );
     }
 
-    public function getDaysFromStartOfWeekDataProvider(): array
+    public static function getDaysFromStartOfWeekDataProvider(): array
     {
         return [
             'Monday en_US' => ['en_US', '2022-11-21', 1],
@@ -5467,9 +5487,7 @@ class WeekTest extends AbstractTestCase
         ];
     }
 
-    /**
-     * @dataProvider getDaysFromStartOfWeekDataProviderExplicit
-     */
+    #[DataProvider('getDaysFromStartOfWeekDataProviderExplicit')]
     public function testGetDaysFromStartOfWeekExplicit(int $start, string $date, int $daysCount)
     {
         static $locales = [null, 'pt_BR', 'de_CH', 'ar_MA'];
@@ -5483,7 +5501,7 @@ class WeekTest extends AbstractTestCase
         $this->assertSame($daysCount, $carbon->getDaysFromStartOfWeek($start));
     }
 
-    public function getDaysFromStartOfWeekDataProviderExplicit(): array
+    public static function getDaysFromStartOfWeekDataProviderExplicit(): array
     {
         return [
             'Monday 0' => [0, '2022-11-21', 1],

@@ -1,559 +1,756 @@
 # Changelog
 
-## 1.1.10 - 2022-10-04
+## 3.28.0 - 2024-05-22
+
+### Added
+
+- MongoDB GridFS adapter (by @GromNaN)
 
 ### Fixed
 
-- [FTP] Prevented type-error during network failure in `ftp_raw` calls.
+- PHP 8.3 directory listing issue for the FTP adapter (by @lanz1)
 
-## 1.1.9 - 2021-12-09
-
-- [Core] prevent `strlen` from receiving `NULL`.
-
-## 1.1.8 - 2021-11-28
+## 3.27.0 - 2024-04-07
 
 ### Fixed
 
-- [FTP] Detect PHP an FTP connection by either is_resource OR it being an instance of `FTP\Connection` (PHP 8.1)
+- Corrected AWS SSE-C Options
+- Handle MetadataDirective gracefully.
 
-## 1.1.7 - 2021-11-25
-
-### Fixed
-
-- [FTP] Windows detection on installations that produce lines with whitespaces (#1384)
-
-## 1.1.6 - 2021-11-21
+## 3.26.0 - 2024-03-25
 
 ### Fixed
 
-- [FTP] Listing contents required escaping for special characters (caused missing contents and failure of directory deletes)
+- Make SFTP connectivity pinging an opt-in feature.
 
-## 1.1.5 - 2021-08-17
+### Added 
+
+- Add `add_content_md5` option to AWS S3 (#1774)
+- Added AWS SSE-C options (#1773)
+
+## 3.25.1 - 2024-03-16
 
 ### Fixed
 
-* [FTP] Do not fail when setting a connection to UTF-8 when it is already on UTF-8.
+- Cleanup connection instance after disconnecting SFTP connection.
+- Fix upcoming PHP 8.4 deprecations (#1772) 
 
-## 1.1.4 - 2021-05-22
+## 3.25.0 - 2024-03-09
 
-### Fixed
+### Added
 
-- [Core] Whitespace normalization now no longer strips funky whitespace but throws an exception.
+- [MountManager] added ability to (dangerously) mount additional filesystems
+- [FTP] added `disconnect` method to proactively close connections
+- [SFTP V3] added `disconnect` method to proactively close connections
 
-## 1.1.3 - 2020-08-23
+## 3.24.0 - 2024-02-04
 
 ### Fixes
 
-* Prevent closed resources from being passed.
-* Allow FTP to use paths with special characters: "[]{}*"
-
-## 1.1.2 - 2020-08-18
+- Updated method signatures to match upgraded dependency signatures for overrides (#1748, #1746)
+- Added missing path prefixing in FTP implementation (#1747)
 
 ### Changes
 
-* Always resolve mime-types
-* Enable directory last_modified key for FTP unix listings
+- Updated string assertions to use PHP 8 functions (#1750, #1749))
 
-## 1.1.1 - 2020-08-12
-
-### Fixes
-
-* Make sure MimeType::detectByFilename detection falls back to `text/plain`, like before.
-
-## 1.1.0 - 2020-08-09
+## 3.23.1 - 2024-01-26
 
 ### Changes
 
-* Minimum PHP version is now 7.2.5
-* MimeType now uses league/mime-type-detection
-* Added (internal) League\Flysystem\Util\MimeType::useDetector to change mime-type resolving.
+- Updated license year
 
-## 1.0.70 - 2020-07-26
-
-### Fixes
-
-* Local::update now also updates permissions.
-
-## 1.0.69 - 2020-05-12
-
-### Fixes
-
-* Corrected the docblock return type of `getTimestamp` and enforce it in the `Filesystem`.
-
-## 1.0.68 - 2020-05-12
-
-### Fixes
-
-* Added mime-types for .ico files (#1163)
-
-## 1.0.67 - 2020-04-16
-
-### Fixes
-
-* Added mime-types for markdown (#1153)
-
-## 1.0.66 - 2020-03-17
-
-### Fixes
-
-* Warnings from FTP are now silenced, preventing exceptions.
-
-## 1.0.65 - 2020-03-08
-
-- Added missing webp mime-type entry.
-
-## 1.0.64 - 2020-02-05
-
-- Improved performance of the connectivity check for FTP connections.
-
-## 1.0.63 - 2020-01-04
-
-- Introduces base exception marker and custom runtime exceptions for error cases.
-
-## 1.0.62 - 2019-12-29
-
-- (#1119) Made `Util::getStreamSize` account for `fstat` failure.
-
-## 1.0.61 - 2019-12-08
-
-- Fixed an array access issue for PHP 7.4 (#1106)
-
-## 1.0.60 - 2019-12-08
-
-- Fixed a PHP 7.4 issue where an array key was accessed for a non-array variable (#1105)
-
-## 1.0.59 - 2019-12-08
-
-- Ensure emulating directories respects a directory named "0".
-
-## 1.0.58 - 2019-12-08
-
-- Release lock on directories before removing them because issue with vagrant mounting.
-
-## 1.0.57 - 2019-10-16
-
-- Added more missing mime-types.
-
-## 1.0.56 - 2019-10-12
-
-- Improved packagist artifact
-- Added missing mime-type.
-
-## 1.0.55 - 2019-08-24
-
-- Fixed metadata fetching of the existing directory in Ftpd.
-
-## 1.0.54 - 2019-08-23
-
-- Fixed directory creation race condition
-- Prevent mime-type lookup when known in config
-
-## 1.0.53 - 2019-06-18
-
-- Clear stat cache before getting file metadata.
-
-## 1.0.52 - 2019-05-20
-
-- Correcting mimetype for CSV files according to latest RFC (https://tools.ietf.org/html/rfc7111).
-- Prevent warnings for `file_get_contents` calls without `has` calls.
-
-## 1.0.51 - 2019-03-30
-
-- [Ftp::listContents] Added support to return 'timestamp' attribute. Note that accuracy is limited
-  due to limitations in the 'LIST' command.
-
-## 1.0.50 - 2019-02-01
-
-- Added option `'case_sensitive'` (default `true`) for cases like Dropbox which are not.
-- Concurrency issue fixed with cache clear.
-
-## 1.0.49 - 2018-11-24
-
-- It's my birthday today.
-- Error message for directory creation in the Local adapter has a better description with more context.
-
-## 1.0.48 - 2018-10-15
-
-- The MountManager now implements the FilesystemInterface.
-
-## 1.0.47 - 2018-09-14
-
-- Specify mimetype for .epub files
-
-## 1.0.46 - 2018-08-22
-
-- Return failure when copying a stream does not work instead of relying only on fclose.
-
-## 1.0.45 - 2018-05-07
-
-- Fixed a regression in path-derived metadata fetching.
-
-## 1.0.44 - 2018-04-06
-
-- Added missing file presence checks on `Filesystem::setVisibility` and `Filesystem::getSize`.
-- The `Handler` types are now deprecated and will be removed in 2.0.0
-- The `FilesystemInterface::get` method is now deprecated and will be removed in 2.0.0
-
-## 1.0.43 - 2018-03-01
-
-- Remove /docs from composer artifact.
-
-## 1.0.42 - 2018-01-27
-
-- Fixed FTP manual recursion.
-- Various code style fixes.
-
-## 1.0.41 - 2017-08-06
-
-- Removed support for HHVM.
+## 3.23.0 - 2023-12-04
 
 ### Fixed
 
-- Response array check mistake was corrected.
-
-## 1.0.40 - 2017-04-28
-
-- Made it possible to indicate an adapter can overwrite files using the write functions rather than the update ones.
-
-## 1.0.39 - 2017-04-25
-
-### Fixed
-
-- Some FTP servers return the `total` of 0 when a file doesn't exist instead of saying it doesn't exist.
-
-## 1.0.38 - 2017-04-22
+- Fixed upstream regression caused by resolving inconclusive mime-type.
 
 ### Added
 
-- You can now optionally put the FTP adapter in `utf8`-mode by setting the `utf8` setting to `true`.
+- Made inconclusive mime-type resolving configurable on the local adapter.
 
-### Fixed
+## 3.22.0 - 2023-12-03
 
-- Pure-FTPd now escapes the first call to rawlist too.
+### Changes
 
-## 1.0.37 - 2017-03-22
+- Prevent double directory creation with lazy root creation for Local filesystem.
 
-### Fixed
+### Fixes
 
-- Space escaping for Pure-FTPd in the FTP adapter.
+- Resolve to "inconclusive" mimetype instead of causing a type error by @GuySartorelli
+- Corrected spelling of a configuration key for the Azure adapter by @shineability
 
-## 1.0.36 - 2017-03-18
+### Additions
 
-### Fixed
+- MountManager::extend allows for immutable dynamic extension of the mount manager.
+- Added a new abstract DecoratedAdapter for easier decoration of adapters by @jnoordsij
 
-- Ensure an FTP connection is still a resource before closing it.
-- Made return values of some internal adapters consistent.
-- Made 0 a valid FTP username.
-- Docblock class reference fixes.
-- Created a more specific exception for when a mount manage is not found (with BC).
+## 3.21.0 - 2023-11-18
 
-## 1.0.35 - 2017-02-09
+### Changes
 
-### Fixed
+- Retain visibility on local copy for local FS, in line with other adapter (#1730) by @jnoordsij
 
-- Creating a directory in FTP checked whether a directory already existed, the check was not strict enough.
-
-## 1.0.34 - 2017-01-30
-
-### Fixed
-
-- Account for a Finfo buffer error which causes an array to string conversion.
-- Simplified path handling for Windows.
-
-## 1.0.33 - 2017-01-23
-
-### Fixed
-
-- Path traversing possibility on Windows.
-
-## 1.0.32 - 2016-10-19
-
-### Fixed
-
-- Fixed listings on windows.
-
-## 1.0.31 - 2016-10-19
-
-### Fixed
-
-- Relative path resolving was too greedy.
-
-## 1.0.30 - 2016-10-18
+## 3.20.0 - 2023-11-14
 
 ### Changed
 
-- Lowered minimum PHP version to 5.5.9
+- Normalise paths for public and temporary URLs (#1727)
 
-## 1.0.29 - 2016-10-18
-
-### Changed
-
-- All FTP-like adapters now have a safe storage for usernames and passwords.
-
-## 1.0.28 - 2016-10-07
-
-### Fixed
-
-- [#705] Config::has now also checks the fallback config.
-
-## 1.0.27 - 2016-08-10
-
-### Fixed
-
-- [#684] The local adapter now infers the mimetype based on the extension for empty files.
-
-## 1.0.26 - 2016-08-03
+## 3.19.0 - 2023-11-07
 
 ### Added
 
-- [Filesystem] Added an option to disable asserts.
+- Configuration option to specify if visibility should be retained during copy/move operations
+- InMemoryFilesystemAdapter now supports visibility changes on move and copy.
+- Default visibility options are ignored when moving/copying while respecting visibility retention settings.
+- Local filesystem implementation now allows setting visibility on move and copy.
 
-## 1.0.25 - 2016-07-18
+## 3.18.0 - 2023-10-05
+
+### Added
+
+- Configuration option to specify how to handle same path copy/move operations (#1715)
+
+## 3.17.0 - 2023-10-05
+
+### Added
+
+- [AsyncAWS] Added support for version 2.0 of async-aws/{s3,simple-s3}
+
+## 3.16.0 - 2023-09-07
+
+### Added
+
+- [AsyncAws] Allow specifying `get_object_options` for temporary URL generation
+
+### Fixed
+
+- [ZipArchive] override on move
+- [WebDAV] encode path for propfind actions
+- [PathPrefixing]  [#1686](https://github.com/thephpleague/flysystem/issues/1686)
+
+## 3.15.1 - 2023-05-04
+
+### Fixed
+
+- Remove duplicate class caused by package extractin and inclusion
+
+## 3.15.0 - 2023-05-04
+
+### Added
+
+- Extracted the local adapter as a standalone package
+
+### Changed
+
+- Removed readme's from shipped artefacts.
+
+## 3.14.0 - 2023-04-11
+
+### Added
+
+- Made disabling stat cache configurable for SFTP adapters.
+
+## 3.13.0 - 2023-04-11
+
+### Fixed
+
+- AsyncAwsS3 object deletion now chunks per 100 objects to prevent memory exhaustion
+- AsyncAwsS3 now disregards top-level directories from listings
+- LocalAdapter now deals with file deletions during directory listings gracefully.
+
+### Added
+
+- DirectoryListing now supports correct phpstan for map and filter methods. 
+- FTP/SFTP added config option to detect the mime-type using the path alone (prevents a read)
+- SFTP now supports PuTTY style private keys
+- 
+
+## 3.12.3 - 2023-02-18
+
+### Fixed
+
+- [Google Cloud Storage] Fixed ACL error for uniform bucker ACL copy operations.
+- 
+- ## 3.12.2 - 2023-01-19
+
+### Fixed
+
+- [AWS S3] Corrected param order for doesObjectExistV2 call
+
+## 3.12.1 - 2023-01-06
+
+### Fixed
+
+- [AWS S3] Use doesObjectExistV2 to prevent false positive respomnses.
+
+## 3.12.0 - 2022-12-20
+
+### Added
+
+- [Core] Chained public URL generation strategy
+
+### Fixed
+
+- [WebDAV] Handle cases where the content listing returns entries with URL prefixes.
+- [Local] Ensure correct implicit root creations happens on windows.
+- [ZipArchive] Fix incorrect zip contents listing for top-level directory.
+
+## 3.11.0 - 2022-12-02
+
+### Added
+
+- [Google Cloud Storage] Added `UniformBucketLevelAccessVisibility` to allow buckets with uniform bucket-level access policies.
+
+## 3.10.4 - 2022-11-26
+
+### Changed
+
+- [I became a dad, meet Tim](https://twitter.com/frankdejonge/status/1594966175108177921)
+
+### Fixed
+
+- [PathPrefixing] ensure `checksum` and `temporaryUrl` are prefixed
+- [WebDAV] ensure directory creation uses trailing slashes for paths
+
+## 3.10.3 - 2022-11-14
+
+### Fixed
+
+- [Local] Handle checksum errors without message (#1590)
+
+## 3.10.2 - 2022-10-25
+
+### Fixed
+
+- [Filesystem] Ensure adapter is used for exposing temporary URLs.
+
+## 3.10.1 - 2022-10-21
+
+### Fixed
+
+- [Filesystem] Added missing constructor argument to allow temporary URL generator injection.
+
+## 3.10.0 - 2022-10-21
+
+### Added
+
+- [Filesystem] added `temporaryUrl` method
+- [AsyncAWS] added `temporaryUrl` method
+- [AWS S3] added `temporaryUrl` method
+- [Azure Blob Storage] added `temporaryUrl` method
+- [MountManager] added `temporaryUrl` method
+- [Google Cloud Storage] added `temporaryUrl` method
+- [ReadOnly] added `temporaryUrl` method
+- [PathPrefixing] added `temporaryUrl` method
+
+## 3.9.0 - 2022-10-18
+
+### Added
+
+- [Filesystem] Added ability to inject custom public URL generator into a filesystem.
+- [MountManager] added `checksum` and `publicUrl` methods
+- [ZipArchive] Do not prefix directories when creating/reading an archive
+- [ShardedPrefixPublicUrlGenerator] added url generator strategy that distributes over a list of prefixes
+
+## 3.8.0 - 2022-10-18
+
+### Added
+
+- [ChecksumAlgoIsNotSupported] Exception to indicate a checksum is not supported by the checksum provider, filesystem will fall back to ad-hoc generation.
+
+## 3.7.0 - 2022-10-17
+
+### Added
+
+- [Filesystem] added `checksum` method
+- [AWS S3] added `checksum` method
+- [Async S3] added `checksum` method
+- [Google Cloud Storage] added `checksum` method
+- [Azure Blob Storage] added `checksum` method
+
+## 3.6.0 - 2022-10-13
+
+### Added
+
+- [Filesystem] Added public url method
+- [Azure Blob Storage] Added public url method
+- [AWS S3] Added public url method
+- [Async S3] Added public url method
+- [GCS] Added public url method
+- [WebDAV] Added public url method
+- [ReadOnly] Added public url method
+- [PathPrefixing] Added public url method
+
+## 3.5.3 - 2022-09-23
+
+### Fixed
+
+- [SFTP] Account for missing "type" field in metadata result.
+
+## 3.5.2 - 2022-09-23
+
+### Fixed
+
+- [SFTP v2/v3] Fixed possible race-condition during directory creation leading to false failures.
+
+## 3.5.1 - 2022-09-18
+
+### Fixed
+
+- [WebDAV] Strip directory prefix in `createDirectory` to prevent double prefixing in `directoryExists`.
+
+## 3.5.0 - 2022-09-17
+
+### Added
+
+- [AWS S3] Allow specifying visibility on move and copy
+
+## 3.4.0 - 2022-09-15
+
+### Added
+
+- Added FTP configuration option useRawListOptions (null|false|true).
+- UnableToListContents exception was added to uniformly represent content listing exceptions.
+
+### Fixed
+
+- [FTP] Don't use raw list options for FileZilla FTP servers ([#1553](https://github.com/thephpleague/flysystem/pull/1553))
+- [WebDAV] Correct path formatting for move and copy operations ([#1552](https://github.com/thephpleague/flysystem/pull/1552))
+
+## 3.3.0 - 2022-09-09
+
+### Added
+
+- StaticInMemoryAdapterRegistry contributed by @kbond
+- ReadonlyFilesystemAdapter contributed by @kbond
+- PathPrefixedAdapter contributed by @shyim
+
+### Fixed
+
+- WebDAV prefix is now encoded and the dir is not required to be pre-created ([#1533](https://github.com/thephpleague/flysystem/pull/1533))
+
+## 3.2.1 - 2022-08-14
+
+### Fixed
+
+- [ZipArchive] reverted regression introduced in [#1525](https://github.com/thephpleague/flysystem/pull/1525)
+
+## 3.2.0 - 2022-07-26
+
+### Added
+
+- [AwsS3V3] Added configuration options for forwarded options, multipart upload configuration, and metadata fields.
+
+### Fixes
+
+- [ZipArchive] delete top-level directory when deleting directories.
+- [AwsS3V3] add `ChecksumAlgorithm` to forwarded options.
+- [AwsS3V3] add `ContentMD5` to forwarded options.
+- [AwsS3V3] made forwarded options and metadata fields configurable.
+- [SftpV3] upgrade minimum version, PHP 8 and the lowest version fails to authenticate.
+
+## 3.1.1 - 2022-07-18
+
+- [AwsS3V3] Corrected exception type (#1524)
+
+## 3.1.0 - 2022-06-29
+
+- Added option for the Local adapter to create the root directory only on the first mutating (write/copy/move) action.
+
+## 3.0.23 - 2022-06-29
+
+- Added reasons for exceptions for all adapters that were missing previous exception messages.
+
+## 3.0.22 - 2022-06-29
+
+- [AwsS3V3] Added reasons for exceptions
+- [AwsS3V3] Use ListObjectsV2 instead of ListObjects
+
+## 3.0.21 - 2022-06-12
+
+- [AwsS3V3] Use ListObjectsV2 instead of ListObjects
+
+## 3.0.20 - 2022-05-25
+
+### Fixed
+
+- [Core] Fix deprecated ${var} string interpolation patterns (#1470)
+
+## 3.0.19 - 2022-05-03
+
+### Fixed
+
+- [FTP] Turn errors into proper exceptions when resolving the connection root (#1460)
+
+## 3.0.18 - 2022-04-25
+
+### Fixed
+
+- [SFTP v3] Fix retries (#1451)
+
+## 3.0.17 - 2022-04-14
+
+### Fixed
+
+- [SFTP v2] Avoid type errors when public key is not retrieved (#1446)
+- [SFTP v3] Avoid type errors when public key is not retrieved (#1446)
+
+## 3.0.16 - 2022-04-11
+
+### Fixed
+
+- [Local] fall back to extension lookups when the mime-type comes up as inconclusive.
+
+## 3.0.15 - 2022-04-08
+
+### Fixed
+
+- [GCS] Allow setting upload metadata
+- [GCS] Allow setting contentType, or resolve it
+- [SFTP v2+v3] Delete top-level directory too.
+
+## 3.0.14 - 2022-04-06
+
+### Added
+
+- [InMemory] allow to set a last-updated time (#1438)
+- [SFTP V3] allow configuring preferred algo's (#1440)
+
+## 3.0.13 - 2022-04-02
+
+### Fixed
+
+- [AWS S3 V3] Do not return top-level directory when listing that same directory
+
+## 3.0.12 - 2022-03-12
+
+### Fixed
+
+- [SFTP V3] Fix issue where listing is false.
+- [Async AWS S3] Cosmetic fix for directory prefixing.
+
+## 3.0.11 - 2022-03-04
+
+### Fixed
+
+- [AWS S3] Use globally configured options.
+
+## 3.0.10 - 2022-02-26
+
+### Fixed
+
+- [AWS S3] fix detecting directories that only contain other directories but no files.
+- [AWS S3] when checking for directory existence, limit the result set (perf)
+- [AWS S3] throw interface exception when failing to delete directory
+- [Async AWS S3] when checking for directory existence, limit the result set (perf)
+
+## 3.0.9 - 2022-02-22
+
+### Fixed
+
+- [AWS S3] support setting an ACL as a direct option instead of using visibility.
+
+## 3.0.8 - 2022-02-16
+
+### Fixed
+
+- [AWS S3] Set ContentType when mime-type config option is set during writes, like in v1.
+
+## 3.0.7 - 2022-02-14
+
+### Fixed
+
+- [WebDAV] added missing composer.json for sub-split
+
+## 3.0.6 - 2022-02-14
+
+### Added
+
+- [WebDAV] new adapter added
+
+### Fixed
+
+- [Core] Trim slashed uniformly in the attribute classes.
+- [Core] Uniformly use directory_visibility over visibility for directory usage.
+- [FTP] export-ignore the test case.
+
+## 3.0.5 - 2022-02-12
+
+### Added
+
+- [AzureBlobStorage] New adapter added
+
+### Fixed
+
+- [AsyncAwsS3] Make EXTRA_METADATA_FIELDS protected to prevent error when extending the class
+
+## 3.0.4 - 2022-02-10
+
+### Fixed
+
+- [FTP] Do not require setting of the root directory, use '' by default.
+
+## 3.0.3 - 2022-01-31
+
+### Fixed
+
+- [FTP] Made connection resolving lazy again (#1414)
+
+## 3.0.2 - 2022-01-30
+
+### Fixes
+
+* [FTP] Support relative or empty connection root directories (#1410)
+
+## 3.0.1 - 2022-01-15
+
+### Fixes
+
+* [ZipArchive] delete top-level directory too when deleting a directory
+* [GoogleCloudStorage] Use listing to check for directory existence (consistency)
+* [GoogleCloudStorage] Fixed bug where exceptions were not thrown 
+* [AwsS3V3] Allow passing options for controlling multi-upload options (#1396)
+* [Local] Convert windows-style directory separator to unix-style (#1398)
+
+## 3.0.0 - 2022-01-13
+
+### Added
+
+* FilesystemReader::has to check for directory or file existence
+* FilesystemReader::directoryExists to check for directory existence
+* FilesystemReader::fileExists to check for file existence
+* FilesystemAdapter::directoryExists to check for directory existence
+* FilesystemAdapter::fileExists to check for file existence
+
+## 2.5.0 - 2022-09-17
+
+### Added
+
+- [AWS S3] Allow specifying visibility on move and copy
+
+## 2.4.5 - 2022-04-25
+
+- [SFTP v3] Fix retries (#1451)
+
+## 2.4.4 - 2022-04-14
+
+### Fixed
+
+- [SFTP v2] Avoid type errors when public key is not retrieved (#1446)
+- [SFTP v3] Avoid type errors when public key is not retrieved (#1446)
+
+## 2.4.3 - 2022-02-16
+
+### Fixed
+
+- [AWS S3] Set ContentType when mime-type config option is set during writes, like in v1.
+
+## 2.4.2 - 2022-01-31
+
+### Fixed
+
+- [FTP] Made connection resolving lazy again (#1414)
+
+## 2.4.1 - 2022-01-30
+
+### Fixed
+
+- [FTP] Fix relative connection root handling
+
+## 2.4.0 - 2022-01-04
+
+### Added
+
+- [SFTP V3] New adapter officially published
+
+## 2.3.2 - 2021-11-28
+
+### Fixed
+
+- [FTP] Check for FTP\Connection object in addition to a `resource` for connectivity checks and connection handling.
+- [Local] Simplify writeStream, as a bonus, have an EXT_LOCK on it now by default.
+
+## 2.3.1 - 2021-09-22
+
+### Fixed
+
+- [ZipArchive] copy stream, the ziparchive is closed after getting the stream
+- [Core] PHP 8.1 compatibility updates
+- [LocalFilesystem] parse permissions during listing
+- [LocalFilesystem] clear realstatcache
+- [FTP] PHP 8.1 compatibility updates
+- [Core] Upgraded PHP-CS-Fixer
+
+## 2.3.0 - 2021-09-22
+
+### Added
+
+- [GoogleCloudStorage] Make it possible to set an empty prefix (#1358)
+- [GoogleCloudStorage] Added possibility not to set visibility (#1356)
+
+## 2.2.3 - 2021-08-18
+
+### Fixed
+
+- [Core] Corrected exception message for UnableToCopyFile.
+
+## 2.2.2 - 2021-08-18
+
+### Fixed
+
+- [Core] Ensure the sorted directory listing can be iterated over (#1342).
+
+## 2.2.1 - 2021-08-17
+
+### Fixed
+
+- [FTP] use original path when ensuring the parent directory exists during `move` operation.
+- [FTP] do not fail setting UTF-8 when the server is already on UTF-8.
+ 
+## 2.2.0 - 2021-07-20
+
+### Added
+
+* [Core] Added sortByPath on the directory listing to allows content listings to be sorted. 
+
+## 2.1.1 - 2021-06-24
+
+### Fixed
+
+* [Core] Whitespace normalization now no longer strips funky whitespace but throws an exception.
+
+## 2.1.0 - 2021-05-25
+
+### Added
+
+* [Core] the DirectoryAttributes now have an `extraMetadata` like files do.
+
+### Fixed
+
+* [AwsS3V3] Allow the ACL config option to take precedence over the visibility key.
+
+## 2.0.8 - 2021-05-15
+
+### Fixed
+
+* [SFTP] Don't fail listing contents when a directory does not exist (#1301)
+
+## 2.0.7 - 2021-05-13
+
+### Fixed
+
+* [LocalFilesystem] convert windows style paths to unix style paths on listing
+
+## 2.0.6 - 2021-05-13
+
+### Fixed
+
+* [AsyncAwsS3] do not urlencode CopySource arguments (#1302)
+
+## 2.0.5 - 2021-04-11
+
+### Fixed
+
+* [AwsS3] ensure write errors are turned into exceptions. 
+
+## 2.0.4 - 2021-02-13
+
+### Fixed
+
+* [InMemory] Corrected how the file size is determined.
+
+## 2.0.3 - 2021-02-09
+
+### Fixed
+
+* [AwsS3V3] Use the $config array during the copy operation.
+* [Ftp] Close FTP connections when the object is destructed.
+* [Core] Allow for an absolute root path of `/`.
+
+## 2.0.2 - 2020-12-28
+
+### Fixed
+
+* Corrected the ignored exports for Ftp
+
+## 2.0.1 - 2020-12-28
+
+### Fixed
+
+* Corrected the ignored exports for Phpseclib
+
+## 2.0.0 - 2020-11-24
+
+### Changed
+
+- string type added to all visibility input
+
+### Added
+
+- Google Cloud Storage adapter.
+
+## 2.0.0-beta.3 - 2020-08-23
+
+### Added
+
+- UnableToCheckFileExistence error introduced
+- Mount manager is re-introduced
+
+### Fixes
+
+- Allow FTP filenames to contain special characters.
+- Prevent resources of incorrect types to be passed.
 
 ### Improved
 
-- [Local\Ftp] Streams opened with `fopen` now open in binary mode, which is better on Windows environments.
-
-## 1.0.24 - 2016-06-03
-
-### Fixed
-
-- [Local] Creating the root directory could lead to raceconditions, which are now handled a lot nicer. Initially only
-  for the constructor but now also fixed the same thing for all the write operations.
-
-
-## 1.0.23 - 2016-06-03
-
-### Altered
-
-- Default file/directory permissions are non executable.
-
-## 1.0.22 - 2016-04-28
-
-### Fixed
-
-- Regression fix, the "0" root directory is now possible again.
-
-## 1.0.21 - 2016-04-22
-
-### Fixed
-
-- Explicitly return false when a `has` call receives an empty filename.
-- MounManager `copy` and `move` operators now comply to the `Filesystem`'s signature.
-
-## 1.0.20 - 2016-03-14
-
-### Improved
-
-- MimeType detection now falls back on extension guessing when the contents is a resource.
-
-## 1.0.19 - 2016-03-12
-
-### Fixed
-
-- [Util::normalizeRelativePath] `'.'` didn't normalize to `''`, this is now fixed.
-
-## 1.0.18 - 2016-03-07
-
-### Fixed
-
-- Reverted "Simplified Util::pathinfo, dirname key always exists." which had unexpected side-effects.
-
-## 1.0.17 - 2016-02-19
-
-### Fixed
-
-- [Util::guessMimeType] Worked around incorrect detection of assembly mime-type. (#608)
-
-## 1.0.16 - 2015-12-19
-
-### Fixed
-
-- [Ftp::isConnected] PHP warnings are prevented by improving the connection check.
-- [Ftp::listContents] Recursive listings not use the `R` flag instead of the function param.
-- [Ftp::listContents] The `*` character is now properly escaped.
-- [Ftp::getMetadata] The `*` character is now properly escaped.
-- [Ftp] An `ignorePassiveAddress` option has been added to allow NAS FTP servers to work.
-- [Util] Mimetype `application/x-empty` is not treated as `text/plain` and will fall back to extension based mimetype checks.
-- [Local] Unreadable files no longer cause a Fatal error, they're not a catchable exception.
-
-## 1.0.15 - 2015-10-01
-
-### Fixed
-
-- [Util::emulateDirectories] Now emulates correctly when a mix of files and directories are returned.
-
-## 1.0.14 - 2015-09-28
+- [AWS] By default, make sure readStream resources are streamed over HTTP.
 
 ### Added
 
-- [Adapter\Local] Now has configurable file and directory permissions.
+- DirectoryAttributes now have a `lastModified` accessor.
 
-## 1.0.13 - 2015-09-20
+## 2.0.0-beta.2 - 2020-08-08
 
-### Fixed
+### Fixes
 
-- [Adapter\Ftp] Now tries to reconnect when a connection is dropped.
+- Allow listing of top-level directory for AWS S3
+- Ensure the adapters can use the correct beta release.
 
-## 1.0.12 - 2015-09-05
+## 2.0.0-beta.1 - 2020-08-04
 
-### Fixed
+### Changes
 
-- [Util::pathinfo] Now checks for existence of the dirname key, it's missing in some PHP versions.
+- Small code optimizations
+- Add global options array to AwsS3V3Adapter like in V1
 
-## 1.0.11 - 2015-07-18
+## 2.0.0-alpha.4 - 2020-07-26
 
-### Fixed
+### Changes
 
-- [Adapter\Local::deleteDir] Now removes up links correctly.
+* Renamed AwsS3V3Filesystem to AwsS3V3Adapter (in line with other adapter names).
+* Renamed the PHPSecLibV2 package to PhpseclibV2, Renamed the FTP package to Ftp.
+* Public key and ss-agent authentication support for Sftp
 
-## 1.0.10 - 2015-07-21
+### Fixes
 
-### Fixed
+* Allow creation of files with empty streams.
 
-- [Filesystem::listContents] The implementation is clearer now and works more reliably for windows users.
+## 2.0.0-alpha.3 - 2020-03-21
 
-## 1.0.9 - 2015-07-13
+### Fixes
 
-### Fixed
+* Corrected the required version for the sub-split packages.
 
-- [Filesystem::listContents] This function now uses DIRECTORY_SEPARATOR when the local adapter is used.
+## 2.0.0-alpha.2 - 2020-03-17
 
-## 1.0.8 - 2015-07-12
+### Changes
 
-### Altered
+* The `League\Flysystem\FilesystemAdapter::listContents` method returns an `iterable` instead of a `Generator`.
+* The `League\Flysystem\DirectoryListing` class accepts an `iterable` instead of a `Generator`.
 
-- [Local::deleteDir] This function now uses the correct (reversed) iterator instead of relying in listContents.
+## 2.0.0-alpha.1 - 2020-03-09
 
-### Added
-
-- [Local] The Local adapter now has the ability to skip links using Local::SKIP_LINKS as the third constructor argument.
-
-## 1.0.7 - 2015-07-11
-
-### Fixed
-
-- [Filesystem] Fixed the handling of directories named "0".
-
-## 1.0.6 - 2015-07-08
-
-### Fixed
-
-- [Adapter\Local] Directories are no longer created with the 0777 permissions which is unsafe for shared hosting environments.
-
-## 1.0.5 - 2015-07-08
-
-### Fixed
-
-- [Filesystem::listContent] Emulated directories didn't respect the natural sorting, this is now corrected in the listContents method.
-- [Filesystem::listContents] The result excess from listing calls wasn't filtered strict enough, this is now improved.
-
-### Added
-
-- [Handler] Added getter for the Filesystem.
-- [Handler] Now allows plugins calls.
-
-## 1.0.4 - 2015-06-07
-
-### Fixed
-
-- [Adapter\Ftp] Now handles windows FTP servers.
-- [Adapter\Local] Symlinks are now explicitly not supported, this was previously broken.
-- [Adapter\Ftp] Detecting whether a path is a directory or not is more reliable.
-- [Adapter\SynologyFtp] Has been renamed to Ftpd (The original class still exists for BC).
-- [Filesystem] Not uses `getAdapter` internally to aid extension.
-- [Adapter\Local] Now uses `umask` when creating directories to make it more reliable.
-- [Misc] Coding style fixes.
-
-## 1.0.3 - 2015-03-29
-
-### Fixed
-
-- #429: Handle FTP filenames with leading spaces.
-- #418: Handle FTP filenames with dot prefixes.
-- #427: Path normalising edge case resolved.
-
-## 1.0.2 2015-03-10
-
-### Changed
-
-- [Adapter\Local] Again allows read only dirs to be the adapter's root.
-
-## 1.0.1 - 2015-01-23
-
-### Fixed
-
-- Re-added missing metadata from pathinfo to `getMetadata` calls.
-
-## 1.0.0 - 2015-01-19
-
-### Removed
-
-- Adapters moved into their own repo's: AwsS3, Dropbox, GridFS, Rackspace
-- [Filesystem] Caching is removed and moved into it's own repo as an adapter decorator.
-
-### Fixed
-
-- [FilesystemInterface] This interface is now no longer related to the AdapterInterface and now correctly specifies return type.
-- [AdapterInterface] The adapter interface now consistently specifies return type.
-
-### Changed
-
-- [AbstractAdapter / Polyfills] Polyfill methods from the AbstractAdapter are now moved to their own traits and only included in adapters that need them.
-
-## 0.5.12 - 2014-11-05
-
-### Fixed
-
-- [Cache] Cache contents is now in control over what's cached instead of the implicit controle the adapters had.
-
-## 0.5.11 - 2014-11-05
-
-### Fixed
-
-- [AwsS3] Removed raw response from response array
-- [Cache] Ensure cache response is JSON formatted and has the correct entries.
-
-## 0.5.10 - 2014-10-28
-
-### Fixed
-
-- [AwsS3] Contents supplied during AwsS3::write is now cached like all the other adapters. (Very minor chance of this happening)
-- [AwsS] Detached stream from guzzle response to prevent it from closing on EntityBody destruction.
-- [Util] Paths with directory names or file names with double dots are now allowed.
-- [Cache:Noop] Added missing readStream method.
-
-## 0.5.9 - 2014-10-18
-
-### Fixed
-
-- [AwsS3] CacheControl write option is now correctly mapped.
-- [AwsS3] writeStream now properly detects Body type which resulted in cache corruption: c7246e3341135baad16180760ece3967da7a44f3
-
-## 0.5.8 - 2014-10-17
-
-### Fixed
-
-- [Rackspace] Path prefixing done twice when retrieving meta-data.
-- [Core] Finfo is only used to determine mime-type when available.
-- [AwsS3] Previously set ACL is now respected in rename and copy.
-
-### Added
-
-- Stash cache adapter.
-
-## 0.5.7 - 2014-09-16
-
-### Fixed
-
-- Path prefixing would done twice for rackspace when using streams for writes or updates.
-
-## 0.5.6 - 2014-09-09
-
-### Added
-
-- Copy Adapter
-
-### Fixed
-
-- Dropbox path normalisation.
+* Initial 2.0.0 alpha release

@@ -11,62 +11,54 @@
 
 namespace Monolog;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class UtilsTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @param string $expected
-     * @param object $object
-     * @dataProvider provideObjects
-     */
-    public function testGetClass($expected, $object)
+    #[DataProvider('provideObjects')]
+    public function testGetClass(string $expected, object $object)
     {
         $this->assertSame($expected, Utils::getClass($object));
     }
 
-    public function provideObjects()
+    public static function provideObjects()
     {
         return [
             ['stdClass', new \stdClass()],
-            ['class@anonymous', new class {}],
-            ['stdClass@anonymous', new class extends \stdClass {}],
+            ['class@anonymous', new class {
+            }],
+            ['stdClass@anonymous', new class extends \stdClass {
+            }],
         ];
     }
 
-    /**
-     * @param string $expected
-     * @param string $input
-     * @dataProvider providePathsToCanonicalize
-     */
-    public function testCanonicalizePath($expected, $input)
+    #[DataProvider('providePathsToCanonicalize')]
+    public function testCanonicalizePath(string $expected, string $input)
     {
         $this->assertSame($expected, Utils::canonicalizePath($input));
     }
 
-    public function providePathsToCanonicalize()
+    public static function providePathsToCanonicalize()
     {
-        return array(
-            array('/foo/bar', '/foo/bar'),
-            array('file://'.getcwd().'/bla', 'file://bla'),
-            array(getcwd().'/bla', 'bla'),
-            array(getcwd().'/./bla', './bla'),
-            array('file:///foo/bar', 'file:///foo/bar'),
-            array('any://foo', 'any://foo'),
-            array('\\\\network\path', '\\\\network\path'),
-        );
+        return [
+            ['/foo/bar', '/foo/bar'],
+            ['file://'.getcwd().'/bla', 'file://bla'],
+            [getcwd().'/bla', 'bla'],
+            [getcwd().'/./bla', './bla'],
+            ['file:///foo/bar', 'file:///foo/bar'],
+            ['any://foo', 'any://foo'],
+            ['\\\\network\path', '\\\\network\path'],
+        ];
     }
 
-    /**
-     * @param int    $code
-     * @param string $msg
-     * @dataProvider providesHandleJsonErrorFailure
-     */
-    public function testHandleJsonErrorFailure($code, $msg)
+    #[DataProvider('providesHandleJsonErrorFailure')]
+    public function testHandleJsonErrorFailure(int $code, string $msg)
     {
         $this->expectException('RuntimeException', $msg);
         Utils::handleJsonError($code, 'faked');
     }
 
-    public function providesHandleJsonErrorFailure()
+    public static function providesHandleJsonErrorFailure()
     {
         return [
             'depth' => [JSON_ERROR_DEPTH, 'Maximum stack depth exceeded'],
@@ -80,8 +72,8 @@ class UtilsTest extends \PHPUnit_Framework_TestCase
      * @param mixed $in     Input
      * @param mixed $expect Expected output
      * @covers Monolog\Formatter\NormalizerFormatter::detectAndCleanUtf8
-     * @dataProvider providesDetectAndCleanUtf8
      */
+    #[DataProvider('providesDetectAndCleanUtf8')]
     public function testDetectAndCleanUtf8($in, $expect)
     {
         $reflMethod = new \ReflectionMethod(Utils::class, 'detectAndCleanUtf8');
@@ -91,7 +83,7 @@ class UtilsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expect, $in);
     }
 
-    public function providesDetectAndCleanUtf8()
+    public static function providesDetectAndCleanUtf8()
     {
         $obj = new \stdClass;
 
@@ -110,15 +102,12 @@ class UtilsTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @dataProvider providesPcreLastErrorMessage
-     * @param int $code
-     * @param string $msg
-     */
-    public function testPcreLastErrorMessage($code, $msg)
+    #[DataProvider('providesPcreLastErrorMessage')]
+    public function testPcreLastErrorMessage(int $code, string $msg)
     {
         if (PHP_VERSION_ID >= 80000) {
             $this->assertSame('No error', Utils::pcreLastErrorMessage($code));
+
             return;
         }
 
@@ -128,7 +117,7 @@ class UtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array[]
      */
-    public function providesPcreLastErrorMessage()
+    public static function providesPcreLastErrorMessage(): array
     {
         return [
             [0, 'PREG_NO_ERROR'],
@@ -142,7 +131,7 @@ class UtilsTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function provideIniValuesToConvertToBytes()
+    public static function provideIniValuesToConvertToBytes()
     {
         return [
             ['1', 1],
@@ -176,12 +165,8 @@ class UtilsTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideIniValuesToConvertToBytes
-     * @param mixed $input
-     * @param int|false $expected
-     */
-    public function testExpandIniShorthandBytes($input, $expected)
+    #[DataProvider('provideIniValuesToConvertToBytes')]
+    public function testExpandIniShorthandBytes(string|null|bool $input, int|false $expected)
     {
         $result = Utils::expandIniShorthandBytes($input);
         $this->assertEquals($expected, $result);

@@ -7,14 +7,15 @@ about: Did you encounter a bug?
 
 <!-- Fill in the relevant information below to help triage your issue. -->
 
-|    Q        |   A
-|------------ | ------
-| BC Break    | yes
-| Version     | x.y.z
+| Q                 | A       |
+|-------------------|---------|
+| Flysystem Version | x.y.z   |
+| Adapter Name      | example |
+| Adapter version   | x.y.z   |
 
 #### Summary
 
-<!-- Provide a summary desciribing the problem you are experiencing. -->
+<!-- Provide a summary describing the problem you are experiencing. -->
 
 #### How to reproduce
 

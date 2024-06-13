@@ -17,19 +17,18 @@ use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\AbstractTestCase;
 
 class TotalTest extends AbstractTestCase
 {
-    /**
-     * @dataProvider \Tests\CarbonInterval\TotalTest::dataForIntervalSpecs
-     */
+    #[DataProvider('dataForIntervalSpecs')]
     public function testReturnsTotalValue($spec, $unit, $expected)
     {
         $this->assertSame(
-            $expected,
+            (float) $expected,
             CarbonInterval::fromString($spec)->total($unit),
-            "$spec as $unit did not get the expected total"
+            "$spec as $unit did not get the expected total",
         );
     }
 
@@ -56,7 +55,7 @@ class TotalTest extends AbstractTestCase
     public function testThrowsExceptionForInvalidUnits()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Unknown unit \'foo\'.'
+            'Unknown unit \'foo\'.',
         ));
 
         CarbonInterval::create()->total('foo');
@@ -66,25 +65,25 @@ class TotalTest extends AbstractTestCase
     {
         $interval = CarbonInterval::create(0, 0, 0, 0, 150, 0, 0);
 
-        $this->assertSame(150 * 60 * 60 * 1000 * 1000, $interval->totalMicroseconds);
-        $this->assertSame(150 * 60 * 60 * 1000, $interval->totalMilliseconds);
-        $this->assertSame(150 * 60 * 60, $interval->totalSeconds);
-        $this->assertSame(150 * 60, $interval->totalMinutes);
-        $this->assertSame(150, $interval->totalHours);
-        $this->assertSame(150 / 24, $interval->totalDays);
-        $this->assertSame(150 / 24 / 7, $interval->totalWeeks);
-        $this->assertSame(150 / 24 / 7 / 4, $interval->totalMonths);
-        $this->assertSame(150 / 24 / 7 / 4 / 12, $interval->totalYears);
+        $this->assertSame(150.0 * 60 * 60 * 1000 * 1000, $interval->totalMicroseconds);
+        $this->assertSame(150.0 * 60 * 60 * 1000, $interval->totalMilliseconds);
+        $this->assertSame(150.0 * 60 * 60, $interval->totalSeconds);
+        $this->assertSame(150.0 * 60, $interval->totalMinutes);
+        $this->assertSame(150.0, $interval->totalHours);
+        $this->assertSame(150.0 / 24, $interval->totalDays);
+        $this->assertSame(150.0 / 24 / 7, $interval->totalWeeks);
+        $this->assertSame(150.0 / 24 / 7 / 4, $interval->totalMonths);
+        $this->assertSame(150.0 / 24 / 7 / 4 / 12, $interval->totalYears);
 
         $interval = CarbonInterval::milliseconds(12312);
 
-        $this->assertSame(12312000, $interval->totalMicroseconds);
-        $this->assertSame(12312, $interval->totalMilliseconds);
+        $this->assertSame(12312000.0, $interval->totalMicroseconds);
+        $this->assertSame(12312.0, $interval->totalMilliseconds);
 
         $interval = CarbonInterval::milliseconds(-12312);
 
-        $this->assertSame(-12312000, $interval->totalMicroseconds);
-        $this->assertSame(-12312, $interval->totalMilliseconds);
+        $this->assertSame(-12312000.0, $interval->totalMicroseconds);
+        $this->assertSame(-12312.0, $interval->totalMilliseconds);
     }
 
     public static function dataForNegativeIntervals(): Generator
@@ -94,20 +93,18 @@ class TotalTest extends AbstractTestCase
         yield [1, CarbonInterval::hours(0)->hours(-150)->invert()];
     }
 
-    /**
-     * @dataProvider \Tests\CarbonInterval\TotalTest::dataForNegativeIntervals
-     */
+    #[DataProvider('dataForNegativeIntervals')]
     public function testGetNegativeTotalsViaGetters($factor, $interval)
     {
-        $this->assertSame($factor * 150 * 60 * 60 * 1000 * 1000, $interval->totalMicroseconds);
-        $this->assertSame($factor * 150 * 60 * 60 * 1000, $interval->totalMilliseconds);
-        $this->assertSame($factor * 150 * 60 * 60, $interval->totalSeconds);
-        $this->assertSame($factor * 150 * 60, $interval->totalMinutes);
-        $this->assertSame($factor * 150, $interval->totalHours);
-        $this->assertSame($factor * 150 / 24, $interval->totalDays);
-        $this->assertSame($factor * 150 / 24 / 7, $interval->totalWeeks);
-        $this->assertSame($factor * 150 / 24 / 7 / 4, $interval->totalMonths);
-        $this->assertSame($factor * 150 / 24 / 7 / 4 / 12, $interval->totalYears);
+        $this->assertSame($factor * 150.0 * 60 * 60 * 1000 * 1000, $interval->totalMicroseconds);
+        $this->assertSame($factor * 150.0 * 60 * 60 * 1000, $interval->totalMilliseconds);
+        $this->assertSame($factor * 150.0 * 60 * 60, $interval->totalSeconds);
+        $this->assertSame($factor * 150.0 * 60, $interval->totalMinutes);
+        $this->assertSame($factor * 150.0, $interval->totalHours);
+        $this->assertSame($factor * 150.0 / 24, $interval->totalDays);
+        $this->assertSame($factor * 150.0 / 24 / 7, $interval->totalWeeks);
+        $this->assertSame($factor * 150.0 / 24 / 7 / 4, $interval->totalMonths);
+        $this->assertSame($factor * 150.0 / 24 / 7 / 4 / 12, $interval->totalYears);
     }
 
     public function testTotalsWithCustomFactors()
@@ -120,9 +117,9 @@ class TotalTest extends AbstractTestCase
             'week' => [5, 'days'],
         ]);
 
-        $this->assertSame(1, CarbonInterval::make('1d')->totalDays);
-        $this->assertSame(5, CarbonInterval::make('1w')->totalDays);
-        $this->assertSame(1, CarbonInterval::make('1w')->totalWeeks);
+        $this->assertSame(1.0, CarbonInterval::make('1d')->totalDays);
+        $this->assertSame(5.0, CarbonInterval::make('1w')->totalDays);
+        $this->assertSame(1.0, CarbonInterval::make('1w')->totalWeeks);
 
         CarbonInterval::setCascadeFactors($factors);
     }
@@ -226,11 +223,11 @@ class TotalTest extends AbstractTestCase
 
         CarbonInterval::setCascadeFactors($cascades);
 
-        $this->assertSame(150 * 60 * 60, $totalSeconds);
-        $this->assertSame(150 * 60, $totalMinutes);
-        $this->assertSame(150, $totalHours);
-        $this->assertSame(150 / 8, $totalDays);
-        $this->assertSame(150 / 8 / 5, $totalWeeks);
+        $this->assertSame(150.0 * 60 * 60, $totalSeconds);
+        $this->assertSame(150.0 * 60, $totalMinutes);
+        $this->assertSame(150.0, $totalHours);
+        $this->assertSame(150.0 / 8, $totalDays);
+        $this->assertSame(150.0 / 8 / 5, $totalWeeks);
         $this->assertSame('Unit months have no configuration to get total from other units.', $monthsError);
         $this->assertSame('Unit years have no configuration to get total from other units.', $yearsError);
     }
@@ -254,12 +251,12 @@ class TotalTest extends AbstractTestCase
         $totalYears = $interval->totalYears;
         CarbonInterval::setCascadeFactors($cascades);
 
-        $this->assertSame(150 * 60 * 60, $totalSeconds);
-        $this->assertSame(150 * 60, $totalMinutes);
-        $this->assertSame(150, $totalHours);
-        $this->assertSame(1146, $totalDays);
-        $this->assertSame(1146 / 30, $totalMonths);
-        $this->assertSame(1146 / 30 / 12, $totalYears);
+        $this->assertSame(150.0 * 60 * 60, $totalSeconds);
+        $this->assertSame(150.0 * 60, $totalMinutes);
+        $this->assertSame(150.0, $totalHours);
+        $this->assertSame(1146.0, $totalDays);
+        $this->assertSame(1146.0 / 30, $totalMonths);
+        $this->assertSame(1146.0 / 30 / 12, $totalYears);
     }
 
     public function testMicrosecondsInterval()
@@ -272,10 +269,26 @@ class TotalTest extends AbstractTestCase
 
         $interval = CarbonInterval::milliseconds(600000)->cascade();
 
-        $this->assertSame(600000000, $interval->totalMicroseconds);
-        $this->assertSame(600000, $interval->totalMilliseconds);
-        $this->assertSame(600, $interval->totalSeconds);
-        $this->assertSame(10, $interval->totalMinutes);
+        $this->assertSame(600000000.0, $interval->totalMicroseconds);
+        $this->assertSame(600000.0, $interval->totalMilliseconds);
+        $this->assertSame(600.0, $interval->totalSeconds);
+        $this->assertSame(10.0, $interval->totalMinutes);
         $this->assertSame(1 / 6, $interval->totalHours);
+    }
+
+    public function testWithDiffInterval()
+    {
+        $this->assertSame(51.0, Carbon::parse('2020-08-10')->diff('2020-09-30')->totalDays);
+    }
+
+    public function testAlterationAfterDiff()
+    {
+        $t1 = Carbon::now();
+        $t2 = $t1->copy()->addMinutes(2);
+
+        $p = $t1->diffAsCarbonInterval($t2);
+        $p->addSeconds(10);
+
+        $this->assertSame(130.0, $p->totalSeconds);
     }
 }

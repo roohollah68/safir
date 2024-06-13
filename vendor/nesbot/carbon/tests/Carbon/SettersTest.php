@@ -13,17 +13,52 @@ declare(strict_types=1);
 
 namespace Tests\Carbon;
 
+use BadMethodCallException;
 use Carbon\Carbon;
 use Carbon\Exceptions\UnitException;
+use Carbon\Month;
+use Carbon\Unit;
 use DateTimeZone;
 use Exception;
-use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\TestWith;
 use Tests\AbstractTestCase;
 
 class SettersTest extends AbstractTestCase
 {
     public const SET_UNIT_NO_OVERFLOW_SAMPLE = 200;
+
+    public function testMonthEnum()
+    {
+        $d = Carbon::parse('2023-10-25 21:14:51');
+        $d->month = Month::February;
+
+        $this->assertSame('2023-02-25 21:14:51', $d->format('Y-m-d H:i:s'));
+
+        $d->setMonth(Month::July);
+
+        $this->assertSame('2023-07-25 21:14:51', $d->format('Y-m-d H:i:s'));
+    }
+
+    public function testSetMonthUnit()
+    {
+        $d = Carbon::parse('2023-10-25 21:14:51');
+        $d->set(Unit::Month, Month::February);
+
+        $this->assertSame(2, $d->get(Unit::Month));
+        $this->assertSame('2023-02-25 21:14:51', $d->format('Y-m-d H:i:s'));
+    }
+
+    public function testMonthEnumOnWrongUnit()
+    {
+        $this->expectExceptionObject(new UnitException(
+            'Month enum cannot be used to set year',
+        ));
+
+        $d = Carbon::now();
+        // @phpstan-ignore-next-line
+        $d->year = Month::February;
+    }
 
     public function testSingularUnit()
     {
@@ -125,6 +160,66 @@ class SettersTest extends AbstractTestCase
         $d = Carbon::now();
         $d->second = 2;
         $this->assertSame(2, $d->second);
+    }
+
+    public function testUnitOfUnit()
+    {
+        $date = Carbon::create(2023, 1, 27, 20, 12, 42, 'America/Toronto');
+        $date->minuteOfYear = (95 * 24 + 3) * 60 + 50;
+
+        $this->assertSame('2023-04-06 04:50:42 America/Toronto', $date->format('Y-m-d H:i:s e'));
+
+        $date->dayOfWeek = 2;
+
+        $this->assertSame('2023-04-04 04:50:42 America/Toronto', $date->format('Y-m-d H:i:s e'));
+
+        $date->dayOfWeek = 6;
+
+        $this->assertSame('2023-04-08 04:50:42 America/Toronto', $date->format('Y-m-d H:i:s e'));
+
+        $date->dayOfWeek = 0;
+
+        $this->assertSame('2023-04-02 04:50:42 America/Toronto', $date->format('Y-m-d H:i:s e'));
+
+        $date->dayOfWeekIso = 7;
+
+        $this->assertSame('2023-04-02 04:50:42 America/Toronto', $date->format('Y-m-d H:i:s e'));
+
+        $date->dayOfWeek = 4;
+
+        $this->assertSame('2023-04-06 04:50:42 America/Toronto', $date->format('Y-m-d H:i:s e'));
+
+        $date->dayOfWeekIso = 7;
+
+        $this->assertSame('2023-04-09 04:50:42 America/Toronto', $date->format('Y-m-d H:i:s e'));
+    }
+
+    public function testUnitOfUnitMethod()
+    {
+        $date = Carbon::create(2023, 1, 27, 20, 12, 42, 'America/Toronto');
+        $date->minuteOfYear((95 * 24 + 3) * 60 + 50);
+
+        $this->assertSame('2023-04-06 04:50:42 America/Toronto', $date->format('Y-m-d H:i:s e'));
+    }
+
+    public function testUnitOfUnitUnknownMethod()
+    {
+        $this->expectExceptionObject(new BadMethodCallException(
+            'Method fooOfBar does not exist.',
+        ));
+
+        $date = Carbon::create(2023, 1, 27, 20, 12, 42, 'America/Toronto');
+        $date->fooOfBar((95 * 24 + 3) * 60 + 50);
+    }
+
+    public function testUnitOfUnitFloat()
+    {
+        $this->expectExceptionObject(new UnitException(
+            '->minuteOfYear expects integer value',
+        ));
+
+        $date = Carbon::create(2018, 1, 27, 20, 12, 42, 'America/Toronto');
+        $date->minuteOfYear = (float) ((95 * 24 + 3) * 60 + 50);
     }
 
     public function testTimeSetter()
@@ -241,7 +336,12 @@ class SettersTest extends AbstractTestCase
         $d->timestamp = 1600887164.88952298;
         $this->assertSame('2020-09-23 14:52:44.889523', $d->format('Y-m-d H:i:s.u'));
 
-        $d->setTimestamp(1599828571.23561248);
+        $d->setTimestamp(
+            // See https://github.com/php/php-src/issues/14332
+            PHP_VERSION < 8.4
+                ? 1599828571.23561248
+                : 1599828571.2356121,
+        );
         $this->assertSame('2020-09-11 08:49:31.235612', $d->format('Y-m-d H:i:s.u'));
 
         $d->timestamp = '0.88951247 1600887164';
@@ -260,7 +360,7 @@ class SettersTest extends AbstractTestCase
     public function testSetTimezoneWithInvalidTimezone()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Unknown or bad timezone (sdf)'
+            'Unknown or bad timezone (sdf)',
         ));
 
         $d = Carbon::now();
@@ -270,7 +370,7 @@ class SettersTest extends AbstractTestCase
     public function testTimezoneWithInvalidTimezone()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Unknown or bad timezone (sdf)'
+            'Unknown or bad timezone (sdf)',
         ));
 
         /** @var mixed $d */
@@ -351,7 +451,7 @@ class SettersTest extends AbstractTestCase
     public function testTimezoneWithInvalidTimezoneSetter()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Unknown or bad timezone (sdf)'
+            'Unknown or bad timezone (sdf)',
         ));
 
         $d = Carbon::now();
@@ -361,7 +461,7 @@ class SettersTest extends AbstractTestCase
     public function testTzWithInvalidTimezone()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Unknown or bad timezone (sdf)'
+            'Unknown or bad timezone (sdf)',
         ));
 
         /** @var mixed $d */
@@ -372,7 +472,7 @@ class SettersTest extends AbstractTestCase
     public function testTzWithInvalidTimezoneSetter()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Unknown or bad timezone (sdf)'
+            'Unknown or bad timezone (sdf)',
         ));
 
         $d = Carbon::now();
@@ -490,7 +590,7 @@ class SettersTest extends AbstractTestCase
     public function testInvalidSetter()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            "Unknown setter 'doesNotExit'"
+            "Unknown setter 'doesNotExit'",
         ));
 
         /** @var mixed $date */
@@ -498,29 +598,17 @@ class SettersTest extends AbstractTestCase
         $date->doesNotExit = 'bb';
     }
 
-    /**
-     * @dataProvider \Tests\Carbon\SettersTest::dataForTestSetTimeFromTimeString
-     *
-     * @param int    $hour
-     * @param int    $minute
-     * @param int    $second
-     * @param string $time
-     */
-    public function testSetTimeFromTimeString($hour, $minute, $second, $time)
+    #[TestWith([9, 15, 30, '09:15:30'])]
+    #[TestWith([9, 15, 0, '09:15'])]
+    #[TestWith([9, 0, 0, '09'])]
+    #[TestWith([9, 5, 3, '9:5:3'])]
+    #[TestWith([9, 5, 0, '9:5'])]
+    #[TestWith([9, 0, 0, '9'])]
+    public function testSetTimeFromTimeString(int $hour, int $minute, int $second, string $time)
     {
         Carbon::setTestNow(Carbon::create(2016, 2, 12, 1, 2, 3));
         $d = Carbon::now()->setTimeFromTimeString($time);
         $this->assertCarbon($d, 2016, 2, 12, $hour, $minute, $second);
-    }
-
-    public static function dataForTestSetTimeFromTimeString(): Generator
-    {
-        yield [9, 15, 30, '09:15:30'];
-        yield [9, 15, 0, '09:15'];
-        yield [9, 0, 0, '09'];
-        yield [9, 5, 3, '9:5:3'];
-        yield [9, 5, 0, '9:5'];
-        yield [9, 0, 0, '9'];
     }
 
     public function testWeekendDaysSetter()
@@ -574,7 +662,7 @@ class SettersTest extends AbstractTestCase
                 mt_rand(-9999, 9999) :
                 mt_rand(-60, 60);
 
-            $date = Carbon::create($year, $month, $day, $hour, $minute, $second + $microsecond / 1000000);
+            $date = Carbon::create($year, $month, $day, $hour, $minute, $second + $microsecond / 1000000, 'UTC');
             $original = $date->copy();
             $date->setUnitNoOverflow($valueUnit, $value, $overflowUnit);
             $start = $original->copy()->startOf($overflowUnit);
@@ -588,13 +676,18 @@ class SettersTest extends AbstractTestCase
 
             $unit = ucfirst(Carbon::pluralUnit($valueUnit));
             $modulo = $value % $units[$valueUnit];
+
             if ($modulo < 0) {
                 $modulo += $units[$valueUnit];
             }
+
             if ($value === $date->$valueUnit ||
                 $modulo === $date->$valueUnit ||
-                (method_exists($date, "diffInReal$unit") && $$valueUnit - $date->{"diffInReal$unit"}($original, false) === $value) ||
-                $$valueUnit - $date->{"diffIn$unit"}($original, false) === $value
+                $$valueUnit - ((int) $date->{"diffIn$unit"}($original, false)) === $value ||
+                ($valueUnit === 'day' &&
+                    $date->format('Y-m-d H:i:s.u') === $original->copy()
+                        ->modify(($original->day + $value).' days')
+                        ->format('Y-m-d H:i:s.u'))
             ) {
                 $results['current']++;
 
@@ -624,7 +717,7 @@ class SettersTest extends AbstractTestCase
                 $overflowUnit,
                 $unit,
                 $modulo,
-                $$valueUnit
+                $$valueUnit,
             );
         }
 
@@ -639,7 +732,7 @@ class SettersTest extends AbstractTestCase
     public function testSetUnitNoOverflowInputUnitException()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Unknown unit \'anyUnit\''
+            'Unknown unit \'anyUnit\'',
         ));
 
         Carbon::now()->setUnitNoOverflow('anyUnit', 1, 'year');
@@ -648,7 +741,7 @@ class SettersTest extends AbstractTestCase
     public function testSetUnitNoOverflowOverflowUnitException()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Unknown unit \'anyUnit\''
+            'Unknown unit \'anyUnit\'',
         ));
 
         Carbon::now()->setUnitNoOverflow('minute', 1, 'anyUnit');
@@ -720,7 +813,7 @@ class SettersTest extends AbstractTestCase
             if ($value === $date->$valueUnit ||
                 $modulo === $date->$valueUnit ||
                 (method_exists($date, "diffInReal$unit") && -$date->{"diffInReal$unit"}($original, false) === $value) ||
-                -$date->{"diffIn$unit"}($original, false) === $value
+                -((int) round($date->{"diffIn$unit"}($original, false))) === $value
             ) {
                 $results['current']++;
 
@@ -750,7 +843,7 @@ class SettersTest extends AbstractTestCase
                 $overflowUnit,
                 $unit,
                 $modulo,
-                $$valueUnit
+                $value,
             );
         }
 
@@ -817,11 +910,26 @@ class SettersTest extends AbstractTestCase
             if ($value === $date->$valueUnit ||
                 $modulo === $date->$valueUnit ||
                 (method_exists($date, "diffInReal$unit") && $value === $date->{"diffInReal$unit"}($original, false)) ||
-                $value === $date->{"diffIn$unit"}($original, false)
+                ((int) round($date->{"diffIn$unit"}($original, false))) === $value
             ) {
                 $results['current']++;
 
                 continue;
+            }
+
+            if ($valueUnit === 'day') {
+                $dateInterval = $date->diffAsDateInterval($original);
+                $days = $dateInterval->days;
+
+                if ($days !== false) {
+                    $days *= $dateInterval->invert ? -1 : 1;
+
+                    if ($value === $days) {
+                        $results['current']++;
+
+                        continue;
+                    }
+                }
             }
 
             if ($date->$valueUnit === $start->$valueUnit) {
@@ -847,7 +955,7 @@ class SettersTest extends AbstractTestCase
                 $overflowUnit,
                 $unit,
                 $modulo,
-                $$valueUnit
+                $value,
             );
         }
 

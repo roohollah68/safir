@@ -13,12 +13,14 @@ namespace Monolog\Handler;
 
 use Exception;
 use Monolog\ErrorHandler;
+use Monolog\Level;
 use Monolog\Logger;
 use Monolog\Test\TestCase;
 use PhpConsole\Connector;
 use PhpConsole\Dispatcher\Debug as DebugDispatcher;
 use PhpConsole\Dispatcher\Errors as ErrorDispatcher;
 use PhpConsole\Handler as VendorPhpConsoleHandler;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -27,12 +29,9 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 class PHPConsoleHandlerTest extends TestCase
 {
-    /** @var  Connector|MockObject */
-    protected $connector;
-    /** @var  DebugDispatcher|MockObject */
-    protected $debugDispatcher;
-    /** @var  ErrorDispatcher|MockObject */
-    protected $errorDispatcher;
+    protected Connector&MockObject $connector;
+    protected DebugDispatcher&MockObject $debugDispatcher;
+    protected ErrorDispatcher&MockObject $errorDispatcher;
 
     protected function setUp(): void
     {
@@ -101,7 +100,7 @@ class PHPConsoleHandlerTest extends TestCase
 
         $connector->expects($this->any())
             ->method('isActiveClient')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         return $connector;
     }
@@ -114,7 +113,7 @@ class PHPConsoleHandlerTest extends TestCase
         return $options[$name];
     }
 
-    protected function initLogger($handlerOptions = [], $level = Logger::DEBUG)
+    protected function initLogger($handlerOptions = [], $level = Level::Debug)
     {
         return new Logger('test', [
             new PHPConsoleHandler($handlerOptions, $this->connector, $level),
@@ -185,7 +184,8 @@ class PHPConsoleHandlerTest extends TestCase
         );
         $errorHandler = ErrorHandler::register($this->initLogger($classesPartialsTraceIgnore ? ['classesPartialsTraceIgnore' => $classesPartialsTraceIgnore] : []), false);
         $errorHandler->registerErrorHandler([], false, E_USER_WARNING);
-        $errorHandler->handleError($code, $message, $file, $line);
+        $reflMethod = new \ReflectionMethod($errorHandler, 'handleError');
+        $reflMethod->invoke($errorHandler, $code, $message, $file, $line);
     }
 
     public function testException()
@@ -247,9 +247,7 @@ class PHPConsoleHandlerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideConnectorMethodsOptionsSets
-     */
+    #[DataProvider('provideConnectorMethodsOptionsSets')]
     public function testOptionCallsConnectorMethod($option, $method, $value, $isArgument = true)
     {
         $expectCall = $this->connector->expects($this->once())->method($method);
@@ -276,9 +274,7 @@ class PHPConsoleHandlerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideDumperOptionsValues
-     */
+    #[DataProvider('provideDumperOptionsValues')]
     public function testDumperOptions($option, $dumperProperty, $value)
     {
         new PHPConsoleHandler([$option => $value], $this->connector);

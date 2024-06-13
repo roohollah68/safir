@@ -14,10 +14,13 @@ declare(strict_types=1);
 namespace Tests\Carbon;
 
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use InvalidArgumentException;
 use stdClass;
+use SubCarbon;
 use Tests\AbstractTestCase;
 
 class TestingAidsTest extends AbstractTestCase
@@ -35,7 +38,7 @@ class TestingAidsTest extends AbstractTestCase
         Carbon::setTestNow($yesterday = Carbon::yesterday());
 
         $this->assertTrue(Carbon::hasTestNow());
-        $this->assertSame($yesterday, Carbon::getTestNow());
+        $this->assertEquals($yesterday, Carbon::getTestNow());
     }
 
     public function testTestingAidsWithTestNowSetToString()
@@ -67,7 +70,6 @@ class TestingAidsTest extends AbstractTestCase
         $testNow = Carbon::yesterday();
 
         $this->wrapWithTestNow(function () use ($testNow) {
-            $this->assertEquals($testNow, Carbon::parse());
             $this->assertEquals($testNow, Carbon::parse(null));
             $this->assertEquals($testNow, Carbon::parse(''));
             $this->assertEquals($testNow, Carbon::parse('now'));
@@ -213,6 +215,19 @@ class TestingAidsTest extends AbstractTestCase
         Carbon::setTestNowAndTimezone(Carbon::parse('2018-05-06T12:00:00-05:00'));
     }
 
+    public function testSetTestNowAndTimezoneWithBadTimezoneWithErrorAsException(): void
+    {
+        $this->expectExceptionObject(new InvalidArgumentException(
+            "Timezone ID '-05:00' is invalid, did you mean 'America/Chicago'?\n".
+            "It must be one of the IDs from DateTimeZone::listIdentifiers(),\n".
+            'For the record, hours/minutes offset are relevant only for a particular moment, but not as a default timezone.'
+        ));
+
+        $this->withErrorAsException(function () {
+            Carbon::setTestNowAndTimezone(Carbon::parse('2018-05-06T12:00:00-05:00'));
+        });
+    }
+
     public function testSetTestNowAndTimezoneWithNull(): void
     {
         Carbon::setTestNowAndTimezone();
@@ -317,6 +332,17 @@ class TestingAidsTest extends AbstractTestCase
         $this->assertTrue($n2 > $n1);
     }
 
+    public function testSetTestNowGlobally(): void
+    {
+        require_once __DIR__.'/../Fixtures/SubCarbon.php';
+
+        SubCarbon::setTestNow('2018-05-06 05:10:15.123456');
+
+        $this->assertSame('2018-05-06 05:10:15.123456', SubCarbon::now()->format('Y-m-d H:i:s.u'));
+        $this->assertSame('2018-05-06 05:10:15.123456', Carbon::now()->format('Y-m-d H:i:s.u'));
+        $this->assertSame('2018-05-06 05:10:15.123456', CarbonImmutable::now()->format('Y-m-d H:i:s.u'));
+    }
+
     public function testWithTestNow()
     {
         $self = $this;
@@ -363,5 +389,50 @@ class TestingAidsTest extends AbstractTestCase
 
         $currentTime = new Carbon('tomorrow');
         $this->assertSame('2000-01-02 00:00:00 UTC', $currentTime->format('Y-m-d H:i:s e'));
+    }
+
+    public function testTimezoneConsistency()
+    {
+        Carbon::setTestNow();
+        date_default_timezone_set('UTC');
+        $currentDate = Carbon::now()->setTimezone('America/Los_Angeles');
+        $laDate = $currentDate->format('Y-m-d H:i:s e');
+        $utcDate = $currentDate->copy()->utc()->format('Y-m-d H:i:s e');
+
+        Carbon::setTestNow($currentDate);
+        $this->assertSame($utcDate, Carbon::now()->format('Y-m-d H:i:s e'));
+        $this->assertSame($utcDate, Carbon::now('UTC')->format('Y-m-d H:i:s e'));
+
+        Carbon::setTestNowAndTimezone($currentDate);
+        $this->assertSame($laDate, Carbon::now()->format('Y-m-d H:i:s e'));
+        $this->assertSame($utcDate, Carbon::now('UTC')->format('Y-m-d H:i:s e'));
+    }
+
+    public function testSleep()
+    {
+        $initial = Carbon::now('UTC');
+        Carbon::setTestNow($initial);
+        $before = microtime(true);
+        Carbon::sleep(5);
+        Carbon::sleep(20);
+        $after = microtime(true);
+
+        $this->assertLessThan(0.1, $after - $before);
+
+        $this->assertSame(
+            $initial->copy()->addSeconds(25)->format('Y-m-d H:i:s.u'),
+            Carbon::now('UTC')->format('Y-m-d H:i:s.u'),
+        );
+
+        Carbon::setTestNow(null);
+
+        $before = new DateTimeImmutable('now UTC');
+        Carbon::sleep(0.5);
+        $after = new DateTimeImmutable('now UTC');
+
+        $this->assertSame(
+            5,
+            (int) round(10 * ((float) $after->format('U.u') - ((float) $before->format('U.u')))),
+        );
     }
 }

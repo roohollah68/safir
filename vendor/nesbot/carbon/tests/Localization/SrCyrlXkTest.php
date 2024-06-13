@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Tests\Localization;
 
-/**
- * @group localization
- */
+use PHPUnit\Framework\Attributes\Group;
+
+#[Group('localization')]
 class SrCyrlXkTest extends LocalizationTestCase
 {
     public const LOCALE = 'sr_Cyrl_XK'; // Serbian
@@ -162,7 +162,7 @@ class SrCyrlXkTest extends LocalizationTestCase
         '6. 1.',
 
         // Carbon::parse('2018-01-07 00:00:00')->isoFormat('Do wo')
-        // '7th 2nd'
+        // '7th 1st'
         '7. 1.',
 
         // Carbon::parse('2018-01-11 00:00:00')->isoFormat('Do wo')

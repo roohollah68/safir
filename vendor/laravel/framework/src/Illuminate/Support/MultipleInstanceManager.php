@@ -64,7 +64,7 @@ abstract class MultipleInstanceManager
     abstract public function getInstanceConfig($name);
 
     /**
-     * Get an instance instance by name.
+     * Get an instance by name.
      *
      * @param  string|null  $name
      * @return mixed
@@ -94,6 +94,7 @@ abstract class MultipleInstanceManager
      * @return mixed
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     protected function resolve($name)
     {
@@ -139,7 +140,7 @@ abstract class MultipleInstanceManager
      */
     public function forgetInstance($name = null)
     {
-        $name = $name ?? $this->getDefaultInstance();
+        $name ??= $this->getDefaultInstance();
 
         foreach ((array) $name as $instanceName) {
             if (isset($this->instances[$instanceName])) {
@@ -158,7 +159,7 @@ abstract class MultipleInstanceManager
      */
     public function purge($name = null)
     {
-        $name = $name ?? $this->getDefaultInstance();
+        $name ??= $this->getDefaultInstance();
 
         unset($this->instances[$name]);
     }

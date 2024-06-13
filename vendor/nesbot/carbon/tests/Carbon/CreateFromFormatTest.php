@@ -57,6 +57,16 @@ class CreateFromFormatTest extends AbstractTestCase
         $this->assertInstanceOfCarbon($d);
     }
 
+    public function testCreateFromFormatWithNamedArguments()
+    {
+        $d = Carbon::createFromFormat(
+            format: 'Y-m-d H:i:s',
+            time: '1975-05-21 22:32:11',
+            timezone: 'Asia/tokyo',
+        );
+        $this->assertSame('1975-05-21 22:32:11 Asia/tokyo', $d->format('Y-m-d H:i:s e'));
+    }
+
     public function testCreateFromFalseTimezone()
     {
         $d = Carbon::createFromFormat('Y-m-d H:i:s.u', '1975-05-21 22:32:11.123456', false);
@@ -92,9 +102,7 @@ class CreateFromFormatTest extends AbstractTestCase
     }
 
     /**
-     * @requires PHP >= 7.3
-     *
-     * Due to https://bugs.php.net/bug.php?id=75577, proper "v" format support can only works from PHP 7.3.0.
+     * Due to https://bugs.php.net/bug.php?id=75577, proper "v" format support can only work from PHP 7.3.0.
      */
     public function testCreateFromFormatWithMillisecondsMerged()
     {

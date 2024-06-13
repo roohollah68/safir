@@ -2,10 +2,20 @@
 
 namespace Hekmatinasser\Verta;
 
-use DateTime;
-use Hekmatinasser\Verta\Traits\Date;
+use Exception;
+use Hekmatinasser\Jalali\Jalali;
+use Illuminate\Support\Carbon;
 
-class Verta extends DateTime implements VertaInterface
+class Verta extends Jalali
 {
-    use Date;
+    /**
+     * Create a Carbon instance from Verta
+     *
+     * @return Carbon
+     * @throws Exception
+     */
+    public function toCarbon(): Carbon
+    {
+        return new Carbon($this->datetime(), $this->timezone);
+    }
 }

@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace Tests\Carbon;
 
 use Carbon\Carbon;
-use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\AbstractTestCase;
 
 class GettersTest extends AbstractTestCase
@@ -23,7 +23,7 @@ class GettersTest extends AbstractTestCase
     public function testGettersThrowExceptionOnUnknownGetter()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            "Unknown getter 'doesNotExit'"
+            "Unknown getter 'doesNotExit'",
         ));
 
         /** @var mixed $d */
@@ -197,18 +197,12 @@ class GettersTest extends AbstractTestCase
 
     public function testLocalizedGetters()
     {
-        Carbon::useStrictMode(false);
-
-        $currentLocale = setlocale(LC_ALL, '0');
-        if (setlocale(LC_ALL, 'fr_FR.UTF-8', 'fr_FR.utf8', 'fr_FR', 'fr') === false) {
-            $this->markTestSkipped('testSetLocaleToAuto test need fr_FR.UTF-8.');
-        }
+        Carbon::setLocale('fr');
         $d = Carbon::create(2019, 7, 15, 7, 8, 9);
         $this->assertSame('lundi', $d->localeDayOfWeek);
         $this->assertSame('lun.', $d->shortLocaleDayOfWeek);
         $this->assertSame('juillet', $d->localeMonth);
         $this->assertSame('juil.', $d->shortLocaleMonth);
-        setlocale(LC_ALL, $currentLocale);
     }
 
     public function testDayOfYearGetter()
@@ -244,53 +238,40 @@ class GettersTest extends AbstractTestCase
         $this->assertSame($age, $d->age);
     }
 
-    public static function dataForTestQuarter(): Generator
+    public static function dataForTestQuarter(): array
     {
-        yield [1, 1];
-        yield [2, 1];
-        yield [3, 1];
-        yield [4, 2];
-        yield [5, 2];
-        yield [6, 2];
-        yield [7, 3];
-        yield [8, 3];
-        yield [9, 3];
-        yield [10, 4];
-        yield [11, 4];
-        yield [12, 4];
+        return [
+            [1, 1],
+            [2, 1],
+            [3, 1],
+            [4, 2],
+            [5, 2],
+            [6, 2],
+            [7, 3],
+            [8, 3],
+            [9, 3],
+            [10, 4],
+            [11, 4],
+            [12, 4],
+        ];
     }
 
-    /**
-     * @dataProvider \Tests\Carbon\GettersTest::dataForTestQuarter
-     *
-     * @param int $month
-     * @param int $quarter
-     */
-    public function testQuarterFirstOfMonth($month, $quarter)
+    #[DataProvider('dataForTestQuarter')]
+    public function testQuarterFirstOfMonth(int $month, int $quarter)
     {
         $c = Carbon::create(2015, $month, 1)->startOfMonth();
         $this->assertSame($quarter, $c->quarter);
     }
 
-    /**
-     * @dataProvider \Tests\Carbon\GettersTest::dataForTestQuarter
-     *
-     * @param int $month
-     * @param int $quarter
-     */
-    public function testQuarterMiddleOfMonth($month, $quarter)
+    #[DataProvider('dataForTestQuarter')]
+    public function testQuarterMiddleOfMonth(int $month, int $quarter)
     {
         $c = Carbon::create(2015, $month, 15, 12, 13, 14);
         $this->assertSame($quarter, $c->quarter);
     }
 
-    /**
-     * @dataProvider \Tests\Carbon\GettersTest::dataForTestQuarter
-     *
-     * @param int $month
-     * @param int $quarter
-     */
-    public function testQuarterLastOfMonth($month, $quarter)
+    #[DataProvider('dataForTestQuarter')]
+    public function testQuarterLastOfMonth(int $month, int $quarter)
     {
         $c = Carbon::create(2015, $month, 1)->endOfMonth();
         $this->assertSame($quarter, $c->quarter);

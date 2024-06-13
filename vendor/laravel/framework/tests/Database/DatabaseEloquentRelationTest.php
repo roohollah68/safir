@@ -205,7 +205,7 @@ class DatabaseEloquentRelationTest extends TestCase
             });
 
             $this->fail('Exception was not thrown');
-        } catch (Exception $exception) {
+        } catch (Exception) {
             // Does nothing.
         }
 
@@ -269,23 +269,9 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertSame('foo', $result);
     }
 
-    public function testRelationResolvers()
-    {
-        $model = new EloquentRelationResetModelStub;
-        $builder = m::mock(Builder::class);
-        $builder->shouldReceive('getModel')->andReturn($model);
-
-        EloquentRelationResetModelStub::resolveRelationUsing('customer', function ($model) use ($builder) {
-            return new EloquentResolverRelationStub($builder, $model);
-        });
-
-        $this->assertInstanceOf(EloquentResolverRelationStub::class, $model->customer());
-        $this->assertSame(['key' => 'value'], $model->customer);
-    }
-
     public function testIsRelationIgnoresAttribute()
     {
-        $model = new EloquentRelationAndAtrributeModelStub;
+        $model = new EloquentRelationAndAttributeModelStub;
 
         $this->assertTrue($model->isRelation('parent'));
         $this->assertFalse($model->isRelation('field'));
@@ -353,15 +339,7 @@ class EloquentNoTouchingAnotherModelStub extends Model
     ];
 }
 
-class EloquentResolverRelationStub extends EloquentRelationStub
-{
-    public function getResults()
-    {
-        return ['key' => 'value'];
-    }
-}
-
-class EloquentRelationAndAtrributeModelStub extends Model
+class EloquentRelationAndAttributeModelStub extends Model
 {
     protected $table = 'one_more_table';
 

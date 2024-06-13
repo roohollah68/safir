@@ -17,5 +17,5 @@ use Carbon\CarbonPeriodImmutable;
 
 class DynamicIntervalTest extends \Tests\CarbonPeriod\DynamicIntervalTest
 {
-    protected $periodClass = CarbonPeriodImmutable::class;
+    protected static string $periodClass = CarbonPeriodImmutable::class;
 }

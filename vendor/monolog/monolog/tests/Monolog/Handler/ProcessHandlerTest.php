@@ -12,7 +12,8 @@
 namespace Monolog\Handler;
 
 use Monolog\Test\TestCase;
-use Monolog\Logger;
+use Monolog\Level;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class ProcessHandlerTest extends TestCase
 {
@@ -46,21 +47,26 @@ class ProcessHandlerTest extends TestCase
 
         $handler = $mockBuilder->getMock();
 
-        $handler->expects($this->exactly(2))
+        $matcher = $this->exactly(2);
+        $handler->expects($matcher)
             ->method('writeProcessInput')
-            ->withConsecutive([$this->stringContains($fixtures[0])], [$this->stringContains($fixtures[1])]);
+            ->willReturnCallback(function () use ($matcher, $fixtures) {
+                match ($matcher->numberOfInvocations()) {
+                    1 =>  $this->stringContains($fixtures[0]),
+                    2 =>  $this->stringContains($fixtures[1]),
+                };
+            })
+        ;
 
         /** @var ProcessHandler $handler */
-        $handler->handle($this->getRecord(Logger::WARNING, $fixtures[0]));
-        $handler->handle($this->getRecord(Logger::ERROR, $fixtures[1]));
+        $handler->handle($this->getRecord(Level::Warning, $fixtures[0]));
+        $handler->handle($this->getRecord(Level::Error, $fixtures[1]));
     }
 
     /**
      * Data provider for invalid commands.
-     *
-     * @return array
      */
-    public function invalidCommandProvider()
+    public static function invalidCommandProvider(): array
     {
         return [
             [1337, 'TypeError'],
@@ -71,22 +77,19 @@ class ProcessHandlerTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidCommandProvider
-     * @param mixed $invalidCommand
      * @covers Monolog\Handler\ProcessHandler::guardAgainstInvalidCommand
      */
-    public function testConstructWithInvalidCommandThrowsInvalidArgumentException($invalidCommand, $expectedExcep)
+    #[DataProvider('invalidCommandProvider')]
+    public function testConstructWithInvalidCommandThrowsInvalidArgumentException(mixed $invalidCommand, string $expectedExcep)
     {
         $this->expectException($expectedExcep);
-        new ProcessHandler($invalidCommand, Logger::DEBUG);
+        new ProcessHandler($invalidCommand, Level::Debug);
     }
 
     /**
      * Data provider for invalid CWDs.
-     *
-     * @return array
      */
-    public function invalidCwdProvider()
+    public static function invalidCwdProvider(): array
     {
         return [
             [1337, 'TypeError'],
@@ -96,14 +99,14 @@ class ProcessHandlerTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidCwdProvider
      * @param mixed $invalidCwd
      * @covers Monolog\Handler\ProcessHandler::guardAgainstInvalidCwd
      */
+    #[DataProvider('invalidCwdProvider')]
     public function testConstructWithInvalidCwdThrowsInvalidArgumentException($invalidCwd, $expectedExcep)
     {
         $this->expectException($expectedExcep);
-        new ProcessHandler(self::DUMMY_COMMAND, Logger::DEBUG, true, $invalidCwd);
+        new ProcessHandler(self::DUMMY_COMMAND, Level::Debug, true, $invalidCwd);
     }
 
     /**
@@ -112,7 +115,7 @@ class ProcessHandlerTest extends TestCase
      */
     public function testConstructWithValidCwdWorks()
     {
-        $handler = new ProcessHandler(self::DUMMY_COMMAND, Logger::DEBUG, true, sys_get_temp_dir());
+        $handler = new ProcessHandler(self::DUMMY_COMMAND, Level::Debug, true, sys_get_temp_dir());
         $this->assertInstanceOf(
             'Monolog\Handler\ProcessHandler',
             $handler,
@@ -133,11 +136,11 @@ class ProcessHandlerTest extends TestCase
 
         $handler->expects($this->once())
             ->method('selectErrorStream')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->expectException(\UnexpectedValueException::class);
         /** @var ProcessHandler $handler */
-        $handler->handle($this->getRecord(Logger::WARNING, 'stream failing, whoops'));
+        $handler->handle($this->getRecord(Level::Warning, 'stream failing, whoops'));
     }
 
     /**
@@ -150,7 +153,7 @@ class ProcessHandlerTest extends TestCase
 
         $this->expectException(\UnexpectedValueException::class);
 
-        $handler->handle($this->getRecord(Logger::WARNING, 'some warning in the house'));
+        $handler->handle($this->getRecord(Level::Warning, 'some warning in the house'));
     }
 
     /**
@@ -167,11 +170,11 @@ class ProcessHandlerTest extends TestCase
 
         $handler->expects($this->exactly(2))
             ->method('readProcessErrors')
-            ->willReturnOnConsecutiveCalls('', $this->returnValue('some fake error message here'));
+            ->willReturnOnConsecutiveCalls('', 'some fake error message here');
 
         $this->expectException(\UnexpectedValueException::class);
         /** @var ProcessHandler $handler */
-        $handler->handle($this->getRecord(Logger::WARNING, 'some test stuff'));
+        $handler->handle($this->getRecord(Level::Warning, 'some test stuff'));
     }
 
     /**
@@ -184,7 +187,7 @@ class ProcessHandlerTest extends TestCase
         $property->setAccessible(true);
 
         $handler = new ProcessHandler(self::DUMMY_COMMAND);
-        $handler->handle($this->getRecord(Logger::WARNING, '21 is only the half truth'));
+        $handler->handle($this->getRecord(Level::Warning, '21 is only the half truth'));
 
         $process = $property->getValue($handler);
         $this->assertTrue(is_resource($process), 'Process is not running although it should.');

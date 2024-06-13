@@ -16,6 +16,7 @@ namespace Tests\CarbonImmutable;
 use Carbon\CarbonImmutable as Carbon;
 use Carbon\CarbonInterface;
 use Closure;
+use DateTime;
 use DateTimeZone;
 use Exception;
 use stdClass;
@@ -23,7 +24,7 @@ use Tests\AbstractTestCase;
 
 class TestingAidsTest extends AbstractTestCase
 {
-    public function wrapWithTestNow(Closure $func, CarbonInterface $dt = null)
+    public function wrapWithTestNow(Closure $func, ?CarbonInterface $dt = null): void
     {
         Carbon::setTestNow($dt ?: Carbon::now());
         $func();
@@ -43,7 +44,7 @@ class TestingAidsTest extends AbstractTestCase
         Carbon::setTestNow($yesterday = Carbon::yesterday());
 
         $this->assertTrue(Carbon::hasTestNow());
-        $this->assertSame($yesterday, Carbon::getTestNow());
+        $this->assertSame($yesterday->format('Y-m-d H:i:s.u e'), Carbon::getTestNow()->format('Y-m-d H:i:s.u e'));
     }
 
     public function testTestingAidsWithTestNowSetToString()
@@ -68,6 +69,13 @@ class TestingAidsTest extends AbstractTestCase
         Carbon::setTestNow($yesterday = Carbon::yesterday());
 
         $this->assertEquals($yesterday, Carbon::now());
+    }
+
+    public function testNowWithDateTime()
+    {
+        Carbon::setTestNow(new DateTime('2021-05-26 08:41:59'));
+
+        $this->assertSame('2021-05-26 08:41:59', Carbon::now()->format('Y-m-d H:i:s'));
     }
 
     public function testNowWithClosureValue()
@@ -124,7 +132,6 @@ class TestingAidsTest extends AbstractTestCase
         $testNow = Carbon::yesterday();
 
         $this->wrapWithTestNow(function () use ($testNow) {
-            $this->assertEquals($testNow, Carbon::parse());
             $this->assertEquals($testNow, Carbon::parse(null));
             $this->assertEquals($testNow, Carbon::parse(''));
             $this->assertEquals($testNow, Carbon::parse('now'));

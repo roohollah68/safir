@@ -14,7 +14,10 @@ declare(strict_types=1);
 namespace Tests\CarbonImmutable;
 
 use Carbon\CarbonImmutable as Carbon;
+use Carbon\Exceptions\InvalidFormatException;
 use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
 use DateTimeZone;
 use Tests\AbstractTestCase;
 
@@ -25,6 +28,8 @@ class ConstructTest extends AbstractTestCase
         $c = new Carbon();
         $now = Carbon::now();
         $this->assertInstanceOfCarbon($c);
+        $this->assertInstanceOf(DateTimeImmutable::class, $c);
+        $this->assertInstanceOf(DateTimeInterface::class, $c);
         $this->assertSame($now->tzName, $c->tzName);
         $this->assertCarbon($c, $now->year, $now->month, $now->day, $now->hour, $now->minute, $now->second);
     }
@@ -50,17 +55,11 @@ class ConstructTest extends AbstractTestCase
         $c = new Carbon(new DateTime('2009-09-09 09:09:09', new DateTimeZone('Asia/Tokyo')), 'Europe/Paris');
 
         $this->assertSame('2009-09-09 02:09:09 Europe/Paris', $c->format('Y-m-d H:i:s e'));
-
-        \Carbon\Carbon::useStrictMode(false);
-
-        $c = new Carbon(new DateTime('2009-09-09 09:09:09', new DateTimeZone('Asia/Tokyo')), '¤¤ Incorrect Timezone ¤¤');
-
-        $this->assertSame('2009-09-09 09:09:09 America/Toronto', $c->format('Y-m-d H:i:s e'));
     }
 
     public function testParseCreatesAnInstanceDefaultToNow()
     {
-        $c = Carbon::parse();
+        $c = Carbon::parse(null);
         $now = Carbon::now();
         $this->assertInstanceOfCarbon($c);
         $this->assertSame($now->tzName, $c->tzName);
@@ -151,6 +150,15 @@ class ConstructTest extends AbstractTestCase
         $c = Carbon::parse('now', $timezone);
         $this->assertSame($timezone, $c->tzName);
         $this->assertSame(9 + $dayLightSavingTimeOffset, $c->offsetHours);
+    }
+
+    public function testParseError()
+    {
+        $this->expectException(InvalidFormatException::class);
+        $this->expectExceptionMessage("Could not parse 'completely broken'");
+        $this->expectExceptionMessage('Failed to parse time string');
+
+        Carbon::parse('completely broken');
     }
 
     public function testMockingWithMicroseconds()

@@ -15,22 +15,20 @@ namespace Tests\CarbonImmutable;
 
 use Carbon\CarbonImmutable as Carbon;
 use Carbon\CarbonInterval;
-use Carbon\Exceptions\NotLocaleAwareException;
 use Carbon\Language;
 use Carbon\Translator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\Translator as SymfonyTranslator;
-use Symfony\Component\Translation\TranslatorInterface;
 use Tests\AbstractTestCase;
 use Tests\CarbonImmutable\Fixtures\MyCarbon;
 
-/**
- * @group localization
- */
+#[Group('localization')]
 class LocalizationTest extends AbstractTestCase
 {
     protected function tearDown(): void
@@ -171,168 +169,158 @@ class LocalizationTest extends AbstractTestCase
     /**
      * @see \Tests\CarbonImmutable\LocalizationTest::testSetLocale
      * @see \Tests\CarbonImmutable\LocalizationTest::testSetTranslator
-     *
-     * @return array
      */
-    public static function dataForLocales()
+    public static function dataForLocales(): array
     {
         return [
-            ['af'],
-            ['ar'],
-            ['ar_DZ'],
-            ['ar_KW'],
-            ['ar_LY'],
-            ['ar_MA'],
-            ['ar_SA'],
-            ['ar_Shakl'],
-            ['ar_TN'],
-            ['az'],
-            ['be'],
-            ['bg'],
-            ['bm'],
-            ['bn'],
-            ['bo'],
-            ['br'],
-            ['bs'],
-            ['bs_BA'],
-            ['ca'],
-            ['cs'],
-            ['cv'],
-            ['cy'],
-            ['da'],
-            ['de'],
-            ['de_AT'],
-            ['de_CH'],
-            ['dv'],
-            ['dv_MV'],
-            ['el'],
-            ['en'],
-            ['en_AU'],
-            ['en_CA'],
-            ['en_GB'],
-            ['en_IE'],
-            ['en_IL'],
-            ['en_NZ'],
-            ['eo'],
-            ['es'],
-            ['es_DO'],
-            ['es_US'],
-            ['et'],
-            ['eu'],
-            ['fa'],
-            ['fi'],
-            ['fo'],
-            ['fr'],
-            ['fr_CA'],
-            ['fr_CH'],
-            ['fy'],
-            ['gd'],
-            ['gl'],
-            ['gom_Latn'],
-            ['gu'],
-            ['he'],
-            ['hi'],
-            ['hr'],
-            ['hu'],
-            ['hy'],
-            ['hy_AM'],
-            ['id'],
-            ['is'],
-            ['it'],
-            ['ja'],
-            ['jv'],
-            ['ka'],
-            ['kk'],
-            ['km'],
-            ['kn'],
-            ['ko'],
-            ['ku'],
-            ['ky'],
-            ['lb'],
-            ['lo'],
-            ['lt'],
-            ['lv'],
-            ['me'],
-            ['mi'],
-            ['mk'],
-            ['ml'],
-            ['mn'],
-            ['mr'],
-            ['ms'],
-            ['ms_MY'],
-            ['mt'],
-            ['my'],
-            ['nb'],
-            ['ne'],
-            ['nl'],
-            ['nl_BE'],
-            ['nn'],
-            ['no'],
-            ['oc'],
-            ['pa_IN'],
-            ['pl'],
-            ['ps'],
-            ['pt'],
-            ['pt_BR'],
-            ['ro'],
-            ['ru'],
-            ['sd'],
-            ['se'],
-            ['sh'],
-            ['si'],
-            ['sk'],
-            ['sl'],
-            ['sq'],
-            ['sr'],
-            ['sr_Cyrl'],
-            ['sr_Cyrl_ME'],
-            ['sr_Latn_ME'],
-            ['sr_ME'],
-            ['ss'],
-            ['sv'],
-            ['sw'],
-            ['ta'],
-            ['te'],
-            ['tet'],
-            ['tg'],
-            ['th'],
-            ['tl_PH'],
-            ['tlh'],
-            ['tr'],
-            ['tzl'],
-            ['tzm'],
-            ['tzm_Latn'],
-            ['ug_CN'],
-            ['uk'],
-            ['ur'],
-            ['uz'],
-            ['uz_Latn'],
-            ['vi'],
-            ['yo'],
-            ['zh'],
-            ['zh_CN'],
-            ['zh_HK'],
-            ['zh_TW'],
+            'af' => ['af'],
+            'ar' => ['ar'],
+            'ar_DZ' => ['ar_DZ'],
+            'ar_KW' => ['ar_KW'],
+            'ar_LY' => ['ar_LY'],
+            'ar_MA' => ['ar_MA'],
+            'ar_SA' => ['ar_SA'],
+            'ar_Shakl' => ['ar_Shakl'],
+            'ar_TN' => ['ar_TN'],
+            'az' => ['az'],
+            'be' => ['be'],
+            'bg' => ['bg'],
+            'bm' => ['bm'],
+            'bn' => ['bn'],
+            'bo' => ['bo'],
+            'br' => ['br'],
+            'bs' => ['bs'],
+            'bs_BA' => ['bs_BA'],
+            'ca' => ['ca'],
+            'cs' => ['cs'],
+            'cv' => ['cv'],
+            'cy' => ['cy'],
+            'da' => ['da'],
+            'de' => ['de'],
+            'de_AT' => ['de_AT'],
+            'de_CH' => ['de_CH'],
+            'dv' => ['dv'],
+            'dv_MV' => ['dv_MV'],
+            'el' => ['el'],
+            'en' => ['en'],
+            'en_AU' => ['en_AU'],
+            'en_CA' => ['en_CA'],
+            'en_GB' => ['en_GB'],
+            'en_IE' => ['en_IE'],
+            'en_IL' => ['en_IL'],
+            'en_NZ' => ['en_NZ'],
+            'eo' => ['eo'],
+            'es' => ['es'],
+            'es_DO' => ['es_DO'],
+            'es_US' => ['es_US'],
+            'et' => ['et'],
+            'eu' => ['eu'],
+            'fa' => ['fa'],
+            'fi' => ['fi'],
+            'fo' => ['fo'],
+            'fr' => ['fr'],
+            'fr_CA' => ['fr_CA'],
+            'fr_CH' => ['fr_CH'],
+            'fy' => ['fy'],
+            'gd' => ['gd'],
+            'gl' => ['gl'],
+            'gom_Latn' => ['gom_Latn'],
+            'gu' => ['gu'],
+            'he' => ['he'],
+            'hi' => ['hi'],
+            'hr' => ['hr'],
+            'hu' => ['hu'],
+            'hy' => ['hy'],
+            'hy_AM' => ['hy_AM'],
+            'id' => ['id'],
+            'is' => ['is'],
+            'it' => ['it'],
+            'ja' => ['ja'],
+            'jv' => ['jv'],
+            'ka' => ['ka'],
+            'kk' => ['kk'],
+            'km' => ['km'],
+            'kn' => ['kn'],
+            'ko' => ['ko'],
+            'ku' => ['ku'],
+            'ky' => ['ky'],
+            'lb' => ['lb'],
+            'lo' => ['lo'],
+            'lt' => ['lt'],
+            'lv' => ['lv'],
+            'me' => ['me'],
+            'mi' => ['mi'],
+            'mk' => ['mk'],
+            'ml' => ['ml'],
+            'mn' => ['mn'],
+            'mr' => ['mr'],
+            'ms' => ['ms'],
+            'ms_MY' => ['ms_MY'],
+            'mt' => ['mt'],
+            'my' => ['my'],
+            'nb' => ['nb'],
+            'ne' => ['ne'],
+            'nl' => ['nl'],
+            'nl_BE' => ['nl_BE'],
+            'nn' => ['nn'],
+            'no' => ['no'],
+            'oc' => ['oc'],
+            'pa_IN' => ['pa_IN'],
+            'pl' => ['pl'],
+            'ps' => ['ps'],
+            'pt' => ['pt'],
+            'pt_BR' => ['pt_BR'],
+            'ro' => ['ro'],
+            'ru' => ['ru'],
+            'sd' => ['sd'],
+            'se' => ['se'],
+            'sh' => ['sh'],
+            'si' => ['si'],
+            'sk' => ['sk'],
+            'sl' => ['sl'],
+            'sq' => ['sq'],
+            'sr' => ['sr'],
+            'sr_Cyrl' => ['sr_Cyrl'],
+            'sr_Cyrl_ME' => ['sr_Cyrl_ME'],
+            'sr_Latn_ME' => ['sr_Latn_ME'],
+            'sr_ME' => ['sr_ME'],
+            'ss' => ['ss'],
+            'sv' => ['sv'],
+            'sw' => ['sw'],
+            'ta' => ['ta'],
+            'te' => ['te'],
+            'tet' => ['tet'],
+            'tg' => ['tg'],
+            'th' => ['th'],
+            'tl_PH' => ['tl_PH'],
+            'tlh' => ['tlh'],
+            'tr' => ['tr'],
+            'tzl' => ['tzl'],
+            'tzm' => ['tzm'],
+            'tzm_Latn' => ['tzm_Latn'],
+            'ug_CN' => ['ug_CN'],
+            'uk' => ['uk'],
+            'ur' => ['ur'],
+            'uz' => ['uz'],
+            'uz_Latn' => ['uz_Latn'],
+            'vi' => ['vi'],
+            'yo' => ['yo'],
+            'zh' => ['zh'],
+            'zh_CN' => ['zh_CN'],
+            'zh_HK' => ['zh_HK'],
+            'zh_TW' => ['zh_TW'],
         ];
     }
 
-    /**
-     * @dataProvider \Tests\CarbonImmutable\LocalizationTest::dataForLocales
-     *
-     * @param string $locale
-     */
-    public function testSetLocale($locale)
+    #[DataProvider('dataForLocales')]
+    public function testSetLocale(string $locale)
     {
-        $this->assertTrue(Carbon::setLocale($locale));
+        Carbon::setLocale($locale);
         $this->assertTrue($this->areSameLocales($locale, Carbon::getLocale()));
     }
 
-    /**
-     * @dataProvider \Tests\CarbonImmutable\LocalizationTest::dataForLocales
-     *
-     * @param string $locale
-     */
-    public function testSetTranslator($locale)
+    #[DataProvider('dataForLocales')]
+    public function testSetTranslator(string $locale)
     {
         $ori = Carbon::getTranslator();
         $t = new Translator($locale);
@@ -348,46 +336,41 @@ class LocalizationTest extends AbstractTestCase
 
     public function testSetLocaleWithKnownLocale()
     {
-        $this->assertTrue(Carbon::setLocale('fr'));
+        Carbon::setLocale('fr');
+        $this->assertSame('fr', Carbon::getLocale());
     }
 
-    /**
-     * @see \Tests\CarbonImmutable\LocalizationTest::testSetLocaleWithMalformedLocale
-     *
-     * @return array
-     */
-    public static function dataForTestSetLocaleWithMalformedLocale()
+    #[TestWith(['DE'])]
+    #[TestWith(['pt-BR'])]
+    #[TestWith(['pt-br'])]
+    #[TestWith(['PT-br'])]
+    #[TestWith(['PT-BR'])]
+    #[TestWith(['pt_br'])]
+    #[TestWith(['PT_br'])]
+    #[TestWith(['PT_BR'])]
+    public function testSetLocaleWithMalformedLocale(string $malformedLocale)
     {
-        return [
-            ['DE'],
-            ['pt-BR'],
-            ['pt-br'],
-            ['PT-br'],
-            ['PT-BR'],
-            ['pt_br'],
-            ['PT_br'],
-            ['PT_BR'],
-        ];
-    }
+        Carbon::setLocale($malformedLocale);
+        $split = preg_split('/[-_]/', $malformedLocale);
 
-    /**
-     * @dataProvider \Tests\CarbonImmutable\LocalizationTest::dataForTestSetLocaleWithMalformedLocale
-     *
-     * @param string $malformedLocale
-     */
-    public function testSetLocaleWithMalformedLocale($malformedLocale)
-    {
-        $this->assertTrue(Carbon::setLocale($malformedLocale));
+        $this->assertSame(
+            strtolower($split[0]).(\count($split) === 1 ? '' : '_'.strtoupper($split[1])),
+            Carbon::getLocale(),
+        );
     }
 
     public function testSetLocaleWithNonExistingLocale()
     {
-        $this->assertFalse(Carbon::setLocale('pt-XX'));
+        Carbon::setLocale('pt-XX');
+
+        $this->assertSame('pt', Carbon::getLocale());
     }
 
     public function testSetLocaleWithUnknownLocale()
     {
-        $this->assertFalse(Carbon::setLocale('zz'));
+        Carbon::setLocale('zz');
+
+        $this->assertSame('en', Carbon::getLocale());
     }
 
     public function testCustomTranslation()
@@ -415,7 +398,8 @@ class LocalizationTest extends AbstractTestCase
             'day' => '1 boring day|%count% boring days',
         ];
 
-        $this->assertTrue(Carbon::setLocale('en'));
+        Carbon::setLocale('en');
+        $this->assertSame('en', Carbon::getLocale());
         /** @var Translator $translator */
         $translator = Carbon::getTranslator();
         $translator->setMessages('en', $enBoring);
@@ -442,7 +426,8 @@ class LocalizationTest extends AbstractTestCase
         $this->assertArrayHasKey('en_Boring', $messages);
         $this->assertSame($enBoring, $messages['en_Boring']);
 
-        $this->assertTrue(Carbon::setLocale('en_Boring'));
+        Carbon::setLocale('en_Boring');
+        $this->assertSame('en_Boring', Carbon::getLocale());
 
         $diff = Carbon::create(2018, 1, 1, 0, 0, 0)
             ->diffForHumans(Carbon::create(2018, 1, 4, 4, 0, 0), true, false, 2);
@@ -454,12 +439,13 @@ class LocalizationTest extends AbstractTestCase
 
         $this->assertSame([], $translator->getMessages());
 
-        $this->assertTrue(Carbon::setLocale('en'));
+        Carbon::setLocale('en');
+        $this->assertSame('en', Carbon::getLocale());
     }
 
     public function testCustomWeekStart()
     {
-        $this->assertTrue(Carbon::setLocale('ru'));
+        Carbon::setLocale('ru');
 
         /** @var Translator $translator */
         $translator = Carbon::getTranslator();
@@ -484,7 +470,7 @@ class LocalizationTest extends AbstractTestCase
 
         $translator->resetMessages('ru');
 
-        $this->assertTrue(Carbon::setLocale('en'));
+        Carbon::setLocale('en');
     }
 
     public function testAddAndRemoveDirectory()
@@ -498,24 +484,24 @@ class LocalizationTest extends AbstractTestCase
         $translator = Carbon::getTranslator();
         Carbon::setLocale('en');
 
-        $this->assertFalse(Carbon::setLocale('foo'));
+        Carbon::setLocale('foo');
         $this->assertSame('Saturday', Carbon::parse('2018-07-07 00:00:00')->isoFormat('dddd'));
 
         $translator->addDirectory($directory);
 
-        $this->assertTrue(Carbon::setLocale('foo'));
+        Carbon::setLocale('foo');
         $this->assertSame('samedi', Carbon::parse('2018-07-07 00:00:00')->isoFormat('dddd'));
 
         Carbon::setLocale('en');
         $translator->removeDirectory($directory);
 
-        $this->assertFalse(Carbon::setLocale('bar'));
+        Carbon::setLocale('bar');
         $this->assertSame('Saturday', Carbon::parse('2018-07-07 00:00:00')->isoFormat('dddd'));
 
-        $this->assertTrue(Carbon::setLocale('foo'));
+        Carbon::setLocale('foo');
         $this->assertSame('samedi', Carbon::parse('2018-07-07 00:00:00')->isoFormat('dddd'));
 
-        $this->assertTrue(Carbon::setLocale('en'));
+        Carbon::setLocale('en');
     }
 
     public function testLocaleHasShortUnits()
@@ -668,26 +654,6 @@ class LocalizationTest extends AbstractTestCase
         $this->assertSame(['en'], Carbon::getAvailableLocales());
     }
 
-    public function testNotLocaleAwareException()
-    {
-        if (method_exists(TranslatorInterface::class, 'getLocale')) {
-            $this->markTestSkipped('In Symfony < 5, NotLocaleAwareException will never been thrown.');
-        }
-
-        $translator = new class() implements TranslatorInterface {
-            public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null)
-            {
-                return 'x';
-            }
-        };
-
-        Carbon::setTranslator($translator);
-
-        $this->expectExceptionObject(new NotLocaleAwareException($translator));
-
-        Carbon::now()->locale();
-    }
-
     public function testGetAvailableLocalesInfo()
     {
         $infos = Carbon::getAvailableLocalesInfo();
@@ -723,17 +689,13 @@ class LocalizationTest extends AbstractTestCase
     public function testTranslationCustomWithCustomTranslator()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Translator does not implement Symfony\Component\Translation\TranslatorInterface '.
+            'Translator does not implement Symfony\Contracts\Translation\TranslatorInterface '.
             'and Symfony\Component\Translation\TranslatorBagInterface. '.
-            'Symfony\Component\Translation\IdentityTranslator has been given.'
+            'Symfony\Component\Translation\IdentityTranslator has been given.',
         ));
 
         $date = Carbon::create(2018, 1, 1, 0, 0, 0);
-        $date->setLocalTranslator(
-            class_exists(MessageSelector::class)
-                ? new IdentityTranslator(new MessageSelector())
-                : new IdentityTranslator()
-        );
+        $date->setLocalTranslator(new IdentityTranslator());
 
         $date->getTranslationMessage('foo');
     }
@@ -836,7 +798,7 @@ class LocalizationTest extends AbstractTestCase
     {
         $this->assertSame(
             '29 февраля 2020 г., 12:24',
-            Carbon::parse('2020-02-29 12:24:00')->locale('ru_RU')->isoFormat('LLL')
+            Carbon::parse('2020-02-29 12:24:00')->locale('ru_RU')->isoFormat('LLL'),
         );
     }
 
@@ -844,12 +806,12 @@ class LocalizationTest extends AbstractTestCase
     {
         $this->assertSame(
             'година',
-            CarbonInterval::hour()->locale('uk')->forHumans(['aUnit' => true])
+            CarbonInterval::hour()->locale('uk')->forHumans(['aUnit' => true]),
         );
 
         $this->assertSame(
             'годину тому',
-            Carbon::now()->subHour()->locale('uk')->diffForHumans(['aUnit' => true])
+            Carbon::now()->subHour()->locale('uk')->diffForHumans(['aUnit' => true]),
         );
     }
 

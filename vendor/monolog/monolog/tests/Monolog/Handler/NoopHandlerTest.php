@@ -11,39 +11,34 @@
 
 namespace Monolog\Handler;
 
+use Monolog\Level;
 use Monolog\Test\TestCase;
-use Monolog\Logger;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @covers Monolog\Handler\NoopHandler::handle
  */
 class NoopHandlerTest extends TestCase
 {
-    /**
-     * @dataProvider logLevelsProvider
-     */
-    public function testIsHandling($level)
+    #[DataProvider('logLevelsProvider')]
+    public function testIsHandling(Level $level)
     {
         $handler = new NoopHandler();
         $this->assertTrue($handler->isHandling($this->getRecord($level)));
     }
 
-    /**
-     * @dataProvider logLevelsProvider
-     */
-    public function testHandle($level)
+    #[DataProvider('logLevelsProvider')]
+    public function testHandle(Level $level)
     {
         $handler = new NoopHandler();
         $this->assertFalse($handler->handle($this->getRecord($level)));
     }
 
-    public function logLevelsProvider()
+    public static function logLevelsProvider()
     {
         return array_map(
-            function ($level) {
-                return [$level];
-            },
-            array_values(Logger::getLevels())
+            fn ($level) => [$level],
+            Level::cases()
         );
     }
 }

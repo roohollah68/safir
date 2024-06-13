@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Validation\Rule as RuleContract;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Translation\ArrayLoader;
 use Illuminate\Translation\Translator;
@@ -41,6 +42,15 @@ class ValidationPasswordRuleTest extends TestCase
         $this->passes(new Password(8), ['88888888']);
     }
 
+    public function testMax()
+    {
+        $this->fails(Password::min(2)->max(4), ['aaaaa', '11111111'], [
+            'validation.max.string',
+        ]);
+
+        $this->passes(Password::min(2)->max(3), ['aa', '111']);
+    }
+
     public function testConditional()
     {
         $is_privileged_user = true;
@@ -49,7 +59,7 @@ class ValidationPasswordRuleTest extends TestCase
         });
 
         $this->fails($rule, ['aaaaaaaa', '11111111'], [
-            'The my password must contain at least one symbol.',
+            'validation.password.symbols',
         ]);
 
         $is_privileged_user = false;
@@ -63,7 +73,7 @@ class ValidationPasswordRuleTest extends TestCase
     public function testMixedCase()
     {
         $this->fails(Password::min(2)->mixedCase(), ['nn', 'MM'], [
-            'The my password must contain at least one uppercase and one lowercase letter.',
+            'validation.password.mixed',
         ]);
 
         $this->passes(Password::min(2)->mixedCase(), ['Nn', 'Mn', 'âA']);
@@ -72,7 +82,7 @@ class ValidationPasswordRuleTest extends TestCase
     public function testLetters()
     {
         $this->fails(Password::min(2)->letters(), ['11', '22', '^^', '``', '**'], [
-            'The my password must contain at least one letter.',
+            'validation.password.letters',
         ]);
 
         $this->passes(Password::min(2)->letters(), ['1a', 'b2', 'â1', '1 京都府']);
@@ -81,7 +91,7 @@ class ValidationPasswordRuleTest extends TestCase
     public function testNumbers()
     {
         $this->fails(Password::min(2)->numbers(), ['aa', 'bb', '  a', '京都府'], [
-            'The my password must contain at least one number.',
+            'validation.password.numbers',
         ]);
 
         $this->passes(Password::min(2)->numbers(), ['1a', 'b2', '00', '京都府 1']);
@@ -98,40 +108,40 @@ class ValidationPasswordRuleTest extends TestCase
     public function testSymbols()
     {
         $this->fails(Password::min(2)->symbols(), ['ab', '1v'], [
-            'The my password must contain at least one symbol.',
+            'validation.password.symbols',
         ]);
 
         $this->passes(Password::min(2)->symbols(), ['n^d', 'd^!', 'âè$', '金廿土弓竹中；']);
     }
 
-    // public function testUncompromised()
-    // {
-    //     $this->fails(Password::min(2)->uncompromised(), [
-    //         '123456',
-    //         'password',
-    //         'welcome',
-    //         'abc123',
-    //         '123456789',
-    //         '12345678',
-    //         'nuno',
-    //     ], [
-    //         'The given my password has appeared in a data leak. Please choose a different my password.',
-    //     ]);
+    public function testUncompromised()
+    {
+        $this->fails(Password::min(2)->uncompromised(), [
+            '123456',
+            'password',
+            'welcome',
+            'abc123',
+            '123456789',
+            '12345678',
+            'nuno',
+        ], [
+            'validation.password.uncompromised',
+        ]);
 
-    //     $this->passes(Password::min(2)->uncompromised(9999999), [
-    //         'nuno',
-    //     ]);
+        $this->passes(Password::min(2)->uncompromised(9999999), [
+            'nuno',
+        ]);
 
-    //     $this->passes(Password::min(2)->uncompromised(), [
-    //         '手田日尸Ｚ難金木水口火女月土廿卜竹弓一十山',
-    //         '!p8VrB',
-    //         '&xe6VeKWF#n4',
-    //         '%HurHUnw7zM!',
-    //         'rundeliekend',
-    //         '7Z^k5EvqQ9g%c!Jt9$ufnNpQy#Kf',
-    //         'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwSX',
-    //     ]);
-    // }
+        $this->passes(Password::min(2)->uncompromised(), [
+            '手田日尸Ｚ難金木水口火女月土廿卜竹弓一十山',
+            '!p8VrB',
+            '&xe6VeKWF#n4',
+            '%HurHUnw7zM!',
+            'rundeliekend',
+            '7Z^k5EvqQ9g%c!Jt9$ufnNpQy#Kf',
+            'NRs*Gz2@hSmB$vVBSPDfqbRtEzk4nF7ZAbM29VMW$BPD%b2U%3VmJAcrY5eZGVxP%z%apnwSX',
+        ]);
+    }
 
     public function testMessagesOrder()
     {
@@ -145,22 +155,22 @@ class ValidationPasswordRuleTest extends TestCase
 
         $this->fails($makeRules(), ['foo', 'azdazd'], [
             'validation.min.string',
-            'The my password must contain at least one uppercase and one lowercase letter.',
-            'The my password must contain at least one number.',
+            'validation.password.mixed',
+            'validation.password.numbers',
         ]);
 
         $this->fails($makeRules(), ['1231231'], [
             'validation.min.string',
-            'The my password must contain at least one uppercase and one lowercase letter.',
+            'validation.password.mixed',
         ]);
 
         $this->fails($makeRules(), ['4564654564564'], [
-            'The my password must contain at least one uppercase and one lowercase letter.',
+            'validation.password.mixed',
         ]);
 
         $this->fails($makeRules(), ['aaaaaaaaa', 'TJQSJQSIUQHS'], [
-            'The my password must contain at least one uppercase and one lowercase letter.',
-            'The my password must contain at least one number.',
+            'validation.password.mixed',
+            'validation.password.numbers',
         ]);
 
         $this->passes($makeRules(), ['4564654564564Abc']);
@@ -173,26 +183,26 @@ class ValidationPasswordRuleTest extends TestCase
 
         $this->fails($makeRules(), ['foo', 'azdazd'], [
             'validation.min.string',
-            'The my password must contain at least one symbol.',
+            'validation.password.symbols',
         ]);
 
         $this->fails($makeRules(), ['1231231'], [
             'validation.min.string',
-            'The my password must contain at least one letter.',
-            'The my password must contain at least one symbol.',
+            'validation.password.letters',
+            'validation.password.symbols',
         ]);
 
         $this->fails($makeRules(), ['aaaaaaaaa', 'TJQSJQSIUQHS'], [
-            'The my password must contain at least one symbol.',
+            'validation.password.symbols',
         ]);
 
         $this->fails($makeRules(), ['4564654564564'], [
-            'The my password must contain at least one letter.',
-            'The my password must contain at least one symbol.',
+            'validation.password.letters',
+            'validation.password.symbols',
         ]);
 
         $this->fails($makeRules(), ['abcabcabc!'], [
-            'The given my password has appeared in a data leak. Please choose a different my password.',
+            'validation.password.uncompromised',
         ]);
 
         $v = new Validator(
@@ -268,6 +278,32 @@ class ValidationPasswordRuleTest extends TestCase
         $this->assertTrue($v1->passes());
     }
 
+    public function testCustomMessages()
+    {
+        $rules = [
+            'my_password' => Password::min(6)->letters(),
+        ];
+
+        $messages = [
+            'min' => 'Message for validating length',
+            'password.letters' => 'Message for validating letters',
+        ];
+
+        $v = new Validator(
+            resolve('translator'),
+            ['my_password' => '1234'],
+            $rules,
+            $messages,
+        );
+
+        $this->assertFalse($v->passes());
+
+        $this->assertSame(
+            ['my_password' => array_values($messages)],
+            $v->messages()->toArray()
+        );
+    }
+
     public function testPassesWithCustomRules()
     {
         $closureRule = function ($attribute, $value, $fail) {
@@ -276,7 +312,7 @@ class ValidationPasswordRuleTest extends TestCase
             }
         };
 
-        $ruleObject = new class implements \Illuminate\Contracts\Validation\Rule
+        $ruleObject = new class implements RuleContract
         {
             public function passes($attribute, $value)
             {

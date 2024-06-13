@@ -11,6 +11,7 @@
 
 namespace Monolog\Handler;
 
+use Monolog\Level;
 use Monolog\Test\TestCase;
 
 /**
@@ -38,12 +39,18 @@ class SyslogUdpHandlerTest extends TestCase
             ->onlyMethods(['write'])
             ->setConstructorArgs(['lol'])
             ->getMock();
-        $socket->expects($this->at(0))
+
+        $matcher = $this->atLeast(2);
+
+        $socket->expects($matcher)
             ->method('write')
-            ->with("lol", "<".(LOG_AUTHPRIV + LOG_WARNING).">1 $time $host php $pid - - ");
-        $socket->expects($this->at(1))
-            ->method('write')
-            ->with("hej", "<".(LOG_AUTHPRIV + LOG_WARNING).">1 $time $host php $pid - - ");
+            ->willReturnCallback(function () use ($matcher, $time, $host, $pid) {
+                match ($matcher->numberOfInvocations()) {
+                    1 => $this->equalTo("lol") && $this->equalTo("<".(LOG_AUTHPRIV + LOG_WARNING).">1 $time $host php $pid - - "),
+                    2 => $this->equalTo("hej") && $this->equalTo("<".(LOG_AUTHPRIV + LOG_WARNING).">1 $time $host php $pid - - "),
+                    default => $this->assertTrue(true)
+                };
+            });
 
         $handler->setSocket($socket);
 
@@ -64,7 +71,7 @@ class SyslogUdpHandlerTest extends TestCase
 
         $handler->setSocket($socket);
 
-        $handler->handle($this->getRecordWithMessage(null));
+        $handler->handle($this->getRecordWithMessage(''));
     }
 
     public function testRfc()
@@ -74,22 +81,28 @@ class SyslogUdpHandlerTest extends TestCase
         $host = gethostname();
 
         $handler = $this->getMockBuilder('\Monolog\Handler\SyslogUdpHandler')
-            ->setConstructorArgs(array("127.0.0.1", 514, "authpriv", 'debug', true, "php", \Monolog\Handler\SyslogUdpHandler::RFC3164))
+            ->setConstructorArgs(["127.0.0.1", 514, "authpriv", 'debug', true, "php", \Monolog\Handler\SyslogUdpHandler::RFC3164])
             ->onlyMethods([])
             ->getMock();
 
         $handler->setFormatter(new \Monolog\Formatter\ChromePHPFormatter());
 
         $socket = $this->getMockBuilder('\Monolog\Handler\SyslogUdp\UdpSocket')
-            ->setConstructorArgs(array('lol', 999))
-            ->onlyMethods(array('write'))
+            ->setConstructorArgs(['lol', 999])
+            ->onlyMethods(['write'])
             ->getMock();
-        $socket->expects($this->at(0))
+
+        $matcher = $this->atLeast(2);
+
+        $socket->expects($matcher)
             ->method('write')
-            ->with("lol", "<".(LOG_AUTHPRIV + LOG_WARNING).">$time $host php[$pid]: ");
-        $socket->expects($this->at(1))
-            ->method('write')
-            ->with("hej", "<".(LOG_AUTHPRIV + LOG_WARNING).">$time $host php[$pid]: ");
+            ->willReturnCallback(function () use ($matcher, $time, $host, $pid) {
+                match ($matcher->numberOfInvocations()) {
+                    1 => $this->equalTo("lol") && $this->equalTo("<".(LOG_AUTHPRIV + LOG_WARNING).">$time $host php[$pid]: "),
+                    2 => $this->equalTo("hej") && $this->equalTo("<".(LOG_AUTHPRIV + LOG_WARNING).">$time $host php[$pid]: "),
+                    default => $this->assertTrue(true)
+                };
+            });
 
         $handler->setSocket($socket);
 
@@ -98,6 +111,6 @@ class SyslogUdpHandlerTest extends TestCase
 
     protected function getRecordWithMessage($msg)
     {
-        return ['message' => $msg, 'level' => \Monolog\Logger::WARNING, 'context' => null, 'extra' => [], 'channel' => 'lol', 'datetime' => new \DateTimeImmutable('2014-01-07 12:34:56')];
+        return $this->getRecord(message: $msg, level: Level::Warning, channel: 'lol', datetime: new \DateTimeImmutable('2014-01-07 12:34:56'));
     }
 }

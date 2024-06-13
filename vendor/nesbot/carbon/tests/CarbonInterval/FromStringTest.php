@@ -16,21 +16,18 @@ namespace Tests\CarbonInterval;
 use Carbon\CarbonInterval;
 use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use Tests\AbstractTestCase;
 
 class FromStringTest extends AbstractTestCase
 {
-    /**
-     * @dataProvider \Tests\CarbonInterval\FromStringTest::dataForValidStrings
-     *
-     * @param string         $string
-     * @param CarbonInterval $expected
-     */
-    public function testReturnsInterval($string, $expected)
+    #[DataProvider('dataForValidStrings')]
+    public function testReturnsInterval(string $string, CarbonInterval $expected)
     {
         $result = CarbonInterval::fromString($string);
 
-        $this->assertEquals($expected, $result, "'$string' does not return expected interval.");
+        $this->assertEquals($expected->optimize(), $result->optimize(), "'$string' does not return expected interval.");
     }
 
     public static function dataForValidStrings(): Generator
@@ -109,17 +106,14 @@ class FromStringTest extends AbstractTestCase
         // big numbers
         yield ['1999999999999.5 hours', new CarbonInterval(0, 0, 0, 0, 1999999999999, 30, 0)];
         yield [(0x7fffffffffffffff).' days', new CarbonInterval(0, 0, 0, 0x7fffffffffffffff, 0, 0, 0)];
-        yield ['1999999999999.5 hours -85 minutes', new CarbonInterval(0, 0, 0, 0, 1999999999999, 115, 0)];
+        yield ['1999999999999.5 hours -85 minutes', new CarbonInterval(0, 0, 0, 0, 1999999999999, -55, 0)];
         yield ['2.333 seconds', new CarbonInterval(0, 0, 0, 0, 0, 0, 2, 333000)];
     }
 
-    /**
-     * @dataProvider \Tests\CarbonInterval\FromStringTest::dataForInvalidStrings
-     *
-     * @param string $string
-     * @param string $part
-     */
-    public function testThrowsExceptionForUnknownValues($string, $part)
+    #[TestWith(['1q', '1q'])]
+    #[TestWith(['about 12..14m', '12..'])]
+    #[TestWith(['4h 13', '13'])]
+    public function testThrowsExceptionForUnknownValues(string $string, string $part)
     {
         $message = null;
 
@@ -130,12 +124,5 @@ class FromStringTest extends AbstractTestCase
         }
 
         $this->assertStringContainsString($part, $message);
-    }
-
-    public static function dataForInvalidStrings(): Generator
-    {
-        yield ['1q', '1q'];
-        yield ['about 12..14m', '12..'];
-        yield ['4h 13', '13'];
     }
 }

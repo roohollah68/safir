@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Translation;
 
 use Illuminate\Contracts\Translation\Loader;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Translation\MessageSelector;
 use Illuminate\Translation\Translator;
@@ -51,6 +52,16 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo']]);
         $this->assertEquals(['tree bar', 'breeze bar'], $t->get('foo::bar.qux', ['foo' => 'bar'], 'en'));
+        $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
+        $this->assertSame('foo', $t->get('foo::bar.foo'));
+    }
+
+    public function testGetMethodProperlyLoadsAndRetrievesArrayItem()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => 'breeze :foo', 'qux' => ['tree :foo', 'breeze :foo', 'beep' => ['rock' => 'tree :foo']]]);
+        $this->assertEquals(['foo' => 'foo', 'baz' => 'breeze bar', 'qux' => ['tree bar', 'breeze bar', 'beep' => ['rock' => 'tree bar']]], $t->get('foo::bar', ['foo' => 'bar'], 'en'));
         $this->assertSame('breeze bar', $t->get('foo::bar.baz', ['foo' => 'bar'], 'en'));
         $this->assertSame('foo', $t->get('foo::bar.foo'));
     }
@@ -112,7 +123,7 @@ class TranslationTranslatorTest extends TestCase
         $this->assertSame('breeze bar', $t->get('foo.bar', ['foo' => 'bar']));
     }
 
-    public function testChoiceMethodProperlyLoadsAndRetrievesItem()
+    public function testChoiceMethodProperlyLoadsAndRetrievesItemForAnInt()
     {
         $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->willReturn('line');
@@ -120,6 +131,16 @@ class TranslationTranslatorTest extends TestCase
         $selector->shouldReceive('choose')->once()->with('line', 10, 'en')->andReturn('choiced');
 
         $t->choice('foo', 10, ['replace']);
+    }
+
+    public function testChoiceMethodProperlyLoadsAndRetrievesItemForAFloat()
+    {
+        $t = $this->getMockBuilder(Translator::class)->onlyMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
+        $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo(['replace']), $this->equalTo('en'))->willReturn('line');
+        $t->setSelector($selector = m::mock(MessageSelector::class));
+        $selector->shouldReceive('choose')->once()->with('line', 1.2, 'en')->andReturn('choiced');
+
+        $t->choice('foo', 1.2, ['replace']);
     }
 
     public function testChoiceMethodProperlyCountsCollectionsAndLoadsAndRetrievesItem()
@@ -209,6 +230,81 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
         $this->assertSame('foo ', $t->get('foo :message', ['message' => null]));
+    }
+
+    public function testGetJsonReplacesWithStringable()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->getLoader()
+            ->shouldReceive('load')
+            ->once()
+            ->with('en', '*', '*')
+            ->andReturn(['test' => 'the date is :date']);
+
+        $date = Carbon::createFromTimestamp(0);
+
+        $this->assertSame(
+            'the date is 1970-01-01 00:00:00',
+            $t->get('test', ['date' => $date])
+        );
+
+        $t->stringable(function (\Illuminate\Support\Carbon $carbon) {
+            return $carbon->format('jS M Y');
+        });
+        $this->assertSame(
+            'the date is 1st Jan 1970',
+            $t->get('test', ['date' => $date])
+        );
+    }
+
+    public function testTagReplacements()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'We have some nice <docs-link>documentation</docs-link>', '*')->andReturn([]);
+
+        $this->assertSame(
+            'We have some nice <a href="https://laravel.com/docs">documentation</a>',
+            $t->get(
+                'We have some nice <docs-link>documentation</docs-link>',
+                [
+                    'docs-link' => fn ($children) => "<a href=\"https://laravel.com/docs\">$children</a>",
+                ]
+            )
+        );
+    }
+
+    public function testTagReplacementsHandleMultipleOfSameTag()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '<bold-this>bold</bold-this> something else <bold-this>also bold</bold-this>', '*')->andReturn([]);
+
+        $this->assertSame(
+            '<b>bold</b> something else <b>also bold</b>',
+            $t->get(
+                '<bold-this>bold</bold-this> something else <bold-this>also bold</bold-this>',
+                [
+                    'bold-this' => fn ($children) => "<b>$children</b>",
+                ]
+            )
+        );
+    }
+
+    public function testDetermineLocalesUsingMethod()
+    {
+        $t = new Translator($this->getLoader(), 'en');
+        $t->determineLocalesUsing(function ($locales) {
+            $this->assertSame(['en'], $locales);
+
+            return ['en', 'lz'];
+        });
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('lz', 'foo', '*')->andReturn([]);
+        $this->assertSame('foo', $t->get('foo'));
     }
 
     protected function getLoader()

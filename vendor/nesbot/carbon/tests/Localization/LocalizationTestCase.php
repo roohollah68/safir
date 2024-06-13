@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterval;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\AbstractTestCase;
 
 /**
@@ -329,22 +330,26 @@ abstract class LocalizationTestCase extends AbstractTestCase
     {
         parent::setUp();
 
-        if (!Carbon::setLocale(static::LOCALE) || !$this->areSameLocales(Carbon::getLocale(), static::LOCALE)) {
+        Carbon::setLocale(static::LOCALE);
+
+        if (!$this->areSameLocales(Carbon::getLocale(), static::LOCALE)) {
             throw new InvalidArgumentException('Locale '.static::LOCALE.' not found');
         }
 
-        if (!CarbonImmutable::setLocale(static::LOCALE) || !$this->areSameLocales(CarbonImmutable::getLocale(), static::LOCALE)) {
+        CarbonImmutable::setLocale(static::LOCALE);
+
+        if (!$this->areSameLocales(CarbonImmutable::getLocale(), static::LOCALE)) {
             throw new InvalidArgumentException('Locale '.static::LOCALE.' not found');
         }
 
-        if (!CarbonInterval::setLocale(static::LOCALE) || !$this->areSameLocales(CarbonInterval::getLocale(), static::LOCALE)) {
+        CarbonInterval::setLocale(static::LOCALE);
+
+        if (!$this->areSameLocales(CarbonInterval::getLocale(), static::LOCALE)) {
             throw new InvalidArgumentException('Locale '.static::LOCALE.' not found');
         }
     }
 
-    /**
-     * @group language
-     */
+    #[Group('language')]
     public function testLanguage()
     {
         $this->wrapWithNonDstDate(function () {

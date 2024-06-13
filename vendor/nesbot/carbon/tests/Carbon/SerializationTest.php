@@ -17,6 +17,8 @@ use Carbon\Carbon;
 use DateTime;
 use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use ReflectionClass;
 use ReflectionObject;
 use ReflectionProperty;
@@ -25,21 +27,15 @@ use Throwable;
 
 class SerializationTest extends AbstractTestCase
 {
-    /**
-     * @var string
-     */
-    protected $serialized;
+    protected string $serialized;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->serialized = \extension_loaded('msgpack')
-            ? [
-                "O:13:\"Carbon\Carbon\":4:{s:4:\"date\";s:26:\"2016-02-01 13:20:25.000000\";s:13:\"timezone_type\";i:3;s:8:\"timezone\";s:15:\"America/Toronto\";s:18:\"dumpDateProperties\";a:2:{s:4:\"date\";s:26:\"2016-02-01 13:20:25.000000\";s:8:\"timezone\";s:96:\"O:21:\"Carbon\CarbonTimeZone\":2:{s:13:\"timezone_type\";i:3;s:8:\"timezone\";s:15:\"America/Toronto\";}\";}}",
-                "O:13:\"Carbon\Carbon\":4:{s:4:\"date\";s:26:\"2016-02-01 13:20:25.000000\";s:13:\"timezone_type\";i:3;s:8:\"timezone\";s:15:\"America/Toronto\";s:18:\"dumpDateProperties\";a:2:{s:4:\"date\";s:26:\"2016-02-01 13:20:25.000000\";s:8:\"timezone\";s:23:\"s:15:\"America/Toronto\";\";}}",
-            ]
-            : ['O:13:"Carbon\Carbon":3:{s:4:"date";s:26:"2016-02-01 13:20:25.000000";s:13:"timezone_type";i:3;s:8:"timezone";s:15:"America/Toronto";}'];
+            ? 'O:13:"Carbon\Carbon":4:{s:4:"date";s:26:"2016-02-01 13:20:25.000000";s:13:"timezone_type";i:3;s:8:"timezone";s:15:"America/Toronto";s:18:"dumpDateProperties";a:2:{s:4:"date";s:26:"2016-02-01 13:20:25.000000";s:8:"timezone";s:15:"America/Toronto";}}'
+            : 'O:13:"Carbon\Carbon":3:{s:4:"date";s:26:"2016-02-01 13:20:25.000000";s:13:"timezone_type";i:3;s:8:"timezone";s:15:"America/Toronto";}';
     }
 
     protected function cleanSerialization(string $serialization): string
@@ -50,17 +46,16 @@ class SerializationTest extends AbstractTestCase
     public function testSerialize()
     {
         $dt = Carbon::create(2016, 2, 1, 13, 20, 25);
-        $message = "not in:\n".implode("\n", $this->serialized);
-        $this->assertContains($this->cleanSerialization($dt->serialize()), $this->serialized, $message);
-        $this->assertContains($this->cleanSerialization(serialize($dt)), $this->serialized, $message);
+        $this->assertSame($this->serialized, $this->cleanSerialization($dt->serialize()));
+        $this->assertSame($this->serialized, $this->cleanSerialization(serialize($dt)));
     }
 
     public function testFromUnserialized()
     {
-        $dt = Carbon::fromSerialized($this->serialized[0]);
+        $dt = Carbon::fromSerialized($this->serialized);
         $this->assertCarbon($dt, 2016, 2, 1, 13, 20, 25);
 
-        $dt = unserialize($this->serialized[0]);
+        $dt = unserialize($this->serialized);
         $this->assertCarbon($dt, 2016, 2, 1, 13, 20, 25);
     }
 
@@ -82,15 +77,11 @@ class SerializationTest extends AbstractTestCase
         yield ['foobar'];
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @dataProvider \Tests\Carbon\SerializationTest::dataForTestFromUnserializedWithInvalidValue
-     */
-    public function testFromUnserializedWithInvalidValue($value)
+    #[DataProvider('dataForTestFromUnserializedWithInvalidValue')]
+    public function testFromUnserializedWithInvalidValue(mixed $value)
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            "Invalid serialized value: $value"
+            "Invalid serialized value: $value",
         ));
 
         Carbon::fromSerialized($value);
@@ -155,12 +146,9 @@ class SerializationTest extends AbstractTestCase
         $this->assertSame('1990-01-17 10:28:07', $date->format('Y-m-d h:i:s'));
     }
 
+    #[RequiresPhpExtension('msgpack')]
     public function testMsgPackExtension(): void
     {
-        if (!\extension_loaded('msgpack')) {
-            $this->markTestSkipped('This test needs msgpack extension to be enabled.');
-        }
-
         $string = '2018-06-01 21:25:13.321654 Europe/Vilnius';
         $date = Carbon::parse('2018-06-01 21:25:13.321654 Europe/Vilnius');
         $message = @msgpack_pack($date);

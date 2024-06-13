@@ -55,9 +55,6 @@ class SupportReflectorTest extends TestCase
         $this->assertTrue(Reflector::isParameterSubclassOf($method->getParameters()[0], IA::class));
     }
 
-    /**
-     * @requires PHP >= 8
-     */
     public function testUnionTypeName()
     {
         $method = (new ReflectionClass(C::class))->getMethod('f');
@@ -92,17 +89,12 @@ class B extends A
     }
 }
 
-if (PHP_MAJOR_VERSION >= 8) {
-    eval('
-namespace Illuminate\Tests\Support;
-
 class C
 {
     public function f(A|Model $x)
     {
         //
     }
-}');
 }
 
 class TestClassWithCall

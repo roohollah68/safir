@@ -15,10 +15,11 @@ namespace Tests\CarbonImmutable;
 
 use Carbon\CarbonImmutable as Carbon;
 use DateTime;
-use Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 use Tests\AbstractTestCase;
+use TypeError;
 
 class IsTest extends AbstractTestCase
 {
@@ -118,11 +119,13 @@ class IsTest extends AbstractTestCase
     public function testIsNextQuarterFalse()
     {
         $this->assertFalse(Carbon::now()->addQuartersNoOverflow(2)->isNextQuarter());
+        $this->assertFalse(Carbon::now()->addQuartersNoOverflow(5)->isNextQuarter());
     }
 
     public function testIsLastQuarterFalse()
     {
         $this->assertFalse(Carbon::now()->subQuartersNoOverflow(2)->isLastQuarter());
+        $this->assertFalse(Carbon::now()->subQuartersNoOverflow(5)->isLastQuarter());
     }
 
     public function testIsNextMonthTrue()
@@ -138,11 +141,13 @@ class IsTest extends AbstractTestCase
     public function testIsNextMonthFalse()
     {
         $this->assertFalse(Carbon::now()->addMonthsNoOverflow(2)->isNextMonth());
+        $this->assertFalse(Carbon::now()->addMonthsNoOverflow(13)->isNextMonth());
     }
 
     public function testIsLastMonthFalse()
     {
         $this->assertFalse(Carbon::now()->subMonthsNoOverflow(2)->isLastMonth());
+        $this->assertFalse(Carbon::now()->subMonthsNoOverflow(13)->isLastMonth());
     }
 
     public function testIsNextYearTrue()
@@ -284,7 +289,7 @@ class IsTest extends AbstractTestCase
     public function testIsSameFoobar()
     {
         $this->expectExceptionObject(new InvalidArgumentException(
-            'Bad comparison unit: \'foobar\''
+            'Bad comparison unit: \'foobar\'',
         ));
 
         Carbon::now()->isSameUnit('foobar', Carbon::now()->subMillennium());
@@ -634,6 +639,24 @@ class IsTest extends AbstractTestCase
         $this->assertFalse(Carbon::now()->subDay()->isCurrentSecond());
     }
 
+    public function testIsSameMicrosecond()
+    {
+        $current = new Carbon('2018-05-06T13:30:54.123456');
+        $this->assertTrue($current->isSameMicrosecond(new DateTime('2018-05-06T13:30:54.123456')));
+        $this->assertFalse($current->isSameMicrosecond(new DateTime('2018-05-06T13:30:54.123457')));
+        $this->assertFalse($current->isSameMicrosecond(new DateTime('2019-05-06T13:30:54.123456')));
+        $this->assertFalse($current->isSameMicrosecond(new DateTime('2018-05-06T13:30:55.123456')));
+        $this->assertTrue($current->isSameSecond($current->copy()));
+        $this->assertTrue(Carbon::now()->isCurrentMicrosecond());
+        $this->assertFalse(Carbon::now()->subMicrosecond()->isCurrentMicrosecond());
+        $this->assertFalse(Carbon::now()->isLastMicrosecond());
+        $this->assertTrue(Carbon::now()->subMicrosecond()->isLastMicrosecond());
+        $this->assertFalse(Carbon::now()->isNextMicrosecond());
+        $this->assertTrue(Carbon::now()->addMicrosecond()->isNextMicrosecond());
+        $this->assertTrue(Carbon::now()->subMicroseconds(Carbon::MICROSECONDS_PER_SECOND)->isLastSecond());
+        $this->assertSame(4.0, Carbon::now()->subMicroseconds(4 * Carbon::MICROSECONDS_PER_SECOND)->diffInSeconds(Carbon::now()));
+    }
+
     public function testIsDayOfWeek()
     {
         // True in the past past
@@ -676,9 +699,7 @@ class IsTest extends AbstractTestCase
 
     public function testIsSameAsWithInvalidArgument()
     {
-        $this->expectExceptionObject(new InvalidArgumentException(
-            'Expected null, string, DateTime or DateTimeInterface, stdClass given'
-        ));
+        $this->expectException(TypeError::class);
 
         $current = Carbon::createFromDate(2012, 1, 2);
         $current->isSameAs('Y-m-d', new stdClass());
@@ -896,8 +917,10 @@ class IsTest extends AbstractTestCase
         // @see https://github.com/briannesbitt/Carbon/issues/2180
         $this->assertTrue(Carbon::hasFormat('2020-09-01 12:00:00Europe/Moscow', 'Y-m-d H:i:se'));
 
+        $this->assertTrue(Carbon::hasFormat('2012-12-04 22:59.32130', 'Y-m-d H:s.vi'));
+
         // Format failure
-        $this->assertFalse(Carbon::hasFormat(null, 'd m Y'));
+        $this->assertFalse(Carbon::hasFormat('', 'd m Y'));
         $this->assertFalse(Carbon::hasFormat('1975-05-01', 'd m Y'));
         $this->assertFalse(Carbon::hasFormat('Foo 21st', 'D jS'));
         $this->assertFalse(Carbon::hasFormat('Sun 51st', 'D jS'));
@@ -912,59 +935,54 @@ class IsTest extends AbstractTestCase
         $this->assertTrue(Carbon::hasFormat('2012-12-04 22:59.32130', 'Y-m-d H:s.vi'));
     }
 
-    public static function dataForFormatLetters(): Generator
+    public static function dataForFormatLetters(): array
     {
-        yield ['d'];
-        yield ['D'];
-        yield ['j'];
-        yield ['l'];
-        yield ['N'];
-        yield ['S'];
-        yield ['w'];
-        yield ['z'];
-        yield ['W'];
-        yield ['F'];
-        yield ['m'];
-        yield ['M'];
-        yield ['n'];
-        yield ['t'];
-        yield ['L'];
-        yield ['o'];
-        yield ['Y'];
-        yield ['y'];
-        yield ['a'];
-        yield ['A'];
-        yield ['B'];
-        yield ['g'];
-        yield ['G'];
-        yield ['h'];
-        yield ['H'];
-        yield ['i'];
-        yield ['s'];
-        yield ['u'];
-        yield ['v'];
-        yield ['e'];
-        yield ['I'];
-        yield ['O'];
-        yield ['P'];
-        yield ['T'];
-        yield ['Z'];
-        yield ['U'];
-        yield ['c'];
-        yield ['r'];
+        return [
+            'd' => ['d'],
+            'D' => ['D'],
+            'j' => ['j'],
+            'l' => ['l'],
+            'N' => ['N'],
+            'S' => ['S'],
+            'w' => ['w'],
+            'z' => ['z'],
+            'W' => ['W'],
+            'F' => ['F'],
+            'm' => ['m'],
+            'M' => ['M'],
+            'n' => ['n'],
+            't' => ['t'],
+            'L' => ['L'],
+            'o' => ['o'],
+            'Y' => ['Y'],
+            'y' => ['y'],
+            'a' => ['a'],
+            'A' => ['A'],
+            'B' => ['B'],
+            'g' => ['g'],
+            'G' => ['G'],
+            'h' => ['h'],
+            'H' => ['H'],
+            'i' => ['i'],
+            's' => ['s'],
+            'u' => ['u'],
+            'v' => ['v'],
+            'e' => ['e'],
+            'I' => ['I'],
+            'O' => ['O'],
+            'P' => ['P'],
+            'T' => ['T'],
+            'Z' => ['Z'],
+            'U' => ['U'],
+            'c' => ['c'],
+            'r' => ['r'],
+        ];
     }
 
-    /**
-     * @dataProvider \Tests\CarbonImmutable\IsTest::dataForFormatLetters
-     */
+    #[DataProvider('dataForFormatLetters')]
     public function testHasFormatWithSingleLetter($letter)
     {
         $output = Carbon::now()->format($letter);
-
-        if ($output === '1000' && $letter === 'v' && version_compare(PHP_VERSION, '7.2.12', '<')) {
-            $output = '000';
-        }
-
         $this->assertTrue(Carbon::hasFormat($output, $letter), "'$letter' format should match '$output'");
     }
 

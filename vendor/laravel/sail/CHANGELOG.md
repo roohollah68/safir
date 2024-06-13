@@ -1,6 +1,77 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/sail/compare/v1.24.1...1.x)
+## [Unreleased](https://github.com/laravel/sail/compare/v1.29.1...1.x)
+
+## [v1.29.1](https://github.com/laravel/sail/compare/v1.29.0...v1.29.1) - 2024-03-20
+
+* [1.x] Make commands lazy by [@timacdonald](https://github.com/timacdonald) in https://github.com/laravel/sail/pull/683
+* Preinstall nano, so default make tinker edit work out of the box by [@negoziator](https://github.com/negoziator) in https://github.com/laravel/sail/pull/685
+* Revert opcache for CLI by [@driesvints](https://github.com/driesvints) in https://github.com/laravel/sail/pull/684
+
+## [v1.29.0](https://github.com/laravel/sail/compare/v1.28.2...v1.29.0) - 2024-03-08
+
+* Allow building sail to run PHP as root by [@vmsh0](https://github.com/vmsh0) in https://github.com/laravel/sail/pull/677
+* Update MAILER config to use mailpit on L11 by [@SamuelMwangiW](https://github.com/SamuelMwangiW) in https://github.com/laravel/sail/pull/678
+
+## [v1.28.2](https://github.com/laravel/sail/compare/v1.28.1...v1.28.2) - 2024-03-04
+
+* [1.x] Switch from XDEBUG_SESSION to XDEBUG_TRIGGER for sail debug by [@GregMayes](https://github.com/GregMayes) in https://github.com/laravel/sail/pull/675
+* Error calling command "sail mariadb" by [@halfbaked](https://github.com/halfbaked) in https://github.com/laravel/sail/pull/674
+
+## [v1.28.1](https://github.com/laravel/sail/compare/v1.28.0...v1.28.1) - 2024-02-23
+
+* [1.x] Use new MariaDB connection if possible by [@staudenmeir](https://github.com/staudenmeir) in https://github.com/laravel/sail/pull/672
+
+## [v1.28.0](https://github.com/laravel/sail/compare/v1.27.4...v1.28.0) - 2024-02-20
+
+* Changing pcov Directory by [@joaopalopes24](https://github.com/joaopalopes24) in https://github.com/laravel/sail/pull/670
+* add ffmpeg to support videos, when using Spatie media-library for Videos by [@negoziator](https://github.com/negoziator) in https://github.com/laravel/sail/pull/671
+
+## [v1.27.4](https://github.com/laravel/sail/compare/v1.27.3...v1.27.4) - 2024-02-08
+
+* Fix open in browser with APP_PORT by [@ijpatricio](https://github.com/ijpatricio) in https://github.com/laravel/sail/pull/663
+
+## [v1.27.3](https://github.com/laravel/sail/compare/v1.27.2...v1.27.3) - 2024-01-30
+
+* [1.x] Improves console output by [@nunomaduro](https://github.com/nunomaduro) in https://github.com/laravel/sail/pull/661
+
+## [v1.27.2](https://github.com/laravel/sail/compare/v1.27.1...v1.27.2) - 2024-01-21
+
+* Add Support for Typesense by [@jasonbosco](https://github.com/jasonbosco) in https://github.com/laravel/sail/pull/655
+* Lint sail script by [@dimitriacosta](https://github.com/dimitriacosta) in https://github.com/laravel/sail/pull/656
+* Make DB_CONNECTION replacement more robust by @taylorotwell in https://github.com/laravel/sail/commit/2276a8d9d6cfdcaad98bf67a34331d100149d5b6
+
+## [v1.27.1](https://github.com/laravel/sail/compare/v1.27.0...v1.27.1) - 2024-01-13
+
+* [1.x] [#651] Don't do anything if no phpunit files are present by [@zack6849](https://github.com/zack6849) in https://github.com/laravel/sail/pull/652
+
+## [v1.27.0](https://github.com/laravel/sail/compare/v1.26.3...v1.27.0) - 2024-01-03
+
+* [1.x] Allow easy customization of the command ran by supervisor's PHP process by [@bram-pkg](https://github.com/bram-pkg) in https://github.com/laravel/sail/pull/645
+* [1.x] Default to PHP 8.3 by [@Jubeki](https://github.com/Jubeki) in https://github.com/laravel/sail/pull/647
+
+## [v1.26.3](https://github.com/laravel/sail/compare/v1.26.2...v1.26.3) - 2023-12-02
+
+* [1.x] Add PHP 8.3 xdebug by [@Jubeki](https://github.com/Jubeki) in https://github.com/laravel/sail/pull/642
+
+## [v1.26.2](https://github.com/laravel/sail/compare/v1.26.1...v1.26.2) - 2023-11-27
+
+* Add missing PHP 8.3 extensions by [@hebbet](https://github.com/hebbet) in https://github.com/laravel/sail/pull/640
+
+## [v1.26.1](https://github.com/laravel/sail/compare/v1.26.0...v1.26.1) - 2023-11-20
+
+- Update default user by [@taylorotwell](https://github.com/taylorotwell) in https://github.com/laravel/sail/commit/7a82f5aa364dbee3fd9c52fc464cf0bdd11150ed
+
+## [v1.26.0](https://github.com/laravel/sail/compare/v1.25.0...v1.26.0) - 2023-10-18
+
+- Fix: Allow postCreateCommand to fail silently in VS Code on Windows by [@seanburns326a](https://github.com/seanburns326a) in https://github.com/laravel/sail/pull/626
+- Support Laravel 11 and update dependencies by [@Jubeki](https://github.com/Jubeki) in https://github.com/laravel/sail/pull/629
+- Use nodejs 20 by [@Jubeki](https://github.com/Jubeki) in https://github.com/laravel/sail/pull/628
+
+## [v1.25.0](https://github.com/laravel/sail/compare/v1.24.1...v1.25.0) - 2023-09-11
+
+- Add Bun by [@punyflash](https://github.com/punyflash) in https://github.com/laravel/sail/pull/616
+- Install bun from npm by [@punyflash](https://github.com/punyflash) in https://github.com/laravel/sail/pull/617
 
 ## [v1.24.1](https://github.com/laravel/sail/compare/v1.24.0...v1.24.1) - 2023-09-01
 

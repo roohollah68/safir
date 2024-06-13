@@ -435,13 +435,14 @@ class DatabaseEloquentCollectionTest extends TestCase
         $one->shouldReceive('getKey')->andReturn(1);
 
         $two = m::mock(Model::class);
-        $two->shouldReceive('getKey')->andReturn('2');
+        $two->shouldReceive('getKey')->andReturn(2);
 
         $three = m::mock(Model::class);
         $three->shouldReceive('getKey')->andReturn(3);
 
         $c = new Collection([$one, $two, $three]);
 
+        $this->assertEquals($c, $c->except(null));
         $this->assertEquals(new Collection([$one, $three]), $c->except(2));
         $this->assertEquals(new Collection([$one]), $c->except([2, 3]));
     }
@@ -462,6 +463,22 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals([], $c[0]->getHidden());
     }
 
+    public function testSetVisibleReplacesVisibleOnEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->setVisible(['hidden']);
+
+        $this->assertEquals(['hidden'], $c[0]->getVisible());
+    }
+
+    public function testSetHiddenReplacesHiddenOnEntireCollection()
+    {
+        $c = new Collection([new TestEloquentCollectionModel]);
+        $c = $c->setHidden(['visible']);
+
+        $this->assertEquals(['visible'], $c[0]->getHidden());
+    }
+
     public function testAppendsAddsTestOnEntireCollection()
     {
         $c = new Collection([new TestEloquentCollectionModel]);
@@ -480,6 +497,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(BaseCollection::class, get_class($a->collapse()));
         $this->assertEquals(BaseCollection::class, get_class($a->flatten()));
         $this->assertEquals(BaseCollection::class, get_class($a->zip(['a', 'b'], ['c', 'd'])));
+        $this->assertEquals(BaseCollection::class, get_class($a->countBy('foo')));
         $this->assertEquals(BaseCollection::class, get_class($b->flip()));
     }
 
@@ -591,6 +609,25 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertContainsOnly('bool', $commentsExists);
     }
 
+    public function testWithNonScalarKey()
+    {
+        $fooKey = new EloquentTestKey('foo');
+        $foo = m::mock(Model::class);
+        $foo->shouldReceive('getKey')->andReturn($fooKey);
+
+        $barKey = new EloquentTestKey('bar');
+        $bar = m::mock(Model::class);
+        $bar->shouldReceive('getKey')->andReturn($barKey);
+
+        $collection = new Collection([$foo, $bar]);
+
+        $this->assertCount(1, $collection->only([$fooKey]));
+        $this->assertSame($foo, $collection->only($fooKey)->first());
+
+        $this->assertCount(1, $collection->except([$fooKey]));
+        $this->assertSame($bar, $collection->except($fooKey)->first());
+    }
+
     /**
      * Helpers...
      */
@@ -671,4 +708,16 @@ class EloquentTestCommentModel extends Model
     protected $table = 'comments';
     protected $guarded = [];
     public $timestamps = false;
+}
+
+class EloquentTestKey
+{
+    public function __construct(private readonly string $key)
+    {
+    }
+
+    public function __toString()
+    {
+        return $this->key;
+    }
 }

@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace Tests\PHPStan;
 
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use RuntimeException;
 use Tests\AbstractTestCase;
 
+#[RequiresPhp('<8.4')]
 class FeaturesTest extends AbstractTestCase
 {
     /**
@@ -40,7 +42,7 @@ class FeaturesTest extends AbstractTestCase
     {
         $this->assertStringContainsString(
             '[OK] No errors',
-            $this->analyze(__DIR__.'/project.neon')
+            $this->analyze(__DIR__.'/project.neon'),
         );
     }
 
@@ -48,7 +50,7 @@ class FeaturesTest extends AbstractTestCase
     {
         $this->assertStringContainsString(
             '22     Static call to instance method Carbon\Carbon::foo().',
-            $this->analyze(__DIR__.'/bad-project.neon')
+            $this->analyze(__DIR__.'/bad-project.neon'),
         );
     }
 
