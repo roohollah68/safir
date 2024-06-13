@@ -176,9 +176,9 @@ class CustomerController extends Controller
             'verified' => 'waiting',
         ]);
 
-        $customer->update([
-            'balance' => $customer->balance + $req->amount,
-        ]);
+//        $customer->update([
+//            'balance' => $customer->balance + $req->amount,
+//        ]);
         if ($req->link) {
             $transaction = $customer->transactions()->find($req->link);
             $transaction->update([
