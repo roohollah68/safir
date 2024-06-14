@@ -38,7 +38,7 @@ class Customer extends Model
     public function categoryText($cat)
     {
         if ($cat > 0 && $cat < 11)
-            return $this->categories($cat);
+            return $this->categories()[$cat];
         return 'انتخاب نشده';
     }
 
