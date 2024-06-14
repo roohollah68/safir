@@ -1,5 +1,6 @@
 @extends('layout.main')
 
+@props(['edit' => false])
 @section('title')
     @if($edit)
         ویرایش سفارش
@@ -13,7 +14,7 @@
     <x-auth-validation-errors class="mb-4" id="errors" :errors="$errors"/>
     <form id="form" action="" method="post" enctype="multipart/form-data" onsubmit="return beforeSubmit();">
         @include('addEditOrder.form')
-        @include('addEditOrder.products')
+        @includeWhen( $creatorIsAdmin || !$edit, 'addEditOrder.products')
     </form>
 
 @endsection

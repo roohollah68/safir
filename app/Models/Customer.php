@@ -37,29 +37,26 @@ class Customer extends Model
 
     public function categoryText($cat)
     {
-        switch ($cat) {
-            case 1:
-                return 'فروشگاه قهوه';
-            case 2:
-                return 'عطاری';
-            case 3:
-                return 'هایپرمارکت';
-            case 4:
-                return 'کافی شاپ';
-            case 5:
-                return 'آجیل و شیرینی فروشی';
-            case 6:
-                return 'پخش';
-            case 7:
-                return 'نمایندگی پپتینا';
-            case 8:
-                return 'مردمی';
-            case 9:
-                return 'نمونه رایگان';
-            case 10:
-                return 'سایر';
-        }
+        if ($cat > 0 && $cat < 11)
+            return $this->categories($cat);
         return 'انتخاب نشده';
+    }
+
+    public function categories()
+    {
+        return [
+            'انتخاب نشده',
+            'فروشگاه قهوه',
+            'عطاری',
+            'هایپرمارکت',
+            'کافی شاپ',
+            'آجیل و شیرینی فروشی',
+            'پخش',
+            'نمایندگی پپتینا',
+            'مردمی',
+            'نمونه رایگان',
+            'سایر'
+        ];
     }
 
     public function city()

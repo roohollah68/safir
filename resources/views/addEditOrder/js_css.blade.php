@@ -20,6 +20,7 @@
         startEditProccess();
 
         $("input[type=radio]").checkboxradio();
+        $(".checkboxradio").checkboxradio();
         $("#addToCustomers").checkboxradio();
     });
 
@@ -38,7 +39,9 @@
             }
         });
         refreshProducts()
-        // $('input[name=paymentMethod]').on('click',paymentAction);
+        paymentAction()
+        deliveryAction()
+        $('input[name=paymentMethod]').on('click',paymentAction);
         $('input[name=deliveryMethod]').on('click', deliveryAction);
 
         $("#city").autocomplete({
@@ -78,7 +81,7 @@
     function deliveryAction() {
         $('.deliveryDesc').hide();
         deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
-        $('#' + deliveryMethod).next().next().show();
+        $('#' + deliveryMethod).next().show();
         refreshProducts();
     }
 

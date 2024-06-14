@@ -17,7 +17,7 @@ class WoocommerceController extends Controller
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
         $request = json_decode(file_get_contents('php://input'));
         if (env('APP_ENV') == 'local')
-            $request = json_decode(file_get_contents('woo/1403-3-18_20-44-07 _ peptina _ الهام براتی.txt'));
+            $request = json_decode(file_get_contents('woo/1403-3-24_10-38-02 _ peptina _ زینب بختیاری.txt'));
         if (!isset($request->billing))
             return 'not used';
         file_put_contents('woo/' . verta(null, "Asia/Tehran")->
@@ -74,6 +74,10 @@ class WoocommerceController extends Controller
         $user = User::where('username', $website)->first();
 
         $web = Websites::where('website_id', $request->id)->where('website', $website)->first();
+        $deliveryTime ='';
+        $metaData = collect($request->meta_data)->keyBy('key');
+        if(isset($metaData['_delivery_time_novin']))
+            $deliveryTime = $metaData['_delivery_time_novin']->value;
         $orderData = [
             'name' => $request->billing->first_name . ' ' . $request->billing->last_name,
             'phone' => $request->billing->phone,
@@ -84,7 +88,7 @@ class WoocommerceController extends Controller
             'total' => $request->total,
             'customerCost' => 0,
             'paymentMethod' => $request->payment_method_title,
-            'deliveryMethod' => $request->shipping_lines[0]->method_title,
+            'deliveryMethod' => $request->shipping_lines[0]->method_title . ' _ ' . $deliveryTime,
             'counter' => 'approved',
             'confirm' => true,
         ];

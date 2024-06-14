@@ -1,4 +1,3 @@
-@if( $creatorIsAdmin || !$edit)
     <br>
     @if(!$safir && !$edit)
         <a class="btn {{$location == 't'?'btn-info':'btn-outline-info'}}" href="/add_order?city=t">تهران</a>
@@ -44,10 +43,8 @@
                                    name="price_{{$product->id}}"
                                    value="{{$product->priceWithDiscount}}"
                                    onchange="calculate_discount({{$product->id}},this.value)"
-                                   @if($safir)
-                                       disabled
-                                @endif
-                            >
+                                       @disabled($safir)>
+
                             <span class=" btn text-danger original"
                                   @if($product->priceWithDiscount!=$product->price)
                                       style="text-decoration: line-through"
@@ -69,9 +66,7 @@
                                    value="{{old("discount_".$product->id)?:+$product->coupon}}"
                                    style="width: 80px"
                                    onchange="changeDiscount({{$product->id}},this.value)"
-                                   @if(!$creatorIsAdmin)
-                                       disabled
-                                   @endif
+                                       @disabled(!$creatorIsAdmin)
                                    min="0" max="100" step="0.25">
                             @if($creatorIsAdmin)
                                 <a class="btn btn-outline-info fa fa-plus" dir="ltr"
@@ -86,4 +81,3 @@
             </tbody>
         </table>
     </div>
-@endif

@@ -12,7 +12,6 @@
 
 @section('content')
 
-
     <form action="" method="post" class="input-group col-12 mb-3" onsubmit="return dateFilter();">
         <div class="col-md-6 d-flex">
             <span class="input-group-text cursor-pointer" id="date1">📅</span>
@@ -29,48 +28,26 @@
     </form>
 
 
-    <label for="deleted_orders"> سفارشات حذف شده</label>
-    <input type="checkbox" id="deleted_orders" class="checkboxradio"
-           onclick="deleted = this.checked;prepare_data()">
+    <x-checkbox :id="'showDeleted'"> سفارشات حذف شده</x-checkbox>
+
     @if(!$safir)
 
-        <label for="confirm-wait"> در انتظار تایید کاربر</label>
-        <input type="checkbox" id="confirm-wait" class="checkboxradio"
-               onclick="confirmWait = this.checked;prepare_data()">
-
-        <label for="counter-wait"> در انتظار تایید حسابدار</label>
-        <input type="checkbox" id="counter-wait" class="checkboxradio"
-               onclick="counterWait = this.checked;prepare_data()">
-
-        <label for="print-wait"> در انتظار پرینت</label>
-        <input type="checkbox" id="print-wait" class="checkboxradio"
-               onclick="printWait = this.checked;prepare_data()">
-
-        <label for="proccess-wait"> در حال پردازش</label>
-        <input type="checkbox" id="proccess-wait" class="checkboxradio"
-               onclick="proccessWait = this.checked;prepare_data()">
+        <x-checkbox :id="'confirmWait'">در انتظار تایید کاربر</x-checkbox>
+        <x-checkbox :id="'counterWait'">در انتظار تایید حسابدار</x-checkbox>
+        <x-checkbox :id="'printWait'"> در انتظار پرینت</x-checkbox>
+        <x-checkbox :id="'proccessWait'"> در حال پردازش</x-checkbox>
 
         @if($superAdmin)
             <br>
-            <label for="safir-orders">سفیران</label>
-            <input type="checkbox" id="safir-orders" class="checkboxradio"
-                   onclick="safirOrders = this.checked;prepare_data()" checked>
+            <x-checkbox :id="'safirOrders'" :checked="true">سفیران</x-checkbox>
+            <x-checkbox :id="'siteOrders'" :checked="true">سایت ها</x-checkbox>
+            <x-checkbox :id="'adminOrders'" :checked="true">فروشگاه ها</x-checkbox>
 
-            <label for="site-orders">سایت ها</label>
-            <input type="checkbox" id="site-orders" class="checkboxradio"
-                   onclick="siteOrders = this.checked;prepare_data()" checked>
-
-            <label for="admin-orders">فروشگاه ها</label>
-            <input type="checkbox" id="admin-orders" class="checkboxradio"
-                   onclick="adminOrders = this.checked;prepare_data()" checked>
         @endif
         <br>
-        <label for="location-t">تهران</label>
-        <input type="radio" id="location-t" name="location" value="t" class="checkboxradio"
-               onclick="Location = 't';prepare_data()" checked>
-        <label for="location-m">مشهد</label>
-        <input type="radio" id="location-m" name="location" value="m" class="checkboxradio"
-               onclick="Location = 'm';prepare_data()">
+        <x-radio :id="'location-t'" :checked="true" onclick="Location = 't';prepare_data()" name="location">تهران</x-radio>
+        <x-radio :id="'location-m'"  onclick="Location = 'm';prepare_data()" name="location">مشهد</x-radio>
+
     @endif
     <br>
     @if($superAdmin || $print)
@@ -96,8 +73,5 @@
     <table id="main-table" class="stripe">
     </table>
     <div id="invoice-wrapper"></div>
-
-
-
 
 @endsection

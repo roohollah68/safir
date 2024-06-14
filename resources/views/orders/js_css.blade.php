@@ -10,7 +10,7 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let deleted, printWait, confirmWait, counterWait, proccessWait, user = 'all', Location = 't';
+    let showDeleted, printWait, confirmWait, counterWait, proccessWait, user = 'all', Location = 't';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     let role = users[userId].role;
     let dtp1Instance;
@@ -39,7 +39,7 @@
         $.each(orders, (id, order) => {
             if (user != 'all' && user != order.user_id)
                 return
-            if (deleted ^ !!order.deleted_at)
+            if (showDeleted ^ !!order.deleted_at)
                 return
             if (confirmWait && order.confirm)
                 return
@@ -211,7 +211,7 @@
         let deleteOrder = `<i class="fa fa-trash-alt btn btn-danger" onclick="delete_order(${id},this)" title="حذف سفارش" ></i> `;
         let editOrder = `<a class="fa fa-edit btn btn-primary" href="edit_order/${id}" title="ویرایش سفارش"></a> `;
         let res = viewOrder;
-        if (deleted)
+        if (showDeleted)
             return res;
         @if($safir)
         if (!order.state)
@@ -225,9 +225,9 @@
         let invoice = `<a class="fa fa-file-invoice-dollar btn btn-info text-success" onclick="invoice(${id})" title=" فاکتور"></a> `;
         let preInvoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title="پیش فاکتور"></a> `;
 
-        if (!order.state && !order.confirm)
+        if (!order.state && (!order.confirm || creatorRole === 'user'))
             res += deleteOrder;
-        if (!order.confirm || creatorRole === 'user')
+        if (!order.confirm || (creatorRole === 'user' && !order.state))
             res += editOrder;
 
         if ((print || superAdmin) && order.state)

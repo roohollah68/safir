@@ -66,7 +66,6 @@ class OrderController extends Controller
         $citiesId = $cities->keyBy('id');
         $province = Province::all()->keyBy('id');
         return view('addEditOrder.addEditOrder', [
-            'edit' => false,
             'customers' => $customers,
             'customersId' => $customersId,
             'products' => $products,
@@ -195,9 +194,9 @@ class OrderController extends Controller
     {
         $user = auth()->user();
         if ($this->superAdmin())
-            $order = Order::findOrFail($id);
+            $order = Order::with('customer.city.province')->findOrFail($id);
         else
-            $order = $user->orders()->findOrFail($id);
+            $order = $user->orders()->with('customer.city.province')->findOrFail($id);
         $creatorIsAdmin = !$order->user()->first()->safir();
 
         if (($order->state && !$creatorIsAdmin) || ($order->confirm && $creatorIsAdmin))
@@ -229,7 +228,8 @@ class OrderController extends Controller
         }
 //        $customer = null;
 //        if($creator)
-        $customer = $order->customer()->first();
+//        $customer = $order->customer()->first();
+        $customer = $order->customer;
         if (!$customer) {
             $customer = new Customer();
             $customer->city_id = 0;
@@ -369,7 +369,7 @@ class OrderController extends Controller
         return +$order->state;
     }
 
-    public function pdfs($ids): string
+    public function pdfs($ids)
     {
         $idArray = explode(",", $ids);
         $fonts = array();
@@ -405,7 +405,7 @@ class OrderController extends Controller
         return 'pdf/' . $fileName;
     }
 
-    public function invoice($id, Request $request): array
+    public function invoice($id, Request $request)
     {
         if ($this->superAdmin() || $this->print())
             $order = Order::findOrFail($id);
@@ -454,38 +454,6 @@ class OrderController extends Controller
             ])->render(), $order->id]];
         }
     }
-
-//    public function confirmInvoice($id, Request $request)
-//    {
-//        DB::beginTransaction();
-//
-//        $order = Order::findOrFail($id);
-//        if ($order->confirm)
-//            return $order;
-//        $order->paymentMethod = $request->pay;
-//        $order->confirm = +$request->confirm;
-//        $order->save();
-//        $orderProducts = $order->orderProducts()->with('product');
-//        $orderProducts->update(['verified' => true]);
-//        foreach ($orderProducts->get() as $orderProduct) {
-//            $product = $orderProduct->product;
-//
-//            $product->update([
-//                'quantity' => $product->quantity - $orderProduct->number,
-//            ]);
-//            $order->productChange()->create([
-//                'product_id' => $product->id,
-//                'change' => -$orderProduct->number,
-//                'quantity' => $product->quantity,
-//                'desc' => ' خرید مشتری ' . $order->name,
-//            ]);
-//        }
-//        $this->addToCustomerTransactions($order);
-//        $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
-//        $order->save();
-//        DB::commit();
-//        return $order;
-//    }
 
     public function cancelInvoice($id)
     {

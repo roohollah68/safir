@@ -19,11 +19,9 @@
                         >همه
                         </option>
                         @foreach($users as $user)
-                            <option value="{{$user->id}}"
-                                    @if( isset($_GET['user']) && $user->id == $_GET['user'])
-                                        selected
-                                @endif
-                            >{{$user->name}}</option>
+                            <option value="{{$user->id}}" @selected($_GET['user'] && $user->id == $_GET['user'])>
+                                {{$user->name}}
+                            </option>
                         @endforeach
                     </select>
                 </div>

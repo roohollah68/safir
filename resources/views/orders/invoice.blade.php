@@ -46,12 +46,8 @@
                         <th class="w-9 border-left smaller">قیمت بعد تخفیف</th>
                         <th class="w-23 border-left">جمع (ریال)</th>
                     </tr>
-                    @php
-                        $counter = 1;
-                        $total_dis = 0;
-                        $total_no_dis=0;
-                        $totalProducts = 0
-                    @endphp
+                    @props(['total_dis'=>0,'total_no_dis'=>0,'totalProducts'=>0])
+
                     @foreach($orderProducts as $orderProduct)
                         @php
                             $price_dis = $orderProduct->price;
@@ -62,8 +58,8 @@
                             $total_dis = $total_dis + $sub_total_dis;
                             $totalProducts += $orderProduct->number;
                         @endphp
-                        <tr class="{{$counter>$firstPageItems?$lastPage:$firstPage}}">
-                            <td>{{$counter++}}</td>
+                        <tr class="{{$loop->iteration>$firstPageItems?$lastPage:$firstPage}}">
+                            <td>{{$loop->iteration}}</td>
                             <td>{{$orderProduct->name}}</td>
                             <td>{{+$orderProduct->number}}</td>
                             <td>{{number_format($price_no_dis)}}</td>
@@ -104,9 +100,9 @@
                 /
                 توضیحات: {{$order->desc}}
                 <br>
-                @if(!$order->confirm)
+                @unless($order->confirm)
                     <<اعتبار این پیش فاکتور برای ۴۸ ساعت است>>
-                @endif
+                @endunless
             </div>
            <div class="{{$lastPage}}">
             <div class="w-100 normal d-flex justify-content-around">

@@ -9,90 +9,44 @@
 <input type="hidden" name="location" value="{{$location}}">
 <div id="formElements" class="bg-white">
     <div class="row">
-        <div class="col-md-6">
-            <div class="form-group input-group required">
-                <div class="input-group-append" style="min-width: 160px">
-                    <label for="name" class="input-group-text w-100">نام و نام خانوادگی:</label>
-                </div>
-                <input value="{{old('name')?:$order->name}}" type="text" id="name" class="form-control" name="name"
-                       required="" @if($edit && $creatorIsAdmin) readonly @endif>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group input-group required minlength=11 maxlength=11 pattern=^[۰-۹0-9]*$">
-                <div class="input-group-append" style="min-width: 160px">
-                    <label for="phone" class="input-group-text w-100">شماره تماس:</label>
-                </div>
-                <input value="{{old('phone')?:$order->phone}}" type="text" id="phone" class="form-control" name="phone"
-                       required=""
-                       minlength="11"
-                       maxlength="11" pattern="^[۰-۹0-9]*$"
-                       oninvalid="this.setCustomValidity('لطفا شماره 11 رقمی تلفن را وارد کنید.')"
-                       onkeypress="return event.charCode >= 48 && event.charCode <= 57"
-                       oninput="this.setCustomValidity('')" placeholder="مانند 09123456789">
-            </div>
-        </div>
+        <x-col-md-6 :name="'name'" value="{{old('name')?:$order->name}}" :required="true"
+                    :readonly="$edit && $creatorIsAdmin">نام و نام خانوادگی:
+        </x-col-md-6>
+
+        <x-col-md-6 :name="'phone'" value="{{old('phone')?:$order->phone}}" :required="true"
+                    minlength="11"
+                    maxlength="11" pattern="^[۰-۹0-9]*$"
+                    oninvalid="this.setCustomValidity('لطفا شماره 11 رقمی تلفن را وارد کنید.')"
+                    onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                    oninput="this.setCustomValidity('')" placeholder="مانند 09123456789">شماره تماس:
+        </x-col-md-6>
+
         @if($creatorIsAdmin)
-            <div class="col-md-6">
-                <div class="form-group input-group required">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label for="city" class="input-group-text w-100">شهر:</label>
-                    </div>
-                    <input name="city" id="city" class="form-control" rows="2"
-                           required value="{{old('city')?:$customer->city()->first()->name}}">
-                    <input type="hidden" id="city_id" name="city_id"
-                           value="{{old('city_id')?:$customer->city()->first()->id}}">
-                    <div class="input-group-append" style="min-width: 120px">
-                        <span id="province" onclick="$('#city').change()"
-                              class="input-group-text w-100">{{$customer->city()->first()->province()->first()->name}}</span>
-                    </div>
-                </div>
-            </div>
+            <x-col-md-6 :name="'city'" value="{{old('city')?:$customer->city->name}}">شهر:</x-col-md-6>
+            <input type="hidden" id="city_id" name="city_id" value="{{old('city_id')?:$customer->city->id}}">
+
         @else
             <input type="hidden" name="city_id" value="0">
         @endif
-        <div class="col-md-6">
-            <div class="form-group input-group required">
-                <div class="input-group-append" style="min-width: 160px">
-                    <label for="address" class="input-group-text w-100">آدرس:</label>
-                </div>
-                <textarea name="address" id="address" class="form-control" rows="2"
-                          required="">{{old('address')?:$order->address}}</textarea>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group input-group required">
-                <div class="input-group-append w-25">
-                    <label for="orders" class="input-group-text w-100">سفارشات:</label>
-                </div>
-                <div class="w-75 border">
-                    <div id="orders">{{$order->orders}}</div>
-                </div>
-            </div>
 
-        </div>
-        <div class="col-md-6">
-            <div class="form-group input-group minlength=10 maxlength=10 pattern=^[۰-۹0-9]*$">
-                <div class="input-group-append" style="min-width: 160px">
-                    <label for="zip_code" class="input-group-text w-100">کد پستی:</label>
-                </div>
-                <input value="{{old('zip_code')?:$order->zip_code}}" type="text" id="zip_code" class="form-control"
-                       name="zip_code"
-                       minlength="10"
-                       maxlength="10" pattern="^[۰-۹0-9]*$"
-                       onkeypress="return event.charCode >= 48 && event.charCode <= 57">
-            </div>
-        </div>
+        <x-col-md-6 :name="'address'" :content="old('address')?:$order->address" :required="true"
+                    rows="2" :tag="'textarea'">آدرس:
+        </x-col-md-6>
 
+        <x-col-md-6 :name="'orders'" :content="$order->orders"
+                    :tag="'div'">سفارشات:
+        </x-col-md-6>
 
-        <div class="col-md-6">
-            <div class="form-group input-group ">
-                <div class="input-group-append" style="min-width: 160px">
-                    <label for="desc" class="input-group-text w-100">توضیحات:</label>
-                </div>
-                <textarea name="desc" id="desc" class="form-control" rows="2">{{old('desc')?:$order->desc}}</textarea>
-            </div>
-        </div>
+        <x-col-md-6 :name="'zip_code'" value="{{old('zip_code')?:$order->zip_code}}"
+                    minlength="10"
+                    maxlength="10" pattern="^[۰-۹0-9]*$"
+                    onkeypress="return event.charCode >= 48 && event.charCode <= 57">کد پستی:
+        </x-col-md-6>
+
+        <x-col-md-6 :name="'desc'" :content="old('desc')?:$order->desc"
+                    rows="2" :tag="'textarea'">توضیحات:
+        </x-col-md-6>
+
         @if($creatorIsAdmin)
             <div class="col-md-6">
                 <div class="form-group input-group required">
@@ -100,13 +54,11 @@
                         <label for="category" class="input-group-text w-100">دسته بندی:</label>
                     </div>
                     <select class="form-control" name="category" id="category">
-                        @for($ii=0;$ii<11;$ii++)
-                            <option value="{{$ii}}"
-                                    @if($ii == $customer->category)
-                                        selected
-                                @endif
-                            >{{$customer->categoryText($ii)}}</option>
-                        @endfor
+                        @foreach($customer->categories() as $ii => $category)
+                            <option value="{{$ii}}" @selected($ii == $customer->category) >
+                                {{$category}}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -120,24 +72,23 @@
         <div class="p-3 m-2 border">
             <h4>نحوه پرداخت</h4>
             @if(!$edit)
-                <input type="radio" name="paymentMethod" value="credit" id="credit" checked>
-                <label for="credit">{{$payMethods['credit']}}</label><br>
-
-                <input type="radio" name="paymentMethod" value="receipt" id="receipt">
-                <label for="receipt">{{$payMethods['receipt']}}</label>
+                <x-radio :id="'credit'" :name="'paymentMethod'" value="credit" checked>
+                    {{$payMethods['credit']}}</x-radio><br>
+                <x-radio :id="'receipt'" :name="'paymentMethod'" value="receipt">
+                    {{$payMethods['receipt']}}</x-radio><br>
                 <input type="file" id="receiptPhoto" name="receipt"><br>
-
-                <input type="radio" name="paymentMethod" value="onDelivery" id="onDelivery">
-                <label for="onDelivery">{{$payMethods['onDelivery']}}</label>
+                <x-radio :id="'onDelivery'" :name="'paymentMethod'" value="onDelivery">
+                    {{$payMethods['onDelivery']}}</x-radio><br>
                 <label for="customerDiscount">درصد تخفیف به مشتری</label>
                 <input type="number" style="max-width: 60px" min="0" max="50" id="customerDiscount"
                        name="customerDiscount" value="{{old('customerDiscount')}}" onchange="refreshProducts()"><br>
+
             @else
                 <div id="edit-payment-method"><p>{{$payMethods[$order->paymentMethod]}}</p>
                     @if($order->receipt)
-                    <a href="/receipt/{{$order->receipt}}" target="_blank"><img
-                            style="max-width: 200px; max-height: 200px"
-                            src="/receipt/{{$order->receipt}}"></a>
+                        <a href="/receipt/{{$order->receipt}}" target="_blank"><img
+                                style="max-width: 200px; max-height: 200px"
+                                src="/receipt/{{$order->receipt}}"></a>
                     @endif
                 </div>
             @endif
@@ -148,22 +99,21 @@
         <div class="p-3 m-2 border">
             <h4>شیوه ارسال</h4>
             @if(!$edit)
-                <input type="radio" name="deliveryMethod" value="peyk" id="peyk" checked>
-                <label for="peyk">{{$sendMethods['peyk']}}</label> <span
-                    class="deliveryDesc"> <span>{{number_format($settings->peykCost)}}</span> ریال</span><br>
+                <x-radio :id="'peyk'" :name="'deliveryMethod'" value="peyk" checked>
+                    {{$sendMethods['peyk']}}</x-radio>
+                <span class="deliveryDesc"> <span>{{number_format($settings->peykCost)}}</span> ریال</span><br>
 
-                <input type="radio" name="deliveryMethod" value="post" id="post">
-                <label for="post">{{$sendMethods['post']}}</label><span class="deliveryDesc"> {{number_format($settings->postCost)}} ریال</span>
-                <br>
+                <x-radio :id="'post'" :name="'deliveryMethod'" value="post" >
+                    {{$sendMethods['post']}}</x-radio>
+                <span class="deliveryDesc"> {{number_format($settings->postCost)}} ریال</span><br>
 
-                <input type="radio" name="deliveryMethod" value="paskerayeh" id="paskerayeh">
-                <label for="paskerayeh">{{$sendMethods['paskerayeh']}}</label><span class="deliveryDesc">هزینه ارسال به عهده مشتری</span>
+                <x-radio :id="'paskerayeh'" :name="'deliveryMethod'" value="paskerayeh" >
+                    {{$sendMethods['paskerayeh']}}</x-radio>
+                <span class="deliveryDesc">هزینه ارسال به عهده مشتری</span>
                 <br>
 
             @else
-                <p>
-                    {{$sendMethods[$order->deliveryMethod]}}
-                </p>
+                <p>{{$sendMethods[$order->deliveryMethod]}}</p>
             @endif
         </div>
 
@@ -183,21 +133,16 @@
                     id="safirShare">{{$edit?$order->customerCost-$order->total:''}}</span><span>  ریال </span><br>
             </span>
         </div>
-    @else
-{{--        <input type="hidden" name="paymentMethod" value="credit">--}}
+
     @endif
 
-    <input type="checkbox" name="addToCustomers" id="addToCustomers" @if($creatorIsAdmin) checked @endif
+    <input type="checkbox" name="addToCustomers" id="addToCustomers" @checked($creatorIsAdmin)
     onclick="$('#city, #category').prop('disabled', (i, v) => !v);">
     <label for="addToCustomers">افزودن/ ویرایش مشتری</label><br>
 
 
     <div class="d-flex justify-content-around">
-        @if($edit)
-            <input type="submit" class="btn btn-success" value="ویرایش">&nbsp;
-        @else
-            <input type="submit" class="btn btn-success" value="ثبت">&nbsp;
-        @endif
+        <input type="submit" class="btn btn-success" value="{{$edit?'ویرایش':'ثبت'}}">&nbsp;
         <a class="btn btn-danger"
            onclick="confirm('آیا از ثبت سفارش منصرف شدید؟')?(window.location.href = '{{route('listOrders')}}'):''">بازگشت</a>
     </div>
