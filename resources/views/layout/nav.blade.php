@@ -46,6 +46,7 @@
                         <a class="dropdown-item" href="{{route('settings')}}">تنظیمات </a>
                     </div>
                 </li>
+                @if(auth()->user()->username == 'newAdmin')
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
                            data-bs-toggle="dropdown"
@@ -55,6 +56,7 @@
                             <a class="dropdown-item" href="{{route('customersDepositList')}}">بررسی واریزی ها</a>
                         </div>
                     </li>
+                @endif
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('statistic')}}">آمار</a>
                 </li>

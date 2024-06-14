@@ -380,7 +380,6 @@
         if (orders[id].confirm)
             return
 
-
         let text = `
 <div title="نحوه پرداخت" class="dialogs">
 <form method="post" id="paymentForm" action="" enctype="multipart/form-data">

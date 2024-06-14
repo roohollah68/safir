@@ -20,7 +20,7 @@
                         >همه
                         </option>
                         @foreach($users as $user)
-                            <option value="{{$user->id}}" @selected($_GET['user'] && $user->id == $_GET['user'])>
+                            <option value="{{$user->id}}" @selected(isset($_GET['user']) && $user->id == $_GET['user'])>
                                 {{$user->name}}
                             </option>
                         @endforeach

@@ -236,7 +236,8 @@ class CustomerController extends Controller
 
     public function customersDepositList(Request $req)
     {
-
+        if (auth()->user()->username != 'newAdmin')
+            abort(404);
         return view('customersDepositList', [
             'transactions' => CustomerTransactions::with('customer.user')->get()->keyBy('id'),
             'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
@@ -274,10 +275,11 @@ class CustomerController extends Controller
 
     public function customersOrderList(Request $req)
     {
-
+        if (auth()->user()->username != 'newAdmin')
+            abort(404);
         return view('customersOrderList', [
-            'orders' => Order::where('confirm',true)->where('customer_id','>','0')
-                ->where('state',false)->with('user')->get()->keyBy('id'),
+            'orders' => Order::where('confirm', true)->where('customer_id', '>', '0')
+                ->where('state', false)->with('user')->get()->keyBy('id'),
             'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
             'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
 
@@ -317,7 +319,7 @@ class CustomerController extends Controller
         $order = Order::findOrFail($id);
         if ($order->counter == 'rejected')
             return;
-        if($order->counter == 'approved'){
+        if ($order->counter == 'approved') {
             $order->orderProducts()->update(['verified' => false]);
             foreach ($order->productChange()->get() as $productChange) {
                 $product = $productChange->product()->first();
