@@ -221,7 +221,7 @@
 
         let cancelInvoice = `<a class="fa-regular fa-xmark btn btn-danger" onclick="cancelInvoice(${id})" title=" رد فاکتور"> </a> `;
         let generatePDF = `<i class="fa fa-file-pdf btn btn-${+order.state > 1 ? 'success' : 'secondary'}" onclick="generatePDF([${id}])" title="دانلود لیبل"></i> `;
-        let selectPayment = `<a class="fa fa-check btn btn-success" onclick="selectPayment(${id})" title=" تایید فاکتور"></a> `;
+        let confirmInvoice = `<a class="fa fa-check btn btn-success" onclick="selectPayment(${id})" title=" تایید فاکتور"></a> `;
         let invoice = `<a class="fa fa-file-invoice-dollar btn btn-info text-success" onclick="invoice(${id})" title=" فاکتور"></a> `;
         let preInvoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title="پیش فاکتور"></a> `;
 
@@ -233,14 +233,14 @@
         if ((print || superAdmin) && order.state)
             res += generatePDF
 
-        if (creatorRole !== 'user') {
+        if (!superAdmin) {
             if (order.confirm) {
                 res += invoice;
                 if (order.state < 10)
                     res += cancelInvoice;
             } else {
                 res += preInvoice;
-                res += selectPayment;
+                res += confirmInvoice;
             }
         }
         @endif
