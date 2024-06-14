@@ -56,10 +56,10 @@
                             <a class="dropdown-item" href="{{route('customersDepositList')}}">بررسی واریزی ها</a>
                         </div>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{route('statistic')}}">آمار</a>
+                    </li>
                 @endif
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{route('statistic')}}">آمار</a>
-                </li>
             @endif
             @if($safir)
                 <li class="nav-item">
