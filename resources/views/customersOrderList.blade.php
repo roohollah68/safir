@@ -141,11 +141,14 @@
         }
 
         function rejectOrder(id) {
-            $.post('/rejectOrder/' + id, {_token: token})
-                .done(res => {
-                    $('#button_' + id).html(approveButton(id));
-                    $('#status_' + id).html('<i class="btn btn-danger">رد شده</i>');
-                })
+            let reason = prompt("لطفا دلیل رد فاکتور را بنویسید", "");
+            if (reason != null) {
+                $.post('/rejectOrder/' + id, {_token: token, reason: reason})
+                    .done(res => {
+                        $('#button_' + id).html(approveButton(id));
+                        $('#status_' + id).html('<i class="btn btn-danger">رد شده</i>');
+                    })
+            }
         }
 
         function approveButton(id) {

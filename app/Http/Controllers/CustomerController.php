@@ -258,7 +258,7 @@ class CustomerController extends Controller
         ]);
     }
 
-    public function rejectDeposit($id)
+    public function rejectDeposit($id, Request $req)
     {
         $trans = CustomerTransactions::with('customer')->findOrFail($id);
 
@@ -270,6 +270,7 @@ class CustomerController extends Controller
             ]);
         $trans->update([
             'verified' => 'rejected',
+            'description' => $trans->description . ' _ ' . $req->reason,
         ]);
     }
 
@@ -313,7 +314,7 @@ class CustomerController extends Controller
         DB::commit();
     }
 
-    public function rejectOrder($id)
+    public function rejectOrder($id, Request $req)
     {
         DB::beginTransaction();
         $order = Order::findOrFail($id);
@@ -338,6 +339,7 @@ class CustomerController extends Controller
             $this->deleteFromBale(env('GroupId'), $order->bale_id);
         }
         $order->counter = 'rejected';
+        $order->paymentNote .= ' _ ' . $req->reason;
         $order->save();
         DB::commit();
     }

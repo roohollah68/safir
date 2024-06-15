@@ -394,7 +394,7 @@ class OrderController extends Controller
 
                 $pdf = PDF::loadView('pdfs', ['orders' => [$order], 'fonts' => [$font]], []);
                 $mpdf = $pdf->getMpdf();
-            } while ($mpdf->page > 1 || $font < 5);
+            } while ($mpdf->page > 1 || $font < 6);
             $fonts[] = $font;
             $orders[] = $order;
         }

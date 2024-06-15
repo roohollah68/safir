@@ -129,9 +129,6 @@
         });
 
 
-
-
-
         function approveDeposit(id) {
             $.post('/approveDeposit/' + id, {_token: token})
                 .done(res => {
@@ -141,11 +138,14 @@
         }
 
         function rejectDeposit(id) {
-            $.post('/rejectDeposit/' + id, {_token: token})
-                .done(res => {
-                    $('#button_' + id).html(approveButton(id));
-                    $('#status_' + id).html('<i class="btn btn-danger">رد شده</i>');
-                })
+            let reason = prompt("لطفا دلیل رد سند واریز را بنویسید", "");
+            if (reason != null) {
+                $.post('/rejectDeposit/' + id, {_token: token, reason: reason})
+                    .done(res => {
+                        $('#button_' + id).html(approveButton(id));
+                        $('#status_' + id).html('<i class="btn btn-danger">رد شده</i>');
+                    })
+            }
         }
 
         function approveButton(id) {
