@@ -32,8 +32,6 @@
                                    type="number" value="{{old("product_".$product->id)}}" style="width: 50px" min="0">
                             <span class="btn btn-primary fa fa-minus" onclick="num_minus({{$product->id}})"></span>
                             <span class="btn btn-outline-info ">{{+$product->quantity}}</span>
-
-
                         </td>
 
                         {{--قیمت(ریال)--}}

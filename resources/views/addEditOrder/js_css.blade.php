@@ -4,19 +4,18 @@
     let customersId = {!!json_encode($customersId)!!};
     let paymentMethod = "credit";
     let deliveryMethod = "peyk";
-    let product_table;
     let products = {!!json_encode($products)!!};
     let cart = {!!json_encode($cart)!!};
     let cities = {!!json_encode($cities)!!};
     let citiesId = {!!json_encode($citiesId)!!};
-    let province = {!!json_encode($province)!!};
-    let submit = false;
     let creatorIsAdmin = !!'{{$creatorIsAdmin}}';
 
     $(function () {
+        //Hide form errors after some time.
         setTimeout(function () {
             $("#errors").hide()
         }, 10000);
+
         startEditProccess();
 
         $("input[type=radio]").checkboxradio();
@@ -26,7 +25,7 @@
 
     @if($creatorIsAdmin || !$edit)
     $(function () {
-        product_table = $('#product-table').DataTable({
+        $('#product-table').DataTable({
             autoWidth: false,
             paging: false,
             order: [[3, "desc"]],
@@ -53,25 +52,22 @@
 
         $('#city').change(function () {
             let city = cities[this.value];
-            if (city) {
+            if (city)
                 $('#city_id').val(city.id);
-                $('#province').html(province[city.province_id].name);
-            } else {
+            else {
                 let city = citiesId[$('#city_id').val()];
                 $('#city').val(city.name)
-                $('#province').html(province[city.province_id].name);
             }
         }).click(function () {
             this.value = '';
-            $('#province').html('<sapn class="fa fa-arrow-rotate-back"></span>');
         });
     });
 
     function paymentAction() {
         paymentMethod = $('input[name="paymentMethod"]:checked').val();
-        $('#receiptPhoto,#customerDiscount,label[for=customerDiscount]').hide();
+        $('.receiptPhoto,#customerDiscount,label[for=customerDiscount]').hide();
         if (paymentMethod == 'receipt') {
-            $('#receiptPhoto').show();
+            $('.receiptPhoto').show();
         } else if (paymentMethod == 'onDelivery') {
             $('#customerDiscount,label[for=customerDiscount]').show();
         }
@@ -79,9 +75,7 @@
     }
 
     function deliveryAction() {
-        $('.deliveryDesc').hide();
         deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
-        $('#' + deliveryMethod).next().show();
         refreshProducts();
     }
 
@@ -116,6 +110,8 @@
                 deliveryCost = {{$settings->peykCost}};
             else if (deliveryMethod == 'post')
                 deliveryCost = {{$settings->postCost}};
+            else if (deliveryMethod == 'peykeShahri')
+                deliveryCost = {{$settings->peykeShahri}};
         $('#deliveryCost').html(num(deliveryCost));
         $('#cartSum').html(num(total));
         $('#total').html(num(total + deliveryCost));
@@ -170,11 +166,6 @@
             delete cart[id];
         }
         refreshProducts();
-    }
-
-    function customerFind() {
-        let id = $('#customerId').val();
-        setCustomerInfo(customersId[id])
     }
 
     function setCustomerInfo(customer) {

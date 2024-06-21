@@ -48,11 +48,13 @@ class OrderController extends Controller
 
         $customersData = $user->customers()->get();
 
-        if (($this->superAdmin() || $this->admin()) && $user->id != 57) {
-            $products = Product::where('category', '<>', 'pack')->where('location', $city)->get()->keyBy('id');
+        //استثنا آقای عبدی
+        if ($this->safir() || $user->id != 57) {
+            $products = Product::where('category', 'final')->where('location', 't')->where('price', '>', '1')->get()->keyBy('id');
         } else {
-            $products = Product::where('category', 'final')->where('location', $city)->where('price', '>', '1')->get()->keyBy('id');
+            $products = Product::where('category', '<>', 'pack')->where('location', 't')->get()->keyBy('id');
         }
+
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
@@ -77,7 +79,6 @@ class OrderController extends Controller
             'customer' => $customer,
             'cities' => $cities,
             'citiesId' => $citiesId,
-            'province' => $province,
             'location' => $city,
         ]);
     }
@@ -193,23 +194,23 @@ class OrderController extends Controller
     public function editForm($id)
     {
         $user = auth()->user();
-        if ($this->superAdmin())
-            $order = Order::with('customer.city.province')->findOrFail($id);
-        else
-            $order = $user->orders()->with('customer.city.province')->findOrFail($id);
-        $creatorIsAdmin = !$order->user()->first()->safir();
 
-        if (($order->state && !$creatorIsAdmin) || ($order->confirm && $creatorIsAdmin))
+        if ($this->superAdmin()) {
+            $order = Order::with('customer.city.province')->with('user')->findOrFail($id);
+            $customersData = Customer::all();
+        }else {
+            $order = $user->orders()->with('customer.city.province')->with('user')->findOrFail($id);
+            $customersData = $user->customers()->get();
+        }
+
+        if (($order->state && $order->user->safir()) || ($order->confirm && $order->user->admin()))
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
 
-        $customersData = $user->customers()->get();
-        if ($this->superAdmin())
-            $customersData = Customer::all();
         //استثنا آقای عبدی
-        if (($this->superAdmin() || $this->admin()) && $user->id != 57) {
-            $products = Product::where('category', '<>', 'pack')->where('location', $order->location)->get()->keyBy('id');
-        } else {
+        if ($this->safir() || $user->id != 57) {
             $products = Product::where('category', 'final')->where('location', $order->location)->where('price', '>', '1')->get()->keyBy('id');
+        } else {
+            $products = Product::where('category', '<>', 'pack')->where('location', $order->location)->get()->keyBy('id');
         }
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
@@ -226,9 +227,6 @@ class OrderController extends Controller
                 $products[$product->product_id]->priceWithDiscount = round((100 - +$product->discount) * $product->price / 100);
             }
         }
-//        $customer = null;
-//        if($creator)
-//        $customer = $order->customer()->first();
         $customer = $order->customer;
         if (!$customer) {
             $customer = new Customer();
@@ -236,13 +234,12 @@ class OrderController extends Controller
         }
         $cities = City::all()->keyBy('name');
         $citiesId = $cities->keyBy('id');
-        $province = Province::all()->keyBy('id');
 
         return view('addEditOrder.addEditOrder')->with([
             'cart' => $cart,
             'cities' => $cities,
             'citiesId' => $citiesId,
-            'creatorIsAdmin' => $creatorIsAdmin,
+            'creatorIsAdmin' => $order->user->admin(),
             'customer' => $customer,
             'customers' => $customers,
             'customersId' => $customersId,
@@ -251,7 +248,6 @@ class OrderController extends Controller
             'location' => $order->location,
             'order' => $order,
             'products' => $products,
-            'province' => $province,
             'settings' => $this->settings(),
             'user' => $user,
         ]);

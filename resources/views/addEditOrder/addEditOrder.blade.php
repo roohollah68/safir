@@ -2,11 +2,7 @@
 
 @props(['edit' => false])
 @section('title')
-    @if($edit)
-        ویرایش سفارش
-    @else
-        افزودن سفارش جدید
-    @endif
+    {{$edit?'ویرایش سفارش':'افزودن سفارش جدید'}}
 @endsection
 
 @section('content')

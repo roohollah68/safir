@@ -18,15 +18,7 @@ class SettingController extends Controller
     public function showSettings()
     {
         $setting = $this->settings();
-        return view('settings',
-            [
-                'loadOrders' => $setting->loadOrders,
-                'minCoupon' => $setting->minCoupon,
-                'negative' => $setting->negative,
-                'peykCost' => $setting->peykCost,
-                'postCost' => $setting->postCost,
-                'freeDelivery' => $setting->freeDelivery,
-            ]);
+        return view('settings', ['setting' => $setting,]);
     }
 
     public function editSettings(Request $req)

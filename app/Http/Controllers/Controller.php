@@ -107,6 +107,7 @@ class Controller extends BaseController
         $deliveryCosts = [
             'peyk' => $this->settings()->peykCost,
             'post' => $this->settings()->postCost,
+            'peykeShahri' => $this->settings()->peykeShahri,
             'paskerayeh' => 0,
         ];
         return $deliveryCosts[$deliveryMethod];

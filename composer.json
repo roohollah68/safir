@@ -13,9 +13,8 @@
         "carlos-meneses/laravel-mpdf": "^2.1",
         "hekmatinasser/verta": "^8.4",
         "laravel/framework": "^11.0",
+        "laravel/tinker": "^2.9",
         "nunomaduro/collision": "^8.1"
-    },
-    "require-dev": {
     },
     "config": {
         "optimize-autoloader": true,

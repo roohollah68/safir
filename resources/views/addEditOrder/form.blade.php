@@ -1,21 +1,21 @@
 @csrf
 @if($creatorIsAdmin)
     <label for="customerId">شماره مشتری:</label>
-    <input type="number" value="{{old('customerId')?:$order->customer_id}}" min="0" step="1" name="customerId"
-           id="customerId"
-           style="width: 70px"
-           onchange="customerFind()" readonly>
+    <input type="number" value="{{old('customerId')?:$order->customer_id}}" name="customerId"
+           id="customerId" style="width: 70px" readonly>
 @endif
+
 <input type="hidden" name="location" value="{{$location}}">
+
 <div id="formElements" class="bg-white">
     <div class="row">
+
         <x-col-md-6 :name="'name'" value="{{old('name')?:$order->name}}" :required="true"
                     :readonly="$edit && $creatorIsAdmin">نام و نام خانوادگی:
         </x-col-md-6>
 
         <x-col-md-6 :name="'phone'" value="{{old('phone')?:$order->phone}}" :required="true"
-                    minlength="11"
-                    maxlength="11" pattern="^[۰-۹0-9]*$"
+                    minlength="11" maxlength="11" pattern="^[۰-۹0-9]*$"
                     oninvalid="this.setCustomValidity('لطفا شماره 11 رقمی تلفن را وارد کنید.')"
                     onkeypress="return event.charCode >= 48 && event.charCode <= 57"
                     oninput="this.setCustomValidity('')" placeholder="مانند 09123456789">شماره تماس:
@@ -73,12 +73,13 @@
             <h4>نحوه پرداخت</h4>
             @if(!$edit)
                 <x-radio :id="'credit'" :name="'paymentMethod'" value="credit" checked>
-                    {{$payMethods['credit']}}</x-radio><br>
+                    {{$payMethods['credit']}}</x-radio>
                 <x-radio :id="'receipt'" :name="'paymentMethod'" value="receipt">
-                    {{$payMethods['receipt']}}</x-radio><br>
-                <input type="file" id="receiptPhoto" name="receipt"><br>
+                    {{$payMethods['receipt']}}</x-radio>
                 <x-radio :id="'onDelivery'" :name="'paymentMethod'" value="onDelivery">
                     {{$payMethods['onDelivery']}}</x-radio><br>
+                <label for='receiptPhoto' class="btn btn-info m-2 hide receiptPhoto">بارگذاری تصویر رسید بانکی  <i class="fa fa-image"></i></label>
+                <input type="file" id="receiptPhoto" class="hide" name="receipt">
                 <label for="customerDiscount">درصد تخفیف به مشتری</label>
                 <input type="number" style="max-width: 60px" min="0" max="50" id="customerDiscount"
                        name="customerDiscount" value="{{old('customerDiscount')}}" onchange="refreshProducts()"><br>
@@ -100,16 +101,17 @@
             <h4>شیوه ارسال</h4>
             @if(!$edit)
                 <x-radio :id="'peyk'" :name="'deliveryMethod'" value="peyk" checked>
-                    {{$sendMethods['peyk']}}</x-radio>
-                <span class="deliveryDesc"> <span>{{number_format($settings->peykCost)}}</span> ریال</span><br>
+                    {{$sendMethods['peyk']}} ({{number_format($settings->peykCost)}} ریال)</x-radio>
 
                 <x-radio :id="'post'" :name="'deliveryMethod'" value="post" >
-                    {{$sendMethods['post']}}</x-radio>
-                <span class="deliveryDesc"> {{number_format($settings->postCost)}} ریال</span><br>
+                    {{$sendMethods['post']}} ({{number_format($settings->postCost)}} ریال)</x-radio>
+
+                 <x-radio :id="'peykeShahri'" :name="'deliveryMethod'" value="peykeShahri" >
+                    {{$sendMethods['peykeShahri']}} ({{number_format($settings->peykeShahri)}} ریال)</x-radio>
 
                 <x-radio :id="'paskerayeh'" :name="'deliveryMethod'" value="paskerayeh" >
-                    {{$sendMethods['paskerayeh']}}</x-radio>
-                <span class="deliveryDesc">هزینه ارسال به عهده مشتری</span>
+                    {{$sendMethods['paskerayeh']}} (هزینه ارسال به عهده مشتری)</x-radio>
+
                 <br>
 
             @else
@@ -137,7 +139,7 @@
     @endif
 
     <input type="checkbox" name="addToCustomers" id="addToCustomers" @checked($creatorIsAdmin)
-    onclick="$('#city, #category').prop('disabled', (i, v) => !v);">
+    class="checkboxradio" onclick="$('#city, #category').prop('disabled', (i, v) => !v);">
     <label for="addToCustomers">افزودن/ ویرایش مشتری</label><br>
 
 
