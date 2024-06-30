@@ -50,14 +50,15 @@ class OrderController extends Controller
 
         //استثنا آقای عبدی
         if ($this->safir() || $user->id != 57) {
-            $products = Product::where('category', 'final')->where('location', 't')->where('price', '>', '1')->get()->keyBy('id');
+            $products = Product::where('category', 'final')->where('location', 't')->where('price', '>', '1')->where('available', true)->get()->keyBy('id');
         } else {
-            $products = Product::where('category', '<>', 'pack')->where('location', 't')->get()->keyBy('id');
+            $products = Product::where('category', '<>', 'pack')->where('location', 't')->where('available', true)->get()->keyBy('id');
         }
-
+        $cart = [];
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
+            $cart[$id] = '';
         }
 
         $customers = $customersData->keyBy('name');
@@ -73,7 +74,7 @@ class OrderController extends Controller
             'products' => $products,
             'settings' => $this->settings(),
             'user' => $user,
-            'cart' => (object)[],
+            'cart' => $cart,
             'creatorIsAdmin' => ($this->superAdmin() || $this->admin()),
             'order' => $order,
             'customer' => $customer,
@@ -198,7 +199,7 @@ class OrderController extends Controller
         if ($this->superAdmin()) {
             $order = Order::with('customer.city.province')->with('user')->findOrFail($id);
             $customersData = Customer::all();
-        }else {
+        } else {
             $order = $user->orders()->with('customer.city.province')->with('user')->findOrFail($id);
             $customersData = $user->customers()->get();
         }
@@ -208,18 +209,19 @@ class OrderController extends Controller
 
         //استثنا آقای عبدی
         if ($this->safir() || $user->id != 57) {
-            $products = Product::where('category', 'final')->where('location', $order->location)->where('price', '>', '1')->get()->keyBy('id');
+            $products = Product::where('category', 'final')->where('location', $order->location)->where('available', true)->where('price', '>', '1')->get()->keyBy('id');
         } else {
-            $products = Product::where('category', '<>', 'pack')->where('location', $order->location)->get()->keyBy('id');
+            $products = Product::where('category', '<>', 'pack')->where('location', $order->location)->where('available', true)->get()->keyBy('id');
         }
+        $cart = [];
         foreach ($products as $id => $product) {
             $products[$id]->coupon = $this->calculateDis($id);
             $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
+            $cart[$id] = '';
         }
         $customers = $customersData->keyBy('name');
         $customersId = $customersData->keyBy('id');
         $selectedProducts = $order->orderProducts()->get();
-        $cart = [];
         foreach ($selectedProducts as $product) {
             if (isset($products[$product->product_id])) {
                 $cart[$product->product_id] = +$product->number;
@@ -716,7 +718,7 @@ class OrderController extends Controller
         if ($paymentMethod == 'cheque') {
             if ($req->file("chequePhoto"))
                 $photo = $req->file("chequePhoto")->store("", 'deposit');
-                $photo2 = $req->file("chequePhoto")->store("", 'receipt');
+            $photo2 = $req->file("chequePhoto")->store("", 'receipt');
         }
         if ($paymentMethod == 'payInDate') {
             if (strlen($req->payInDate) != 10)

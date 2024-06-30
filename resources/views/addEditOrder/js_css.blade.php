@@ -1,5 +1,4 @@
 <script>
-
     let customers = {!!json_encode($customers)!!};
     let customersId = {!!json_encode($customersId)!!};
     let paymentMethod = "credit";
@@ -16,20 +15,18 @@
             $("#errors").hide()
         }, 10000);
 
-        startEditProccess();
-
-        $("input[type=radio]").checkboxradio();
-        $(".checkboxradio").checkboxradio();
-        $("#addToCustomers").checkboxradio();
+        $(".checkboxradio").checkboxradio();//jquery-ui
     });
 
     @if($creatorIsAdmin || !$edit)
     $(function () {
+        //create products table
         $('#product-table').DataTable({
             autoWidth: false,
             paging: false,
             order: [[3, "desc"]],
         });
+        
         $("#name").autocomplete({
             source: Object.keys(customers),
             select: function (event, ui) {
@@ -85,10 +82,10 @@
         let ordersText = ''; //عبارت مربوط به قسمت محصولات
         let ordersListText = ''; // عبارت مربوط به فاکتور سفیران
         $.each(cart, (id, number) => {
-            if (number > 0) {
+            if (number) {
                 let price = products[id].priceWithDiscount * number; //قیمت با تخفیف
                 let Price = products[id].price * number;  //قیمت بدون تخفیف
-                $('#product_' + id).val(number);
+                // $('#product_' + id).val(number);
                 ordersText = ordersText.concat(products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + '<br>');
                 ordersListText = ordersListText.concat('<li>' + products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + ': ' + num(price) + '</li>');
 
@@ -222,23 +219,6 @@
     }
 
     @endif
-
-    function startEditProccess() {
-
-        @if($errors->count())
-        $.each(products, function (id) {
-            $('#product_' + id).change();
-        });
-        refreshProducts();
-        @if($safir)
-        $('#{{old("paymentMethod")}}').click();
-        $('#{{old("deliveryMethod")}}').click();
-        @endif
-            @elseif($edit)
-            deliveryMethod = `{{$order->deliveryMethod}}`;
-        paymentMethod = `{{$order->paymentMethod}}`;
-        @endif
-    }
 
 </script>
 
