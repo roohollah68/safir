@@ -226,7 +226,7 @@ class OrderController extends Controller
             if (isset($products[$product->product_id])) {
                 $cart[$product->product_id] = +$product->number;
                 $products[$product->product_id]->coupon = +$product->discount;
-                $products[$product->product_id]->priceWithDiscount = round((100 - +$product->discount) * $product->price / 100);
+                $products[$product->product_id]->priceWithDiscount = round((100 - +$product->discount) * $products[$product->product_id]->price / 100);
             }
         }
         $customer = $order->customer;
