@@ -418,8 +418,7 @@ class OrderController extends Controller
         $order->city = $this->city($order->user()->first())[0];
         $firstPageItems = $request->firstPageItems;
         $totalPages = $request->totalPages;
-        $orderProducts = OrderProduct::where('order_id', $id)->get();
-        $number = $orderProducts->count();
+        $orderProducts = OrderProduct::where('order_id', $id)->with('product')->get();
         if ($totalPages > 1) {
             $v1 = view('orders.invoice', [
                 'firstPage' => '',
