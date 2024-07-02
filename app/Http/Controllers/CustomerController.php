@@ -309,12 +309,12 @@ class CustomerController extends Controller
                 'desc' => ' خرید مشتری ' . $order->name,
             ]);
         }
-        $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+//        $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
         $order->save();
         DB::commit();
     }
 
-    public function rejectOrder($id, Request $req)
+    public function rejectOrder($id, Request $req = null)
     {
         DB::beginTransaction();
         $order = Order::findOrFail($id);
@@ -339,7 +339,8 @@ class CustomerController extends Controller
             $this->deleteFromBale(env('GroupId'), $order->bale_id);
         }
         $order->counter = 'rejected';
-        $order->paymentNote .= ' _ ' . $req->reason;
+        if($req)
+            $order->paymentNote .= ' _ ' . $req->reason;
         $order->save();
         DB::commit();
     }

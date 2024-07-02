@@ -233,12 +233,10 @@
         if ((print || superAdmin) && order.state)
             res += generatePDF
 
-        if (admin) {
-            if (order.state < 10 && order.confirm)
-                res += cancelInvoice;
-            else
-                res += confirmInvoice;
-        }
+        if (order.state < 10 && order.confirm)
+            res += cancelInvoice;
+        else
+            res += confirmInvoice;
 
         if (order.confirm)
             res += invoice;

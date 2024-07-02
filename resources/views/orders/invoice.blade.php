@@ -52,7 +52,9 @@
                         @php
                             $price_dis = $orderProduct->price;
                             $sub_total_dis= ($orderProduct->price * $orderProduct->number); //قیمت * تعداد
-                            $price_no_dis = round((100/(100-$orderProduct->discount))*$orderProduct->price);
+                            $price_no_dis = 0;
+                            if($orderProduct->discount != 100)
+                                $price_no_dis = round((100/(100-$orderProduct->discount))*$orderProduct->price);
                             $sub_total_no_dis = $price_no_dis * $orderProduct->number;
                             $total_no_dis = $total_no_dis + $sub_total_no_dis;
                             $total_dis = $total_dis + $sub_total_dis;
