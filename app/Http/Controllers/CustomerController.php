@@ -324,12 +324,14 @@ class CustomerController extends Controller
             $order->orderProducts()->update(['verified' => false]);
             foreach ($order->productChange()->get() as $productChange) {
                 $product = $productChange->product()->first();
+                $productChange->update(['isDeleted' => true]);
+                if (!$product)
+                    continue;
                 $product->update([
                     'quantity' => $product->quantity - $productChange->change,
                 ]);
-                $productChange->update(['isDeleted' => true]);
                 $order->productChange()->create([
-                    'product_id' => $product->id,
+                    'product_id' => $productChange->product_id,
                     'change' => -$productChange->change,
                     'quantity' => $product->quantity,
                     'desc' => 'لغو خرید مشتری ' . $order->name,
@@ -339,7 +341,7 @@ class CustomerController extends Controller
             $this->deleteFromBale(env('GroupId'), $order->bale_id);
         }
         $order->counter = 'rejected';
-        if($req)
+        if ($req)
             $order->paymentNote .= ' _ ' . $req->reason;
         $order->save();
         DB::commit();
