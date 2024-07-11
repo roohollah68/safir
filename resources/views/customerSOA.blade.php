@@ -6,7 +6,7 @@
 <span>شماره تماس:</span> <b>{{$customer->phone}}</b><br>
 <span>تاریخ:</span> <b dir="ltr">{{verta()->formatDate()}}</b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
 <span>آدرس:</span> <b>{{$customer->address}}</b><br>
-<span>مانده کل:</span><b dir="ltr">{{number_format($customer->balance)}}</b><span>ریال</span>
+<span>مانده کل:</span> <b dir="ltr">{{number_format($customer->balance)}} </b><span>ریال</span>
 <table id="customers">
     <thead>
     <tr>
@@ -35,7 +35,7 @@
             <td dir="ltr">{{number_format($total)}}</td>
         </tr>
     @endforeach
-    
+
     </tbody>
 </table>
 
