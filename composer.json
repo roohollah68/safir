@@ -10,7 +10,7 @@
     "require": {
         "php": "^8.2",
         "ext-json": "*",
-        "carlos-meneses/laravel-mpdf": "^2.1",
+        "carlos-meneses/laravel-mpdf": "^2.1.13",
         "hekmatinasser/verta": "^8.4",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",

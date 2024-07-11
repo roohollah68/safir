@@ -82,6 +82,7 @@
 
                         @if(!$safir)
                             <a class="btn btn-info" href="/customer/transaction/{{$customer->id}}">تراکنش ها</a>
+                            <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب" href="/customer/SOA/{{$customer->id}}"></a>
                         @endif
                     </td>
                 </tr>
@@ -132,10 +133,13 @@
                 pageLength: 50,
             });
             $('#brief-table').hide();
-
-
         });
-
+        // function customerSOA(id){
+        //     const doc = new jsPDF();
+        //
+        //     doc.text("Hello world!", 10, 10);
+        //     doc.save("a4.pdf");
+        // }
 
     </script>
 @endsection

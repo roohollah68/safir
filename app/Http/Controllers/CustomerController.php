@@ -11,6 +11,7 @@ use App\Models\Province;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 
 class CustomerController extends Controller
 {
@@ -345,6 +346,24 @@ class CustomerController extends Controller
             $order->paymentNote .= ' _ ' . $req->reason;
         $order->save();
         DB::commit();
+    }
+
+    public function customerSOA($id)
+    {
+        $customer = Customer::with('transactions')->find($id);
+        $total = 0;
+        $pdf = PDF::loadView('customerSOA', [
+            'customer' => $customer,
+            'total' => $total,
+        ], [], [
+            'format' => 'A4',
+            'title' => 'گردش حساب',
+            'margin_left' => 4,
+            'margin_right' => 4,
+            'margin_top' => 4,
+            'margin_bottom' => 4,
+        ]);
+        return $pdf->stream($id . '.pdf');
     }
 
 }
