@@ -24,9 +24,16 @@ class WoocommerceController extends Controller
             format('Y-n-j_H-i-s') . ' _ ' . $website . ' _ ' . $request->billing->first_name .
             ' ' . $request->billing->last_name . '.txt', file_get_contents('php://input'));
 
+        $websiteTitle = [
+            'matchano' => 'ماچانو',
+            'peptina' => 'پپتینا',
+            'matchashop' => 'ماچا شاپ',
+            'berrynocom' => 'برینو',
+        ][$website];
+
         $orders = '';
         $products = array();
-        $text = 'بررسی مطابقت محصولات: ' . $website . ' ' . $request->billing->first_name . ' ' . $request->billing->last_name . '
+        $text = 'بررسی مطابقت محصولات: ' . $websiteTitle . ' ' . $request->billing->first_name . ' ' . $request->billing->last_name . '
 ';
         $hasInconsistent = false;
         foreach ($request->line_items as $item) {
@@ -54,19 +61,14 @@ class WoocommerceController extends Controller
         if ($hasInconsistent)
             $this->sendTextToBale($text, '5742084958');
 
-        $websiteTitle = "?";
+
         $desc = '';
         if ($website == 'matchano') {
-            $websiteTitle = 'ماچانو';
             $request->total = $request->total * 10000;
             if ($request->payment_method == 'cod')
                 $desc = $request->payment_method_title . ' - ' . number_format($request->total, 0, '.', '/') . ' ریال';
-        } elseif ($website == 'peptina' || $website == 'berrynocom') {
+        } elseif ($website == 'peptina' || $website == 'berrynocom' || $website == 'matchashop') {
             $request->total = $request->total * 10;
-            if ($website == 'peptina')
-                $websiteTitle = 'پپتینا';
-            else
-                $websiteTitle = 'برینو';
             if ($request->payment_method == 'cod')
                 $desc = $request->payment_method_title . ' - ' . number_format($request->total, 0, '.', '/') . ' ریال';
         }
@@ -74,9 +76,9 @@ class WoocommerceController extends Controller
         $user = User::where('username', $website)->first();
 
         $web = Websites::where('website_id', $request->id)->where('website', $website)->first();
-        $deliveryTime ='';
+        $deliveryTime = '';
         $metaData = collect($request->meta_data)->keyBy('key');
-        if(isset($metaData['_delivery_time_novin']))
+        if (isset($metaData['_delivery_time_novin']))
             $deliveryTime = $metaData['_delivery_time_novin']->value;
         $orderData = [
             'name' => $request->billing->first_name . ' ' . $request->billing->last_name,

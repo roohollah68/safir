@@ -54,7 +54,7 @@
             if (Location !== order.location)
                 return;
             let website = false;
-            if (order.user_id === 30 || order.user_id === 32 || order.user_id === 33)
+            if (order.user_id === 30 || order.user_id === 32 || order.user_id === 33|| order.user_id === 75)
                 website = true;
             if (users[order.user_id].role === 'admin' && !adminOrders)
                 return

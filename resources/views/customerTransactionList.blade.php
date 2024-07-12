@@ -20,6 +20,7 @@
         <span class="h3">بدهکاری:</span> <b dir="ltr"
                                             class="h3 text-danger">{{number_format($customer->balance)}}</b><span
             class="h3">ریال</span><br>
+        <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب" href="/customer/SOA/{{$customer->id}}"></a>
         <a class="fa fa-edit btn btn-primary"
            href="/customer/edit/{{$customer->id}}"
            title="ویرایش مشتری">
