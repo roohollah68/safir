@@ -14,27 +14,36 @@ class StatisticController extends Controller
 {
     public function showStatistic(Request $request)
     {
-        if (!isset($request->Base)) {
+        if (!isset($request->base)) {
             return view('statistic', [
                 'users' => User::all()->keyBy("id"),
+                'request' => (object)[
+                    'from' => verta()->addMonths(-1)->toCarbon(),
+                    'to' => verta()->toCarbon(),
+                    'user' => 'all',
+                    'base' => 'productBase',
+                    'safirOrders' => true,
+                    'siteOrders' => true,
+                    'adminOrders' => true,
+                ],
             ]);
         }
-        $from = Verta::parse($request->from)->toCarbon();
-        $to = Verta::parse($request->to)->toCarbon();
-        $users = User::all()->keyBy("id");
 
+        $request->from = Verta::parse($request->from)->toCarbon();
+        $request->to = Verta::parse($request->to)->toCarbon();
+        $users = User::all()->keyBy("id");
         $orders = Order::where([
             ['state', 10],
-            ['created_at', '>', $from],
-            ['created_at', '<', $to]
+            ['created_at', '>', $request->from],
+            ['created_at', '<', $request->to]
         ])->with('orderProducts');
 
         if ($request->user != 'all')
             $orders = $orders->where('user_id', $request->user);
 
-        if ($request->Base == 'productBase') {
+        if ($request->base == 'productBase') {
             $orders = $orders->get();
-            $products = Product::all()->keyBy('id');
+            $products = Product::where('category', 'final')->get()->keyBy('id');
             foreach ($products as $id => $product) {
                 $products[$id]->number = 0;
                 $products[$id]->total = 0;
@@ -55,28 +64,14 @@ class StatisticController extends Controller
             return view('statistic', [
                 'products' => $products,
                 'totalSale' => $totalSale,
+                'request' => $request,
                 'users' => User::all()->keyBy("id"),
             ]);
 
-        } elseif ($request->Base == 'safirBase') {
+        } elseif ($request->base == 'safirBase') {
 
-        } elseif ($request->Base == 'customerBase') {
+        } elseif ($request->base == 'customerBase') {
 
         }
-//        $products = Product::all()->keyBy('id');
-//        $totalSale = 0;
-//
-//        foreach ($products as $id => $product) {
-//            $orderProducts = OrderProduct::where('created_at', '>', $from)->
-//            where('created_at', '<', $to)->where('product_id', $id)->get();
-//            $products[$id]->number = 0;
-//            $products[$id]->total = 0;
-//            foreach ($orderProducts as $orderProduct) {
-//                $products[$id]->number += $orderProduct->number;
-//                $products[$id]->total += $orderProduct->number * $orderProduct->price;
-//            }
-//            $totalSale += $products[$id]->total;
-//        }
-
     }
 }
