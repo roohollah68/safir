@@ -47,7 +47,7 @@
 
     </form>
 
-
+@if(isset($totalSale))
         <br>
         <h4>کل مبلغ آمار فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
         <br>
@@ -72,7 +72,7 @@
             @endforeach
             </tbody>
         </table>
-
+@endif
 @endsection
 
 
