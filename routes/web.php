@@ -7,6 +7,7 @@ use App\Http\Controllers\DepositController;
 use App\Http\Controllers\OrderProductController;
 use App\Http\Controllers\ProductChangeController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
@@ -39,7 +40,8 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'role']], functio
     Route::post('coupon/edit/{id}', [CouponController::class, 'update']);
     Route::post('coupon/delete/{id}', [CouponController::class, 'deleteCoupon']);
 
-    Route::get('statistic', [OrderProductController::class, 'showStatistic'])->name('statistic');
+    Route::get('statistic', [StatisticController::class, 'showStatistic'])->name('statistic');
+    Route::post('statistic', [StatisticController::class, 'showStatistic'])->name('statistic');
 
     Route::get('customers_deposit_list', [CustomerController::class, 'customersDepositList'])->name('customersDepositList');
     Route::get('customers_order_list', [CustomerController::class, 'customersOrderList'])->name('customersOrderList');

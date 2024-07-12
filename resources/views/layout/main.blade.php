@@ -30,9 +30,6 @@
 
     <script src="/js/dom-to-image.min.js"></script>
 
-{{--    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js" integrity="sha512-ToRWKKOvhBSS8EtqSflysM/S7v9bB9V0X3B1+E7xo7XZBEZCPL3VX5SFIp8zxY19r7Sz0svqQVbAOx+QcLQSAQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>--}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2,1,0/jspdf.es.js" integrity="sha512-g6a2PxOd25ZIGzqfb0YSkr867kmKivPOHwutDOoLDVpk3EcUZ67dX8bZ575reQ9CYjX6ht3E3j/il7TI1v85XA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
     @include('layout.style_css')
 
     @yield('files')
