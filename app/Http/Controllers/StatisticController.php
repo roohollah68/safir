@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
@@ -53,15 +54,12 @@ class StatisticController extends Controller
             }
 
             foreach ($orders as $order) {
-                if ($order->website && !$request->siteOrders) {
+                if ($order->website && !$request->siteOrders)
                     continue;
-                }
-                if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders) {
+                if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders)
                     continue;
-                }
-                if ($users[$order->user_id]->admin() && !$request->adminOrders) {
+                if ($users[$order->user_id]->admin() && !$request->adminOrders)
                     continue;
-                }
                 $orderNumber++;
                 foreach ($order->orderProducts as $orderProduct) {
                     $id = $orderProduct->product_id;
@@ -81,26 +79,22 @@ class StatisticController extends Controller
                 'totalProfit' => $totalProfit,
                 'request' => $request,
                 'users' => $users,
-                'orderNumber'=> $orderNumber,
+                'orderNumber' => $orderNumber,
             ]);
 
         } elseif ($request->base == 'safirBase') {
-            foreach ($users as $id=>$user){
+            foreach ($users as $id => $user) {
                 $users[$id]->orderNumber = 0;
                 $users[$id]->totalSale = 0;
             }
             $orders = $orders->with('website')->get();
             foreach ($orders as $order) {
-
-                if ($order->website && !$request->siteOrders) {
+                if ($order->website && !$request->siteOrders)
                     continue;
-                }
-                if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders) {
+                if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders)
                     continue;
-                }
-                if ($users[$order->user_id]->admin() && !$request->adminOrders) {
+                if ($users[$order->user_id]->admin() && !$request->adminOrders)
                     continue;
-                }
                 $id = $order->user_id;
                 $users[$id]->orderNumber++;
                 $users[$id]->totalSale += $order->total;
@@ -111,11 +105,38 @@ class StatisticController extends Controller
                 'totalSale' => $totalSale,
                 'request' => $request,
                 'users' => $users,
-                'orderNumber'=> $orderNumber,
+                'orderNumber' => $orderNumber,
             ]);
 
         } elseif ($request->base == 'customerBase') {
-
+            $customers = Customer::all()->keyBy('id');
+            foreach ($customers as $id => $customer) {
+                $customers[$id]->orderNumber = 0;
+                $customers[$id]->totalSale = 0;
+            }
+            $orders = $orders->with('website', 'customer')->get();
+            foreach ($orders as $order) {
+                if ($order->website && !$request->siteOrders)
+                    continue;
+                if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders)
+                    continue;
+                if ($users[$order->user_id]->admin() && !$request->adminOrders)
+                    continue;
+                if (!$order->customer)
+                    continue;
+                $id = $order->customer_id;
+                $customers[$id]->orderNumber++;
+                $customers[$id]->totalSale += $order->total;
+                $orderNumber++;
+                $totalSale += $order->total;
+            }
+            return view('statistic', [
+                'totalSale' => $totalSale,
+                'request' => $request,
+                'users' => $users,
+                'customers' => $customers,
+                'orderNumber' => $orderNumber,
+            ]);
         }
     }
 

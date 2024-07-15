@@ -113,8 +113,32 @@
                 </tbody>
             </table>
         @endif
-        @if($request->base=='safirBase')
+        @if($request->base=='customerBase')
+            <br>
+            <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+            <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
+            <br>
 
+            <table class="stripe" id="statistic-table">
+                <thead>
+                <tr>
+                    <th>نام مشتری</th>
+                    <th>کاربر مرتبط</th>
+                    <th>تعداد فروش</th>
+                    <th>مبلغ کل(ریال)</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($customers as $customer)
+                    <tr>
+                        <td><a href="/customer/transaction/{{$customer->id}}">{{$customer->name}}</a></td>
+                        <td>{{$users[$customer->user_id]->name}}</td>
+                        <td>{{$customer->orderNumber}}</td>
+                        <td>{{number_format($customer->totalSale)}}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
         @endif
     @endif
 @endsection
@@ -127,17 +151,19 @@
     <script>
         $(function () {
             $('#statistic-table').DataTable({
-                order: [[2, "desc"]],
+                order: [[3, "desc"]],
             });
             $(".checkboxradio").checkboxradio();
 
             const date1 = new mds.MdsPersianDateTimePicker($('#date1')[0], {
                 targetTextSelector: '#date1-text',
                 selectedDate: new Date('{{$request->from}}'),
+                selectedDateToShow: new Date('{{$request->from}}'),
             });
             const date2 = new mds.MdsPersianDateTimePicker($('#date2')[0], {
                 targetTextSelector: '#date2-text',
                 selectedDate: new Date('{{$request->to}}'),
+                selectedDateToShow: new Date('{{$request->to}}'),
             });
 
 
