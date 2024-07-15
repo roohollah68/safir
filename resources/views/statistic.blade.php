@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-    <form action="" method="post" onsubmit="return dateFilter();">
+    <form action="" method="post">
         @csrf
         <div class="input-group col-12 mb-3">
             <div class="col-md-6 d-flex">
@@ -55,7 +55,8 @@
 
     @if(isset($totalSale))
         <br>
-        <h4>کل مبلغ آمار فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+        <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+        <h4>مجموع سود در این دوره : <span>{{number_format($totalProfit)}}</span> ریال </h4>
         <br>
 
         <table class="stripe" id="statistic-table">
@@ -65,15 +66,21 @@
                 <th>تعداد فروش</th>
                 <th>مبلغ کل(ریال)</th>
                 <th>قیمت میانگین(ریال)</th>
+                <th>قیمت تولید(ریال)</th>
+                <th>سود(ریال)</th>
+
             </tr>
             </thead>
             <tbody>
             @foreach($products as $product)
                 <tr>
-                    <td>{{$product->name}}</td>
+                    <td><a href="/product/edit/{{$product->id}}">{{$product->name}}</a></td>
                     <td>{{$product->number}}</td>
                     <td>{{number_format($product->total)}}</td>
                     <td>{{number_format(($product->number>0)?$product->total/$product->number:0)}}</td>
+                    <td>{{number_format($product->productPrice)}}</td>
+                    <td>{{number_format($product->profit)}}</td>
+
                 </tr>
             @endforeach
             </tbody>

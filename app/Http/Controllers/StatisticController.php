@@ -36,7 +36,7 @@ class StatisticController extends Controller
             ['state', 10],
             ['created_at', '>', $request->from],
             ['created_at', '<', $request->to]
-        ])->with('orderProducts');
+        ])->with('orderProducts', 'website');
 
         if ($request->user != 'all')
             $orders = $orders->where('user_id', $request->user);
@@ -47,23 +47,38 @@ class StatisticController extends Controller
             foreach ($products as $id => $product) {
                 $products[$id]->number = 0;
                 $products[$id]->total = 0;
+                $products[$id]->profit = 0;
             }
             foreach ($orders as $order) {
-
+                if ($order->website && !$request->siteOrders) {
+                    continue;
+                }
+                if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders) {
+                    continue;
+                }
+                if ($users[$order->user_id]->admin() && !$request->adminOrders) {
+                    continue;
+                }
                 foreach ($order->orderProducts as $orderProduct) {
-                    if (isset($products[$orderProduct->product_id])) {
-                        $products[$orderProduct->product_id]->number += $orderProduct->number;
-                        $products[$orderProduct->product_id]->total += $orderProduct->number * $orderProduct->price;
+                    $id = $orderProduct->product_id;
+                    if (isset($products[$id])) {
+                        $products[$id]->number += $orderProduct->number;
+                        $products[$id]->total += $orderProduct->number * $orderProduct->price;
+                        $products[$id]->profit += $orderProduct->number * ($orderProduct->price - $products[$id]->productPrice);
                     }
                 }
             }
             $totalSale = 0;
+            $totalProfit = 0;
             foreach ($products as $id => $product) {
-                $totalSale += $products[$id]->total;
+                $totalSale += $product->total;
+                $totalProfit += $product->profit;
             }
+
             return view('statistic', [
                 'products' => $products,
                 'totalSale' => $totalSale,
+                'totalProfit' => $totalProfit,
                 'request' => $request,
                 'users' => User::all()->keyBy("id"),
             ]);
@@ -74,4 +89,6 @@ class StatisticController extends Controller
 
         }
     }
+
+
 }
