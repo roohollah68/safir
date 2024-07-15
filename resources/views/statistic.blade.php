@@ -53,7 +53,6 @@
                class="checkboxradio" @checked($request->base=='paymentBase')>
         <br>
         <input class="btn btn-success m-3" type="submit" value="اعمال فیلتر">
-
     </form>
 
     @if(isset($totalSale))
@@ -63,7 +62,6 @@
             <h4>مجموع سود در این دوره : <span>{{number_format($totalProfit)}}</span> ریال </h4>
             <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
             <br>
-
             <table class="stripe" id="statistic-table">
                 <thead>
                 <tr>
@@ -73,7 +71,6 @@
                     <th>قیمت میانگین(ریال)</th>
                     <th>قیمت تولید(ریال)</th>
                     <th>سود(ریال)</th>
-
                 </tr>
                 </thead>
                 <tbody>
@@ -96,7 +93,6 @@
             <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
             <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
             <br>
-
             <table class="stripe" id="statistic-table">
                 <thead>
                 <tr>
@@ -148,7 +144,6 @@
             <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
             <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
             <br>
-
             <table class="stripe" id="statistic-table">
                 <thead>
                 <tr>
@@ -170,8 +165,6 @@
         @endif
     @endif
 @endsection
-
-
 @section('files')
     <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
     <link rel="stylesheet" href="/date-time-picker/mds.bs.datetimepicker.style.css">
@@ -193,8 +186,6 @@
                 selectedDate: new Date('{{$request->to}}'),
                 selectedDateToShow: new Date('{{$request->to}}'),
             });
-
-
         });
     </script>
 
