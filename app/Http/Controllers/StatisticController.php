@@ -137,6 +137,34 @@ class StatisticController extends Controller
                 'customers' => $customers,
                 'orderNumber' => $orderNumber,
             ]);
+        } elseif ($request->base == 'paymentBase') {
+            $paymentMethods = [];
+            $orders = $orders->with('website')->get();
+            foreach ($orders as $order) {
+                if ($order->website && !$request->siteOrders)
+                    continue;
+                if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders)
+                    continue;
+                if ($users[$order->user_id]->admin() && !$request->adminOrders)
+                    continue;
+                if (!$order->paymentMethod)
+                    continue;
+                $index = $order->payMethod();
+                if(!isset($paymentMethods[$index])){
+                    $paymentMethods[$index] = (object)['orderNumber'=>0,'totalSale'=>0];
+                }
+                $paymentMethods[$index]->orderNumber++;
+                $paymentMethods[$index]->totalSale += $order->total;
+                $orderNumber++;
+                $totalSale += $order->total;
+            }
+            return view('statistic', [
+                'totalSale' => $totalSale,
+                'request' => $request,
+                'users' => $users,
+                'paymentMethods' => $paymentMethods,
+                'orderNumber' => $orderNumber,
+            ]);
         }
     }
 

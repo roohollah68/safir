@@ -48,6 +48,9 @@
         <label for="customerBase">بر اساس مشتری</label>
         <input type="radio" name="base" value="customerBase" id="customerBase"
                class="checkboxradio" @checked($request->base=='customerBase')>
+        <label for="paymentBase">بر اساس نحوه پرداخت</label>
+        <input type="radio" name="base" value="paymentBase" id="paymentBase"
+               class="checkboxradio" @checked($request->base=='paymentBase')>
         <br>
         <input class="btn btn-success m-3" type="submit" value="اعمال فیلتر">
 
@@ -113,7 +116,7 @@
                 </tbody>
             </table>
         @endif
-        @if($request->base=='customerBase')
+        @if($request->base=='paymentBase')
             <br>
             <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
             <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
@@ -122,19 +125,17 @@
             <table class="stripe" id="statistic-table">
                 <thead>
                 <tr>
-                    <th>نام مشتری</th>
-                    <th>کاربر مرتبط</th>
+                    <th>شیوه پرداخت</th>
                     <th>تعداد فروش</th>
                     <th>مبلغ کل(ریال)</th>
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($customers as $customer)
+                @foreach($paymentMethods as $index => $paymentMethod)
                     <tr>
-                        <td><a href="/customer/transaction/{{$customer->id}}">{{$customer->name}}</a></td>
-                        <td>{{$users[$customer->user_id]->name}}</td>
-                        <td>{{$customer->orderNumber}}</td>
-                        <td>{{number_format($customer->totalSale)}}</td>
+                        <td>{{$index}}</td>
+                        <td>{{$paymentMethod->orderNumber}}</td>
+                        <td>{{number_format($paymentMethod->totalSale)}}</td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -151,7 +152,7 @@
     <script>
         $(function () {
             $('#statistic-table').DataTable({
-                order: [[3, "desc"]],
+                order: [[2, "desc"]],
             });
             $(".checkboxradio").checkboxradio();
 
