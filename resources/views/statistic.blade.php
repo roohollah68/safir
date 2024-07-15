@@ -116,6 +116,33 @@
                 </tbody>
             </table>
         @endif
+        @if($request->base=='customerBase')
+            <br>
+            <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+            <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
+            <br>
+
+            <table class="stripe" id="statistic-table">
+                <thead>
+                <tr>
+                    <th>نام مشتری</th>
+                    <th>تعداد فروش</th>
+                    <th>مبلغ کل(ریال)</th>
+                    <th>کاربر مرتبط</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($customers as $customer)
+                    <tr>
+                        <td><a href="/customer/transaction/{{$customer->id}}">{{$customer->name}}</a></td>
+                        <td>{{$customer->orderNumber}}</td>
+                        <td>{{number_format($customer->totalSale)}}</td>
+                        <td>{{$users[$customer->user_id]->name}}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        @endif
         @if($request->base=='paymentBase')
             <br>
             <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
