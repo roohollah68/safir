@@ -54,37 +54,68 @@
     </form>
 
     @if(isset($totalSale))
-        <br>
-        <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
-        <h4>مجموع سود در این دوره : <span>{{number_format($totalProfit)}}</span> ریال </h4>
-        <br>
+        @if($request->base=='productBase')
+            <br>
+            <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+            <h4>مجموع سود در این دوره : <span>{{number_format($totalProfit)}}</span> ریال </h4>
+            <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
+            <br>
 
-        <table class="stripe" id="statistic-table">
-            <thead>
-            <tr>
-                <th>نام محصول</th>
-                <th>تعداد فروش</th>
-                <th>مبلغ کل(ریال)</th>
-                <th>قیمت میانگین(ریال)</th>
-                <th>قیمت تولید(ریال)</th>
-                <th>سود(ریال)</th>
-
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($products as $product)
+            <table class="stripe" id="statistic-table">
+                <thead>
                 <tr>
-                    <td><a href="/product/edit/{{$product->id}}">{{$product->name}}</a></td>
-                    <td>{{$product->number}}</td>
-                    <td>{{number_format($product->total)}}</td>
-                    <td>{{number_format(($product->number>0)?$product->total/$product->number:0)}}</td>
-                    <td>{{number_format($product->productPrice)}}</td>
-                    <td>{{number_format($product->profit)}}</td>
+                    <th>نام محصول</th>
+                    <th>تعداد فروش</th>
+                    <th>مبلغ کل(ریال)</th>
+                    <th>قیمت میانگین(ریال)</th>
+                    <th>قیمت تولید(ریال)</th>
+                    <th>سود(ریال)</th>
 
                 </tr>
-            @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                @foreach($products as $product)
+                    <tr>
+                        <td><a href="/product/edit/{{$product->id}}">{{$product->name}}</a></td>
+                        <td>{{$product->number}}</td>
+                        <td>{{number_format($product->total)}}</td>
+                        <td>{{number_format(($product->number>0)?$product->total/$product->number:0)}}</td>
+                        <td>{{number_format($product->productPrice)}}</td>
+                        <td>{{number_format($product->profit)}}</td>
+
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        @endif
+        @if($request->base=='safirBase')
+            <br>
+            <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+            <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
+            <br>
+
+            <table class="stripe" id="statistic-table">
+                <thead>
+                <tr>
+                    <th>نام فرروشنده</th>
+                    <th>تعداد فروش</th>
+                    <th>مبلغ کل(ریال)</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($users as $user)
+                    <tr>
+                        <td>{{$user->name}}</td>
+                        <td>{{$user->orderNumber}}</td>
+                        <td>{{number_format($user->totalSale)}}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        @endif
+        @if($request->base=='safirBase')
+
+        @endif
     @endif
 @endsection
 

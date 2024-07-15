@@ -36,19 +36,22 @@ class StatisticController extends Controller
             ['state', 10],
             ['created_at', '>', $request->from],
             ['created_at', '<', $request->to]
-        ])->with('orderProducts', 'website');
+        ]);
 
         if ($request->user != 'all')
             $orders = $orders->where('user_id', $request->user);
-
+        $totalSale = 0;
+        $totalProfit = 0;
+        $orderNumber = 0;
         if ($request->base == 'productBase') {
-            $orders = $orders->get();
+            $orders = $orders->with('orderProducts', 'website')->get();
             $products = Product::where('category', 'final')->get()->keyBy('id');
             foreach ($products as $id => $product) {
                 $products[$id]->number = 0;
                 $products[$id]->total = 0;
                 $products[$id]->profit = 0;
             }
+
             foreach ($orders as $order) {
                 if ($order->website && !$request->siteOrders) {
                     continue;
@@ -59,20 +62,17 @@ class StatisticController extends Controller
                 if ($users[$order->user_id]->admin() && !$request->adminOrders) {
                     continue;
                 }
+                $orderNumber++;
                 foreach ($order->orderProducts as $orderProduct) {
                     $id = $orderProduct->product_id;
                     if (isset($products[$id])) {
                         $products[$id]->number += $orderProduct->number;
                         $products[$id]->total += $orderProduct->number * $orderProduct->price;
                         $products[$id]->profit += $orderProduct->number * ($orderProduct->price - $products[$id]->productPrice);
+                        $totalSale += $orderProduct->number * $orderProduct->price;
+                        $totalProfit += $orderProduct->number * ($orderProduct->price - $products[$id]->productPrice);
                     }
                 }
-            }
-            $totalSale = 0;
-            $totalProfit = 0;
-            foreach ($products as $id => $product) {
-                $totalSale += $product->total;
-                $totalProfit += $product->profit;
             }
 
             return view('statistic', [
@@ -80,10 +80,39 @@ class StatisticController extends Controller
                 'totalSale' => $totalSale,
                 'totalProfit' => $totalProfit,
                 'request' => $request,
-                'users' => User::all()->keyBy("id"),
+                'users' => $users,
+                'orderNumber'=> $orderNumber,
             ]);
 
         } elseif ($request->base == 'safirBase') {
+            foreach ($users as $id=>$user){
+                $users[$id]->orderNumber = 0;
+                $users[$id]->totalSale = 0;
+            }
+            $orders = $orders->with('website')->get();
+            foreach ($orders as $order) {
+
+                if ($order->website && !$request->siteOrders) {
+                    continue;
+                }
+                if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders) {
+                    continue;
+                }
+                if ($users[$order->user_id]->admin() && !$request->adminOrders) {
+                    continue;
+                }
+                $id = $order->user_id;
+                $users[$id]->orderNumber++;
+                $users[$id]->totalSale += $order->total;
+                $orderNumber++;
+                $totalSale += $order->total;
+            }
+            return view('statistic', [
+                'totalSale' => $totalSale,
+                'request' => $request,
+                'users' => $users,
+                'orderNumber'=> $orderNumber,
+            ]);
 
         } elseif ($request->base == 'customerBase') {
 
