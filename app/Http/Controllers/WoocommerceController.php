@@ -16,7 +16,7 @@ class WoocommerceController extends Controller
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
         $request = json_decode(file_get_contents('php://input'));
         if (env('APP_ENV') == 'local')
-            $request = json_decode(file_get_contents('woo/1403-4-10_11-45-18 _ peptina _ زهرا طاهرنسب.txt'));
+            $request = json_decode(file_get_contents('woo/1403-4-22_05-48-03 _ peptina _ کوثر امیرخانی.txt'));
         if (!isset($request->billing))
             return 'not used';
         file_put_contents('woo/' . verta(null, "Asia/Tehran")->
@@ -36,42 +36,28 @@ class WoocommerceController extends Controller
 ';
         $hasInconsistent = false;
         foreach ($request->line_items as $item) {
-            $orders = $orders . ' ' . $item->name . ' ' . $item->quantity . 'عدد' . '،';
-            if (substr($item->sku, 0, 1) == 's') {
-                $product_id = (int)filter_var($item->sku, FILTER_SANITIZE_NUMBER_INT);
-                $product = Product::find($product_id);
-                if ($product)
-                    $products[$product->id] = [$item->quantity, $product];
-                else {
-                    $hasInconsistent = true;
-                    $text .= '❌ آیدی نامنطبق:
- ' . $item->name . ' -> ' . $item->sku . '
- ' . $product_id . '
- ';
-                }
-
+            $product_id = (int)filter_var($item->sku, FILTER_SANITIZE_NUMBER_INT);
+            $product = Product::find($product_id);
+            if ($product && substr($item->sku, 0, 1) == 's') {
+                $orders .= ' ' . $product->name . ' ' . $item->quantity . 'عدد' . '،';
+                $products[$product->id] = [$item->quantity, $product];
             } else {
+                $orders .= ' ' . $item->name . ' ' . $item->quantity . 'عدد' . '،';
                 $hasInconsistent = true;
-                $text .= '❌ محصول نامنطبق:
- ' . $item->name . ' -> ' . $item->sku . '
- ';
+                $text .= '❌ آیدی نامنطبق: ' . $item->name . ' -> ' . $item->sku . ' ' . $product_id . '* *';
             }
         }
         if ($hasInconsistent)
             $this->sendTextToBale($text, '5742084958');
 
-
         $desc = '';
-        if ($website == 'matchano') {
+        if ($website == 'matchano')
             $request->total = $request->total * 10000;
-            if ($request->payment_method == 'cod')
-                $desc = $request->payment_method_title . ' - ' . number_format($request->total, 0, '.', '/') . ' ریال';
-        } elseif ($website == 'peptina' || $website == 'berrynocom' || $website == 'matchashop') {
+        else
             $request->total = $request->total * 10;
-            if ($request->payment_method == 'cod')
-                $desc = $request->payment_method_title . ' - ' . number_format($request->total, 0, '.', '/') . ' ریال';
-        }
 
+        if ($request->payment_method == 'cod')
+            $desc = $request->payment_method_title . ' - ' . number_format($request->total, 0, '.', '/') . ' ریال';
         $user = User::where('username', $website)->first();
 
         $web = Websites::where('website_id', $request->id)->where('website', $website)->first();
