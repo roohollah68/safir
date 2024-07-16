@@ -686,7 +686,9 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         if (!$order->deliveryMethod)
             $order->deliveryMethod = '';
-        $order->deliveryMethod .= ' - ' . $req->sendMethod;
+        if ($req->note)
+            $req->note = ' - کد مرسوله: ' . $req->note;
+        $order->deliveryMethod .= ' - ' . $req->sendMethod . $req->note;
         $order->save();
         DB::commit();
         return $order;

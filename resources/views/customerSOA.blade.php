@@ -6,7 +6,9 @@
 <span>شماره تماس:</span> <b>{{$customer->phone}}</b><br>
 <span>تاریخ:</span> <b dir="ltr">{{verta()->formatDate()}}</b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
 <span>آدرس:</span> <b>{{$customer->address}}</b><br>
-
+<span class="x-large">مانده کل:</span>
+<b class="x-large" dir="ltr">{{number_format($customer->balance)}} </b>
+<span class="x-large"> ریال</span>
 <table id="customers">
     <thead>
     <tr>
@@ -25,6 +27,8 @@
         @endif
         @php
             $total += $trans->type?$trans->amount:-$trans->amount;
+            $total1 += $trans->type?0:$trans->amount;
+            $total2 += $trans->type?$trans->amount:0;
         @endphp
         <tr>
             <td>{{$trans->order_id?:$trans->id}}</td>
@@ -35,10 +39,16 @@
             <td dir="ltr">{{number_format($total)}}</td>
         </tr>
     @endforeach
-
+    <tr>
+        <td colspan="3" class="large">مجموع</td>
+        <td dir="ltr" class="large">{{number_format($total1)}}</td>
+        <td dir="ltr" class="large">{{number_format($total2)}}</td>
+        <td dir="ltr" class="large">{{number_format($total)}}</td>
+    </tr>
     </tbody>
+    z
 </table>
-<span class="h2">مانده کل:</span> <b dir="ltr">{{number_format($customer->balance)}} </b><span class="h2">ریال</span>
+
 <style>
     #customers {
         border-collapse: collapse;
@@ -63,6 +73,14 @@
         padding-bottom: 12px;
         background-color: gray;
         color: white;
+    }
+
+    .x-large {
+        font-size: x-large;
+    }
+
+    .large{
+        font-size: large;
     }
 </style>
 </html>

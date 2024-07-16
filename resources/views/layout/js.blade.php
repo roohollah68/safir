@@ -44,20 +44,24 @@
     function view_order(id) {
         $.post('/viewOrder/' + id, {_token: token})
             .done(res => {
-                dialog = $(res).dialog({
-                    modal: true,
-                    open: () => {
-                        $('.ui-dialog-titlebar-close').hide();
-                        $('.ui-widget-overlay').bind('click', function () {
-                            dialog.remove();
-                        });
-                    }
-                });
+                dialog = Dialog(res);
             })
     }
 
     function num(x) {
         return numeral(x).format(0, 0);
+    }
+
+    function Dialog(text){
+        return dialog = $(text).dialog({
+            modal: true,
+            open: () => {
+                $('.ui-dialog-titlebar-close').hide();
+                $('.ui-widget-overlay').bind('click', function () {
+                    dialog.remove()
+                });
+            }
+        });
     }
 
     $(function () {

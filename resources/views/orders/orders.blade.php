@@ -73,5 +73,11 @@
     <table id="main-table" class="stripe">
     </table>
     <div id="invoice-wrapper"></div>
+    <div class="d-none" id="paymentMethodText">
+        @include('orders.paymentMethods')
+    </div>
+    <div class="d-none" id="sendMethodText">
+        @include('orders.sendMethods')
+    </div>
 
 @endsection

@@ -45,7 +45,6 @@
                 <th>شماره تماس</th>
 
                 @if(!$safir)
-                    <th>دسته</th>
                     <th>بدهکاری(ریال)</th>
                 @else
                     <th>آدرس</th>
@@ -65,7 +64,6 @@
                     <td>{{$customer->phone}}</td>
 
                     @if(!$safir)
-                        <td>{{$customer->categoryText($customer->category)}}</td>
                         <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
                                          class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
                     @else
@@ -125,7 +123,7 @@
     <script>
         $(function () {
             $('#customer-table').DataTable({
-                order: [[4, "asc"]],
+                order: [[3, "asc"]],
                 pageLength: 100,
             });
             $('#brief-table table').DataTable({
