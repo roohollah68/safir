@@ -109,22 +109,22 @@
                            minlength="10" maxlength="10" pattern="^[۰-۹0-9]*$">
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group input-group required">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label for="category" class="input-group-text w-100">دسته بندی:</label>
-                    </div>
-                    <select class="form-control" name="category" id="category">
-                        @for($ii=0;$ii<11;$ii++)
-                            <option value="{{$ii}}"
-                                    @if($ii == $customer->category)
-                                    selected
-                                @endif
-                            >{{$customer->categoryText($ii)}}</option>
-                        @endfor
-                    </select>
-                </div>
-            </div>
+{{--            <div class="col-md-6">--}}
+{{--                <div class="form-group input-group required">--}}
+{{--                    <div class="input-group-append" style="min-width: 160px">--}}
+{{--                        <label for="category" class="input-group-text w-100">دسته بندی:</label>--}}
+{{--                    </div>--}}
+{{--                    <select class="form-control" name="category" id="category">--}}
+{{--                        @for($ii=0;$ii<11;$ii++)--}}
+{{--                            <option value="{{$ii}}"--}}
+{{--                                    @if($ii == $customer->category)--}}
+{{--                                    selected--}}
+{{--                                @endif--}}
+{{--                            >{{$customer->categoryText($ii)}}</option>--}}
+{{--                        @endfor--}}
+{{--                    </select>--}}
+{{--                </div>--}}
+{{--            </div>--}}
             @if($superAdmin && $customer->name)
             <div class="col-md-6">
                 <div class="form-group input-group required">

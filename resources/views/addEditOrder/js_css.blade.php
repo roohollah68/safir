@@ -26,7 +26,7 @@
             paging: false,
             order: [[3, "desc"]],
         });
-        
+
         $("#name").autocomplete({
             source: Object.keys(customers),
             select: function (event, ui) {
@@ -171,7 +171,7 @@
         $('#phone').val(customer.phone);
         $('#address').val(customer.address);
         $('#zip_code').val(customer.zip_code);
-        $('#category').val(customer.category).change();
+        // $('#category').val(customer.category).change();
         $('#city').val(citiesId[customer.city_id].name).change();
     }
 

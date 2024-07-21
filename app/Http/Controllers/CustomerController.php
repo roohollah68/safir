@@ -78,7 +78,7 @@ class CustomerController extends Controller
             'phone' => $request->phone,
             'address' => $request->address,
             'zip_code' => $request->zip_code,
-            'category' => $request->category,
+//            'category' => $request->category,
             'city_id' => $request->city_id,
         ]);
         return redirect()->route('CustomerList');
@@ -121,7 +121,7 @@ class CustomerController extends Controller
             'phone' => $request->phone,
             'address' => $request->address,
             'zip_code' => $request->zip_code,
-            'category' => $request->category,
+//            'category' => $request->category,
             'city_id' => $request->city_id,
             'user_id' => $request->user,
         ]);

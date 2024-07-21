@@ -47,24 +47,24 @@
                     rows="2" :tag="'textarea'">توضیحات:
         </x-col-md-6>
 
-        @if($creatorIsAdmin)
-            <div class="col-md-6">
-                <div class="form-group input-group required">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label for="category" class="input-group-text w-100">دسته بندی:</label>
-                    </div>
-                    <select class="form-control" name="category" id="category">
-                        @foreach($customer->categories() as $ii => $category)
-                            <option value="{{$ii}}" @selected($ii == $customer->category) >
-                                {{$category}}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-        @else
-            <input type="hidden" name="category" value="0">
-        @endif
+{{--        @if($creatorIsAdmin)--}}
+{{--            <div class="col-md-6">--}}
+{{--                <div class="form-group input-group required">--}}
+{{--                    <div class="input-group-append" style="min-width: 160px">--}}
+{{--                        <label for="category" class="input-group-text w-100">دسته بندی:</label>--}}
+{{--                    </div>--}}
+{{--                    <select class="form-control" name="category" id="category">--}}
+{{--                        @foreach($customer->categories() as $ii => $category)--}}
+{{--                            <option value="{{$ii}}" @selected($ii == $customer->category) >--}}
+{{--                                {{$category}}--}}
+{{--                            </option>--}}
+{{--                        @endforeach--}}
+{{--                    </select>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        @else--}}
+{{--            <input type="hidden" name="category" value="0">--}}
+{{--        @endif--}}
     </div>
 
 
