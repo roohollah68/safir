@@ -709,6 +709,9 @@ class OrderController extends Controller
         $paymentMethod = $req->paymentMethod;
         $photo = null;
         $date = null;
+        if($order->confirm){
+            return ['error', 'قبلا تایید شده.'];
+        }
         if ($paymentMethod == 'cash') {
             if (!$req->file("cashPhoto"))
                 return ['error', 'باید عکس رسید بانکی بارگذاری شود.'];
