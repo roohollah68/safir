@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\CustomerTransactions;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
@@ -15,9 +16,13 @@ class StatisticController extends Controller
 {
     public function showStatistic(Request $request)
     {
+        $users = User::with('customers')->get()->keyBy("id");
+        foreach ($users as $id => $user) {
+            $users[$id]->customer = $user->customers->keyby('name');
+        }
         if (!isset($request->base)) {
             return view('statistic', [
-                'users' => User::all()->keyBy("id"),
+                'users' => $users,
                 'request' => (object)[
                     'from' => verta()->addMonths(-1)->toCarbon(),
                     'to' => verta()->toCarbon(),
@@ -26,24 +31,31 @@ class StatisticController extends Controller
                     'safirOrders' => true,
                     'siteOrders' => true,
                     'adminOrders' => true,
+                    'customer' => 'همه',
                 ],
             ]);
         }
-
         $request->from = Verta::parse($request->from)->toCarbon();
-        $request->to = Verta::parse($request->to)->toCarbon();
-        $users = User::all()->keyBy("id");
+        $request->to = Verta::parse($request->to)->addDay()->addSeconds(-1)->toCarbon();
+//        dd([$request->from , $request->to]);
         $orders = Order::where([
             ['state', 10],
             ['created_at', '>', $request->from],
             ['created_at', '<', $request->to]
         ]);
 
-        if ($request->user != 'all')
+        if ($request->user != 'all') {
             $orders = $orders->where('user_id', $request->user);
+            $customer = $users[$request->user]->customer;
+            if(isset($customer[$request->customer]))
+                $orders = $orders->where('customer_id',$customer[$request->customer]->id);
+            else
+                $request->customer = 'همه';
+        }
         $totalSale = 0;
         $totalProfit = 0;
         $orderNumber = 0;
+        $productNumber = 0;
         if ($request->base == 'productBase') {
             $orders = $orders->with('orderProducts', 'website')->get();
             $products = Product::where('category', 'final')->get()->keyBy('id');
@@ -65,6 +77,7 @@ class StatisticController extends Controller
                     $id = $orderProduct->product_id;
                     if (isset($products[$id])) {
                         $products[$id]->number += $orderProduct->number;
+                        $productNumber += $orderProduct->number;
                         $products[$id]->total += $orderProduct->number * $orderProduct->price;
                         $products[$id]->profit += $orderProduct->number * ($orderProduct->price - $products[$id]->productPrice);
                         $totalSale += $orderProduct->number * $orderProduct->price;
@@ -80,6 +93,7 @@ class StatisticController extends Controller
                 'request' => $request,
                 'users' => $users,
                 'orderNumber' => $orderNumber,
+                'productNumber' => $productNumber,
             ]);
 
         } elseif ($request->base == 'safirBase') {
@@ -150,8 +164,8 @@ class StatisticController extends Controller
                 if (!$order->paymentMethod)
                     continue;
                 $index = $order->payMethod();
-                if(!isset($paymentMethods[$index])){
-                    $paymentMethods[$index] = (object)['orderNumber'=>0,'totalSale'=>0];
+                if (!isset($paymentMethods[$index])) {
+                    $paymentMethods[$index] = (object)['orderNumber' => 0, 'totalSale' => 0];
                 }
                 $paymentMethods[$index]->orderNumber++;
                 $paymentMethods[$index]->totalSale += $order->total;
@@ -164,6 +178,41 @@ class StatisticController extends Controller
                 'users' => $users,
                 'paymentMethods' => $paymentMethods,
                 'orderNumber' => $orderNumber,
+            ]);
+        } elseif ($request->base == 'depositBase') {
+            $deposits = CustomerTransactions::where('type' , true)
+                ->where('deleted' ,false)
+                ->where('verified' , 'approved');
+
+            if ($request->user == 'all') {
+                $customers = Customer::all()->keyBy('id');
+            }else{
+                $customers = Customer::where('user_id' , $request->user);
+                if(isset($customer[$request->customer]))
+                    $customers = $customers->where('name' , $request->customer);
+                $customers = $customers->get()->keyBy('id');
+            }
+
+            foreach ($customers as $id => $customer){
+                $customers[$id]->total = 0;
+                $customers[$id]->number = 0;
+            }
+
+            $deposits = $deposits->get();
+            foreach ($deposits as $deposit) {
+                if(isset($customers[$deposit->customer_id])) {
+                    $customers[$deposit->customer_id]->total += $deposit->amount;
+                    $customers[$deposit->customer_id]->number++;
+                    $totalSale += $deposit->amount;
+                    $orderNumber++;
+                }
+            }
+            return view('statistic', [
+                'totalSale' => $totalSale,
+                'request' => $request,
+                'users' => $users,
+                'orderNumber' => $orderNumber,
+                'customers' => $customers,
             ]);
         }
     }

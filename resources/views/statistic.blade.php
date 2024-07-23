@@ -28,17 +28,27 @@
         <input type="checkbox" id="adminOrders" name="adminOrders"
                class="checkboxradio" @checked(isset($request->adminOrders))>
         <br>
-        <div class="my-3">
-            <div class="form-group col-md-4 d-flex">
-                <label for="user" class="input-group-text">فروشنده:</label>
-                <select class="form-control" name="user">
-                    <option value="all" selected>همه</option>
-                    @foreach($users as $id=>$user)
-                        <option value="{{$id}}" @selected($request->user == $id)>{{$user->name}}</option>
-                    @endforeach
-                </select>
+        <div class="row">
+            <div class="col-md-4 my-3">
+                <div class="form-group d-flex">
+                    <label for="user" class="input-group-text">فروشنده:</label>
+                    <select class="form-control" name="user" id="user" onchange="customerList()">
+                        <option value="all" selected>همه</option>
+                        @foreach($users as $id=>$user)
+                            <option value="{{$id}}" @selected($request->user == $id)>{{$user->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-4 my-3">
+                <div class="form-group d-flex">
+                    <label for="customer" class="input-group-text">مشتری:</label>
+                    <input type="text" name="customer" value="{{$request->customer}}" id="customer" class="form-control" @readonly($request->user == 'all')>
+                </div>
             </div>
         </div>
+
         <label for="productBase">بر اساس محصول</label>
         <input type="radio" name="base" value="productBase" id="productBase"
                class="checkboxradio" @checked($request->base=='productBase')>
@@ -51,6 +61,9 @@
         <label for="paymentBase">بر اساس نحوه پرداخت</label>
         <input type="radio" name="base" value="paymentBase" id="paymentBase"
                class="checkboxradio" @checked($request->base=='paymentBase')>
+        <label for="depositBase">بر اساس ثبت واریزی</label>
+        <input type="radio" name="base" value="depositBase" id="depositBase"
+               class="checkboxradio" @checked($request->base=='depositBase')>
         <br>
         <input class="btn btn-success m-3" type="submit" value="اعمال فیلتر">
     </form>
@@ -61,6 +74,7 @@
             <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
             <h4>مجموع سود در این دوره : <span>{{number_format($totalProfit)}}</span> ریال </h4>
             <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
+            <h4>تعداد محصولات فروخته شده : <span>{{$productNumber}}</span> عدد </h4>
             <br>
             <table class="stripe" id="statistic-table">
                 <thead>
@@ -163,6 +177,32 @@
                 </tbody>
             </table>
         @endif
+        @if($request->base=='depositBase')
+            <br>
+            <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+            <h4>تعداد واریزی ها در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
+            <br>
+            <table class="stripe" id="statistic-table">
+                <thead>
+                <tr>
+                    <th>مشتری</th>
+                    <th>کاربر مرتبط</th>
+                    <th>مبلغ کل(ریال)</th>
+                    <th>تعداد واریز</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($customers as $id => $customer)
+                    <tr>
+                        <td><a href="/customer/transaction/{{$customer->id}}">{{$customer->name}}</a></td>
+                        <td>{{$users[$customer->user_id]->name}}</td>
+                        <td>{{number_format($customer->total)}}</td>
+                        <td>{{$customer->number}}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        @endif
     @endif
 @endsection
 @section('files')
@@ -170,6 +210,7 @@
     <link rel="stylesheet" href="/date-time-picker/mds.bs.datetimepicker.style.css">
 
     <script>
+        let users = {!!$users!!};
         $(function () {
             $('#statistic-table').DataTable({
                 order: [[2, "desc"]],
@@ -187,6 +228,18 @@
                 selectedDateToShow: new Date('{{$request->to}}'),
             });
         });
+
+        function customerList(){
+            let customerId = $('#user').val()
+            if(customerId === 'all'){
+                $("#customer").val('همه').prop('readonly', true);
+            }else{
+                $("#customer").prop('readonly', false).autocomplete({
+                    source: Object.keys(users[customerId].customer),
+                });
+            }
+
+        }
     </script>
 
 @endsection
