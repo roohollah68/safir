@@ -180,9 +180,13 @@ class StatisticController extends Controller
                 'orderNumber' => $orderNumber,
             ]);
         } elseif ($request->base == 'depositBase') {
-            $deposits = CustomerTransactions::where('type' , true)
-                ->where('deleted' ,false)
-                ->where('verified' , 'approved');
+            $deposits = CustomerTransactions::where([
+                ['type', true],
+                ['deleted', false],
+                ['verified', 'approved'],
+                ['created_at', '>', $request->from],
+                ['created_at', '<', $request->to]
+            ]);
 
             if ($request->user == 'all') {
                 $customers = Customer::all()->keyBy('id');
