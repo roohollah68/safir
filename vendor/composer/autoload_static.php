@@ -553,6 +553,7 @@ class ComposerStaticInit3cd122d8294a4d469d6f1b2428bbd8ef
         'App\\Http\\Controllers\\ProductChangeController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProductChangeController.php',
         'App\\Http\\Controllers\\ProductController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProductController.php',
         'App\\Http\\Controllers\\SettingController' => __DIR__ . '/../..' . '/app/Http/Controllers/SettingController.php',
+        'App\\Http\\Controllers\\StatisticController' => __DIR__ . '/../..' . '/app/Http/Controllers/StatisticController.php',
         'App\\Http\\Controllers\\TelegramController' => __DIR__ . '/../..' . '/app/Http/Controllers/TelegramController.php',
         'App\\Http\\Controllers\\TransactionController' => __DIR__ . '/../..' . '/app/Http/Controllers/TransactionController.php',
         'App\\Http\\Controllers\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserController.php',
