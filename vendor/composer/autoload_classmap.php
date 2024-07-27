@@ -27,6 +27,7 @@ return array(
     'App\\Http\\Controllers\\ProductChangeController' => $baseDir . '/app/Http/Controllers/ProductChangeController.php',
     'App\\Http\\Controllers\\ProductController' => $baseDir . '/app/Http/Controllers/ProductController.php',
     'App\\Http\\Controllers\\SettingController' => $baseDir . '/app/Http/Controllers/SettingController.php',
+    'App\\Http\\Controllers\\StatisticController' => $baseDir . '/app/Http/Controllers/StatisticController.php',
     'App\\Http\\Controllers\\TelegramController' => $baseDir . '/app/Http/Controllers/TelegramController.php',
     'App\\Http\\Controllers\\TransactionController' => $baseDir . '/app/Http/Controllers/TransactionController.php',
     'App\\Http\\Controllers\\UserController' => $baseDir . '/app/Http/Controllers/UserController.php',
