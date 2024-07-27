@@ -175,25 +175,3 @@ class DepositController extends Controller
         $this->bot->sendPhoto($this->chat_id, $file_id, $caption, $this->req->message->message_id, $keyboard);
     }
 
-    public function newDepositWithPhotoTelegram($id, $pass, $file_id)
-    {
-        $user = User::findOrFail($id);
-        if ($user->telegram_code == $pass) {
-            auth()->login($user);
-            self::savePhoto($file_id);
-            return redirect("deposit/add?file=$file_id");
-        }
-        return abort(404);
-    }
-
-    public static function savePhoto($file_id)
-    {
-        if (Storage::disk('deposit')->exists("$file_id.jpg")) {
-            return true;
-        }
-        $bot = new BotApi(env('TelegramDeposit'));
-        $file = $bot->downloadFile($file_id);
-        Storage::disk('deposit')->put($file_id . '.jpg', $file);
-        return true;
-    }
-}

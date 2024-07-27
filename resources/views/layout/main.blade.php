@@ -23,12 +23,16 @@
     <link rel="stylesheet" href="/bootstrap-5.1.3-dist/css/bootstrap.rtl.min.css">
 
     <link rel="stylesheet" href="/css/jquery.dataTables.min.css">
-
+{{--    <link href="https://cdn.datatables.net/v/dt/jszip-3.10.1/dt-2.1.0/b-3.1.0/b-html5-3.1.0/datatables.min.css" rel="stylesheet">--}}
     <link rel="stylesheet" href="/fontAwesome/css/all.min.css"/>
 
     <script src="/js/notify.min.js"></script>
 
     <script src="/js/dom-to-image.min.js"></script>
+
+{{--    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>--}}
+{{--    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>--}}
+{{--    <script src="https://cdn.datatables.net/v/dt/jszip-3.10.1/dt-2.1.0/b-3.1.0/b-html5-3.1.0/datatables.min.js"></script>--}}
 
     @include('layout.style_css')
 

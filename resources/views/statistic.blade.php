@@ -214,6 +214,11 @@
         $(function () {
             $('#statistic-table').DataTable({
                 order: [[2, "desc"]],
+                layout: {
+                    topStart: {
+                        buttons: ['copyHtml5', 'excelHtml5', 'csvHtml5', 'pdfHtml5']
+                    }
+                }
             });
             $(".checkboxradio").checkboxradio();
 
