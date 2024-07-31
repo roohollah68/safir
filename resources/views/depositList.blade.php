@@ -17,10 +17,10 @@
             @endif
             <th>تاریخ ثبت</th>
             <th>مبلغ (ریال)</th>
-            @if($superAdmin)
-                <th>توضیحات</th>
-                <th>تصویر</th>
-            @endif
+
+            <th>توضیحات</th>
+            <th>تصویر</th>
+
             <th>وضعیت</th>
             <th>عملیات</th>
         </tr>
@@ -37,16 +37,16 @@
                 @endif
                 <td>{{verta($deposit->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
                 <td>{{number_format($deposit->amount)}}</td>
-                @if($superAdmin)
-                    <td>{{$deposit->desc}}</td>
-                    <td>
-                        @if($deposit->photo)
-                            <a target="_blank" href="/deposit/{{$deposit->photo}}">
-                                <p>مشاهده سند</p>
-                            </a>
-                        @endif
-                    </td>
-                @endif
+
+                <td>{{$deposit->desc}}</td>
+                <td>
+                    @if($deposit->photo)
+                        <a target="_blank" href="/deposit/{{$deposit->photo}}">
+                            <p>مشاهده سند</p>
+                        </a>
+                    @endif
+                </td>
+
                 <td>
                     @if($deposit->confirmed)
                         <p class="btn btn-success" @if($superAdmin) id="confirm{{$deposit->id}}"

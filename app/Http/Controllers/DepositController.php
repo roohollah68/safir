@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Deposit;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use TelegramBot\Api\BotApi;
-use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup as IKM;
-use App\Keyboards\Keyboard;
+//use Illuminate\Support\Facades\Storage;
+//use TelegramBot\Api\BotApi;
+//use TelegramBot\Api\Types\Inline\InlineKeyboardMarkup as IKM;
+//use App\Keyboards\Keyboard;
 
 class DepositController extends Controller
 {
-    public $req, $chat_id, $bot;
+//    public $req, $chat_id, $bot;
 
     public function depositList()
     {
@@ -133,46 +133,46 @@ class DepositController extends Controller
         }
     }
 
-    public function receive()
-    {
-        $this->bot = new BotApi(env('TelegramDeposit'));
+//    public function receive()
+//    {
+//        $this->bot = new BotApi(env('TelegramDeposit'));
+//
+//        $this->req = json_decode(file_get_contents('php://input'));
+//        $this->chat_id = $this->req->message->from->id;
+//        $user = User::where('telegram_id', $this->chat_id)->first();
+//        if ($user) {
+//            $type = $this->detect_type();
+//            if ($type == 'photo') {
+//                $this->new_order_receipt($user);
+//
+//            }
+//            if ($type == 'text') {
+//                $message = 'برای ثبت واریزی تصویر رسید بانکی را به همین ربات بفرستید.';
+//                $this->bot->sendMessage($this->chat_id, $message);
+//            }
+//
+//        } else {
+//            $message = 'حساب تلگرام شما ثبت نشده است، لطفا ابتدا در ربات @Safir_sefaresh_bot ثبت نام کنید.';
+//            $this->bot->sendMessage($this->chat_id, $message);
+//        }
+//
+//    }
 
-        $this->req = json_decode(file_get_contents('php://input'));
-        $this->chat_id = $this->req->message->from->id;
-        $user = User::where('telegram_id', $this->chat_id)->first();
-        if ($user) {
-            $type = $this->detect_type();
-            if ($type == 'photo') {
-                $this->new_order_receipt($user);
+//    public function detect_type()
+//    {
+//        if (isset($this->req->message->text))
+//            return 'text';
+//        if (isset($this->req->message->photo))
+//            return 'photo';
+//    }
 
-            }
-            if ($type == 'text') {
-                $message = 'برای ثبت واریزی تصویر رسید بانکی را به همین ربات بفرستید.';
-                $this->bot->sendMessage($this->chat_id, $message);
-            }
-
-        } else {
-            $message = 'حساب تلگرام شما ثبت نشده است، لطفا ابتدا در ربات @Safir_sefaresh_bot ثبت نام کنید.';
-            $this->bot->sendMessage($this->chat_id, $message);
-        }
-
-    }
-
-    public function detect_type()
-    {
-        if (isset($this->req->message->text))
-            return 'text';
-        if (isset($this->req->message->photo))
-            return 'photo';
-    }
-
-    public function new_order_receipt($user)
-    {
-        $file_id = end($this->req->message->photo)->file_id;
-        $caption = "برای ثبت جزئیات مربوط به این رسید روی لینک زیر کلیک کنید";
-        $url = env('APP_URL') . "deposit/add/{$user->id}/{$user->telegram_code}/{$file_id}";
-        $keyboard = new IKM(Keyboard::register_user($url, "ثبت فاکتور مربوط به این رسید"));
-        $this->bot->sendPhoto($this->chat_id, $file_id, $caption, $this->req->message->message_id, $keyboard);
-    }
+//    public function new_order_receipt($user)
+//    {
+//        $file_id = end($this->req->message->photo)->file_id;
+//        $caption = "برای ثبت جزئیات مربوط به این رسید روی لینک زیر کلیک کنید";
+//        $url = env('APP_URL') . "deposit/add/{$user->id}/{$user->telegram_code}/{$file_id}";
+//        $keyboard = new IKM(Keyboard::register_user($url, "ثبت فاکتور مربوط به این رسید"));
+//        $this->bot->sendPhoto($this->chat_id, $file_id, $caption, $this->req->message->message_id, $keyboard);
+//    }
 
 }

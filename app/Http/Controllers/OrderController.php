@@ -183,7 +183,7 @@ class OrderController extends Controller
                     'desc' => ' خرید سفیر ' . $user->name
                 ]);
             }
-            //$order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+            $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
             $order->save();
         }
 
@@ -515,7 +515,6 @@ class OrderController extends Controller
 
             }
             app('Telegram')->deleteOrderFromBale($order, env('GroupId'));
-//            $this->deleteFromBale(env('GroupId'), $order->bale_id);
             DB::commit();
             return ['با موفقیت حذف شد', $order];
         };
@@ -708,7 +707,6 @@ class OrderController extends Controller
         DB::beginTransaction();
         $paymentMethod = $req->paymentMethod;
         $photo = null;
-        $date = null;
         if($order->confirm){
             return ['error', 'قبلا تایید شده.'];
         }
@@ -720,9 +718,10 @@ class OrderController extends Controller
 
         }
         if ($paymentMethod == 'cheque') {
-            if ($req->file("chequePhoto"))
+            if ($req->file("chequePhoto")) {
                 $photo = $req->file("chequePhoto")->store("", 'deposit');
-            $photo2 = $req->file("chequePhoto")->store("", 'receipt');
+                $photo2 = $req->file("chequePhoto")->store("", 'receipt');
+            }
         }
         if ($paymentMethod == 'payInDate') {
             if (strlen($req->payInDate) != 10)
