@@ -211,7 +211,7 @@ class TelegramController extends Controller
     public function sendOrderToBale($order, $chatId)
     {
         $message = self::createOrderMessage($order);
-        dd(env('APP_URL') . "receipt/{$order->receipt}");
+//        dd(env('APP_URL') . "receipt/{$order->receipt}");
         $content = array("caption" => $message, "text" => $message, "photo" => env('APP_URL') . "receipt/{$order->receipt}");
         if ($order->receipt) {
             return $this->sendPhotoToBale($content, $chatId);

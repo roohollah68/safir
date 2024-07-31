@@ -310,7 +310,7 @@ class CustomerController extends Controller
                 'desc' => ' خرید مشتری ' . $order->name,
             ]);
         }
-        dd(app('Telegram')->sendOrderToBale($order, env('GroupId')));
+//        dd(app('Telegram')->sendOrderToBale($order, env('GroupId')));
         //$order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
         $order->save();
         DB::commit();
