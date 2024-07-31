@@ -285,7 +285,6 @@ class BaleAPIv2{
 			if(isset($arr["chat_id"]) and isset($arr["photo"])){
 				$arr["command"]='sendPhoto';
 				$arr['photo']=trim($arr['photo']);
-//                dd($arr);
 				$return=$this->sendrequest($arr);
 			}else{
 				$return="undefined chatid or photo";
