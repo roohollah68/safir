@@ -183,7 +183,7 @@ class OrderController extends Controller
                     'desc' => ' خرید سفیر ' . $user->name
                 ]);
             }
-            $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+            //$order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
             $order->save();
         }
 

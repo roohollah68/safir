@@ -28,12 +28,12 @@ class DepositController extends Controller
 
     public function newForm(Request $req)
     {
-        return view('addEditDeposit', ['deposit' => false,'req' => $req->all()]);
+        return view('addEditDeposit', ['deposit' => false, 'req' => $req->all()]);
     }
 
     public function storeNew(Request $req)
     {
-        $req->amount = str_replace(",","",$req->amount);
+        $req->amount = str_replace(",", "", $req->amount);
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'amount' => 'required',
@@ -75,7 +75,7 @@ class DepositController extends Controller
 
     public function updateDeposit($id, Request $req)
     {
-        $req->amount = str_replace(",","",$req->amount);
+        $req->amount = str_replace(",", "", $req->amount);
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'amount' => 'required',
@@ -175,3 +175,4 @@ class DepositController extends Controller
         $this->bot->sendPhoto($this->chat_id, $file_id, $caption, $this->req->message->message_id, $keyboard);
     }
 
+}
