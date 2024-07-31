@@ -311,7 +311,7 @@ class CustomerController extends Controller
             ]);
         }
 //        dd(app('Telegram')->sendOrderToBale($order, env('GroupId')));
-        //$order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+        $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
         $order->save();
         DB::commit();
     }
