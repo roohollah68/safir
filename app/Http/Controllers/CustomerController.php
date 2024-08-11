@@ -9,6 +9,7 @@ use App\Models\CustomerTransactions;
 use App\Models\Order;
 use App\Models\Province;
 use App\Models\User;
+use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
@@ -311,8 +312,8 @@ class CustomerController extends Controller
             ]);
         }
         $response = app('Telegram')->sendOrderToBale($order, env('GroupId'));
-        if(isset($response->result)){
-            $order->bale_id =$response->result->message_id;
+        if (isset($response->result)) {
+            $order->bale_id = $response->result->message_id;
         }
         $order->save();
         DB::commit();
@@ -351,11 +352,28 @@ class CustomerController extends Controller
         DB::commit();
     }
 
-    public function customerSOA($id)
+    public function customerSOA($id, Request $request)
     {
-        $customer = Customer::with('transactions')->find($id);
+
+        $transactions = CustomerTransactions::where('customer_id', $id);
+        $timeDescription = 'همه تراکنش ها';
+        if ($request->timeFilter == 'specifiedTime') {
+            $timeDescription = 'از ' . $request->from . ' تا ' . $request->to;
+            $request->from = Verta::parse($request->from)->toCarbon();
+            $request->to = Verta::parse($request->to)->addDay()->addSeconds(-1)->toCarbon();
+            $transactions = $transactions->where([
+                ['created_at', '>', $request->from],
+                ['created_at', '<', $request->to]
+            ]);
+        }
+
+        $customer = Customer::find($id);
         $pdf = PDF::loadView('customerSOA', [
                 'customer' => $customer,
+                'transactions' => $transactions->get(),
+                'timeDescription' => $timeDescription,
+                'withInvoice' => !!$request->allInvoice,
+                'orders' => [],
                 'total' => 0,
                 'total1' => 0,
                 'total2' => 0,

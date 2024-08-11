@@ -20,7 +20,9 @@
         <span class="h3">بدهکاری:</span> <b dir="ltr"
                                             class="h3 text-danger">{{number_format($customer->balance)}}</b><span
             class="h3">ریال</span><br>
-        <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب" href="/customer/SOA/{{$customer->id}}"></a>
+{{--        <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب" href="/customer/SOA/{{$customer->id}}"></a>--}}
+        <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب"
+           onclick="transactionReport({{$customer->id}})"></a>
         <a class="fa fa-edit btn btn-primary"
            href="/customer/edit/{{$customer->id}}"
            title="ویرایش مشتری">
@@ -94,12 +96,45 @@
         </tbody>
     </table>
     <div id="invoice-wrapper"></div>
+    <div id="transactionReportTXT">
+        <div title="مشاهده سفارش" class="dialogs">
+            <form method="post" id="report" action="">
+                @csrf
+                <label for="allTime">همه زمان ها</label>
+                <input class="checkboxradio" type="radio" name="timeFilter" id="allTime" value="allTime"
+                       onclick="$('#timeInterval').hide()" checked><br><br>
+                <label for="specifiedTime">بازه زمانی مشخص</label>
+                <input class="checkboxradio" type="radio" name="timeFilter" id="specifiedTime" value="specifiedTime"
+                       onclick="$('#timeInterval').show()">
+                <div class="input-group col-12 mb-3 hide" id="timeInterval">
+                    <div class="col-md-10 d-flex">
+                        <span class="input-group-text cursor-pointer" id="date1">📅</span>
+                        <input type="text" name="from" class="form-control" placeholder="از تاریخ" id="date1-text">
+                    </div>
+                    <div class=" col-md-10 d-flex">
+                        <span class="input-group-text cursor-pointer" id="date2">📅</span>
+                        <input type="text" name="to" class="form-control" placeholder="تا تاریخ" id="date2-text">
+                    </div>
+                </div>
+                <br><br>
+                <label for="allInvoice">به همراه فاکتورها</label>
+                <input class="checkboxradio" type="checkbox" name="allInvoice" id="allInvoice">
+                <br><br>
+                <input type="submit" class="btn btn-outline-success" name="submit" value="دریافت فایل">
+            </form>
+
+        </div>
+    </div>
+
 @endsection
 
 
 @section('files')
+    <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
+    <link rel="stylesheet" href="/date-time-picker/mds.bs.datetimepicker.style.css">
     <script>
         let token;
+        let transactionReportTXT;
         $(function () {
             $('#transaction-table').DataTable({
                 columnDefs: [
@@ -117,6 +152,8 @@
                 paging: false,
             });
             token = $('input[name=_token]').val();
+            transactionReportTXT = $('#transactionReportTXT').html();
+            $('#transactionReportTXT').html('');
         });
 
         function deleteDeposit(id) {
@@ -129,7 +166,7 @@
             }
         }
 
-                function cancelInvoice(id) {
+        function cancelInvoice(id) {
             if (confirm('آیا از حذف کردن فاکتور مطمئن هستید؟')) {
                 $.post('/cancel_invoice/' + id, {_token: token})
                     .done(res => {
@@ -137,6 +174,35 @@
                     });
             }
 
+        }
+
+        function transactionReport(id) {
+
+            let dialog =Dialog(transactionReportTXT);
+
+            $(".checkboxradio").checkboxradio();
+
+            const date1 = new mds.MdsPersianDateTimePicker($('#date1')[0], {
+                targetTextSelector: '#date1-text',
+            });
+            const date2 = new mds.MdsPersianDateTimePicker($('#date2')[0], {
+                targetTextSelector: '#date2-text',
+            });
+
+            $("#report").submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: '/customer/SOA/' + id,
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                })
+                dialog.remove();
+            });
         }
 
     </script>

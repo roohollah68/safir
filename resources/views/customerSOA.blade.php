@@ -8,8 +8,9 @@
 <span>آدرس:</span> <b>{{$customer->address}}</b><br>
 <span class="x-large">مانده کل:</span>
 <b class="x-large" dir="ltr">{{number_format($customer->balance)}} </b>
-<span class="x-large"> ریال</span>
-<table id="customers">
+<span class="x-large"> ریال</span><br>
+<span>{{$timeDescription}}</span>
+<table class="customers">
     <thead>
     <tr>
         <th>شماره سند</th>
@@ -21,7 +22,7 @@
     </tr>
     </thead>
     <tbody>
-    @foreach($customer->transactions as $trans)
+    @foreach($transactions as $trans)
         @if($trans->deleted || (!$trans->order_id && $trans->verified != 'approved'))
             @continue
         @endif
@@ -29,6 +30,10 @@
             $total += $trans->type?$trans->amount:-$trans->amount;
             $total1 += $trans->type?0:$trans->amount;
             $total2 += $trans->type?$trans->amount:0;
+            if($withInvoice && $trans->order_id){
+                $order = \App\Models\Order::with('orderProducts')->find($trans->order_id);
+                array_push($orders , $order);
+            }
         @endphp
         <tr>
             <td>{{$trans->order_id?:$trans->id}}</td>
@@ -46,42 +51,111 @@
         <td dir="ltr" class="large">{{number_format($total)}}</td>
     </tr>
     </tbody>
-    z
 </table>
 
-<style>
-    #customers {
-        border-collapse: collapse;
-        width: 100%;
-    }
+@if($withInvoice)
+    @foreach($orders as $order)
+        <pagebreak>
+            <span>شماره فاکتور: {{$order->id}}</span><br>
+            <span>تاریخ فاکتور: </span>
+            <span>{{verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</span>
+            <table class="customers">
+                <tr>
+                    <th>ردیف</th>
+                    <th>شرح کالا/خدمات</th>
+                    <th>مقدار</th>
+                    <th>قیمت (ریال)</th>
+                    <th>درصد تخفیف</th>
+                    <th>قیمت بعد تخفیف</th>
+                    <th>جمع (ریال)</th>
+                </tr>
+                @php
+                    $total_dis = 0;
+                    $total_no_dis = 0;
+                    $totalProducts = 0;
+                @endphp
+                @foreach($order->orderProducts as $orderProduct)
+                    @php
+                        $price_dis = $orderProduct->price;
+                        $sub_total_dis= ($orderProduct->price * $orderProduct->number); //قیمت * تعداد
+                        if($orderProduct->discount != 100)
+                            $price_no_dis = round((100/(100-$orderProduct->discount))*$orderProduct->price);
+                        else
+                            $price_no_dis = $orderProduct->product->price;
+                        $sub_total_no_dis = $price_no_dis * $orderProduct->number;
+                        $total_no_dis = $total_no_dis + $sub_total_no_dis;
+                        $total_dis = $total_dis + $sub_total_dis;
+                        $totalProducts += $orderProduct->number;
+                    @endphp
+                    <tr>
+                        <td>{{$loop->iteration}}</td>
+                        <td>{{$orderProduct->name}}</td>
+                        <td>{{+$orderProduct->number}}</td>
+                        <td>{{number_format($price_no_dis)}}</td>
+                        <td>{{+$orderProduct->discount}}</td>
+                        <td>{{number_format($price_dis)}}</td>
+                        <td>{{number_format($sub_total_dis)}}</td>
+                    </tr>
+                @endforeach
+                <tr>
+                    <td colspan="2">مجموع تعداد اقلام</td>
+                    <td>{{$totalProducts}}</td>
+                    <td colspan="3"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="border-bottom: none;"><br><br></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="4"></td>
+                    <td colspan="2">مبلغ کل بدون تخفیف</td>
+                    <td>{{number_format($total_no_dis)}}</td>
+                </tr>
+                <tr>
+                    <th colspan="4"> شما از این خرید {{number_format(abs($total_no_dis-$total_dis))}} ریال تخفیف
+                        گرفتید
+                    </th>
+                    <th colspan="2">مبلغ قابل پرداخت</th>
+                    <th>{{number_format($total_dis)}}</th>
+                </tr>
+            </table>
+            @endforeach
+            @endif
 
-    #customers td, #customers th {
-        border: 1px solid #ddd;
-        padding: 8px;
-    }
+            <style>
+                .customers {
+                    border-collapse: collapse;
+                    width: 100%;
+                }
 
-    #customers tr:nth-child(even) {
-        background-color: #f2f2f2;
-    }
+                .customers td, .customers th {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                }
 
-    #customers tr:hover {
-        background-color: #ddd;
-    }
+                .customers tr:nth-child(even) {
+                    background-color: #f2f2f2;
+                }
 
-    #customers th {
-        padding-top: 12px;
-        padding-bottom: 12px;
-        background-color: gray;
-        color: white;
-    }
+                .customers tr:hover {
+                    background-color: #ddd;
+                }
 
-    .x-large {
-        font-size: x-large;
-    }
+                .customers th {
+                    padding-top: 12px;
+                    padding-bottom: 12px;
+                    background-color: gray;
+                    color: white;
+                }
 
-    .large{
-        font-size: large;
-    }
-</style>
+                .x-large {
+                    font-size: x-large;
+                }
+
+                .large {
+                    font-size: large;
+                }
+            </style>
 </html>
 

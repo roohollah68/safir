@@ -118,6 +118,7 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'admin', 'role']]
     Route::get('/customer/transaction/{id}', [CustomerController::class, 'customersTransactionList'])
         ->name('customersTransactionList');
     Route::get('/customer/SOA/{id}', [CustomerController::class, 'customerSOA']);
+    Route::post('/customer/SOA/{id}', [CustomerController::class, 'customerSOA']);
     Route::get('/customerDeposit/add/{id}', [CustomerController::class, 'newForm']);
     Route::get('/customerDeposit/add/{id}/{linkId}', [CustomerController::class, 'newForm']);
     Route::post('/customerDeposit/add/{id}', [CustomerController::class, 'storeNew']);

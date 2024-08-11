@@ -80,7 +80,7 @@
 
                         @if(!$safir)
                             <a class="btn btn-info" href="/customer/transaction/{{$customer->id}}">تراکنش ها</a>
-                            <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب" href="/customer/SOA/{{$customer->id}}"></a>
+{{--                            <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب" href="/customer/SOA/{{$customer->id}}"></a>--}}
                         @endif
                     </td>
                 </tr>
