@@ -67,7 +67,7 @@
         </div>
 
         <button class="btn btn-secondary my-2" onclick="generatePDFs()"> فایل PDF انتخابی ها</button>
-        <a id="pdf-link"></a>
+        <a id="pdf-link" target="_blank"></a>
     @endif
 
     <table id="main-table" class="stripe">

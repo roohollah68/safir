@@ -387,7 +387,10 @@ class CustomerController extends Controller
                 'margin_top' => 4,
                 'margin_bottom' => 4,
             ]);
-        return $pdf->stream($id . '.pdf');
+        $pdf->getMpdf()->OutputFile('pdf/' . $id . '.pdf');
+        return env('APP_URL') . 'pdf/' . $id . '.pdf';
+//        return $pdf->stream($id . '.pdf');
+//        return $pdf->download($id . '.pdf');
     }
 
 }

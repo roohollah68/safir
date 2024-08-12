@@ -20,7 +20,7 @@
         <span class="h3">بدهکاری:</span> <b dir="ltr"
                                             class="h3 text-danger">{{number_format($customer->balance)}}</b><span
             class="h3">ریال</span><br>
-{{--        <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب" href="/customer/SOA/{{$customer->id}}"></a>--}}
+        {{--        <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب" href="/customer/SOA/{{$customer->id}}"></a>--}}
         <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب"
            onclick="transactionReport({{$customer->id}})"></a>
         <a class="fa fa-edit btn btn-primary"
@@ -178,7 +178,7 @@
 
         function transactionReport(id) {
 
-            let dialog =Dialog(transactionReportTXT);
+            let dialog = Dialog(transactionReportTXT);
 
             $(".checkboxradio").checkboxradio();
 
@@ -192,14 +192,16 @@
             $("#report").submit(function (e) {
                 e.preventDefault();
                 $.ajax({
-                    type: "POST",
+                    type: "post",
                     url: '/customer/SOA/' + id,
                     data: new FormData(this),
                     processData: false,
                     contentType: false,
                     headers: {
-                        "Accept": "application/json"
+                        "Accept": "application/pdf"
                     }
+                }).done(res => {
+                    window.open(res, '_blank');
                 })
                 dialog.remove();
             });
