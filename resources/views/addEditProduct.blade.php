@@ -119,7 +119,7 @@
                         <label for="alarm" class="input-group-text w-100">حد پایین:</label>
                     </div>
                     <input type="number" id="alarm" class="form-control" name="alarm"
-                           value="{{$product->alarm?:10}}"
+                           value="{{$product->alarm?:0}}"
                            required>
 
                 </div>
