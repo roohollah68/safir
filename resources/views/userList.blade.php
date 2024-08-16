@@ -15,7 +15,7 @@
     @endif
     <br>
     <h3>لیست کاربران تایید شده:</h3>
-    <table class="table">
+    <table class="table table-striped">
         <thead>
         <tr>
             <th>نام و نام خانوادگی</th>

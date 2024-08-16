@@ -43,7 +43,7 @@
     </form>
     <br>
 
-    <table id="transaction-table" class="stripe">
+    <table id="transaction-table" class="table table-striped">
         <br>
         <thead>
         <tr>

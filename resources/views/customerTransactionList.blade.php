@@ -33,7 +33,7 @@
     <br>
     <span class="btn btn-warning" onclick="$('.deleted').toggle()"><span class="fa fa-check deleted"></span> نمایش موارد حذف شده</span>
     <br>
-    <table class="stripe" id="transaction-table">
+    <table class="table table-striped" id="transaction-table">
         <br>
         <thead>
         <tr>
@@ -50,6 +50,7 @@
         <tbody>
 
         @foreach($transactions as $tran)
+            @continue($tran->deleted)
             <tr style="color:{{$tran->type?'green':'red'}}" class="{{$tran->deleted?'deleted':''}}">
                 <td>{{$tran->id}}</td>
                 <td>{{verta($tran->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
@@ -137,6 +138,10 @@
         let transactionReportTXT;
         $(function () {
             $('#transaction-table').DataTable({
+                dom: 'lBfrtip',
+                buttons: [
+                    'excelHtml5',
+                ],
                 columnDefs: [
                     {
                         targets: [2, 3, 4],

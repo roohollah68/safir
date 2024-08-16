@@ -6,7 +6,7 @@
 @endif
 
 <div id="products" class="my-4">
-    <table class="stripe" id="product-table">
+    <table class="table table-striped" id="product-table">
         <thead>
         <tr>
             <th>محصول</th>

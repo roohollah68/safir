@@ -7,7 +7,7 @@
 @section('content')
 
     <br>
-    <table class="stripe" id="transaction-table">
+    <table class="table table-striped" id="transaction-table">
         <thead>
         <tr>
             <th>id</th>

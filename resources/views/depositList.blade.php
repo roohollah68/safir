@@ -8,7 +8,7 @@
     <a class="btn btn-info" href="{{route('addDeposit')}}">ثبت سند واریزی جدید</a>
     <br>
     <br>
-    <table class="stripe" id="product-table">
+    <table class="table table-striped" id="product-table">
         <thead>
         <tr>
             <th>#</th>

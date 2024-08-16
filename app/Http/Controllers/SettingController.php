@@ -146,15 +146,10 @@ class SettingController extends Controller
             }
             if ($customer->balance != $balance) {
                 echo $customer->name . ' / ' . $customer->id . '<br>';
-            };
-            if ($customer->id == 2264) {
-                echo $customer->balance . ' // ' . $balance;
             }
-
 
 //            $customer->save();
         }
-
 
 //        DB::commit();
         return 'ok';

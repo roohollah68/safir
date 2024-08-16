@@ -70,7 +70,7 @@
         <a id="pdf-link" target="_blank"></a>
     @endif
 
-    <table id="main-table" class="stripe">
+    <table id="main-table" class="table table-striped">
     </table>
     <div id="invoice-wrapper"></div>
     <div class="d-none" id="paymentMethodText">

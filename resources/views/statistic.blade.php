@@ -76,7 +76,7 @@
             <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
             <h4>تعداد محصولات فروخته شده : <span>{{$productNumber}}</span> عدد </h4>
             <br>
-            <table class="stripe" id="statistic-table">
+            <table class="table table-striped" id="statistic-table">
                 <thead>
                 <tr>
                     <th>نام محصول</th>
@@ -107,7 +107,7 @@
             <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
             <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
             <br>
-            <table class="stripe" id="statistic-table">
+            <table class="table table-striped" id="statistic-table">
                 <thead>
                 <tr>
                     <th>نام فرروشنده</th>
@@ -132,7 +132,7 @@
             <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
             <br>
 
-            <table class="stripe" id="statistic-table">
+            <table class="table table-striped" id="statistic-table">
                 <thead>
                 <tr>
                     <th>نام مشتری</th>
@@ -158,7 +158,7 @@
             <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
             <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
             <br>
-            <table class="stripe" id="statistic-table">
+            <table class="table table-striped" id="statistic-table">
                 <thead>
                 <tr>
                     <th>شیوه پرداخت</th>
@@ -182,7 +182,7 @@
             <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
             <h4>تعداد واریزی ها در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
             <br>
-            <table class="stripe" id="statistic-table">
+            <table class="table table-striped" id="statistic-table">
                 <thead>
                 <tr>
                     <th>مشتری</th>

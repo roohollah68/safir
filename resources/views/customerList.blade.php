@@ -37,7 +37,7 @@
     <br>
     <br>
     <div id="table-container">
-        <table class="stripe" id="customer-table">
+        <table class="table table-striped" id="customer-table">
             <thead>
             <tr>
                 <th>شماره</th>

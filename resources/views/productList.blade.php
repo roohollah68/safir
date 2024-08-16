@@ -71,7 +71,7 @@
 
     <br>
     <br>
-    <table class="stripe" id="product-table">
+    <table class="table table-striped" id="product-table">
         <thead>
         <tr>
             <th>شماره</th>

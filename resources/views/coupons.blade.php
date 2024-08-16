@@ -8,7 +8,7 @@
     <a class="btn btn-info" href="{{route('addCoupon')}}">افزودن تخفیف جدید</a>
     <br>
     <br>
-    <table class="stripe" id="coupon-table">
+    <table class="table table-striped" id="coupon-table">
         <thead>
         <tr>
             <th>تخفیف(درصد)</th>
