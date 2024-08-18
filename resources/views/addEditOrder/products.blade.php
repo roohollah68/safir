@@ -2,6 +2,7 @@
 @if(!$safir && !$edit)
     <a class="btn {{$location == 't'?'btn-info':'btn-outline-info'}}" href="/add_order?city=t">تهران</a>
     <a class="btn {{$location == 'm'?'btn-info':'btn-outline-info'}}" href="/add_order?city=m">مشهد</a>
+    <a class="btn {{$location == 's'?'btn-info':'btn-outline-info'}}" href="/add_order?city=s">شیراز</a>
     <br>
 @endif
 
@@ -30,7 +31,7 @@
                            type="number" value="{{old("product_".$product->id)?:$cart[$product->id]}}"
                            style="width: 50px" min="0">
                     <span class="btn btn-primary fa fa-minus" onclick="num_minus({{$product->id}})"></span>
-                    <span class="btn btn-outline-info ">{{+$product->quantity}}</span>
+                    <span class="btn btn-outline-info" dir="ltr">{{+$product->quantity}}</span>
                 </td>
 
                 {{--قیمت(ریال)--}}

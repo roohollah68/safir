@@ -23,7 +23,8 @@
         //create products table
         $('#product-table').DataTable({
             autoWidth: false,
-            paging: false,
+            // paging: false,
+            pageLength: 100,
             order: [[3, "desc"]],
         });
 
@@ -55,8 +56,6 @@
                 let city = citiesId[$('#city_id').val()];
                 $('#city').val(city.name)
             }
-        }).click(function () {
-            this.value = '';
         });
     });
 

@@ -49,10 +49,10 @@ class OrderController extends Controller
         $customersData = $user->customers()->get();
 
         //استثنا آقای عبدی
-        if ($this->safir() || $user->id != 57) {
+        if ($this->safir() || $user->id == 57) {
             $products = Product::where('category', 'final')->where('location', 't')->where('price', '>', '1')->where('available', true)->get()->keyBy('id');
         } else {
-            $products = Product::where('category', '<>', 'pack')->where('location', 't')->where('available', true)->get()->keyBy('id');
+            $products = Product::where('category', '<>', 'pack')->where('location', $city)->where('available', true)->get()->keyBy('id');
         }
         $cart = [];
         foreach ($products as $id => $product) {

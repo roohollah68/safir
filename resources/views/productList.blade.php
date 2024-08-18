@@ -172,7 +172,7 @@
         function draw() {
             $('#product-table').DataTable({
                 order: [[3, "desc"]],
-                pageLength: 1000,
+                pageLength: 100,
                 destroy: true,
             });
         }

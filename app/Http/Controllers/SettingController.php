@@ -129,27 +129,39 @@ class SettingController extends Controller
 //            }
 //        }
 
-        $customers = Customer::with('transactions')->get();
-        foreach ($customers as $customer) {
-//            $trans = CustomerTransactions::where('customer_id' , $customer->id)->get();
-            $balance = 0;
-            foreach ($customer->transactions as $tran) {
-                if (($tran->type && $tran->verified != 'approved') || $tran->deleted)
-                    continue;
-                if (!$tran->type) {
-                    $amount = -$tran->amount;
-                } else {
-                    $amount = +$tran->amount;
-                }
-                $balance += $amount;
-//                $tran->save();
-            }
-            if ($customer->balance != $balance) {
-                echo $customer->name . ' / ' . $customer->id . '<br>';
-            }
+
+        $products = Product::where('location', 't')->where('category', 'final')->get();
+        foreach ($products as $product) {
+            $product2 = $product->replicate();
+            $product2->created_at = Carbon::now();
+            $product2->location = 's';
+            $product2->quantity = 0;
+            $product2->available = false;
+            $product2->save();
+        }
+
+
+//        $customers = Customer::with('transactions')->get();
+//        foreach ($customers as $customer) {
+////            $trans = CustomerTransactions::where('customer_id' , $customer->id)->get();
+//            $balance = 0;
+//            foreach ($customer->transactions as $tran) {
+//                if (($tran->type && $tran->verified != 'approved') || $tran->deleted)
+//                    continue;
+//                if (!$tran->type) {
+//                    $amount = -$tran->amount;
+//                } else {
+//                    $amount = +$tran->amount;
+//                }
+//                $balance += $amount;
+////                $tran->save();
+//            }
+//            if ($customer->balance != $balance) {
+//                echo $customer->name . ' / ' . $customer->id . '<br>';
+//            }
 
 //            $customer->save();
-        }
+//    }
 
 //        DB::commit();
         return 'ok';
