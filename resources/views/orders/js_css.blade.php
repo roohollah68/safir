@@ -141,7 +141,8 @@
                         visible: false
                     }
                 ],
-                pageLength: 100,
+                // pageLength: 1000,
+                paging: false,
                 data: data,
                 order: [[13, "desc"]],
                 language: {
