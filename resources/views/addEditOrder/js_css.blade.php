@@ -23,8 +23,8 @@
         //create products table
         $('#product-table').DataTable({
             autoWidth: false,
-            // paging: false,
-            pageLength: 100,
+            paging: false,
+            // pageLength: 100,
             order: [[3, "desc"]],
         });
 
