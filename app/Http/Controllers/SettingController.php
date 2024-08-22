@@ -154,7 +154,7 @@ class SettingController extends Controller
 //                    $amount = +$tran->amount;
 //                }
 //                $balance += $amount;
-////                $tran->save();
+//      //          $tran->save();
 //            }
 //            if ($customer->balance != $balance) {
 //                echo $customer->name . ' / ' . $customer->id . '<br>';
@@ -164,6 +164,22 @@ class SettingController extends Controller
 //    }
 
 //        DB::commit();
+
+//        $products = Product::all();
+//        $alarm = [];
+//        foreach ($products as $product) {
+//            $alarm[$product->id] = $product->alarm;
+//        }
+//        file_put_contents('alarm.json' , json_encode($alarm));
+
+        $products = Product::all()->keyBy('id');
+        $alarm = json_decode(file_get_contents('alarm.json'));
+        foreach ($alarm as $id=>$value){
+            $products[$id]->alarm = $value;
+            $products[$id] ->save();
+        }
+
+
         return 'ok';
     }
 }
