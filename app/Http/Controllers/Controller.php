@@ -17,7 +17,7 @@ class Controller extends BaseController
     public $city = [
         't'=>['تهران' , 'quantity'],
         'm'=>['مشهد','quantity_m'],
-        'f'=>['فریمان', 'quantity_f',
+        'f'=>['فریمان', 'quantity_f'],
         's'=>['شیراز', 'quantity_s'],
     ];
 
