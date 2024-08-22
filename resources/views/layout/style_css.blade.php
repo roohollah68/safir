@@ -63,4 +63,8 @@
     .hide{
         display: none;
     }
+
+    .dt-length{
+        display: none;
+    }
 </style>

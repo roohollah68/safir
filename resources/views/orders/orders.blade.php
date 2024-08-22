@@ -39,11 +39,13 @@
 
         @if($superAdmin)
             <br>
+            <br>
             <x-checkbox :id="'safirOrders'" :checked="true">سفیران</x-checkbox>
             <x-checkbox :id="'siteOrders'" :checked="true">سایت ها</x-checkbox>
             <x-checkbox :id="'adminOrders'" :checked="true">فروشگاه ها</x-checkbox>
-
+            <x-checkbox :id="'COD'">پرداخت در محل</x-checkbox>
         @endif
+        <br>
         <br>
         <x-radio :id="'location-t'" :checked="true" onclick="Location = 't';prepare_data()" name="location">تهران</x-radio>
         <x-radio :id="'location-m'"  onclick="Location = 'm';prepare_data()" name="location">مشهد</x-radio>

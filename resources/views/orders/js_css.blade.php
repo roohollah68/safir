@@ -10,7 +10,7 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let showDeleted, printWait, confirmWait, counterWait, proccessWait, user = 'all', Location = 't';
+    let showDeleted, printWait, confirmWait, counterWait, proccessWait, COD, user = 'all', Location = 't';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     let role = users[userId].role;
     let dtp1Instance;
@@ -58,6 +58,8 @@
                 return
             if (Location !== order.location)
                 return;
+            if (COD && order.paymentMethod !== 'cod' && order.paymentMethod !== 'پرداخت در محل' && order.paymentMethod !== 'onDelivery')
+                return;
             let website = false;
             if (order.user_id === 30 || order.user_id === 32 || order.user_id === 33 || order.user_id === 75)
                 website = true;
@@ -95,7 +97,9 @@
 
                 order.zip_code,
 
-                id
+                id,
+
+                order.total,
 
             ])
         });
@@ -108,7 +112,7 @@
             table.rows.add(data);
             table.draw();
         } else {
-            let hideRows = (print || superAdmin) ? [1, 8, 9, 10, 11, 12, 13] : [0, 1, 3, 8, 9, 10, 11, 12, 13]
+            let hideRows = (print || superAdmin) ? [1, 8, 9, 10, 11, 12, 13, 14] : [0, 1, 3, 8, 9, 10, 11, 12, 13, 14]
             table = $('#main-table').DataTable({
                 columns: [
                     {title: "انتخاب"},
@@ -125,6 +129,7 @@
                     {title: "همراه"},
                     {title: "کدپستی"},
                     {title: "آیدی"},
+                    {title: "مبلغ سفارش"},
                 ],
                 columnDefs: [
                     {
@@ -141,10 +146,14 @@
                         visible: false
                     }
                 ],
-                 pageLength: 100,
+                pageLength: 100,
                 // paging: false,
                 data: data,
                 order: [[13, "desc"]],
+                dom: 'lBfrtip',
+                buttons: [
+                    'excelHtml5',
+                ],
                 language: {
                     "decimal": "",
                     "emptyTable": "هیچ سفارشی موجود نیست",
