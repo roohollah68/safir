@@ -17,8 +17,8 @@ class Controller extends BaseController
     public $city = [
         't'=>['تهران' , 'quantity'],
         'm'=>['مشهد','quantity_m'],
-        'f'=>['فریمان', 'quantity_f']
-        's'=>['شیراز', 'quantity_s']
+        'f'=>['فریمان', 'quantity_f',
+        's'=>['شیراز', 'quantity_s'],
     ];
 
     public function number_Fa_En($Number)
