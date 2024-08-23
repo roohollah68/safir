@@ -47,7 +47,7 @@
         @endif
         <br>
         <br>
-        <x-radio :id="'location-t'" :checked="true" onclick="Location = 't';prepare_data()" name="location">تهران</x-radio>
+        <x-radio :id="'location-t'"  onclick="Location = 't';prepare_data()" name="location">تهران</x-radio>
         <x-radio :id="'location-m'"  onclick="Location = 'm';prepare_data()" name="location">مشهد</x-radio>
         <x-radio :id="'location-s'"  onclick="Location = 's';prepare_data()" name="location">شیراز</x-radio>
 

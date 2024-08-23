@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserMeta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -87,6 +88,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|min:5',
             'phone' => 'required|string|max:11|min:11',
+            'NuRecords' => 'integer|min:1|max:3000'
         ]);
         $request->phone = $this->number_Fa_En($request->phone);
 
@@ -103,6 +105,21 @@ class UserController extends Controller
                 'password' => Hash::make($request->password),
             ]);
         }
+
+        if ($request->NuRecords) {
+            UserMeta::updateOrCreate(
+                ['user_id'=>$id , 'name'=>'NuRecords'],
+                ['value' => $request->NuRecords]
+            );
+        }
+
+        if ($request->city) {
+            UserMeta::updateOrCreate(
+                ['user_id'=>$id , 'name'=>'city'],
+                ['value' => $request->city]
+            );
+        }
+
         if ($this->superAdmin()) {
             User::find($id)->update([
                 'username' => $request->username,

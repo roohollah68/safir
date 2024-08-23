@@ -18,20 +18,21 @@ class OrderController extends Controller
 {
     public function showOrders()
     {
+        $user = auth()->user();
         if ($this->superAdmin() || $this->print()) {
             $users = User::withTrashed()->get()->keyBy("id");
             $orders = Order::withTrashed()->orderBy('id', 'desc')
-                ->limit($this->settings()->loadOrders)->get()->keyBy('id');
+                ->limit($user->meta('NuRecords'))->get()->keyBy('id');
         } else {
             $users = array();
             $users[auth()->user()->id] = auth()->user();
             $orders = auth()->user()->orders()->withTrashed()
-                ->orderBy('id', 'desc')->limit($this->settings()->loadOrders)->get()->keyBy('id');
+                ->orderBy('id', 'desc')->limit($user->meta('NuRecords'))->get()->keyBy('id');
         }
         return view('orders.orders', [
             'users' => $users,
             'orders' => $orders,
-            'userId' => auth()->user()->id,
+            'user' => auth()->user(),
             'limit' => $this->settings()->loadOrders,
         ]);
     }

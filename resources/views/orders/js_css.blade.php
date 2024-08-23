@@ -5,14 +5,14 @@
     let print = {{$print ? 'true' : 'false'}};
     let admin = {{$admin ? 'true' : 'false'}};
     let safir = {{$safir ? 'true' : 'false'}};
-    let userId = {{$userId}};
+    {{--let userId = {{$user->id}};--}}
     let table;
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let showDeleted, printWait, confirmWait, counterWait, proccessWait, COD, user = 'all', Location = 't';
+    let showDeleted, printWait, confirmWait, counterWait, proccessWait, COD, user = 'all', Location = '{{$user->meta('city')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
-    let role = users[userId].role;
+    {{--let role = {{$user->role}};--}}
     let dtp1Instance;
     let sendMethods = {!!json_encode(config('sendMethods'))!!};
     let payMethods = {!!json_encode(config('payMethods'))!!};
@@ -24,6 +24,7 @@
         sendMethodText = $('#sendMethodText').html();
         $('#sendMethodText').html('');
         $(".checkboxradio").checkboxradio();
+        $('#location-'+Location).click();
         prepare_data();
 
         const dtp1Instance2 = new mds.MdsPersianDateTimePicker(document.getElementById('date1'), {

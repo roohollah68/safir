@@ -25,8 +25,7 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'role']], functio
     Route::get('/suspend_user/{id}', [UserController::class, 'suspend']);
     Route::get('/add_user', [UserController::class, 'addUser']);
     Route::post('/add_user', [UserController::class, 'insertUser']);
-    Route::get('/edit_user/{id}', [UserController::class, 'edit']);
-    Route::post('/edit_user/{id}', [UserController::class, 'update']);
+
 
     Route::post('/deposit/changeConfirm/{id}', [DepositController::class, 'changeConfirm']);
 
@@ -56,6 +55,8 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::get('/', [UserController::class, 'home']);
     Route::get('/edit_user', [UserController::class, 'edit'])->name('editUser');
     Route::post('/edit_user', [UserController::class, 'update']);
+    Route::get('/edit_user/{id}', [UserController::class, 'edit']);
+    Route::post('/edit_user/{id}', [UserController::class, 'update']);
 
 });
 

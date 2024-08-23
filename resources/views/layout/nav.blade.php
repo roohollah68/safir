@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary" id="navbar">
-    <a class="navbar-brand" href="{{route('editUser')}}">{{$user}} خوش آمدید</a>
+    <a class="navbar-brand" href="{{route('editUser')}}/{{auth()->user()->id}}">{{$user}} خوش آمدید</a>
     @if($safir)
         <a class="navbar-brand" href="{{route('DepositList')}}">| اعتبار <span dir="ltr">{{number_format($balance)}}</span> ریال</a>
     @endif

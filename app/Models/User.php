@@ -80,7 +80,8 @@ class User extends Authenticatable
         return $this->role == "admin";
     }
 
-    public function superAdmin(){
+    public function superAdmin()
+    {
         return $this->role == 'superAdmin';
     }
 
@@ -89,19 +90,33 @@ class User extends Authenticatable
         return $this->role == "print";
     }
 
-    public function warehouse(){
+    public function warehouse()
+    {
         return $this->role == 'warehouse';
     }
 
-    public function safir(){
+    public function safir()
+    {
         return $this->role == 'user';
     }
 
-    public function counter(){
+    public function counter()
+    {
         return $this->role == 'counter';
     }
 
-    public function account(){
+    public function account()
+    {
         return $this->role == 'account';
     }
+
+    public function meta($name)
+    {
+        $Meta = $this->hasMany(UserMeta::class)->where('name', $name)->first();
+        if ($Meta)
+            return $Meta->value;
+        else
+            return config('userMeta.' . $name);
+    }
+
 }
