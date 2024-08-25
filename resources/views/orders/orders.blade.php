@@ -50,6 +50,7 @@
         <x-radio :id="'location-t'"  onclick="Location = 't';prepare_data()" name="location">تهران</x-radio>
         <x-radio :id="'location-m'"  onclick="Location = 'm';prepare_data()" name="location">مشهد</x-radio>
         <x-radio :id="'location-s'"  onclick="Location = 's';prepare_data()" name="location">شیراز</x-radio>
+        <x-radio :id="'location-e'"  onclick="Location = 'e';prepare_data()" name="location">اصفهان</x-radio>
 
     @endif
     <br>

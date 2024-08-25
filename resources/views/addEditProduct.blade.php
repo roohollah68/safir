@@ -70,6 +70,7 @@
                         <option value="m">مشهد</option>
                         <option value="f">فریمان</option>
                         <option value="s">شیراز</option>
+                        <option value="e">اصفهان</option>
                     </select>
 
                 </div>

@@ -22,7 +22,6 @@ class UserController extends Controller
         return view('userList', ['users' => User::all()]);
     }
 
-
     public function confirm($id)
     {
         User::find($id)->update(['verified' => true]);

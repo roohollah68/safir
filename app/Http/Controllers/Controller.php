@@ -19,6 +19,7 @@ class Controller extends BaseController
         'm'=>['مشهد','quantity_m'],
         'f'=>['فریمان', 'quantity_f'],
         's'=>['شیراز', 'quantity_s'],
+        'e'=>['اصفهان', 'quantity_e'],
     ];
 
     public function number_Fa_En($Number)

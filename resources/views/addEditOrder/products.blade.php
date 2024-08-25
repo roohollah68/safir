@@ -3,6 +3,7 @@
     <a class="btn {{$location == 't'?'btn-info':'btn-outline-info'}}" href="/add_order?city=t">تهران</a>
     <a class="btn {{$location == 'm'?'btn-info':'btn-outline-info'}}" href="/add_order?city=m">مشهد</a>
     <a class="btn {{$location == 's'?'btn-info':'btn-outline-info'}}" href="/add_order?city=s">شیراز</a>
+    <a class="btn {{$location == 'e'?'btn-info':'btn-outline-info'}}" href="/add_order?city=e">اصفهان</a>
     <br>
 @endif
 

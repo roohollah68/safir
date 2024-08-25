@@ -51,6 +51,7 @@
                     <option value="m" @selected($product->location == 'm')>مشهد</option>
                     <option value="f" @selected($product->location == 'f')>فریمان</option>
                     <option value="s" @selected($product->location == 's')>شیراز</option>
+                    <option value="e" @selected($product->location == 'e')>اصفهان</option>
                 </select>
 
             </div>

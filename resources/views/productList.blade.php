@@ -12,6 +12,7 @@
         <a class="btn btn-outline-info" onclick="city='f';changeCity(this)">فریمان</a>
         <a class="btn btn-outline-info" onclick="city='m';changeCity(this)">مشهد</a>
         <a class="btn btn-outline-info" onclick="city='s';changeCity(this)">شیراز</a>
+        <a class="btn btn-outline-info" onclick="city='e';changeCity(this)">اصفهان</a>
     </div>
     <br>
     <br>
