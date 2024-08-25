@@ -12,7 +12,8 @@ class ProductController extends Controller
     public function showProducts(Request $req)
     {
         $city = $req->city ?: 't';
-        $products = Product::where('location', $city)->get()->keyBy('id');
+//        $products = Product::where('location', $city)->get()->keyBy('id');
+        $products = Product::all()->keyBy('id');
         return view('productList', [
             'products' => $products,
             'location' => $city,
@@ -142,14 +143,6 @@ class ProductController extends Controller
     {
         Product::find($id)->update([
             'photo' => ''
-        ]);
-    }
-
-    public function productsList()
-    {
-        $products = Product::all()->keyBy('id');
-        return view('productsList', [
-            'products' => $products,
         ]);
     }
 

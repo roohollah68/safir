@@ -13,6 +13,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TelegramController;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WoocommerceController;
@@ -48,6 +49,8 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'role']], functio
     Route::post('rejectDeposit/{id}', [CustomerController::class, 'rejectDeposit']);
     Route::post('approveOrder/{id}', [CustomerController::class, 'approveOrder']);
     Route::post('rejectOrder/{id}', [CustomerController::class, 'rejectOrder']);
+
+    Route::get('/clear/route', [SettingController::class, 'clearRoute']);
 });
 
 Route::group(['middleware' => ['auth', 'verify']], function () {
@@ -141,6 +144,10 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'warehouse', 'rol
     Route::post('product/edit/{id}', [ProductController::class, 'editProduct']);
     Route::post('product/deletePhoto/{id}', [ProductController::class, 'deletePhoto']);
     Route::post('product/delete/{id}', [ProductController::class, 'deleteProduct']);
+    Route::get('product/fastEdit/{id}', function ($id){
+        $product = Product::find($id);
+        return view('productFastEdit',['product'=>$product]);
+    });
 
     Route::get('/productQuantity/add/{id}', [ProductChangeController::class, 'addQuantity']);
     Route::post('/productQuantity/add/{id}', [ProductChangeController::class, 'insertRecord']);
@@ -160,10 +167,6 @@ Route::get('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteO
 Route::get('/backup', [TelegramController::class, 'backUpDatabase']);
 
 Route::get('/product/alarm', [ProductChangeController::class, 'productAlarm']);
-
-Route::get('/list', [ProductController::class, 'productsList']);
-
-Route::get('/clear/route', [SettingController::class, 'clearRoute']);
 
 Route::get('/command', [SettingController::class, 'command']);
 

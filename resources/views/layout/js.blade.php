@@ -53,7 +53,7 @@
     }
 
     function Dialog(text){
-        return dialog = $(text).dialog({
+        dialog = $(text).dialog({
             modal: true,
             open: () => {
                 $('.ui-dialog-titlebar-close').hide();
@@ -62,10 +62,13 @@
                 });
             }
         });
+        return dialog;
     }
 
     $(function () {
-
+        priceInput();
+    })
+    function priceInput(){
         $(".price-input").on("keyup", function (event) {
             // When user select text in the document, also abort.
             var selection = window.getSelection().toString();
@@ -104,15 +107,17 @@
                 return (input === 0) ? "0" : input.toLocaleString("en-US");
             });
         });
-
-
-    })
+    }
 
     function FarsiDate(uDate) {
         return new Intl.DateTimeFormat('fa-IR', {
             dateStyle: "short",
             timeStyle: "medium",
         }).format(uDate);
+    }
+
+    function priceFormat(price) {
+        return (+(+price).toFixed()).toLocaleString('en-US');
     }
 
 </script>

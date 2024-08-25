@@ -117,7 +117,7 @@
                         <input type="text" name="to" class="form-control" placeholder="تا تاریخ" id="date2-text">
                     </div>
                 </div>
-                <br><br>
+                <br><hr><br>
                 <label for="allInvoice">به همراه فاکتورها</label>
                 <input class="checkboxradio" type="checkbox" name="allInvoice" id="allInvoice">
                 <br><br>

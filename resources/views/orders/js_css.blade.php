@@ -43,7 +43,7 @@
         let counter = 0;
 
         $.each(orders, (id, order) => {
-            if (user != 'all' && user != order.user_id)
+            if (user !== 'all' && +user !== order.user_id)
                 return
             if (showDeleted ^ !!order.deleted_at)
                 return
@@ -113,7 +113,7 @@
             table.rows.add(data);
             table.draw();
         } else {
-            let hideRows = (print || superAdmin) ? [1, 8, 9, 10, 11, 12, 13, 14] : [0, 1, 3, 8, 9, 10, 11, 12, 13, 14]
+            let hideCols = (print || superAdmin) ? [1, 8, 9, 10, 11, 12, 13, 14] : [0, 1, 3, 8, 9, 10, 11, 12, 13, 14]
             table = $('#main-table').DataTable({
                 columns: [
                     {title: "انتخاب"},
@@ -143,7 +143,7 @@
                     },
 
                     {
-                        targets: hideRows,
+                        targets: hideCols,
                         visible: false
                     }
                 ],
