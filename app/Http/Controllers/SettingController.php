@@ -130,15 +130,15 @@ class SettingController extends Controller
 //        }
 
 
-        $products = Product::where('location', 't')->get();
-        foreach ($products as $product) {
-            $product2 = $product->replicate();
-            $product2->created_at = Carbon::now();
-            $product2->location = 'e';
-            $product2->quantity = 0;
-            $product2->available = false;
-            $product2->save();
-        }
+//        $products = Product::where('location', 't')->get();
+//        foreach ($products as $product) {
+//            $product2 = $product->replicate();
+//            $product2->created_at = Carbon::now();
+//            $product2->location = 'e';
+//            $product2->quantity = 0;
+//            $product2->available = false;
+//            $product2->save();
+//        }
 
 
 //        $customers = Customer::with('transactions')->get();
