@@ -9,14 +9,11 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    public function showProducts(Request $req)
+    public function showProducts()
     {
-        $city = $req->city ?: 't';
-//        $products = Product::where('location', $city)->get()->keyBy('id');
         $products = Product::all()->keyBy('id');
         return view('productList', [
             'products' => $products,
-            'location' => $city,
         ]);
     }
 

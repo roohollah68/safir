@@ -78,6 +78,7 @@
                             <option value="t">تهران</option>
                             <option value="m">مشهد</option>
                             <option value="s">شیراز</option>
+                            <option value="e">اصفهان</option>
                         </select>
                     </div>
                 </div>

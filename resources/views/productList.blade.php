@@ -15,7 +15,6 @@
         <a class="btn btn-outline-info" onclick="city='e';changeCity(this)">اصفهان</a>
     </div>
     <br>
-    <br>
     <a class="btn btn-info mb-3" href="{{route('addProduct')}}">
         <span class=" fa fa-plus"></span>
         افزودن محصول جدید
@@ -93,27 +92,6 @@
         </thead>
     </table>
 
-{{--    <div id="fastEdit">--}}
-{{--        <div title="ویرایش سریع" class="dialogs">--}}
-{{--            <form method="post">--}}
-{{--                <label>نام محصول:</label>--}}
-{{--                <input type="text" value=""><br>--}}
-{{--                <label>قیمت:</label>--}}
-{{--                <input type="text" value=""><br>--}}
-{{--                <label>قیمت تولید:</label>--}}
-{{--                <input type="text" value=""><br>--}}
-{{--                <label>موجودی:</label>--}}
-{{--                <input type="text" value=""><br>--}}
-{{--                <label>حد پایین:</label>--}}
-{{--                <input type="text" value=""><br>--}}
-{{--                <label>حد بالا:</label>--}}
-{{--                <input type="text" value=""><br>--}}
-{{--                <label>موجود</label>--}}
-{{--                <input type="checkbox" name="available">--}}
-{{--            </form>--}}
-{{--        </div>--}}
-{{--    </div>--}}
-
 @endsection
 
 
@@ -182,7 +160,7 @@
                     product.name,
                     priceFormat(product.price),
                     priceFormat(product.productPrice),
-                    product.quantity,
+                    '<span dir="ltr">'+(+product.quantity)+'</span>',
                     alarm(product.alarm, product.quantity),
                     high_alarm(product.high_alarm, product.quantity),
                     product.available ? available : unavailable,
@@ -284,30 +262,6 @@
             // $(tag + ' input[type=checkbox]').checkboxradio('refresh');
             // $(tag + ' .save ,' + tag + ' .fast').toggle();
         }
-
-        // function save(id) {
-        //     let tag = '#row_' + id;
-        //     $.post('product/edit/' + id, {
-        //         _token: token,
-        //         name: $(tag + ' input[name=name]').val(),
-        //         price: $(tag + ' input[name=price]').val(),
-        //         PPrice: $(tag + ' input[name=PPrice]').val(),
-        //         value: $(tag + ' input[name=quantity]').val(),
-        //         alarm: $(tag + ' input[name=alarm]').val(),
-        //         high_alarm: $(tag + ' input[name=high_alarm]').val(),
-        //         available: $(tag + ' input[name=available]').prop('checked'),
-        //         category: $(tag + ' input[name=category]').val(),
-        //         location: $(tag + ' input[name=location]').val(),
-        //         // location:$(tag + ' select[name=location]').val(),
-        //         addType: 'value',
-        //         fast: true,
-        //     })
-        //         .done(res => {
-        //             $.notify(res[0], 'success');
-        //             products[res[1].id] = res[1];
-        //             fastEdit(id)
-        //         })
-        // }
 
     </script>
 @endsection

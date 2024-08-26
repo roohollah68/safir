@@ -112,7 +112,7 @@
         <label for="unavailable-dialog">نا موجود</label>
 
         <input type="hidden" name="fast" value="true">
-        <input type="submit" class="btn btn-success" value="ویرایش">
+        <input type="submit" class="btn btn-success mt-3" value="ویرایش">
     </form>
 </div>
 
