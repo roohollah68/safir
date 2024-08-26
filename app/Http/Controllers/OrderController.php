@@ -185,8 +185,8 @@ class OrderController extends Controller
                 ]);
             }
             $response = app('Telegram')->sendOrderToBale($order, env('GroupId'));
-            if(isset($response->result)){
-                $order->bale_id =$response->result->message_id;
+            if (isset($response->result)) {
+                $order->bale_id = $response->result->message_id;
             }
             $order->save();
         }
@@ -588,7 +588,6 @@ class OrderController extends Controller
 
     public function addToCustomerTransactions($order)
     {
-        DB::beginTransaction();
         $customer = $order->customer()->first();
         $customer->update([
             'balance' => $customer->balance - $order->total,
@@ -599,7 +598,6 @@ class OrderController extends Controller
             'type' => false,
             'description' => 'تایید سفارش ' . $order->id . ' - ' . auth()->user()->name,
         ]);
-        DB::commit();
         return $trans;
     }
 
@@ -711,7 +709,7 @@ class OrderController extends Controller
         DB::beginTransaction();
         $paymentMethod = $req->paymentMethod;
         $photo = null;
-        if($order->confirm){
+        if ($order->confirm) {
             return ['error', 'قبلا تایید شده.'];
         }
         if ($paymentMethod == 'cash') {
