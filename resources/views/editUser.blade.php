@@ -74,7 +74,6 @@
                             <label for="city" class="input-group-text w-100">شهر پیش فرض نمایش سفارشات:</label>
                         </div>
                         <select name="city" id="city" class="form-control">
-                            <option>پیشفرض</option>
                             <option value="t">تهران</option>
                             <option value="m">مشهد</option>
                             <option value="s">شیراز</option>
