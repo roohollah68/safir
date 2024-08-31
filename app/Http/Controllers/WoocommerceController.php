@@ -89,7 +89,10 @@ class WoocommerceController extends Controller
                 if ($order->deleted_at) {
                     app('Telegram')->deleteOrderFromBale($order, '5742084958');
                     $order->restore();
-                    $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+                    $baleReq = app('Telegram')->sendOrderToBale($order, env('GroupId'));
+                    if($baleReq){
+                        $order->bale_id= $baleReq->result->message_id;
+                    }
                     $order->save();
                     foreach ($products as $id => $data) {
                         $product = $data[1];
@@ -117,7 +120,10 @@ class WoocommerceController extends Controller
                 if (!$order->deleted_at) {
                     app('Telegram')->deleteOrderFromBale($order, env('GroupId'));
                     $order->delete();
-                    $order->bale_id = app('Telegram')->sendOrderToBale($order, '5742084958')->result->message_id;
+                    $baleReq = app('Telegram')->sendOrderToBale($order, '5742084958');
+                    if($baleReq){
+                        $order->bale_id= $baleReq->result->message_id;
+                    }
                     $order->save();
                     $order->orderProducts()->delete();
                     foreach ($products as $id => $data) {
@@ -144,7 +150,10 @@ class WoocommerceController extends Controller
             ]);
 
             if ($request->status == 'processing' || $request->status == 'completed') {
-                $order->bale_id = app('Telegram')->sendOrderToBale($order, env('GroupId'))->result->message_id;
+                $baleReq = app('Telegram')->sendOrderToBale($order, env('GroupId'));
+                if($baleReq){
+                    $order->bale_id= $baleReq->result->message_id;
+                }
                 $order->save();
                 foreach ($products as $id => $data) {
                     $product = $data[1];
@@ -169,7 +178,10 @@ class WoocommerceController extends Controller
             } else {
                 $order->delete();
                 if ($request->status != 'pending') {
-                    $order->bale_id = app('Telegram')->sendOrderToBale($order, '5742084958');
+                    $baleReq = app('Telegram')->sendOrderToBale($order, '5742084958');
+                    if($baleReq){
+                        $order->bale_id= $baleReq->result->message_id;
+                    }
                     $order->save();
                 }
             }
