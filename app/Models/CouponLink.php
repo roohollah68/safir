@@ -14,6 +14,8 @@ class CouponLink extends Model
         'coupon_id',
     ];
 
+    public $timestamps = false;
+
     public function coupon()
     {
         return $this->belongsTo(Coupon::class);
