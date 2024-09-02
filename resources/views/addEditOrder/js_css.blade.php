@@ -8,6 +8,7 @@
     let cities = {!!json_encode($cities)!!};
     let citiesId = {!!json_encode($citiesId)!!};
     let creatorIsAdmin = !!'{{$creatorIsAdmin}}';
+    let table;
 
     $(function () {
         //Hide form errors after some time.
@@ -21,12 +22,14 @@
     @if($creatorIsAdmin || !$edit)
     $(function () {
         //create products table
-        $('#product-table').DataTable({
-            autoWidth: false,
-            paging: false,
-            // pageLength: 100,
-            order: [[3, "desc"]],
-        });
+        // $('#product-table').DataTable({
+        //     autoWidth: false,
+        //     paging: false,
+        //     // pageLength: 100,
+        //     order: [[3, "desc"]],
+        // });
+
+        createTable()
 
         $("#name").autocomplete({
             source: Object.keys(customers),
@@ -38,7 +41,7 @@
         refreshProducts()
         paymentAction()
         deliveryAction()
-        $('input[name=paymentMethod]').on('click',paymentAction);
+        $('input[name=paymentMethod]').on('click', paymentAction);
         $('input[name=deliveryMethod]').on('click', deliveryAction);
 
         $("#city").autocomplete({
@@ -58,6 +61,35 @@
             }
         });
     });
+
+    function createTable() {
+        let data = [];
+        $.each(products, (id, product) => {
+            let price;
+            if (product.coupon > 0)
+                price = `${product.priceWithDiscount} (${product.coupon} %)`;
+            else
+                price = product.price;
+            data.push([
+                product.name,
+                price,
+                `<span dir="ltr">${+product.quantity}</span>`,
+                `<span class="btn btn-primary fa fa-add" onclick="addProduct(${id})"></span>`,
+            ])
+        });
+        if (table) {
+            table.clear();
+            table.rows.add(data);
+            table.draw();
+        } else {
+            table = $('#product-table').DataTable({
+                data: data,
+                // order: [[3, "desc"]],
+                pageLength: 100,
+                destroy: true,
+            });
+        }
+    }
 
     function paymentAction() {
         paymentMethod = $('input[name="paymentMethod"]:checked').val();
@@ -201,12 +233,12 @@
     function calculate_discount(id, value) {
         // $('#discount_' + id).val(0);
         // return;
-        value = +(value.replaceAll(',', '') );
+        value = +(value.replaceAll(',', ''));
         if (value <= products[id].price && '{{$user->id}}' !== '61') {
             // value = Math.min(products[id].price, +value);
             value = Math.max(0, +value);
             $('#discount_' + id).val((1 - value / products[id].price) * 100).change();
-        }else{
+        } else {
             $('#discount_' + id).val(0);
         }
     }

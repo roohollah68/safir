@@ -190,7 +190,10 @@ class OrderController extends Controller
             }
             $order->save();
         }
-
+        $order->comment()->create([
+            'user_id' => $user->id,
+            'text' => 'سفارش ایجاد شد',
+        ]);
         DB::commit();
 
         return redirect()->route('listOrders');
