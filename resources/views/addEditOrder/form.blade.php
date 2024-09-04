@@ -27,8 +27,8 @@
                     <input type="number" value="{{old('customerId')?:$order->customer_id}}" name="customerId"
                            id="customerId" style="width: 70px" readonly>
                 @endif
+            </div>
         </div>
-    </div>
 
         <x-col-md-6 :name="'phone'" value="{{old('phone')?:$order->phone}}" :required="true"
                     minlength="11" maxlength="11" pattern="^[۰-۹0-9]*$"
@@ -140,22 +140,7 @@
             @endif
         </div>
 
-        <div class="p-3 m-2 border" id="paymentDetails">
-            <h4>فاکتور</h4>
-            <ol id="order-list"></ol>
-            <hr>
-            <span>جمع اقلام: </span><span id="cartSum"></span><span> ریال</span><br>
-            <span>هزینه حمل: </span> <span id="deliveryCost"></span><span>  ریال </span><br><br>
-            <span class="font-weight-bold">مبلغ کل: </span><span id="total"></span></span>  ریال </span>
-            <br><br>
 
-            <span id="onDeliveryMode">
-                <span>پرداختی مشتری: </span><span
-                    id="customerTotal">{{$edit?$order->customerCost:''}}</span><span> ریال </span><br>
-                <span>سهم سفیر: </span><span
-                    id="safirShare">{{$edit?$order->customerCost-$order->total:''}}</span><span>  ریال </span><br>
-            </span>
-        </div>
 
     @endif
 
@@ -164,8 +149,38 @@
     <label for="addToCustomers">افزودن/ ویرایش مشتری</label>
 
 
-        <input type="submit" class="btn btn-success mx-4" style="width: 200px;" value="{{$edit?'ویرایش':'ثبت'}}">&nbsp;
-        <a class="btn btn-danger"
-           onclick="confirm('آیا از ثبت سفارش منصرف شدید؟')?(window.location.href = '{{route('listOrders')}}'):''">بازگشت</a>
+    <input type="submit" class="btn btn-success mx-4" style="width: 200px;" value="{{$edit?'ویرایش':'ثبت'}}">&nbsp;
+    <a class="btn btn-danger"
+       onclick="confirm('آیا از ثبت سفارش منصرف شدید؟')?(window.location.href = '{{route('listOrders')}}'):''">بازگشت</a>
 
+    <table class="table-striped table hide" id="selected-product-table">
+        <thead>
+        <tr>
+            <th>نام محصول</th>
+            <th>تعداد</th>
+            <th>قیمت(ریال)</th>
+            <th>تخفیف</th>
+        </tr>
+        </thead>
+        <tbody id="product-form">
+
+        </tbody>
+    </table>
+
+    <div class="p-3 m-2 border" id="paymentDetails">
+{{--        <h4>فاکتور</h4>--}}
+        {{--            <ol id="order-list"></ol>--}}
+        {{--            <hr>--}}
+        <span>جمع اقلام: </span><span id="cartSum"></span><span> ریال</span> ||
+        <span>هزینه حمل: </span> <span id="deliveryCost"></span><span>  ریال </span> ||
+        <span class="font-weight-bold">مبلغ کل: </span><span id="total"></span></span>  ریال </span>
+        <br>
+
+        <span id="onDeliveryMode">
+                <span>پرداختی مشتری: </span><span
+                id="customerTotal">{{$edit?$order->customerCost:''}}</span><span> ریال </span> ||
+                <span>سهم سفیر: </span><span
+                id="safirShare">{{$edit?$order->customerCost-$order->total:''}}</span><span>  ریال </span><br>
+            </span>
+    </div>
 </div>

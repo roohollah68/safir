@@ -1,17 +1,5 @@
 <br>
-<table class="table-striped table">
-    <thead>
-    <tr>
-        <th>نام محصول</th>
-        <th>تعداد</th>
-        <th>قیمت(ریال)</th>
-        <th>تخفیف</th>
-    </tr>
-    </thead>
-    <tbody id="product-form">
 
-    </tbody>
-</table>
 
 <div id="products" class="my-4">
     <table class="table table-striped" id="product-table">

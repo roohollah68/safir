@@ -9,6 +9,7 @@
     let citiesId = {!!json_encode($citiesId)!!};
     let creatorIsAdmin = !!'{{$creatorIsAdmin}}';
     let safir = !!'{{$safir}}';
+    let edit = !!'{{$edit}}';
     let table;
 
     $(function () {
@@ -18,6 +19,12 @@
         }, 10000);
 
         $(".checkboxradio").checkboxradio();//jquery-ui
+        $.each(cart,(id,number)=>{
+            if(number)
+                addProduct(id);
+            else
+                delete cart[id];
+        });
     });
 
     @if($creatorIsAdmin || !$edit)
@@ -63,17 +70,19 @@
         });
     });
 
+    @endif
+
     function createTable() {
         let data = [];
         $.each(products, (id, product) => {
             let price;
             if (product.coupon > 0)
-                price = `${product.priceWithDiscount} (${product.coupon} %)`;
+                price = `${priceFormat(product.priceWithDiscount)} (${product.coupon}%)`;
             else
-                price = product.price;
+                price = priceFormat(product.price);
             data.push([
                 product.name,
-                priceFormat(price),
+                price,
                 `<span dir="ltr">${+product.quantity}</span>`,
                 `<span class="btn btn-primary fa fa-add" onclick="addProduct(${id})"></span>`,
             ])
@@ -98,6 +107,7 @@
                 return;
         } else
             cart[id] = 1;
+        $('#selected-product-table').show();
         let text = `<tr id="product-${id}">
         <td>${products[id].name}</td>
         <td>
@@ -106,7 +116,7 @@
             name="product_${id}" id="product_${id}"
             onchange="num_product(${id},this.value)"
             type="number" value="${cart[id]}"
-            style="width: 50px" min="0">
+            style="width: 50px" min="0" ${(edit && safir)?'readonly':''}>
             <span class="btn btn-primary fa fa-minus" onclick="num_minus(${id})"></span>
             <span class="btn btn-outline-info" dir="ltr">${+products[id].quantity}</span>
         </td>
@@ -114,10 +124,10 @@
             <input type="text" class="price-input text-success discount" style="width: 80px;"
             name="price_${id}" value="${products[id].priceWithDiscount}"
             onchange="calculate_discount(${id},this.value)" ${safir ? 'disabled' : ''}>` +
-        (products[id].priceWithDiscount === products[id].price) ? '' :
-            `<span class="text-danger" style="text-decoration: line-through">
-                ${priceFormat(products[id].price)}
-            </span>` +
+            ((products[id].priceWithDiscount == products[id].price) ? '' :
+                `<span class="text-danger" style="text-decoration: line-through">
+            ${priceFormat(products[id].price)}
+        </span>`) +
             `</td>
         <td>
         <input type="number" name="discount_${id}" class="discount-value" id="discount_${id}"
@@ -133,6 +143,7 @@
         </tr>`
         $('#product-form').append(text)
         priceInput();
+        refreshProducts();
     }
 
     function paymentAction() {
@@ -158,24 +169,25 @@
         let ordersListText = ''; // عبارت مربوط به فاکتور سفیران
         $.each(cart, (id, number) => {
             if (number) {
-                let price = products[id].priceWithDiscount * number; //قیمت با تخفیف
-                let Price = products[id].price * number;  //قیمت بدون تخفیف
-                // $('#product_' + id).val(number);
-                ordersText = ordersText.concat(products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + '<br>');
-                ordersListText = ordersListText.concat('<li>' + products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + ': ' + num(price) + '</li>');
+                // let price = products[id].priceWithDiscount * number; //قیمت با تخفیف
+                // let Price = products[id].price * number;  //قیمت بدون تخفیف
+                $('#product_' + id).val(number);
+                // ordersText = ordersText.concat(products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + '<br>');
+                // ordersListText = ordersListText.concat('<li>' + products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + ': ' + num(price) + '</li>');
 
-                total += price; //جمع قیمت با تخفیف
-                Total += Price; // جمع قیمت بدون تخفیف
+                total += products[id].priceWithDiscount * number; //جمع قیمت با تخفیف
+                Total += products[id].price * number;  //قیمت بدون تخفیف
+                // $('#product_' + id).val(number);
                 hasProduct = true;
             } else {
                 $('#product_' + id).val('');
                 delete cart[id];
             }
         })
-        $('#orders').html(ordersText);
+        // $('#orders').html(ordersText);
 
         @if($safir)
-        $('#order-list').html(ordersListText)
+        // $('#order-list').html(ordersListText)
         let deliveryCost = 0;
         if (Total < {{$settings->freeDelivery}} || '{{$user->id}}' == '10')
             if (deliveryMethod == 'peyk')
@@ -219,11 +231,15 @@
     }
 
     function num_plus(id) {
+        if (edit && safir)
+            return;
         let n = +$('#product_' + id).val() + 1;
         $('#product_' + id).val(n).change();
     }
 
     function num_minus(id) {
+        if (edit && safir)
+            return;
         let n = +$('#product_' + id).val() - 1;
         $('#product_' + id).val(n).change();
     }
@@ -234,8 +250,13 @@
         $('#product_' + id).val(value);
         cart[id] = value;
         if (value == 0) {
-            $('#product_' + id).val('');
+            // $('#product_' + id).val('');
             delete cart[id];
+            $('#product-'+id).remove();
+            let number = Object.keys(cart).length;
+            if (!number) {
+                $('#selected-product-table').hide();
+            }
         }
         refreshProducts();
     }
@@ -261,19 +282,6 @@
         refreshProducts();
     }
 
-    function beforeSubmit() {
-        $('input[type="search"]').val('').keyup();
-        let number = Object.keys(cart).length;
-
-        if (!number) {
-            alert('محصولی انتخاب نشده است');
-            return false;
-        }
-        console.log($('input[name="paymentMethod"]:checked').val());
-        // return false;
-        return true;
-    }
-
     function calculate_discount(id, value) {
         // $('#discount_' + id).val(0);
         // return;
@@ -287,13 +295,16 @@
         }
     }
 
-    @else
-
     function beforeSubmit() {
+
+        let number = Object.keys(cart).length;
+
+        if (!number) {
+            alert('محصولی انتخاب نشده است');
+            return false;
+        }
         return true;
     }
-
-    @endif
 
 </script>
 
