@@ -1,18 +1,34 @@
 @csrf
-@if($creatorIsAdmin)
-    <label for="customerId">شماره مشتری:</label>
-    <input type="number" value="{{old('customerId')?:$order->customer_id}}" name="customerId"
-           id="customerId" style="width: 70px" readonly>
+@if(!$safir && !$edit)
+    <div class="mb-2">
+        <span>مبدا ارسال سفارش:</span>
+        <a class="btn {{$location == 't'?'btn-info':'btn-outline-info'}}" href="/add_order?city=t">تهران</a>
+        <a class="btn {{$location == 'm'?'btn-info':'btn-outline-info'}}" href="/add_order?city=m">مشهد</a>
+        <a class="btn {{$location == 's'?'btn-info':'btn-outline-info'}}" href="/add_order?city=s">شیراز</a>
+        <a class="btn {{$location == 'e'?'btn-info':'btn-outline-info'}}" href="/add_order?city=e">اصفهان</a>
+    </div>
+    <br>
 @endif
+
 
 <input type="hidden" name="location" value="{{$location}}">
 
 <div id="formElements" class="bg-white">
     <div class="row">
 
-        <x-col-md-6 :name="'name'" value="{{old('name')?:$order->name}}" :required="true"
-                    :readonly="$edit && $creatorIsAdmin">نام و نام خانوادگی:
-        </x-col-md-6>
+        <div class="col-md-6 mb-2">
+            <div class="form-group input-group required">
+                <div class="input-group-append" style="min-width: 160px">
+                    <label for="name" class="input-group-text w-100">نام و نام خانوادگی:</label>
+                </div>
+                <input value="{{old('name')?:$order->name}}" type="text" id="name" class="form-control"
+                       name="name" required @readonly($edit && $creatorIsAdmin)>
+                @if($creatorIsAdmin)
+                    <input type="number" value="{{old('customerId')?:$order->customer_id}}" name="customerId"
+                           id="customerId" style="width: 70px" readonly>
+                @endif
+        </div>
+    </div>
 
         <x-col-md-6 :name="'phone'" value="{{old('phone')?:$order->phone}}" :required="true"
                     minlength="11" maxlength="11" pattern="^[۰-۹0-9]*$"
@@ -29,42 +45,42 @@
             <input type="hidden" name="city_id" value="0">
         @endif
 
-        <x-col-md-6 :name="'address'" :content="old('address')?:$order->address" :required="true"
-                    rows="2" :tag="'textarea'">آدرس:
-        </x-col-md-6>
-
-        <x-col-md-6 :name="'orders'" :content="$order->orders"
-                    :tag="'div'">سفارشات:
-        </x-col-md-6>
-
         <x-col-md-6 :name="'zip_code'" value="{{old('zip_code')?:$order->zip_code}}"
                     minlength="10"
                     maxlength="10" pattern="^[۰-۹0-9]*$"
                     onkeypress="return event.charCode >= 48 && event.charCode <= 57">کد پستی:
         </x-col-md-6>
+        <x-col-md-6 :name="'address'" :content="old('address')?:$order->address" :required="true"
+                    rows="2" :tag="'textarea'">آدرس:
+        </x-col-md-6>
+
+        {{--        <x-col-md-6 :name="'orders'" :content="$order->orders"--}}
+        {{--                    :tag="'div'">سفارشات:--}}
+        {{--        </x-col-md-6>--}}
+
 
         <x-col-md-6 :name="'desc'" :content="old('desc')?:$order->desc"
                     rows="2" :tag="'textarea'">توضیحات:
         </x-col-md-6>
 
-{{--        @if($creatorIsAdmin)--}}
-{{--            <div class="col-md-6">--}}
-{{--                <div class="form-group input-group required">--}}
-{{--                    <div class="input-group-append" style="min-width: 160px">--}}
-{{--                        <label for="category" class="input-group-text w-100">دسته بندی:</label>--}}
-{{--                    </div>--}}
-{{--                    <select class="form-control" name="category" id="category">--}}
-{{--                        @foreach($customer->categories() as $ii => $category)--}}
-{{--                            <option value="{{$ii}}" @selected($ii == $customer->category) >--}}
-{{--                                {{$category}}--}}
-{{--                            </option>--}}
-{{--                        @endforeach--}}
-{{--                    </select>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        @else--}}
-{{--            <input type="hidden" name="category" value="0">--}}
-{{--        @endif--}}
+        {{--        @if($creatorIsAdmin)--}}
+        {{--            <div class="col-md-6">--}}
+        {{--                <div class="form-group input-group required">--}}
+        {{--                    <div class="input-group-append" style="min-width: 160px">--}}
+        {{--                        <label for="category" class="input-group-text w-100">دسته بندی:</label>--}}
+        {{--                    </div>--}}
+        {{--                    <select class="form-control" name="category" id="category">--}}
+        {{--                        @foreach($customer->categories() as $ii => $category)--}}
+        {{--                            <option value="{{$ii}}" @selected($ii == $customer->category) >--}}
+        {{--                                {{$category}}--}}
+        {{--                            </option>--}}
+        {{--                        @endforeach--}}
+        {{--                    </select>--}}
+        {{--                </div>--}}
+        {{--            </div>--}}
+        {{--        @else--}}
+        {{--            <input type="hidden" name="category" value="0">--}}
+        {{--        @endif--}}
     </div>
 
 
@@ -78,7 +94,8 @@
                     {{$payMethods['receipt']}}</x-radio>
                 <x-radio :id="'onDelivery'" :name="'paymentMethod'" value="onDelivery">
                     {{$payMethods['onDelivery']}}</x-radio><br>
-                <label for='receiptPhoto' class="btn btn-info m-2 hide receiptPhoto">بارگذاری تصویر رسید بانکی  <i class="fa fa-image"></i></label>
+                <label for='receiptPhoto' class="btn btn-info m-2 hide receiptPhoto">بارگذاری تصویر رسید بانکی <i
+                        class="fa fa-image"></i></label>
                 <input type="file" id="receiptPhoto" class="hide" name="receipt">
                 <label for="customerDiscount">درصد تخفیف به مشتری</label>
                 <input type="number" style="max-width: 60px" min="0" max="50" id="customerDiscount"
@@ -101,16 +118,20 @@
             <h4>شیوه ارسال</h4>
             @if(!$edit)
                 <x-radio :id="'peyk'" :name="'deliveryMethod'" value="peyk" checked>
-                    {{$sendMethods['peyk']}} ({{number_format($settings->peykCost)}} ریال)</x-radio>
+                    {{$sendMethods['peyk']}} ({{number_format($settings->peykCost)}} ریال)
+                </x-radio>
 
-                <x-radio :id="'post'" :name="'deliveryMethod'" value="post" >
-                    {{$sendMethods['post']}} ({{number_format($settings->postCost)}} ریال)</x-radio>
+                <x-radio :id="'post'" :name="'deliveryMethod'" value="post">
+                    {{$sendMethods['post']}} ({{number_format($settings->postCost)}} ریال)
+                </x-radio>
 
-                 <x-radio :id="'peykeShahri'" :name="'deliveryMethod'" value="peykeShahri" >
-                    {{$sendMethods['peykeShahri']}} ({{number_format($settings->peykeShahri)}} ریال)</x-radio>
+                <x-radio :id="'peykeShahri'" :name="'deliveryMethod'" value="peykeShahri">
+                    {{$sendMethods['peykeShahri']}} ({{number_format($settings->peykeShahri)}} ریال)
+                </x-radio>
 
-                <x-radio :id="'paskerayeh'" :name="'deliveryMethod'" value="paskerayeh" >
-                    {{$sendMethods['paskerayeh']}} (هزینه ارسال به عهده مشتری)</x-radio>
+                <x-radio :id="'paskerayeh'" :name="'deliveryMethod'" value="paskerayeh">
+                    {{$sendMethods['paskerayeh']}} (هزینه ارسال به عهده مشتری)
+                </x-radio>
 
                 <br>
 
@@ -139,14 +160,12 @@
     @endif
 
     <input type="checkbox" name="addToCustomers" id="addToCustomers" @checked($creatorIsAdmin)
-    class="checkboxradio" onclick="$('#city, #category').prop('disabled', (i, v) => !v);">
-    <label for="addToCustomers">افزودن/ ویرایش مشتری</label><br>
+           class="checkboxradio" onclick="$('#city, #category').prop('disabled', (i, v) => !v);">
+    <label for="addToCustomers">افزودن/ ویرایش مشتری</label>
 
 
-    <div class="d-flex justify-content-around">
-        <input type="submit" class="btn btn-success" value="{{$edit?'ویرایش':'ثبت'}}">&nbsp;
+        <input type="submit" class="btn btn-success mx-4" style="width: 200px;" value="{{$edit?'ویرایش':'ثبت'}}">&nbsp;
         <a class="btn btn-danger"
            onclick="confirm('آیا از ثبت سفارش منصرف شدید؟')?(window.location.href = '{{route('listOrders')}}'):''">بازگشت</a>
-    </div>
 
 </div>

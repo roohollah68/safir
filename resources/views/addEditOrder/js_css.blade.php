@@ -8,6 +8,7 @@
     let cities = {!!json_encode($cities)!!};
     let citiesId = {!!json_encode($citiesId)!!};
     let creatorIsAdmin = !!'{{$creatorIsAdmin}}';
+    let safir = !!'{{$safir}}';
     let table;
 
     $(function () {
@@ -72,7 +73,7 @@
                 price = product.price;
             data.push([
                 product.name,
-                price,
+                priceFormat(price),
                 `<span dir="ltr">${+product.quantity}</span>`,
                 `<span class="btn btn-primary fa fa-add" onclick="addProduct(${id})"></span>`,
             ])
@@ -89,6 +90,49 @@
                 destroy: true,
             });
         }
+    }
+
+    function addProduct(id) {
+        if (cart[id]) {
+            if ($('#product-' + id)[0])
+                return;
+        } else
+            cart[id] = 1;
+        let text = `<tr id="product-${id}">
+        <td>${products[id].name}</td>
+        <td>
+            <span class="btn btn-primary fa fa-plus" onclick="num_plus(${id})"></span>
+            <input class="product-number"
+            name="product_${id}" id="product_${id}"
+            onchange="num_product(${id},this.value)"
+            type="number" value="${cart[id]}"
+            style="width: 50px" min="0">
+            <span class="btn btn-primary fa fa-minus" onclick="num_minus(${id})"></span>
+            <span class="btn btn-outline-info" dir="ltr">${+products[id].quantity}</span>
+        </td>
+        <td>
+            <input type="text" class="price-input text-success discount" style="width: 80px;"
+            name="price_${id}" value="${products[id].priceWithDiscount}"
+            onchange="calculate_discount(${id},this.value)" ${safir ? 'disabled' : ''}>` +
+        (products[id].priceWithDiscount === products[id].price) ? '' :
+            `<span class="text-danger" style="text-decoration: line-through">
+                ${priceFormat(products[id].price)}
+            </span>` +
+            `</td>
+        <td>
+        <input type="number" name="discount_${id}" class="discount-value" id="discount_${id}"
+        value="${products[id].coupon}" style="width: 80px" onchange="changeDiscount(${id},this.value)"
+        ${creatorIsAdmin ? '' : 'disabled'} min="0" max="100" step="0.25">` +
+            (creatorIsAdmin ?
+                `<a class="btn btn-outline-info fa fa-plus" dir="ltr"
+           onclick="$('#discount_${id}').val(+$('#discount_${id}').val()+5).change()">5
+                            <i class="fa fa-percent"></i>
+                        </a>
+                    ` : ``) +
+            `</td>
+        </tr>`
+        $('#product-form').append(text)
+        priceInput();
     }
 
     function paymentAction() {
