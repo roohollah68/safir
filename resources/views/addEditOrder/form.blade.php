@@ -166,21 +166,20 @@
 
         </tbody>
     </table>
+    @if($safir)
 
-    <div class="p-3 m-2 border" id="paymentDetails">
-{{--        <h4>فاکتور</h4>--}}
-        {{--            <ol id="order-list"></ol>--}}
-        {{--            <hr>--}}
-        <span>جمع اقلام: </span><span id="cartSum"></span><span> ریال</span> ||
-        <span>هزینه حمل: </span> <span id="deliveryCost"></span><span>  ریال </span> ||
-        <span class="font-weight-bold">مبلغ کل: </span><span id="total"></span></span>  ریال </span>
-        <br>
+        <div class="p-3 m-2 border" id="paymentDetails">
+            <span>جمع اقلام: </span><span id="cartSum"></span><span> ریال</span> ||
+            <span>هزینه حمل: </span> <span id="deliveryCost"></span><span>  ریال </span> ||
+            <span class="font-weight-bold">مبلغ کل: </span><span id="total"></span></span>  ریال </span>
+            <br>
 
-        <span id="onDeliveryMode">
+            <span id="onDeliveryMode">
                 <span>پرداختی مشتری: </span><span
-                id="customerTotal">{{$edit?$order->customerCost:''}}</span><span> ریال </span> ||
+                    id="customerTotal">{{$edit?$order->customerCost:''}}</span><span> ریال </span> ||
                 <span>سهم سفیر: </span><span
-                id="safirShare">{{$edit?$order->customerCost-$order->total:''}}</span><span>  ریال </span><br>
+                    id="safirShare">{{$edit?$order->customerCost-$order->total:''}}</span><span>  ریال </span><br>
             </span>
-    </div>
+        </div>
+    @endif
 </div>
