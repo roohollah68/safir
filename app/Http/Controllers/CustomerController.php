@@ -315,11 +315,12 @@ class CustomerController extends Controller
         if (isset($response->result)) {
             $order->bale_id = $response->result->message_id;
         }
+        (new CommentController)->create($order, auth()->user(), 'تایید حسابداری');
         $order->save();
         DB::commit();
     }
 
-    public function rejectOrder($id, Request $req = null)
+    public function rejectOrder($id, Request $req)
     {
         DB::beginTransaction();
         $order = Order::findOrFail($id);
@@ -346,8 +347,9 @@ class CustomerController extends Controller
             $this->deleteFromBale(env('GroupId'), $order->bale_id);
         }
         $order->counter = 'rejected';
-        if ($req)
-            $order->paymentNote .= ' _ ' . $req->reason;
+        if (isset($req->reason)) {
+            (new CommentController)->create($order, auth()->user(), 'عدم تایید حسابداری: ' . $req->reason);
+        }
         $order->save();
         DB::commit();
     }

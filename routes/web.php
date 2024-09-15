@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DepositController;
@@ -89,8 +90,8 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'admin', 'safir',
     Route::post('/orders/dateFilter', [OrderController::class, 'dateFilter']);
 
     Route::post('/viewOrder/{id}', [OrderController::class, 'viewOrder']);
-
-
+    Route::post('/viewComment/{id}', [CommentController::class, 'view']);
+    Route::post('/addComment/{id}', [CommentController::class, 'add']);
 
 });
 

@@ -89,6 +89,9 @@
                         <a class="btn btn-info fa fa-eye"
                            onclick="view_order({{$order->id}})"
                            title="مشاهده سفارش"></a>
+                        <a class="btn btn-info fa fa-comment"
+                           onclick="view_comment({{$order->id}})"
+                           title="مشاهده سفارش"></a>
                         <a class="fa fa-file-invoice-dollar btn btn-secondary"
                            onclick="invoice({{$order->id}})"
                            title=" فاکتور"></a>

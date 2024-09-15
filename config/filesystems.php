@@ -42,6 +42,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'comment' => [
+            'driver' => 'local',
+            'root' => public_path('comment'),
+            'url' => env('APP_URL').'',
+            'visibility' => 'public',
+        ],
+
         'deposit' => [
             'driver' => 'local',
             'root' => public_path('deposit'),

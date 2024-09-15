@@ -48,6 +48,38 @@
             })
     }
 
+    function view_comment(id) {
+        $.post('/viewComment/' + id, {_token: token})
+            .done(res => {
+                dialog = Dialog(res);
+            })
+    }
+
+    function addComment(id) {
+
+        $('#commentForm').submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: '/addComment/' + id,
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                headers: {
+                    "Accept": "application/json"
+                }
+            }).done(function (res) {
+                if (res === "ok") {
+                    $.notify("با موفقیت ذخیره شد.", "success");
+                    dialog.remove();
+                }
+            }).fail(function () {
+                $.notify('خطایی رخ داده است.', 'warn');
+            });
+        });
+        $('#commentForm').submit();
+    }
+
     function num(x) {
         return numeral(x).format(0, 0);
     }
@@ -60,7 +92,12 @@
                 $('.ui-widget-overlay').bind('click', function () {
                     dialog.remove()
                 });
-            }
+            },
+            show: {
+                effect: "blind",
+                duration: 500
+            },
+            width: '500',
         });
         return dialog;
     }

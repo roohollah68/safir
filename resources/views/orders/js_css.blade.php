@@ -10,7 +10,8 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let showDeleted, printWait, confirmWait, counterWait, proccessWait, COD, user = 'all', Location = '{{$user->meta('city')}}';
+    let showDeleted, printWait, confirmWait, counterWait, proccessWait, COD, user = 'all',
+        Location = '{{$user->meta('city')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     {{--let role = {{$user->role}};--}}
     let dtp1Instance;
@@ -24,7 +25,7 @@
         sendMethodText = $('#sendMethodText').html();
         $('#sendMethodText').html('');
         $(".checkboxradio").checkboxradio();
-        $('#location-'+Location).click();
+        $('#location-' + Location).click();
         prepare_data();
 
         const dtp1Instance2 = new mds.MdsPersianDateTimePicker(document.getElementById('date1'), {
@@ -224,9 +225,10 @@
     function operations(order) {
         let id = order.id;
         let viewOrder = `<i id="view_order_${id}" class="fa fa-eye btn btn-info" onclick="view_order(${id})"></i> `;
+        let viewComment = `<i id="view_comment_${id}" class="fa fa-comment btn btn-info" onclick="view_comment(${id})"></i> `;
         let deleteOrder = `<i class="fa fa-trash-alt btn btn-danger" onclick="delete_order(${id},this)" title="حذف سفارش" ></i> `;
         let editOrder = `<a class="fa fa-edit btn btn-primary" href="edit_order/${id}" title="ویرایش سفارش"></a> `;
-        let res = viewOrder;
+        let res = viewOrder + viewComment;
         if (showDeleted)
             return res;
         @if($safir)
@@ -435,6 +437,7 @@
 
     }
     @endif
+
 
 
     function dateFilter() {

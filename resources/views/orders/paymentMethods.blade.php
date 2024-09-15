@@ -22,7 +22,7 @@
         <br>
         <input type="radio" id="payInDate" value="payInDate" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('#dateOfPayment').show()">
         <label for="payInDate" class="btn btn-danger my-1">پرداخت در تاریخ</label>
-        <input type="text" name="" id="dateOfPayment" class="form-control hide" placeholder="تاریخ پرداخت" >
+        <input type="text" name="payInDatePersian" id="dateOfPayment" class="form-control hide" placeholder="تاریخ پرداخت" >
         <input type="hidden" name="payInDate">
 
         <br><label for="send-note">یادداشت:</label>

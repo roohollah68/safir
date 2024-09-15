@@ -13,11 +13,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
+use function League\Flysystem\type;
 
 class OrderController extends Controller
 {
     public function showOrders()
     {
+
         $user = auth()->user();
         if ($this->superAdmin() || $this->print()) {
             $users = User::withTrashed()->get()->keyBy("id");
@@ -191,6 +193,8 @@ class OrderController extends Controller
             $order->save();
         }
 
+        (new CommentController)->create($order, $user, 'سفارش ایجاد شد');
+
         DB::commit();
 
         return redirect()->route('listOrders');
@@ -330,6 +334,8 @@ class OrderController extends Controller
             'total' => $total,
         ]);
 
+        (new CommentController)->create($order, auth()->user(), 'سفارش ویرایش شد');
+
         $this->addToCustomers($request);
         app('Telegram')->editOrderInBale($order, env('GroupId'));
         DB::commit();
@@ -365,6 +371,15 @@ class OrderController extends Controller
                 ]);
             }
         }
+        $text = null;
+        if ($order->state == 0)
+            $text = 'سفارش به انبار بازگشت';
+        if ($order->state == 1)
+            $text = 'سفارش در حال پردازش برای ارسال';
+        if ($order->state == 10)
+            $text = 'سفارش ارسال شد';
+        if ($text)
+            (new CommentController)->create($order, auth()->user(), $text);
         $order->save();
         $user->save();
         DB::commit();
@@ -378,10 +393,12 @@ class OrderController extends Controller
         $orders = array();
         foreach ($idArray as $id) {
             $order = Order::findOrFail($id);
-            if ($order->state == 1)
+            if ($order->state == 1) {
                 $order->update([
                     'state' => 2
                 ]);
+//                (new CommentController)->create($order, auth()->user(), 'لیبل سفارش پرینت شد.');
+            }
             if ($order->location != 't')
                 $order->desc .= '(انبار ' . $this->city[$order->location][0] . ')';
 
@@ -456,24 +473,25 @@ class OrderController extends Controller
         }
     }
 
-    public function cancelInvoice($id)
+    public function cancelInvoice($id, Request $req)
     {
         DB::beginTransaction();
         $order = Order::findOrFail($id);
         if (!$order->confirm)
             return $order;
-        if ($order->state)
+        if ($order->state) {
             $order->state = 4;
-        $order->confirm = false;
-        if ($order->counter == 'approved') {
-            $customerController = new CustomerController();
-            $customerController->rejectOrder($id);
+            (new CommentController)->create($order, auth()->user(), 'سفارش بعد از تایید ویرایش شد');
         }
+        $order->confirm = false;
+        if ($order->counter == 'approved')
+            (new CustomerController)->rejectOrder($id, $req);
         $this->removeFromCustomerTransactions($order);
         $order->counter = 'waiting';
         $order->paymentMethod = null;
         $order->payInDate = null;
         $order->paymentNote = null;
+        (new CommentController)->create($order, auth()->user(), 'سفارش به حالت پیش فاکتور بازگشت ');
         $order->save();
 
         DB::commit();
@@ -484,18 +502,18 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
         if ($this->superAdmin())
-            $order = Order::findOrFail($id);
+            $order = Order::with('user')->findOrFail($id);
         else
-            $order = auth()->user()->orders()->findOrFail($id);
+            $order = auth()->user()->orders()->with('user')->findOrFail($id);
 
-        if ($order->state || ($order->confirm && $order->user()->first()->role !== 'user'))
+        if ($order->state || ($order->confirm && $order->user->role !== 'user'))
             return 'سفارش نمی تواند حذف شود، چون پردازش شده است!';
 
         if ($order->delete()) {
-            $orderProducts = $order->orderProducts()->delete();
-            if ($order->user()->first()->safir()) {
-                foreach ($order->productChange()->get() as $productChange) {
-                    $product = $productChange->product()->first();
+            $order->orderProducts()->delete();
+            if ($order->user->safir()) {
+                foreach ($order->productChange()->with('product')->get() as $productChange) {
+                    $product = $productChange->product;
                     if ($product)
                         $product->update([
                             'quantity' => $product->quantity - $productChange->change,
@@ -504,8 +522,8 @@ class OrderController extends Controller
                 $order->productChange()->delete();
             }
 
-            if ($order->paymentMethod == 'credit' && $order->user()->first()->safir()) {
-                $user = $order->user()->first();
+            if ($order->paymentMethod == 'credit' && $order->user->safir()) {
+                $user = $order->user;
                 $user->update([
                     'balance' => $user->balance + $order->total,
                 ]);
@@ -519,6 +537,7 @@ class OrderController extends Controller
 
             }
             app('Telegram')->deleteOrderFromBale($order, env('GroupId'));
+            (new CommentController)->create($order, auth()->user(), 'سفارش حذف شد');
             DB::commit();
             return ['با موفقیت حذف شد', $order];
         };
@@ -690,6 +709,7 @@ class OrderController extends Controller
         if ($req->note)
             $req->note = ' - کد مرسوله: ' . $req->note;
         $order->deliveryMethod .= ' - ' . $req->sendMethod . $req->note;
+        (new CommentController)->create($order, auth()->user(), $req->sendMethod . $req->note);
         $order->save();
         DB::commit();
         return $order;
@@ -709,25 +729,22 @@ class OrderController extends Controller
         DB::beginTransaction();
         $paymentMethod = $req->paymentMethod;
         $photo = null;
+        $payInDate = '';
         if ($order->confirm) {
             return ['error', 'قبلا تایید شده.'];
         }
         if ($paymentMethod == 'cash') {
             if (!$req->file("cashPhoto"))
                 return ['error', 'باید عکس رسید بانکی بارگذاری شود.'];
-            $photo = $req->file("cashPhoto")->store("", 'deposit');
-            $photo2 = $req->file("cashPhoto")->store("", 'receipt');
-
+            $photo = $req->file("cashPhoto");
         }
         if ($paymentMethod == 'cheque') {
-            if ($req->file("chequePhoto")) {
-                $photo = $req->file("chequePhoto")->store("", 'deposit');
-                $photo2 = $req->file("chequePhoto")->store("", 'receipt');
-            }
+            $photo = $req->file("chequePhoto");
         }
         if ($paymentMethod == 'payInDate') {
             if (strlen($req->payInDate) != 10)
                 return ['error', 'تاریخ باید مشخص شود.'];
+            $payInDate = $req->payInDatePersian;
         }
         $order->update([
             'confirm' => 1,
@@ -743,15 +760,18 @@ class OrderController extends Controller
                 'type' => true,
                 'verified' => 'waiting',
                 'description' => $req->note . '/ ' . $order->payMethod(),
-                'photo' => $photo,
+                'photo' => $photo->store("", 'deposit'),
                 'paymentLink' => $trans1->id,
             ]);
             $trans1->update([
                 'paymentLink' => $trans2->id,
             ]);
             $order->update([
-                'receipt' => $photo2,
+                'receipt' => $photo->store("", 'receipt'),
             ]);
+            (new CommentController)->create($order, auth()->user(), 'سفارش تایید شد. ' . $req->note . '/ ' . $order->payMethod() . '/ ' . $payInDate, $photo->store("", 'comment'));
+        } else {
+            (new CommentController)->create($order, auth()->user(), 'سفارش تایید شد. ' . $req->note . '/ ' . $order->payMethod() . '/ ' . $payInDate);
         }
 
         DB::commit();
