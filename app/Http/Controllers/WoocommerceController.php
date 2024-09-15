@@ -140,9 +140,10 @@ class WoocommerceController extends Controller
                     }
                 }
             }
+            (new CommentController)->create($order, $user, 'سفارش دوباره ارسال شد');
         } else {
             $order = $user->orders()->create($orderData);
-
+            (new CommentController)->create($order, $user, 'سفارش ایجاد شد');
             $web = $order->website()->create([
                 'website' => $website,
                 'website_id' => $request->id,
@@ -177,6 +178,7 @@ class WoocommerceController extends Controller
 
             } else {
                 $order->delete();
+                (new CommentController)->create($order, $user, 'سفارش حذف شد');
                 if ($request->status != 'pending') {
                     $baleReq = app('Telegram')->sendOrderToBale($order, '5742084958');
                     if($baleReq){
