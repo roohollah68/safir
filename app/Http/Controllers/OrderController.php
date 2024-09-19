@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\City;
 use App\Models\CouponLink;
 use App\Models\Customer;
+use App\Models\Good;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
 use App\Models\Province;
 use App\Models\User;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
@@ -43,25 +45,29 @@ class OrderController extends Controller
     {
         if ($this->superAdmin())
             return redirect()->back();
-        $city = $req->city ?: 't';
-        if ($this->safir())
-            $city = 't';
+//        $warehouse = $req->warehouse ?: 't';
+//        if ($this->safir())
+//            $city = 't';
         $user = auth()->user();
+
         $order = new Order();
 
         $customersData = $user->customers()->get();
 
         //استثنا آقای عبدی
         if ($this->safir() || $user->id == 57) {
-            $products = Product::where('category', 'final')->where('location', 't')->where('price', '>', '1')->where('available', true)->get()->keyBy('id');
+            $goods = Good::where('category', 'final')->with('products')->get()->keyBy('id');
         } else {
-            $products = Product::where('category', '<>', 'pack')->where('location', $city)->where('available', true)->get()->keyBy('id');
+            $goods = Good::where('category', '<>', 'pack')->with('products')->get()->keyBy('id');
         }
         $cart = [];
-        foreach ($products as $id => $product) {
-            $products[$id]->coupon = $this->calculateDis($id);
-            $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->price / 100);
-            $cart[$id] = '';
+        foreach ($goods as $id => $good) {
+            foreach ($good->products as $index => $product){
+                $discount = $this->calculateDis($product->id);
+                $goods[$id]->products[$index]->coupon = $discount;
+                $goods[$id]->products[$index]->priceWithDiscount = round((100 - $discount) * $good->price / 100);
+                $cart[$product->id] = '';
+            }
         }
 
         $customers = $customersData->keyBy('name');
@@ -70,11 +76,11 @@ class OrderController extends Controller
         $customer->city_id = 301;
         $cities = City::all()->keyBy('name');
         $citiesId = $cities->keyBy('id');
-        $province = Province::all()->keyBy('id');
+//        $province = Province::all()->keyBy('id');
         return view('addEditOrder.addEditOrder', [
             'customers' => $customers,
             'customersId' => $customersId,
-            'products' => $products,
+            'goods' => $goods,
             'settings' => $this->settings(),
             'user' => $user,
             'cart' => $cart,
@@ -83,7 +89,7 @@ class OrderController extends Controller
             'customer' => $customer,
             'cities' => $cities,
             'citiesId' => $citiesId,
-            'location' => $city,
+            'warehouses' => Warehouse::all(),
         ]);
     }
 

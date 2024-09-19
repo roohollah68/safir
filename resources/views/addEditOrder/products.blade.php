@@ -1,6 +1,5 @@
 <br>
 
-
 <div id="products" class="my-4">
     <table class="table table-striped" id="product-table">
         <thead>

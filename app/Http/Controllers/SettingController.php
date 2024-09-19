@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\CustomerTransactions;
+use App\Models\Good;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductData;
@@ -164,11 +165,55 @@ class SettingController extends Controller
 //    }
 
 
+        //$this->createGoodTable();
 
+        $this->setWarehouseId();
 
 //        DB::commit();
 
         return 'ok';
+    }
+
+    public function createGoodTable()
+    {
+        $nameList = [];
+        $products = Product::all();
+        foreach ($products as $product) {
+            if (isset($nameList[$product->name])) {
+                $product->update([
+                    'good_id' => $nameList[$product->name],
+                ]);
+            } else {
+                $good = Good::create([
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'productPrice' => $product->productPrice,
+                    'photo' => $product->photo,
+                    'category' => $product->category,
+                ]);
+                $product->update([
+                    'good_id' => $good->id,
+                ]);
+                $nameList[$product->name] = $good->id;
+            }
+        }
+    }
+
+    public function setWarehouseId()
+    {
+        $products = Product::all();
+        $warehouseId = [
+            't'=>1,
+            'f'=>3,
+            'm'=>2,
+            's'=>4,
+            'e'=>5
+        ];
+        foreach ($products as $product) {
+            $product->update([
+                'warehouse_id'=>$warehouseId[$product->location]
+            ]);
+        }
     }
 }
 

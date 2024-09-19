@@ -10,6 +10,7 @@ class Product extends Model
 //    use HasFactory;
 
     protected $fillable =[
+        'good_id',
         'name',
         'price',
         'photo',
@@ -19,7 +20,8 @@ class Product extends Model
         'category',
         'high_alarm',
         'productPrice',
-        'location'
+        'location',
+        'warehouse_id',
     ];
 
     public function orderProducts()
@@ -30,5 +32,15 @@ class Product extends Model
     public function productChange()
     {
         return $this->hasMany(ProductChange::class);
+    }
+
+    public function couponLinks()
+    {
+        return $this->hasMany(CouponLink::class);
+    }
+
+    public function good()
+    {
+        return $this->belongsTo(Good::class);
     }
 }

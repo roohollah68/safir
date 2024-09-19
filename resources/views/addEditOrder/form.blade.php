@@ -1,17 +1,16 @@
 @csrf
 @if(!$safir && !$edit)
-    <div class="mb-2">
-        <span>مبدا ارسال سفارش:</span>
-        <a class="btn {{$location == 't'?'btn-info':'btn-outline-info'}}" href="/add_order?city=t">تهران</a>
-        <a class="btn {{$location == 'm'?'btn-info':'btn-outline-info'}}" href="/add_order?city=m">مشهد</a>
-        <a class="btn {{$location == 's'?'btn-info':'btn-outline-info'}}" href="/add_order?city=s">شیراز</a>
-        <a class="btn {{$location == 'e'?'btn-info':'btn-outline-info'}}" href="/add_order?city=e">اصفهان</a>
+    <div class="mb-2 warehouse-select">
+        <span>انتخاب انبار:</span>
+        @foreach($warehouses as $warehouse)
+            <a class="btn btn-outline-info warehouse-name" id="warehouse-{{$warehouse->id}}" onclick="createTable({{$warehouse->id}})">{{$warehouse->name}}</a>
+        @endforeach
+
     </div>
     <br>
 @endif
+<div id="hidden-input"></div>
 
-
-<input type="hidden" name="location" value="{{$location}}">
 
 <div id="formElements" class="bg-white">
     <div class="row">

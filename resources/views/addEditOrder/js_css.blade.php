@@ -3,7 +3,7 @@
     let customersId = {!!json_encode($customersId)!!};
     let paymentMethod = "credit";
     let deliveryMethod = "peyk";
-    let products = {!!json_encode($products)!!};
+    let goods = {!!json_encode($goods)!!};
     let cart = {!!json_encode($cart)!!};
     let cities = {!!json_encode($cities)!!};
     let citiesId = {!!json_encode($citiesId)!!};
@@ -11,6 +11,7 @@
     let safir = !!'{{$safir}}';
     let edit = !!'{{$edit}}';
     let table;
+    let warehouseId = 1;
 
     $(function () {
         //Hide form errors after some time.
@@ -19,8 +20,8 @@
         }, 10000);
 
         $(".checkboxradio").checkboxradio();//jquery-ui
-        $.each(cart,(id,number)=>{
-            if(number)
+        $.each(cart, (id, number) => {
+            if (number)
                 addProduct(id);
             else
                 delete cart[id];
@@ -29,14 +30,6 @@
 
     @if($creatorIsAdmin || !$edit)
     $(function () {
-        //create products table
-        // $('#product-table').DataTable({
-        //     autoWidth: false,
-        //     paging: false,
-        //     // pageLength: 100,
-        //     order: [[3, "desc"]],
-        // });
-
         createTable()
 
         $("#name").autocomplete({
@@ -72,20 +65,40 @@
 
     @endif
 
-    function createTable() {
+    function createTable(wareId = warehouseId) {
+
+        $('.warehouse-select a').removeClass('btn-outline-info').addClass('btn-info');
+        $('#warehouse-' + warehouse).removeClass('btn-info').addClass('btn-outline-info');
+
+        if (warehouseId !== wareId) {
+            warehouseId = wareId;
+            cart = [];
+            $('#product-table').html('');
+            $('#selected-product-table').hide();
+            refreshProducts();
+        }
+
         let data = [];
-        $.each(products, (id, product) => {
-            let price;
-            if (product.coupon > 0)
-                price = `${priceFormat(product.priceWithDiscount)} (${product.coupon}%)`;
-            else
-                price = priceFormat(product.price);
-            data.push([
-                product.name,
-                price,
-                `<span dir="ltr">${+product.quantity}</span>`,
-                `<span class="btn btn-primary fa fa-add" onclick="addProduct(${id})"></span>`,
-            ])
+        $.each(goods, (goodId, good) => {
+            $.each(good.products, (productId, product) => {
+                if (!product.available)
+                    return;
+                if (product.warehouse_id !== warehouseId)
+                    return;
+                let price;
+                if (product.coupon > 0)
+                    price = `${priceFormat(product.priceWithDiscount)} (${product.coupon}%)`;
+                else
+                    price = priceFormat(product.price);
+                data.push([
+                    good.name,
+                    price,
+                    `<span dir="ltr">${+product.quantity}</span>`,
+                    `<span class="btn btn-primary fa fa-add" onclick="addProduct(${goodId},${productId})"></span>`,
+                ])
+            })
+
+
         });
         if (table) {
             table.clear();
@@ -101,28 +114,28 @@
         }
     }
 
-    function addProduct(id) {
-        if (cart[id]) {
-            if ($('#product-' + id)[0])
+    function addProduct(goodId, productId) {
+        if (cart[productId]) {
+            if ($('#product-' + productId)[0])
                 return;
         } else
-            cart[id] = 1;
+            cart[productId] = 1;
         $('#selected-product-table').show();
-        let text = `<tr id="product-${id}">
-        <td>${products[id].name}</td>
+        let text = `<tr id="product-${productId}">
+        <td>${goods[goodId].name}</td>
         <td>
-            <span class="btn btn-primary fa fa-plus" onclick="num_plus(${id})"></span>
+            <span class="btn btn-primary fa fa-plus" onclick="num_plus(${productId})"></span>
             <input class="product-number"
-            name="product_${id}" id="product_${id}"
-            onchange="num_product(${id},this.value)"
-            type="number" value="${cart[id]}"
-            style="width: 50px" min="0" ${(edit && safir)?'readonly':''}>
-            <span class="btn btn-primary fa fa-minus" onclick="num_minus(${id})"></span>
-            <span class="btn btn-outline-info" dir="ltr">${+products[id].quantity}</span>
+            name="product_${productId}" id="product_${productId}"
+            onchange="num_product(${productId},this.value)"
+            type="number" value="${cart[productId]}"
+            style="width: 50px" min="0" ${(edit && safir) ? 'readonly' : ''}>
+            <span class="btn btn-primary fa fa-minus" onclick="num_minus(${productId})"></span>
+            <span class="btn btn-outline-info" dir="ltr">${+goods[goodId].products[productId].quantity}</span>
         </td>
         <td>
             <input type="text" class="price-input text-success discount" style="width: 80px;"
-            name="price_${id}" value="${products[id].priceWithDiscount}"
+            name="price_${goodId}" value="${goods[goodId].products[productId].priceWithDiscount}"
             onchange="calculate_discount(${id},this.value)" ${safir ? 'disabled' : ''}>` +
             ((products[id].priceWithDiscount == products[id].price) ? '' :
                 `<span class="text-danger" style="text-decoration: line-through">
@@ -165,29 +178,21 @@
     function refreshProducts() {
         let total = 0, Total = 0;
         let hasProduct = false;
-        let ordersText = ''; //عبارت مربوط به قسمت محصولات
-        let ordersListText = ''; // عبارت مربوط به فاکتور سفیران
+        $('#hidden-input').html('');
         $.each(cart, (id, number) => {
             if (number) {
-                // let price = products[id].priceWithDiscount * number; //قیمت با تخفیف
-                // let Price = products[id].price * number;  //قیمت بدون تخفیف
                 $('#product_' + id).val(number);
-                // ordersText = ordersText.concat(products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + '<br>');
-                // ordersListText = ordersListText.concat('<li>' + products[id].name + ' ' + number + ' عدد ' + deleteBTN(id) + ': ' + num(price) + '</li>');
-
-                total += products[id].priceWithDiscount * number; //جمع قیمت با تخفیف
-                Total += products[id].price * number;  //قیمت بدون تخفیف
-                // $('#product_' + id).val(number);
+                total += products[id].priceWithDiscount * number; //جمع قیمت با تخفیف;
+                Total += products[id].price * number;  //قیمت بدون تخفیف;
+                $('#hidden-input').append(`<input type="hidden" name="cart[${id}]" value="${number}">`);
                 hasProduct = true;
             } else {
                 $('#product_' + id).val('');
                 delete cart[id];
             }
         })
-        // $('#orders').html(ordersText);
 
         @if($safir)
-        // $('#order-list').html(ordersListText)
         let deliveryCost = 0;
         if (Total < {{$settings->freeDelivery}} || '{{$user->id}}' == '10')
             if (deliveryMethod == 'peyk')
@@ -252,7 +257,7 @@
         if (value == 0) {
             // $('#product_' + id).val('');
             delete cart[id];
-            $('#product-'+id).remove();
+            $('#product-' + id).remove();
             let number = Object.keys(cart).length;
             if (!number) {
                 $('#selected-product-table').hide();
