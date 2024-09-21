@@ -20,9 +20,34 @@ class Product extends Model
         'category',
         'high_alarm',
         'productPrice',
-        'location',
         'warehouse_id',
     ];
+    protected $appends = ['name','price','productPrice','photo','category'];
+
+    public function getNameAttribute()
+    {
+        return $this->good()->first()->name;
+    }
+
+    public function getPriceAttribute()
+    {
+        return $this->good()->first()->price;
+    }
+
+    public function getProductPriceAttribute()
+    {
+        return $this->good()->first()->productPrice;
+    }
+
+    public function getPhotoAttribute()
+    {
+        return $this->good()->first()->photo;
+    }
+
+    public function getCategoryAttribute()
+    {
+        return $this->good()->first()->category;
+    }
 
     public function orderProducts()
     {

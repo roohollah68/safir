@@ -6,6 +6,7 @@ use App\Models\Coupon;
 use App\Models\CouponLink;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class CouponController extends Controller
@@ -15,7 +16,7 @@ class CouponController extends Controller
         return view('coupons', [
             'coupons' => Coupon::with('couponLinks')->get(),
             'users' => User::all()->keyBy('id'),
-            'products' => Product::where('location', 't')->get()->keyBy('id')
+            'products' => Product::where('warehouse_id', 1)->get()->keyBy('id')
         ]);
     }
 
@@ -24,7 +25,9 @@ class CouponController extends Controller
         return view('addEditCoupon', [
             'coupon' => false,
             'users' => User::where('role','user')->get(),
-            'products' => Product::where('location', 't')->where('category', 'final')->get(),
+            'products' => Product::where('warehouse_id', 1)->whereHas('good', function (Builder $query) {
+                $query->where('category', 'final');
+            })->get(),
         ]);
     }
 
@@ -39,7 +42,7 @@ class CouponController extends Controller
         ]);
 
         $users = User::all();
-        $products = Product::where('location', 't')->get();
+        $products = Product::where('warehouse_id', 1)->get();
         foreach ($users as $user) {
             foreach ($products as $product) {
                 if ($req['user_' . $user->id] && $req['product_' . $product->id]) {
@@ -59,7 +62,7 @@ class CouponController extends Controller
         return view('addEditCoupon', [
             'coupon' => Coupon::with('couponLinks')->find($id),
             'users' => User::all(),
-            'products' => Product::where('location', 't')->get()
+            'products' => Product::where('warehouse_id', 1)->get()
         ]);
     }
 
@@ -76,7 +79,7 @@ class CouponController extends Controller
         CouponLink::where('coupon_id', $id)->delete();
 
         $users = User::all();
-        $products = Product::where('location', 't')->get();
+        $products = Product::where('warehouse_id', 1)->get();
         foreach ($users as $user) {
             foreach ($products as $product) {
                 if ($req['user_' . $user->id] && $req['product_' . $product->id]) {

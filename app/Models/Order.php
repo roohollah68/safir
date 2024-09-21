@@ -29,6 +29,7 @@ class Order extends Model
         'customer_id',
         'bale_id',
         'location',
+        'warehouse_id',
         'payInDate',
         'paymentNote',
         'counter',

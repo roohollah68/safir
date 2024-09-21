@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Good;
 use App\Models\Product;
 use App\Models\ProductChange;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,8 +14,11 @@ class ProductController extends Controller
     public function showProducts()
     {
         $products = Product::all()->keyBy('id');
+        $goods = Good::with('products')->get();
         return view('productList', [
             'products' => $products,
+            'goods' => $goods,
+            'warehouses' => Warehouse::all(),
         ]);
     }
 

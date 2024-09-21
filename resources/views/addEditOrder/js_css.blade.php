@@ -3,7 +3,7 @@
     let customersId = {!!json_encode($customersId)!!};
     let paymentMethod = "credit";
     let deliveryMethod = "peyk";
-    let goods = {!!json_encode($goods)!!};
+    let products = {!!json_encode($products)!!};
     let cart = {!!json_encode($cart)!!};
     let cities = {!!json_encode($cities)!!};
     let citiesId = {!!json_encode($citiesId)!!};
@@ -11,7 +11,6 @@
     let safir = !!'{{$safir}}';
     let edit = !!'{{$edit}}';
     let table;
-    let warehouseId = 1;
 
     $(function () {
         //Hide form errors after some time.
@@ -42,8 +41,8 @@
         refreshProducts()
         paymentAction()
         deliveryAction()
-        $('input[name=paymentMethod]').on('click', paymentAction);
-        $('input[name=deliveryMethod]').on('click', deliveryAction);
+        // $('input[name=paymentMethod]').on('click', paymentAction);
+        // $('input[name=deliveryMethod]').on('click', deliveryAction);
 
         $("#city").autocomplete({
             source: Object.keys(cities),
@@ -65,39 +64,22 @@
 
     @endif
 
-    function createTable(wareId = warehouseId) {
-
-        $('.warehouse-select a').removeClass('btn-outline-info').addClass('btn-info');
-        $('#warehouse-' + warehouse).removeClass('btn-info').addClass('btn-outline-info');
-
-        if (warehouseId !== wareId) {
-            warehouseId = wareId;
-            cart = [];
-            $('#product-table').html('');
-            $('#selected-product-table').hide();
-            refreshProducts();
-        }
-
+    function createTable() {
         let data = [];
-        $.each(goods, (goodId, good) => {
-            $.each(good.products, (productId, product) => {
-                if (!product.available)
-                    return;
-                if (product.warehouse_id !== warehouseId)
-                    return;
-                let price;
-                if (product.coupon > 0)
-                    price = `${priceFormat(product.priceWithDiscount)} (${product.coupon}%)`;
-                else
-                    price = priceFormat(product.price);
-                data.push([
-                    good.name,
-                    price,
-                    `<span dir="ltr">${+product.quantity}</span>`,
-                    `<span class="btn btn-primary fa fa-add" onclick="addProduct(${goodId},${productId})"></span>`,
-                ])
-            })
 
+        $.each(products, (id, product) => {
+
+            let price;
+            if (product.coupon > 0)
+                price = `${priceFormat(product.priceWithDiscount)} (${product.coupon}%)`;
+            else
+                price = priceFormat(product.price);
+            data.push([
+                product.name,
+                price,
+                `<span dir="ltr">${+product.quantity}</span>`,
+                `<span class="btn btn-primary fa fa-add" onclick="addProduct(${id})"></span>`,
+            ]);
 
         });
         if (table) {
@@ -107,44 +89,44 @@
         } else {
             table = $('#product-table').DataTable({
                 data: data,
-                // order: [[3, "desc"]],
                 pageLength: 100,
                 destroy: true,
             });
         }
     }
 
-    function addProduct(goodId, productId) {
-        if (cart[productId]) {
-            if ($('#product-' + productId)[0])
+    function addProduct(id) {
+        let product = products[id];
+        if (cart[id]) {
+            if ($('#product-' + id)[0])
                 return;
         } else
-            cart[productId] = 1;
+            cart[id] = 1;
         $('#selected-product-table').show();
-        let text = `<tr id="product-${productId}">
-        <td>${goods[goodId].name}</td>
+        let text = `<tr id="product-${id}">
+        <td>${product.name}</td>
         <td>
-            <span class="btn btn-primary fa fa-plus" onclick="num_plus(${productId})"></span>
+            <span class="btn btn-primary fa fa-plus" onclick="num_plus(${id})"></span>
             <input class="product-number"
-            name="product_${productId}" id="product_${productId}"
-            onchange="num_product(${productId},this.value)"
-            type="number" value="${cart[productId]}"
-            style="width: 50px" min="0" ${(edit && safir) ? 'readonly' : ''}>
-            <span class="btn btn-primary fa fa-minus" onclick="num_minus(${productId})"></span>
-            <span class="btn btn-outline-info" dir="ltr">${+goods[goodId].products[productId].quantity}</span>
+            name="product_${id}" id="product_${id}"
+            onchange="num_product(${id},this.value)"
+            type="number" value="${cart[id]}"
+            style="width: 50px" min="0" ${(edit && (safir || !creatorIsAdmin)) ? 'readonly' : ''}>
+            <span class="btn btn-primary fa fa-minus" onclick="num_minus(${id})"></span>
+            <span class="btn btn-outline-info" dir="ltr">${+product.quantity}</span>
         </td>
         <td>
             <input type="text" class="price-input text-success discount" style="width: 80px;"
-            name="price_${goodId}" value="${goods[goodId].products[productId].priceWithDiscount}"
+            name="price_${id}" value="${product.priceWithDiscount}"
             onchange="calculate_discount(${id},this.value)" ${safir ? 'disabled' : ''}>` +
-            ((products[id].priceWithDiscount == products[id].price) ? '' :
+            ((product.priceWithDiscount == product.price) ? '' :
                 `<span class="text-danger" style="text-decoration: line-through">
-            ${priceFormat(products[id].price)}
+            ${priceFormat(product.price)}
         </span>`) +
             `</td>
         <td>
         <input type="number" name="discount_${id}" class="discount-value" id="discount_${id}"
-        value="${products[id].coupon}" style="width: 80px" onchange="changeDiscount(${id},this.value)"
+        value="${product.coupon}" style="width: 80px" onchange="changeDiscount(${id},this.value)"
         ${creatorIsAdmin ? '' : 'disabled'} min="0" max="100" step="0.25">` +
             (creatorIsAdmin ?
                 `<a class="btn btn-outline-info fa fa-plus" dir="ltr"
@@ -236,14 +218,14 @@
     }
 
     function num_plus(id) {
-        if (edit && safir)
+        if (edit && (safir || !creatorIsAdmin))
             return;
         let n = +$('#product_' + id).val() + 1;
         $('#product_' + id).val(n).change();
     }
 
     function num_minus(id) {
-        if (edit && safir)
+        if (edit && (safir || !creatorIsAdmin))
             return;
         let n = +$('#product_' + id).val() - 1;
         $('#product_' + id).val(n).change();
@@ -288,11 +270,8 @@
     }
 
     function calculate_discount(id, value) {
-        // $('#discount_' + id).val(0);
-        // return;
         value = +(value.replaceAll(',', ''));
         if (value <= products[id].price && '{{$user->id}}' !== '61') {
-            // value = Math.min(products[id].price, +value);
             value = Math.max(0, +value);
             $('#discount_' + id).val((1 - value / products[id].price) * 100).change();
         } else {

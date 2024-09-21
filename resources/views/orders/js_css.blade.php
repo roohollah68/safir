@@ -11,7 +11,7 @@
     let orders = {!!json_encode($orders)!!};
     let ids;
     let showDeleted, printWait, confirmWait, counterWait, proccessWait, COD, user = 'all',
-        Location = '{{$user->meta('city')}}';
+        warehouseId = '{{$user->meta('warehouseId')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     {{--let role = {{$user->role}};--}}
     let dtp1Instance;
@@ -25,7 +25,7 @@
         sendMethodText = $('#sendMethodText').html();
         $('#sendMethodText').html('');
         $(".checkboxradio").checkboxradio();
-        $('#location-' + Location).click();
+        $('#warehouse-' + warehouseId).click();
         prepare_data();
 
         const dtp1Instance2 = new mds.MdsPersianDateTimePicker(document.getElementById('date1'), {
@@ -58,7 +58,7 @@
                 return
             if (print && !order.confirm)
                 return
-            if (Location !== order.location)
+            if (+warehouseId !== +order.warehouse_id)
                 return;
             if (COD && order.paymentMethod !== 'cod' && order.paymentMethod !== 'پرداخت در محل' && order.paymentMethod !== 'onDelivery')
                 return;
@@ -79,7 +79,7 @@
 
                 order.customer_id ? '<a href="/customer/transaction/' + order.customer_id + '">' + order.name + '</a>' : order.name,
 
-                users[order.user_id].name,
+                users[order.user_id].name + (website?`(${order.website.website_id})`:''),
 
                 (order.orders.length > 30) ? order.orders.substr(0, 30) + ' ...' : order.orders,
 

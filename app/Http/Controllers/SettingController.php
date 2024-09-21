@@ -167,7 +167,9 @@ class SettingController extends Controller
 
         //$this->createGoodTable();
 
-        $this->setWarehouseId();
+//        $this->setWarehouseId();
+
+        $this->setWarehouseId2();
 
 //        DB::commit();
 
@@ -212,6 +214,25 @@ class SettingController extends Controller
         foreach ($products as $product) {
             $product->update([
                 'warehouse_id'=>$warehouseId[$product->location]
+            ]);
+        }
+
+    }
+
+    public function setWarehouseId2()
+    {
+        $orders = Order::all();
+        $warehouseId = [
+            't'=>1,
+            'f'=>3,
+            'm'=>2,
+            's'=>4,
+            'e'=>5
+        ];
+
+        foreach ($orders as $order) {
+            $order->update([
+                'warehouse_id'=>$warehouseId[$order->location]
             ]);
         }
     }

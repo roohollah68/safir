@@ -47,11 +47,10 @@
                     <label for="location-dialog" class="input-group-text">مکان انبار:</label>
                 </div>
                 <select name="location" id="location-dialog" class="form-control">
-                    <option value="t" @selected($product->location == 't')>تهران</option>
-                    <option value="m" @selected($product->location == 'm')>مشهد</option>
-                    <option value="f" @selected($product->location == 'f')>فریمان</option>
-                    <option value="s" @selected($product->location == 's')>شیراز</option>
-                    <option value="e" @selected($product->location == 'e')>اصفهان</option>
+                    @foreach($warehouses as $warehouse)
+                        <option value="{{$warehouse->id}}"
+                                @selected($product->warehouse_id == $warehouse->id) >{{$warehouse->name}}</option>
+                    @endforeach
                 </select>
 
             </div>
@@ -110,7 +109,7 @@
         <input type="radio" class="checkboxradio" id="unavailable-dialog" name="available" value="false"
                @checked(!$product->available)>
         <label for="unavailable-dialog">نا موجود</label>
-
+        <br>
         <input type="hidden" name="fast" value="true">
         <input type="submit" class="btn btn-success mt-3" value="ویرایش">
     </form>

@@ -8,11 +8,11 @@
 
     <span>مکان انبار: </span>
     <div id="cities">
-        <a class="btn btn-info" onclick="city='t';changeCity(this)">تهران</a>
-        <a class="btn btn-outline-info" onclick="city='f';changeCity(this)">فریمان</a>
-        <a class="btn btn-outline-info" onclick="city='m';changeCity(this)">مشهد</a>
-        <a class="btn btn-outline-info" onclick="city='s';changeCity(this)">شیراز</a>
-        <a class="btn btn-outline-info" onclick="city='e';changeCity(this)">اصفهان</a>
+        @foreach($warehouses as $warehouse)
+            <a class="btn btn{{($warehouse->id == auth()->user()->meta('warehouseId'))?'':'-outline'}}-info"
+               onclick="warehouseId={{$warehouse->id}};changeCity(this)">{{$warehouse->name}}</a>
+        @endforeach
+
     </div>
     <br>
     <a class="btn btn-info mb-3" href="{{route('addProduct')}}">
@@ -30,7 +30,7 @@
                 <label class="btn btn-success mb-1" for="normal">موجودی مناسب</label><br>
 
                 <input type="checkbox" id="high" checked>
-                <label class="btn btn-danger " for="high">موجودی زیاد</label>
+                <label class="btn btn-secondary " for="high">موجودی زیاد</label>
             </div>
             <div class="col-md-4 border">
                 <input type="checkbox" id="available" checked>
@@ -100,8 +100,9 @@
         let products = {!!$products!!};
         let token = "{{ csrf_token() }}";
         let table;
-        let low, high, normal, unavailableFilter, availableFilter, final, raw, pach, hideCols, city = 't';
-        let Fast , dialog;
+        let low, high, normal, unavailableFilter, availableFilter, final, raw, pack, hideCols,
+            warehouseId = {{auth()->user()->meta('warehouseId')}};
+        let Fast, dialog;
 
         $(function () {
             dataTable()
@@ -127,17 +128,22 @@
             let Delete = (id) => {
                 return `<i class="fa fa-trash-alt btn btn-danger" onclick="delete_product(${id})" title="حذف محصول"></i>`
             }
+            let quantitiy = (alarm,high_alarm,quantity)=>{
+                let btn = (alarm > quantity) ? 'btn-warning' : ((high_alarm < quantity) ? 'btn-secondary' : '');
+                return `<span dir="ltr" class="btn ${btn}">` + (+quantity) + '</span>'
+            }
             let alarm = (alarm, quantity) => {
                 let btn = (alarm > quantity) ? 'btn-warning' : '';
                 return `<i class="btn ${btn}">${alarm}</i>`
             }
             let high_alarm = (high_alarm, quantity) => {
-                let btn = (high_alarm < quantity) ? 'btn-warning' : '';
+                let btn = (high_alarm < quantity) ? 'btn-secondary' : '';
                 return `<i class="btn ${btn}">${high_alarm}</i>`
             }
             filter();
+
             $.each(products, (id, product) => {
-                if (product.location !== city)
+                if (product.warehouse_id !== warehouseId)
                     return;
                 if (product.alarm > product.quantity && !low)
                     return;
@@ -160,7 +166,7 @@
                     product.name,
                     priceFormat(product.price),
                     priceFormat(product.productPrice),
-                    '<span dir="ltr">'+(+product.quantity)+'</span>',
+                    quantitiy(product.alarm,product.high_alarm,product.quantity),
                     alarm(product.alarm, product.quantity),
                     high_alarm(product.high_alarm, product.quantity),
                     product.available ? available : unavailable,
@@ -227,32 +233,32 @@
         }
 
         function fastEdit(id) {
-            $.get('product/fastEdit/'+id)
-            .done((res=>{
-                dialog = Dialog(res);
-                $('.dialogs .checkboxradio').checkboxradio();
-                priceInput();
-                $("#fastEditForm").submit(function (e) {
-                    e.preventDefault();
-                    $.ajax({
-                        type: "POST",
-                        url: '/product/edit/' + id,
-                        data: new FormData(this),
-                        processData: false,
-                        contentType: false,
-                        headers: {
-                            "Accept": "application/json"
-                        }
-                    }).done(function (res) {
-                        $.notify(res[0], "success")
-                        products[id] = res[1];
-                        dialog.remove();
-                        dataTable()
-                    }).fail(function () {
-                        $.notify('خطایی رخ داده است.', 'warn');
+            $.get('product/fastEdit/' + id)
+                .done((res => {
+                    dialog = Dialog(res);
+                    $('.dialogs .checkboxradio').checkboxradio();
+                    priceInput();
+                    $("#fastEditForm").submit(function (e) {
+                        e.preventDefault();
+                        $.ajax({
+                            type: "POST",
+                            url: '/product/edit/' + id,
+                            data: new FormData(this),
+                            processData: false,
+                            contentType: false,
+                            headers: {
+                                "Accept": "application/json"
+                            }
+                        }).done(function (res) {
+                            $.notify(res[0], "success")
+                            products[id] = res[1];
+                            dialog.remove();
+                            dataTable()
+                        }).fail(function () {
+                            $.notify('خطایی رخ داده است.', 'warn');
+                        });
                     });
-                });
-            }));
+                }));
 
 
             // let tag = '#row_' + id;

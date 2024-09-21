@@ -15,6 +15,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TelegramController;
 use App\Models\Product;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WoocommerceController;
@@ -147,7 +148,10 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'warehouse', 'rol
     Route::post('product/delete/{id}', [ProductController::class, 'deleteProduct']);
     Route::get('product/fastEdit/{id}', function ($id){
         $product = Product::find($id);
-        return view('productFastEdit',['product'=>$product]);
+        return view('productFastEdit',[
+            'product'=>$product,
+            'warehouses' => Warehouse::all(),
+        ]);
     });
 
     Route::get('/productQuantity/add/{id}', [ProductChangeController::class, 'addQuantity']);

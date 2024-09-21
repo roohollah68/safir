@@ -1,16 +1,16 @@
 @csrf
 @if(!$safir && !$edit)
-    <div class="mb-2 warehouse-select">
+    <div class="mb-2">
         <span>انتخاب انبار:</span>
         @foreach($warehouses as $warehouse)
-            <a class="btn btn-outline-info warehouse-name" id="warehouse-{{$warehouse->id}}" onclick="createTable({{$warehouse->id}})">{{$warehouse->name}}</a>
+            <a class="btn btn{{($warehouseId == $warehouse->id)?'':'-outline'}}-info" href="/add_order?warehouseId={{$warehouse->id}}">{{$warehouse->name}}</a>
         @endforeach
 
     </div>
     <br>
 @endif
 <div id="hidden-input"></div>
-
+<input type="hidden" name="warehouseId" value="{{$warehouseId}}">
 
 <div id="formElements" class="bg-white">
     <div class="row">
@@ -53,45 +53,22 @@
                     rows="2" :tag="'textarea'">آدرس:
         </x-col-md-6>
 
-        {{--        <x-col-md-6 :name="'orders'" :content="$order->orders"--}}
-        {{--                    :tag="'div'">سفارشات:--}}
-        {{--        </x-col-md-6>--}}
-
 
         <x-col-md-6 :name="'desc'" :content="old('desc')?:$order->desc"
                     rows="2" :tag="'textarea'">توضیحات:
         </x-col-md-6>
-
-        {{--        @if($creatorIsAdmin)--}}
-        {{--            <div class="col-md-6">--}}
-        {{--                <div class="form-group input-group required">--}}
-        {{--                    <div class="input-group-append" style="min-width: 160px">--}}
-        {{--                        <label for="category" class="input-group-text w-100">دسته بندی:</label>--}}
-        {{--                    </div>--}}
-        {{--                    <select class="form-control" name="category" id="category">--}}
-        {{--                        @foreach($customer->categories() as $ii => $category)--}}
-        {{--                            <option value="{{$ii}}" @selected($ii == $customer->category) >--}}
-        {{--                                {{$category}}--}}
-        {{--                            </option>--}}
-        {{--                        @endforeach--}}
-        {{--                    </select>--}}
-        {{--                </div>--}}
-        {{--            </div>--}}
-        {{--        @else--}}
-        {{--            <input type="hidden" name="category" value="0">--}}
-        {{--        @endif--}}
     </div>
 
 
-    @if($safir)
+    @if($safir || !$creatorIsAdmin)
         <div class="p-3 m-2 border">
             <h4>نحوه پرداخت</h4>
             @if(!$edit)
-                <x-radio :id="'credit'" :name="'paymentMethod'" value="credit" checked>
+                <x-radio :id="'credit'" :name="'paymentMethod'" value="credit" onclick="paymentAction()" checked>
                     {{$payMethods['credit']}}</x-radio>
-                <x-radio :id="'receipt'" :name="'paymentMethod'" value="receipt">
+                <x-radio :id="'receipt'" :name="'paymentMethod'" value="receipt" onclick="paymentAction()">
                     {{$payMethods['receipt']}}</x-radio>
-                <x-radio :id="'onDelivery'" :name="'paymentMethod'" value="onDelivery">
+                <x-radio :id="'onDelivery'" :name="'paymentMethod'" value="onDelivery" onclick="paymentAction()">
                     {{$payMethods['onDelivery']}}</x-radio><br>
                 <label for='receiptPhoto' class="btn btn-info m-2 hide receiptPhoto">بارگذاری تصویر رسید بانکی <i
                         class="fa fa-image"></i></label>
@@ -116,19 +93,19 @@
         <div class="p-3 m-2 border">
             <h4>شیوه ارسال</h4>
             @if(!$edit)
-                <x-radio :id="'peyk'" :name="'deliveryMethod'" value="peyk" checked>
+                <x-radio :id="'peyk'" :name="'deliveryMethod'" value="peyk" onclick="deliveryAction()" checked>
                     {{$sendMethods['peyk']}} ({{number_format($settings->peykCost)}} ریال)
                 </x-radio>
 
-                <x-radio :id="'post'" :name="'deliveryMethod'" value="post">
+                <x-radio :id="'post'" :name="'deliveryMethod'" value="post" onclick="deliveryAction()">
                     {{$sendMethods['post']}} ({{number_format($settings->postCost)}} ریال)
                 </x-radio>
 
-                <x-radio :id="'peykeShahri'" :name="'deliveryMethod'" value="peykeShahri">
+                <x-radio :id="'peykeShahri'" :name="'deliveryMethod'" value="peykeShahri" onclick="deliveryAction()">
                     {{$sendMethods['peykeShahri']}} ({{number_format($settings->peykeShahri)}} ریال)
                 </x-radio>
 
-                <x-radio :id="'paskerayeh'" :name="'deliveryMethod'" value="paskerayeh">
+                <x-radio :id="'paskerayeh'" :name="'deliveryMethod'" value="paskerayeh" onclick="deliveryAction()">
                     {{$sendMethods['paskerayeh']}} (هزینه ارسال به عهده مشتری)
                 </x-radio>
 
@@ -158,14 +135,14 @@
             <th>نام محصول</th>
             <th>تعداد</th>
             <th>قیمت(ریال)</th>
-            <th>تخفیف</th>
+            <th>تخفیف(%)</th>
         </tr>
         </thead>
         <tbody id="product-form">
 
         </tbody>
     </table>
-    @if($safir)
+    @if($safir || !$creatorIsAdmin)
 
         <div class="p-3 m-2 border" id="paymentDetails">
             <span>جمع اقلام: </span><span id="cartSum"></span><span> ریال</span> ||

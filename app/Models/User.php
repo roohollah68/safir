@@ -75,6 +75,11 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+    public function userMetas()
+    {
+        return $this->hasMany(UserMeta::class);
+    }
+
     public function admin()
     {
         return $this->role == "admin";
@@ -112,7 +117,7 @@ class User extends Authenticatable
 
     public function meta($name)
     {
-        $Meta = $this->hasMany(UserMeta::class)->where('name', $name)->first();
+        $Meta = $this->userMetas()->where('name', $name)->first();
         if ($Meta)
             return $Meta->value;
         else
