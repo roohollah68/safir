@@ -165,7 +165,7 @@ class SettingController extends Controller
 //    }
 
 
-        $this->createGoodTable();
+        //$this->createGoodTable();
 
         //$this->setWarehouseId();
 
@@ -198,7 +198,7 @@ class SettingController extends Controller
                     'good_id' => $good->id,
                 ]);
             }
-           
+
         }
     }
 
