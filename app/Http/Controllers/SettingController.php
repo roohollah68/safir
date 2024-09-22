@@ -165,11 +165,11 @@ class SettingController extends Controller
 //    }
 
 
-//        $this->createGoodTable();
+        $this->createGoodTable();
 
         //$this->setWarehouseId();
 
-        $this->setWarehouseId2();
+        //$this->setWarehouseId2();
 
 //        DB::commit();
 
@@ -178,15 +178,15 @@ class SettingController extends Controller
 
     public function createGoodTable()
     {
-        $nameList = [];
-        $products = Product::all();
+        //$nameList = [];
+        $products = Product::where('id' , '>',6054)->get();
         foreach ($products as $product) {
-            if (isset($nameList[$product->name])) {
+            $good = Good::where('name' , $product->name)->first();
+            if($good){
                 $product->update([
-                    'good_id' => $nameList[$product->name],
+                    'good_id' => $good->id,
                 ]);
-
-            } else {
+            }else{
                 $good = Good::create([
                     'name' => $product->name,
                     'price' => $product->price,
@@ -197,8 +197,8 @@ class SettingController extends Controller
                 $product->update([
                     'good_id' => $good->id,
                 ]);
-                $nameList[$product->name] = $good->id;
             }
+           
         }
     }
 
