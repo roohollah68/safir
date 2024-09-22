@@ -44,9 +44,9 @@
         <div class="col-md-12 mb-1">
             <div class="form-group input-group">
                 <div class="input-group-append">
-                    <label for="location-dialog" class="input-group-text">مکان انبار:</label>
+                    <label for="warehouse-dialog" class="input-group-text">مکان انبار:</label>
                 </div>
-                <select name="location" id="location-dialog" class="form-control">
+                <select name="warehouse" id="warehouse-dialog" class="form-control">
                     @foreach($warehouses as $warehouse)
                         <option value="{{$warehouse->id}}"
                                 @selected($product->warehouse_id == $warehouse->id) >{{$warehouse->name}}</option>

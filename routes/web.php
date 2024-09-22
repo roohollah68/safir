@@ -142,6 +142,8 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'warehouse', 'rol
     Route::get('product/add', [ProductController::class, 'showAddForm'])
         ->name('addProduct');
     Route::post('product/add', [ProductController::class, 'storeNew']);
+    Route::post('product/getData', [ProductController::class, 'getData']);
+    Route::post('addToProducts/{id}', [ProductController::class, 'addToProducts']);
     Route::get('product/edit/{id}', [ProductController::class, 'showEditForm']);
     Route::post('product/edit/{id}', [ProductController::class, 'editProduct']);
     Route::post('product/deletePhoto/{id}', [ProductController::class, 'deletePhoto']);
@@ -157,6 +159,11 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'warehouse', 'rol
     Route::get('/productQuantity/add/{id}', [ProductChangeController::class, 'addQuantity']);
     Route::post('/productQuantity/add/{id}', [ProductChangeController::class, 'insertRecord']);
     Route::get('/productQuantity/delete/{id}', [ProductChangeController::class, 'deleteRecord']);
+
+    Route::post('warehouse/transfer/{id}', [ProductController::class, 'transfer']);
+    Route::post('transfer/save/{id}', [ProductController::class, 'transferSave']);
+
+
 
 });
 

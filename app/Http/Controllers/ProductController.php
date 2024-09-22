@@ -6,6 +6,7 @@ use App\Models\Good;
 use App\Models\Product;
 use App\Models\ProductChange;
 use App\Models\Warehouse;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,30 +14,78 @@ class ProductController extends Controller
 {
     public function showProducts()
     {
-        $products = Product::all()->keyBy('id');
-        $goods = Good::with('products')->get();
+
         return view('productList', [
-            'products' => $products,
-            'goods' => $goods,
             'warehouses' => Warehouse::all(),
+            'goods' => Good::all()->keyBy('id'),
         ]);
+    }
+
+    public function getData(Request $req)
+    {
+        $a = time();
+        $products = Product::where('warehouse_id', $req->warehouseId)->
+        select('id', 'good_id', 'available', 'warehouse_id', 'quantity', 'alarm', 'high_alarm');
+//        $goods = Good::where('id','>=', 0);
+//        if (!$req->available) {
+//            $products = $products->where('available', false);
+//        }
+//        if (!$req->unavailable) {
+//            $products = $products->where('available', true);
+//        }
+//        if (!$req->final) {
+////            $goods = $goods->where('category','<>', 'final');
+//            $products = $products->whereHas('good', function (Builder $query) {
+//                $query->where('category','<>', 'final');
+//            });
+//        }
+//        if (!$req->raw) {
+////            $goods = $goods->where('category','<>', 'raw');
+//            $products = $products->whereHas('good', function (Builder $query) {
+//                $query->where('category','<>', 'raw');
+//            });
+//        }
+//        if (!$req->pack) {
+////            $goods = $goods->where('category','<>', 'pack');
+//            $products = $products->whereHas('good', function (Builder $query) {
+//                $query->where('category','<>', 'pack');
+//            });
+//        }
+//        if (!$req->low) {
+//            $products = $products->whereRaw('products.alarm < products.quantity');
+//        }
+//        if (!$req->high) {
+//            $products = $products->whereRaw('products.high_alarm > products.quantity');
+//        }
+//        if(!$req->normal){
+//            $products = $products->whereRaw('products.high_alarm < products.quantity')->
+//            whereRaw('products.alarm > products.quantity');
+//        }
+        $products = $products->get()->keyBy('id');
+//        $goods = $goods->get()->keyBy('id');
+
+        return $products;
+
     }
 
     public function showAddForm()
     {
-        $product = new Product();
+        $good = new Good();
         return view('addEditProduct', [
-            'product' => $product,
+            'good' => $good,
             'edit' => false,
+            'warehouses' => Warehouse::all(),
         ]);
     }
 
     public function showEditForm($id)
     {
-        $product = Product::findOrfail($id);
+        $product = Product::with('good')->findOrfail($id);
         return view('addEditProduct', [
             'product' => $product,
+            'good' => $product->good,
             'edit' => true,
+            'warehouses' => Warehouse::all(),
         ]);
     }
 
@@ -45,39 +94,39 @@ class ProductController extends Controller
         $req->price = +str_replace(",", "", $req->price);
         $req->PPrice = +str_replace(",", "", $req->PPrice);
         request()->validate([
-            'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
-            'name' => 'required|string|max:255|min:4',
+//            'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
+            'name' => 'required|unique:goods|string|max:255|min:4',
             'price' => 'required',
         ]);
-        $photo = '';
-        if ($req->file("photo")) {
-            $photo = $req->file("photo")->store("", 'p-photo');
-        }
-        $available = $req->available == 'true';
+//        $photo = '';
+//        if ($req->file("photo")) {
+//            $photo = $req->file("photo")->store("", 'p-photo');
+//        }
+//        $available = $req->available == 'true';
 
-        $product = Product::where('name', $req->name)->where('location', $req->location)->first();
-        if ($product) {
-            return $this->errorBack('این محصول تکراری است.');
-        } else
-            $product = Product::create([
-                'name' => $req->name,
-                'price' => $req->price,
-                'productPrice' => $req->PPrice,
-                'available' => $available,
-                'photo' => $photo,
-                'category' => $req->category,
-                'location' => $req->location,
-                'quantity' => $req->quantity,
-                'alarm' => $req->alarm,
-                'high_alarm' => $req->high_alarm,
-            ]);
-        if ($req->quantity > 0) {
-            $product->productChange()->create([
-                'change' => $product->quantity,
-                'quantity' => $product->quantity,
-                'desc' => 'مقدار اولیه',
-            ]);
-        }
+//        $product = Product::where('name', $req->name)->where('location', $req->location)->first();
+//        if ($product) {
+//            return $this->errorBack('این محصول تکراری است.');
+//        } else
+        $good = Good::create([
+            'name' => $req->name,
+            'price' => $req->price,
+            'productPrice' => $req->PPrice,
+//                'available' => $available,
+//                'photo' => $photo,
+            'category' => $req->category,
+//                'location' => $req->location,
+//                'quantity' => $req->quantity,
+//                'alarm' => $req->alarm,
+//                'high_alarm' => $req->high_alarm,
+        ]);
+//        if ($req->quantity > 0) {
+//            $product->productChange()->create([
+//                'change' => $product->quantity,
+//                'quantity' => $product->quantity,
+//                'desc' => 'مقدار اولیه',
+//            ]);
+//        }
         return redirect()->route('productList');
     }
 
@@ -91,7 +140,8 @@ class ProductController extends Controller
             'name' => 'required|string|max:255|min:4',
             'price' => 'required',
         ]);
-        $product = Product::findOrFail($id);
+        $product = Product::with('good')->findOrFail($id);
+        $good = $product->good;
         $productChange = new ProductChange();
         $productChange->product_id = $product->id;
 //        if (!$product->photo)
@@ -99,9 +149,9 @@ class ProductController extends Controller
 //        if ($req->file("photo")) {
 //            $product->photo = $req->file("photo")->store("", 'p-photo');
 //        }
-        $product->name = $req->name;
-        $product->price = $req->price;
-        $product->productPrice = $req->PPrice;
+        $good->name = $req->name;
+        $good->price = $req->price;
+        $good->productPrice = $req->PPrice;
         if ($req->addType == 'add') {
             $productChange->change = +$req->add;
             $product->quantity += $req->add;
@@ -115,14 +165,19 @@ class ProductController extends Controller
         $product->alarm = $req->alarm;
         $product->high_alarm = $req->high_alarm;
         $product->available = ($req->available == 'true');
-        $product->category = $req->category;
-        $product->location = $req->location;
+        $good->category = $req->category;
+        if ($product->warehouse_id != $req->warehouseId) {
+            if (Product::where('good_id', $good->id)->where('warehouse_id', $req->warehouseId)->first()) {
+                return $this->errorBack('محصول در انبار مقصد تعریف شده است!');
+            }
+        }
         $product->save();
-        Product::where('name', $product->name)->update([
-            'price' => $product->price,
-            'productPrice' => $product->productPrice,
-            'category' => $product->category,
-        ]);
+        $good->save();
+//        Product::where('name', $product->name)->update([
+//            'price' => $product->price,
+//            'productPrice' => $product->productPrice,
+//            'category' => $product->category,
+//        ]);
         if ($productChange->change != 0)
             $productChange->save();
         DB::commit();
@@ -146,6 +201,61 @@ class ProductController extends Controller
         Product::find($id)->update([
             'photo' => ''
         ]);
+    }
+
+    public function addToProducts($id, Request $req)
+    {
+        $product = Product::where('good_id', $id)->where('warehouse_id', $req->warehouseId)->first();
+        if ($product) {
+            abort(403);
+        }
+        $product = Product::create([
+            'good_id' => $id,
+            'available' => false,
+            'warehouse_id' => $req->warehouseId,
+            'quantity' => 0
+        ]);
+        return $product;
+    }
+
+    public function transfer($id)
+    {
+        $product = Product::with('warehouse')->findOrFail($id);
+        $products = Product::where('good_id', $product->good_id)->where('id', '<>', $id)->with('warehouse')->get();
+        return view('transfer', [
+            'warehouses' => Warehouse::all(),
+            'product' => $product,
+            'products' => $products,
+            'warehouse2' => $product->warehouse,
+        ]);
+    }
+
+    public function transferSave($id, Request $req)
+    {
+        DB::beginTransaction();
+        $product = Product::with('warehouse')->findOrFail($id);
+        $product2 = Product::with('warehouse')->findOrFail($req->productId);
+        $transfer = $req->value;
+        if ($transfer <= 0)
+            return;
+        $product->update([
+            'quantity' => $product->quantity - $transfer,
+        ]);
+        $product->productChange()->create([
+            'change' => - $transfer,
+            'desc' => 'انتقال به انبار '.$product2->warehouse->name,
+            'quantity' => $product->quantity
+        ]);
+        $product2->update([
+            'quantity' => $product2->quantity + $transfer,
+        ]);
+        $product2->productChange()->create([
+            'change' => $transfer,
+            'desc' => 'انتقال از انبار '.$product->warehouse->name,
+            'quantity' => $product2->quantity
+        ]);
+        DB::commit();
+        return $product;
     }
 
 }

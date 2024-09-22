@@ -9,7 +9,7 @@ class Product extends Model
 {
 //    use HasFactory;
 
-    protected $fillable =[
+    protected $fillable = [
         'good_id',
         'name',
         'price',
@@ -22,7 +22,7 @@ class Product extends Model
         'productPrice',
         'warehouse_id',
     ];
-    protected $appends = ['name','price','productPrice','photo','category'];
+    protected $appends = ['name', 'price', 'productPrice', 'photo', 'category'];
 
     public function getNameAttribute()
     {
@@ -67,5 +67,10 @@ class Product extends Model
     public function good()
     {
         return $this->belongsTo(Good::class);
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 }

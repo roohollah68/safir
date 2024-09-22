@@ -38,7 +38,7 @@
     <script src="/js/buttons.print.min.js"></script>
 
     @include('layout.style_css')
-
+    @include('layout.js')
     @yield('files')
 </head>
 
@@ -50,7 +50,11 @@
     @yield('content')
 </div>
 
+<div id="loadingDiv">
+    <div class="loading">Loading&#8230;</div>
+    <div class="content"><h3></h3></div>
+</div>
 
-@include('layout.js')
+
 </body>
 </html>

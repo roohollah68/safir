@@ -7,10 +7,10 @@
 @section('content')
 
     <span>مکان انبار: </span>
-    <div id="cities">
+    <div id="warehouses">
         @foreach($warehouses as $warehouse)
             <a class="btn btn{{($warehouse->id == auth()->user()->meta('warehouseId'))?'':'-outline'}}-info"
-               onclick="warehouseId={{$warehouse->id}};changeCity(this)">{{$warehouse->name}}</a>
+               onclick="warehouseId={{$warehouse->id}};changeWarehouse(this)">{{$warehouse->name}}</a>
         @endforeach
 
     </div>
@@ -38,6 +38,9 @@
 
                 <input type="checkbox" id="unavailable">
                 <label class="btn btn-danger " for="unavailable">محصولات ناموجود</label>
+
+                <input type="checkbox" id="undefined">
+                <label class="btn btn-secondary " for="undefined">محصولات تعریف نشده</label>
             </div>
             <div class="col-md-4 border">
                 <input type="checkbox" id="final" checked>
@@ -54,7 +57,7 @@
 
 
     <br>
-    <div class="input-box">
+    <div class="columns">
         <span>نمایش ستون ها:</span>
         <input type="checkbox" id="col-price" checked>
         <label class="btn btn-secondary" for="col-price">قیمت</label>
@@ -92,59 +95,89 @@
         </thead>
     </table>
 
+
 @endsection
 
 
 @section('files')
     <script>
-        let products = {!!$products!!};
+        let products = {}, goods = {!! $goods !!};
         let token = "{{ csrf_token() }}";
         let table;
-        let low, high, normal, unavailableFilter, availableFilter, final, raw, pack, hideCols,
+        let low, high, normal, unavailableFilter, availableFilter, undefinedFilter, final, raw, pack, hideCols,
             warehouseId = {{auth()->user()->meta('warehouseId')}};
         let Fast, dialog;
+        let available = '<span class="btn btn-success">موجود</span>'
+        let unavailable = '<span class="btn btn-danger">نا موجود</span>'
+
+        let edit = (id) => {
+            return `<a class="fa fa-edit btn btn-primary" href="/product/edit/${id}" title="ویرایش محصول"></a>`
+        }
+        let fastEditFilter = (id) => {
+            return `<a class="fa fa-file-edit btn btn-info fast" onclick="fastEdit(${id})" title="ویرایش سریع"></a>`
+        }
+        let saveFilter = (id) => {
+            return `<i class="fa fa-save btn btn-success save" onclick="save(${id})" title="ذخیره تغییرات" style="display: none;"></i>`
+        }
+        let Delete = (id) => {
+            return `<i class="fa fa-trash-alt btn btn-danger" onclick="delete_product(${id},this)" title="حذف محصول"></i>`
+        }
+        let add = (id) => {
+            return `<a class="fa fa-plus btn btn-success" onclick="addToProducts(${id})" title="اضافه کردن"></a>`
+        }
+        let transferKey = (id) =>{
+            return `<a class="fa fa-warehouse btn btn-secondary" onclick="transfer(${id})" title="جابجایی بین انبارها"></a>`
+        }
+        let quantity = (alarm, high_alarm, quantity) => {
+            let btn = (alarm > quantity) ? 'btn-warning' : ((high_alarm < quantity) ? 'btn-secondary' : '');
+            return `<span dir="ltr" class="btn ${btn}">` + (+quantity) + '</span>'
+        }
+        let alarm = (alarm, quantity) => {
+            let btn = (alarm > quantity) ? 'btn-warning' : '';
+            return `<i class="btn ${btn}">${alarm}</i>`
+        }
+        let high_alarm = (high_alarm, quantity) => {
+            let btn = (high_alarm < quantity) ? 'btn-secondary' : '';
+            return `<i class="btn ${btn}">${high_alarm}</i>`
+        }
 
         $(function () {
-            dataTable()
-            $('.input-box input[type=checkbox]').click(dataTable);
-            $('.input-box input[type=checkbox]').checkboxradio();
+            refreshTable()
+            $('.input-box input[type=checkbox]').click(dataTable).checkboxradio();
+            $('.columns input[type=checkbox]').click(dataTable).checkboxradio();
             Fast = $('#fastEdit').html();
             $('#fastEdit').html('');
         });
 
-        function dataTable() {
-            let data = [];
-            let available = '<span class="btn btn-success">موجود</span>'
-            let unavailable = '<span class="btn btn-danger">نا موجود</span>'
-            let edit = (id) => {
-                return `<a class="fa fa-edit btn btn-primary" href="/product/edit/${id}" title="ویرایش محصول"></a>`
-            }
-            let fastEditFilter = (id) => {
-                return `<a class="fa fa-file-edit btn btn-info fast" onclick="fastEdit(${id})" title="ویرایش سریع"></a>`
-            }
-            let saveFilter = (id) => {
-                return `<i class="fa fa-save btn btn-success save" onclick="save(${id})" title="ذخیره تغییرات" style="display: none;"></i>`
-            }
-            let Delete = (id) => {
-                return `<i class="fa fa-trash-alt btn btn-danger" onclick="delete_product(${id})" title="حذف محصول"></i>`
-            }
-            let quantitiy = (alarm,high_alarm,quantity)=>{
-                let btn = (alarm > quantity) ? 'btn-warning' : ((high_alarm < quantity) ? 'btn-secondary' : '');
-                return `<span dir="ltr" class="btn ${btn}">` + (+quantity) + '</span>'
-            }
-            let alarm = (alarm, quantity) => {
-                let btn = (alarm > quantity) ? 'btn-warning' : '';
-                return `<i class="btn ${btn}">${alarm}</i>`
-            }
-            let high_alarm = (high_alarm, quantity) => {
-                let btn = (high_alarm < quantity) ? 'btn-secondary' : '';
-                return `<i class="btn ${btn}">${high_alarm}</i>`
-            }
-            filter();
+        function refreshTable() {
 
+            $.post('/product/getData', {
+                _token: token,
+                warehouseId: warehouseId,
+                available: availableFilter,
+                unavailable: unavailableFilter,
+                final: final,
+                raw: raw,
+                pack: pack,
+                low: low,
+                high: high,
+                normal: normal,
+            }).done(res => {
+                products = res;
+                dataTable()
+            })
+        }
+
+        function dataTable() {
+            columns();
+            filter();
+            let data = [];
+            let undefined = '<span class="btn btn-secondary">تعریغ نشده</span>'
+            let goodList = [];
             $.each(products, (id, product) => {
-                if (product.warehouse_id !== warehouseId)
+                if (+product.warehouse_id !== +warehouseId)
                     return;
+                goodList[+product.good_id] = true;
                 if (product.alarm > product.quantity && !low)
                     return;
                 if (product.high_alarm < product.quantity && !high)
@@ -166,13 +199,30 @@
                     product.name,
                     priceFormat(product.price),
                     priceFormat(product.productPrice),
-                    quantitiy(product.alarm,product.high_alarm,product.quantity),
+                    quantity(product.alarm, product.high_alarm, product.quantity),
                     alarm(product.alarm, product.quantity),
                     high_alarm(product.high_alarm, product.quantity),
                     product.available ? available : unavailable,
-                    edit(id) + fastEditFilter(id) + saveFilter(id) + Delete(id),
+                    edit(id) + fastEditFilter(id) + saveFilter(id) + transferKey(id) ,
                 ])
             });
+            if (undefinedFilter)
+                $.each(goods, (id, good) => {
+                    if (goodList[id])
+                        return;
+                    data.push([
+                        '',
+                        good.name,
+                        priceFormat(good.price),
+                        priceFormat(good.productPrice),
+                        '',
+                        '',
+                        '',
+                        undefined,
+                        add(id,),
+                    ])
+                });
+
             if (table) {
                 table.clear();
                 table.columns().visible(true)
@@ -200,8 +250,10 @@
             if (!products[id].available || confirm("برای همیشه حذف شود؟")) {
                 $.post('/product/delete/' + id, {_token: "{{ csrf_token() }}"})
                     .done(res => {
-                        if (res === 'ok')
-                            $('#row_' + id).remove();
+                        if (res === 'ok') {
+                            delete products[id];
+                            dataTable();
+                        }
                     });
             }
         }
@@ -212,12 +264,16 @@
             high = $('#high')[0].checked
             availableFilter = $('#available')[0].checked
             unavailableFilter = $('#unavailable')[0].checked
+            undefinedFilter = $('#undefined')[0].checked
             final = $('#final')[0].checked
             raw = $('#raw')[0].checked
             pack = $('#pack')[0].checked
 
-            hideCols = [];
 
+        }
+
+        function columns() {
+            hideCols = [];
             $('#col-price')[0].checked ? null : hideCols.push(2);
             $('#col-productPrice')[0].checked ? null : hideCols.push(3);
             $('#col-quantity')[0].checked ? null : hideCols.push(4);
@@ -226,10 +282,10 @@
             $('#col-available')[0].checked ? null : hideCols.push(7);
         }
 
-        function changeCity(element) {
-            $('#cities a').removeClass('btn-info').addClass('btn-outline-info')
+        function changeWarehouse(element) {
+            $('#warehouses a').removeClass('btn-info').addClass('btn-outline-info')
             $(element).removeClass('btn-outline-info').addClass('btn-info')
-            dataTable();
+            refreshTable();
         }
 
         function fastEdit(id) {
@@ -259,14 +315,45 @@
                         });
                     });
                 }));
+        }
 
+        function addToProducts(id) {
+            $.post('/addToProducts/' + id, {
+                '_token': token,
+                'warehouseId': warehouseId,
+            }).done(res => {
+                products[''+res.id] = res;
+                dataTable()
+            }).fail(function () {
+                $.notify('خطایی رخ داده است.', 'warn');
+            });
+        }
 
-            // let tag = '#row_' + id;
-            // $(tag + ' input, ' + tag + ' select').prop('disabled', (i, v) => {
-            //     return !v;
-            // });
-            // $(tag + ' input[type=checkbox]').checkboxradio('refresh');
-            // $(tag + ' .save ,' + tag + ' .fast').toggle();
+        function transfer(id){
+            $.post('/warehouse/transfer/' + id, {
+                '_token': token,
+            }).done(res => {
+                dialog = Dialog(res);
+                $("#transferForm").submit(function (e) {
+                    e.preventDefault();
+                    $.ajax({
+                        type: "POST",
+                        url: '/transfer/save/' + id,
+                        data: new FormData(this),
+                        processData: false,
+                        contentType: false,
+                        headers: {
+                            "Accept": "application/json"
+                        }
+                    }).done(function (res) {
+                        products[id] = res;
+                        dialog.remove();
+                        dataTable()
+                    }).fail(function () {
+                        $.notify('خطایی رخ داده است.', 'warn');
+                    });
+                });
+            })
         }
 
     </script>

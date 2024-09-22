@@ -12,7 +12,6 @@
     <script>
         $(function () {
             $('select#role').val('{{$user->role}}').change();
-            $('select#city').val('{{$user->meta('city')}}').change();
         })
     </script>
 @endsection
@@ -71,13 +70,12 @@
                 <div class="col-md-6 mb-2">
                     <div class="form-group input-group">
                         <div class="input-group-append">
-                            <label for="city" class="input-group-text w-100">شهر پیش فرض نمایش سفارشات:</label>
+                            <label for="warehouseId" class="input-group-text w-100">انبار پیش فرض:</label>
                         </div>
-                        <select name="city" id="city" class="form-control">
-                            <option value="t">تهران</option>
-                            <option value="m">مشهد</option>
-                            <option value="s">شیراز</option>
-                            <option value="e">اصفهان</option>
+                        <select name="warehouseId" id="warehouseId" class="form-control">
+                            @foreach($warehouses as $warehouse)
+                                <option value="{{$warehouse->id}}" @selected($warehouse->id == $user->meta('warehouseId'))>{{$warehouse->name}}</option>
+                            @endforeach
                         </select>
                     </div>
                 </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\UserMeta;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -45,15 +46,18 @@ class UserController extends Controller
 
     public function edit($id = null)
     {
+        $warehouses = Warehouse::all();
         if ($this->superAdmin() && $id)
             return view('editUser', [
                 'user' => User::find($id),
                 'edit' => true,
+                'warehouses' => $warehouses,
             ]);
         else
             return view('editUser', [
                 'user' => auth()->user(),
                 'edit' => true,
+                'warehouses' => $warehouses,
             ]);
     }
 
@@ -112,10 +116,10 @@ class UserController extends Controller
             );
         }
 
-        if ($request->city) {
+        if ($request->warehouseId) {
             UserMeta::updateOrCreate(
-                ['user_id'=>$id , 'name'=>'city'],
-                ['value' => $request->city]
+                ['user_id'=>$id , 'name'=>'warehouseId'],
+                ['value' => $request->warehouseId]
             );
         }
 

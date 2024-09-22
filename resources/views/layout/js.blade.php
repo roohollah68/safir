@@ -103,6 +103,14 @@
     }
 
     $(function () {
+        let $loading = $('#loadingDiv').hide();
+        $(document)
+            .ajaxStart(function () {
+                $loading.show();
+            })
+            .ajaxStop(function () {
+                $loading.hide();
+            });
         priceInput();
     })
     function priceInput(){

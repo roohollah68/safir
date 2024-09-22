@@ -165,9 +165,9 @@ class SettingController extends Controller
 //    }
 
 
-        //$this->createGoodTable();
+        $this->createGoodTable();
 
-//        $this->setWarehouseId();
+        $this->setWarehouseId();
 
         $this->setWarehouseId2();
 
@@ -184,6 +184,11 @@ class SettingController extends Controller
             if (isset($nameList[$product->name])) {
                 $product->update([
                     'good_id' => $nameList[$product->name],
+                ]);
+                $good = Good::find($nameList[$product->name]);
+                $good->update([
+                    'price' => max($product->price, $good->price),
+                    'productPrice' => max($product->productPrice),
                 ]);
             } else {
                 $good = Good::create([
@@ -205,15 +210,15 @@ class SettingController extends Controller
     {
         $products = Product::all();
         $warehouseId = [
-            't'=>1,
-            'f'=>3,
-            'm'=>2,
-            's'=>4,
-            'e'=>5
+            't' => 1,
+            'f' => 3,
+            'm' => 2,
+            's' => 4,
+            'e' => 5
         ];
         foreach ($products as $product) {
             $product->update([
-                'warehouse_id'=>$warehouseId[$product->location]
+                'warehouse_id' => $warehouseId[$product->location]
             ]);
         }
 
@@ -223,16 +228,16 @@ class SettingController extends Controller
     {
         $orders = Order::all();
         $warehouseId = [
-            't'=>1,
-            'f'=>3,
-            'm'=>2,
-            's'=>4,
-            'e'=>5
+            't' => 1,
+            'f' => 3,
+            'm' => 2,
+            's' => 4,
+            'e' => 5
         ];
 
         foreach ($orders as $order) {
             $order->update([
-                'warehouse_id'=>$warehouseId[$order->location]
+                'warehouse_id' => $warehouseId[$order->location]
             ]);
         }
     }

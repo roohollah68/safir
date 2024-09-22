@@ -11,7 +11,7 @@
 @section('content')
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
     @if($edit)
-        <h4 class="">{{$product->name}}</h4>
+        <h4 class="">{{$good->name}}</h4>
         <h4 class="">تعداد موجود در انبار
             {{+$product->quantity}}
         </h4>
@@ -30,7 +30,7 @@
                         <label for="name" class="input-group-text w-100">نام محصول:</label>
                     </div>
                     <input type="text" id="name" class="form-control" name="name"
-                           value="{{old('name')?:$product->name}}" required>
+                           value="{{old('name')?:$good->name}}" required>
                 </div>
             </div>
             {{--قیمت محصول--}}
@@ -40,7 +40,7 @@
                         <label for="price" class="input-group-text w-100">قیمت:</label>
                     </div>
                     <input type="text" id="price" class="form-control price-input" name="price"
-                           value="{{old('price')?:$product->price}}" required>
+                           value="{{old('price')?:$good->price}}" required>
                     <div class="input-group-append" style="min-width: 120px">
                         <label for="price" class="input-group-text w-100">ریال</label>
                     </div>
@@ -53,30 +53,30 @@
                         <label for="PPrice" class="input-group-text w-100">قیمت تولید:</label>
                     </div>
                     <input type="text" id="PPrice" class="form-control price-input" name="PPrice"
-                           value="{{old('PPrice')?:$product->productPrice}}">
+                           value="{{old('PPrice')?:$good->productPrice}}">
                     <div class="input-group-append" style="min-width: 120px">
                         <label for="PPrice" class="input-group-text w-100">ریال</label>
                     </div>
                 </div>
             </div>
+            @if($edit)
             {{--مکان انبار--}}
             <div class="col-md-6">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
-                        <label for="PPrice" class="input-group-text w-100">مکان انبار:</label>
+                        <label for="warehouse" class="input-group-text w-100">مکان انبار:</label>
                     </div>
-                    <select name="location" id="location">
-                        <option value="t" selected>تهران</option>
-                        <option value="m">مشهد</option>
-                        <option value="f">فریمان</option>
-                        <option value="s">شیراز</option>
-                        <option value="e">اصفهان</option>
+                    <select name="warehouse" id="warehouse" class="form-control">
+                        @foreach($warehouses as $warehouse)
+                            <option value="{{$warehouse->id}}"
+                                    @selected($product->warehouse_id == $warehouse->id) >{{$warehouse->name}}</option>
+                        @endforeach
                     </select>
 
                 </div>
             </div>
             {{--اصلاح موجودی--}}
-            @if($edit)
+
                 <div class="col-md-6 my-2">
                     <div class="form-group input-group">
                         <div class="input-group-text">
@@ -103,17 +103,17 @@
                                disabled>
                     </div>
                 </div>
-            @else
-                <div class="col-md-6">
-                    <div class="form-group input-group">
-                        <div class="input-group-append" style="min-width: 160px">
-                            <label for="quantity" class="input-group-text w-100">موجودی :</label>
-                        </div>
-                        <input type="number" step="0.01" id="quantity" class="form-control" name="quantity" value="0"
-                               required>
-                    </div>
-                </div>
-            @endif
+{{--            @else--}}
+{{--                <div class="col-md-6">--}}
+{{--                    <div class="form-group input-group">--}}
+{{--                        <div class="input-group-append" style="min-width: 160px">--}}
+{{--                            <label for="quantity" class="input-group-text w-100">موجودی :</label>--}}
+{{--                        </div>--}}
+{{--                        <input type="number" step="0.01" id="quantity" class="form-control" name="quantity" value="0"--}}
+{{--                               required>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+
             {{--حد آلارم--}}
             <div class="col-md-6 my-2">
                 <div class="form-group input-group">
@@ -136,29 +136,32 @@
 
                 </div>
             </div>
+            @endif
             {{--دسته بندی محصول--}}
             <div class="col-md-6 bg-light">
                 <div class="form-group input-group">
-                    <input type="radio" name="category" id="final" value="final" checked>
+                    <input type="radio" name="category" id="final" value="final" @checked($good->category == 'final')>
                     <label for="final">محصول نهایی</label>
-                    <input type="radio" name="category" id="raw" value="raw">
+                    <input type="radio" name="category" id="raw" value="raw" @checked($good->category == 'raw')>
                     <label for="raw">مواد اولیه</label>
-                    <input type="radio" name="category" id="pack" value="pack">
+                    <input type="radio" name="category" id="pack" value="pack" @checked($good->category == 'pack')>
                     <label for="pack">ملزومات بسته بندی</label>
 
                 </div>
             </div>
+            @if($edit)
             {{--وضعیت موجودی--}}
             <div class="col-md-6">
                 <div>
-                    <input type="radio" id="available" name="available" value="true" checked>
+                    <input type="radio" id="available" name="available" value="true" @checked($product->available)>
                     <label for="available">موجود</label>
 
-                    <input type="radio" id="notavailable" name="available" value="false">
+                    <input type="radio" id="notavailable" name="available" value="false" @checked(!$product->available)>
                     <label id="navailable" for="notavailable">نا موجود</label>
 
                 </div>
             </div>
+            @endif
             {{--تصویر محصول--}}
             {{--
             <div class="col-md-6 d-none">
@@ -237,10 +240,10 @@
         $(function () {
             $('input[name="available"], input[name="category"]').checkboxradio();
             @if($edit)
-            if (!({{$product->available}}))
-                $('#notavailable').click();
-            if (!!'{{$product->category}}')
-                $('#{{$product->category}}').click();
+            {{--if (!({{$product->available}}))--}}
+            {{--    $('#notavailable').click();--}}
+            {{--if (!!'{{$good->category}}')--}}
+            {{--    $('#{{$good->category}}').click();--}}
             $('#table1').DataTable({
                 order: [[0, "desc"]],
                 pageLength: 100,
