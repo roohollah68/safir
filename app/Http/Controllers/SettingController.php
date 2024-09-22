@@ -185,11 +185,7 @@ class SettingController extends Controller
                 $product->update([
                     'good_id' => $nameList[$product->name],
                 ]);
-                $good = Good::find($nameList[$product->name]);
-                $good->update([
-                    'price' => max($product->price, $good->price),
-                    'productPrice' => max($product->productPrice),
-                ]);
+                
             } else {
                 $good = Good::create([
                     'name' => $product->name,
