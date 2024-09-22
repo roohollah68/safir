@@ -41,8 +41,10 @@ class CommentController extends Controller
         ]);
         if($req->file("photo"))
             $photo = $req->file("photo")->store("","comment");
-        else
+        else {
             $photo = null;
+            $this->sendTextToBale(auth()->user()->name. ': '.$req->text,'4943446822');
+        }
         $text = $req->text;
         if(!$text && !$photo)
             abort(403);
