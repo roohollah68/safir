@@ -46,10 +46,10 @@
                 <input type="checkbox" id="final" checked>
                 <label class="btn btn-info mb-1" for="final">محصول نهایی</label><br>
 
-                <input type="checkbox" id="raw" checked>
+                <input type="checkbox" id="raw">
                 <label class="btn btn-secondary mb-1" for="raw">مواد اولیه</label><br>
 
-                <input type="checkbox" id="pack" checked>
+                <input type="checkbox" id="pack">
                 <label class="btn btn-secondary" for="pack">ملزومات بسته بندی</label>
             </div>
         </div>
