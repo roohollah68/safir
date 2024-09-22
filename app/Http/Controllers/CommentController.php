@@ -39,12 +39,16 @@ class CommentController extends Controller
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
         ]);
-        if($req->file("photo"))
-            $photo = $req->file("photo")->store("","comment");
+        $message = 'شماره سفارش: '. $id."
+            ".auth()->user()->name. ': '.$req->text;
+        if($req->file("photo")) {
+            $photo = $req->file("photo")->store("", "comment");
+            $content = array("caption" => $message,  "photo" => env('APP_URL') . "comment/{$photo}");
+            $this->sendPhotoToBale($content, '4943446822');
+        }
         else {
             $photo = null;
-            $this->sendTextToBale('شماره سفارش: '. $id."
-            ".auth()->user()->name. ': '.$req->text,'4943446822');
+            $this->sendTextToBale($message,'4943446822');
         }
         $text = $req->text;
         if(!$text && !$photo)
