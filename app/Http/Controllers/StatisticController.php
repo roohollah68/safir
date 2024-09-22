@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\User;
 use Carbon\Carbon;
 use Hekmatinasser\Verta\Verta;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class StatisticController extends Controller
@@ -58,7 +59,9 @@ class StatisticController extends Controller
         $productNumber = 0;
         if ($request->base == 'productBase') {
             $orders = $orders->with('orderProducts', 'website')->get();
-            $products = Product::where('category', 'final')->get()->keyBy('id');
+            $products = Product::whereHas('good', function (Builder $query) {
+                $query->where('category', 'final');
+            })->get()->keyBy('id');
             foreach ($products as $id => $product) {
                 $products[$id]->number = 0;
                 $products[$id]->total = 0;
