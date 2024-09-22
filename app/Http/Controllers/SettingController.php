@@ -167,7 +167,7 @@ class SettingController extends Controller
 
 //        $this->createGoodTable();
 
-        $this->setWarehouseId();
+        //$this->setWarehouseId();
 
         $this->setWarehouseId2();
 
