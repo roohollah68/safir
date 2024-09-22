@@ -22,7 +22,7 @@ class Product extends Model
         'productPrice',
         'warehouse_id',
     ];
-    protected $appends = ['name', 'price', 'productPrice', 'photo', 'category'];
+//    protected $appends = ['name', 'price', 'productPrice', 'photo', 'category'];
 
     public function getNameAttribute()
     {
