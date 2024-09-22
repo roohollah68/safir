@@ -165,7 +165,7 @@ class SettingController extends Controller
 //    }
 
 
-        $this->createGoodTable();
+//        $this->createGoodTable();
 
         $this->setWarehouseId();
 
@@ -185,7 +185,7 @@ class SettingController extends Controller
                 $product->update([
                     'good_id' => $nameList[$product->name],
                 ]);
-                
+
             } else {
                 $good = Good::create([
                     'name' => $product->name,
