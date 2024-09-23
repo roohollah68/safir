@@ -166,11 +166,6 @@ class ProductController extends Controller
         $product->high_alarm = $req->high_alarm;
         $product->available = ($req->available == 'true');
         $good->category = $req->category;
-        if ($product->warehouse_id != $req->warehouseId) {
-            if (Product::where('good_id', $good->id)->where('warehouse_id', $req->warehouseId)->first()) {
-                return $this->errorBack('محصول در انبار مقصد تعریف شده است!');
-            }
-        }
         $product->save();
         $good->save();
 //        Product::where('name', $product->name)->update([
@@ -209,12 +204,18 @@ class ProductController extends Controller
         if ($product) {
             abort(403);
         }
-        $product = Product::create([
-            'good_id' => $id,
-            'available' => false,
-            'warehouse_id' => $req->warehouseId,
-            'quantity' => 0
-        ]);
+        $product = Product::withTrashed()->where('good_id', $id)->where('warehouse_id', $req->warehouseId)->first();
+        if ($product) {
+            $product->restore();
+        }else{
+            $product = Product::create([
+                'good_id' => $id,
+                'available' => false,
+                'warehouse_id' => $req->warehouseId,
+                'quantity' => 0
+            ]);
+        }
+
         return $product;
     }
 

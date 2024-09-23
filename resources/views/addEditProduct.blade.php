@@ -66,7 +66,7 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="warehouse" class="input-group-text w-100">مکان انبار:</label>
                     </div>
-                    <select name="warehouse" id="warehouse" class="form-control">
+                    <select name="warehouse" id="warehouse" class="form-control" disabled>
                         @foreach($warehouses as $warehouse)
                             <option value="{{$warehouse->id}}"
                                     @selected($product->warehouse_id == $warehouse->id) >{{$warehouse->name}}</option>

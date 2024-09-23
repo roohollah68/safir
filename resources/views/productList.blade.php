@@ -125,7 +125,7 @@
         let add = (id) => {
             return `<a class="fa fa-plus btn btn-success" onclick="addToProducts(${id})" title="اضافه کردن"></a>`
         }
-        let transferKey = (id) =>{
+        let transferKey = (id) => {
             return `<a class="fa fa-warehouse btn btn-secondary" onclick="transfer(${id})" title="جابجایی بین انبارها"></a>`
         }
         let quantity = (alarm, high_alarm, quantity) => {
@@ -203,7 +203,7 @@
                     alarm(product.alarm, product.quantity),
                     high_alarm(product.high_alarm, product.quantity),
                     product.available ? available : unavailable,
-                    edit(id) + fastEditFilter(id) + saveFilter(id) + transferKey(id) ,
+                    edit(id) + fastEditFilter(id) + saveFilter(id) + Delete(id),
                 ])
             });
             if (undefinedFilter)
@@ -322,14 +322,14 @@
                 '_token': token,
                 'warehouseId': warehouseId,
             }).done(res => {
-                products[''+res.id] = res;
+                products['' + res.id] = res;
                 dataTable()
             }).fail(function () {
                 $.notify('خطایی رخ داده است.', 'warn');
             });
         }
 
-        function transfer(id){
+        function transfer(id) {
             $.post('/warehouse/transfer/' + id, {
                 '_token': token,
             }).done(res => {
