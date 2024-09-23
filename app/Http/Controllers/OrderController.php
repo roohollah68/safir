@@ -420,15 +420,15 @@ class OrderController extends Controller
         $fonts = array();
         $orders = array();
         foreach ($idArray as $id) {
-            $order = Order::findOrFail($id);
+            $order = Order::with('warehouse')->findOrFail($id);
             if ($order->state == 1) {
                 $order->update([
                     'state' => 2
                 ]);
 //                (new CommentController)->create($order, auth()->user(), 'لیبل سفارش پرینت شد.');
             }
-            if ($order->location != 't')
-                $order->desc .= '(انبار ' . $this->city[$order->location][0] . ')';
+            if ($order->warehouse_id != 1)
+                $order->desc .= '(انبار ' . $order->warehouse->name . ')';
 
             $font = 32;
             $order = $this->addCityToAddress($order);

@@ -110,6 +110,11 @@ class Order extends Model
         return $this->hasOne(Websites::class);
     }
 
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
+
 
 
 }
