@@ -79,7 +79,7 @@
 
                 order.customer_id ? '<a href="/customer/transaction/' + order.customer_id + '">' + order.name + '</a>' : order.name,
 
-                users[order.user_id].name + (website?`(${order.website.website_id})`:''),
+                users[order.user_id].name + ((website && order.website)?`(${order.website.website_id})`:''),
 
                 (order.orders.length > 30) ? order.orders.substr(0, 30) + ' ...' : order.orders,
 
