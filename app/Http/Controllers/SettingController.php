@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductData;
 use App\Models\Setting;
 use App\Models\User;
+use GuzzleHttp\Psr7\Query;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -171,9 +172,11 @@ class SettingController extends Controller
 
         //$this->setWarehouseId2();
 
+        $this->repairShiraz();
+
 //        DB::commit();
 
-        $this->sendTextToBale('hi ```[ljk]lkuvlkwnv```' , env('GroupId'));
+//        $this->sendTextToBale('hi ```[ljk]lkuvlkwnv```' , env('GroupId'));
 
         return 'ok';
     }
@@ -181,14 +184,14 @@ class SettingController extends Controller
     public function createGoodTable()
     {
         //$nameList = [];
-        $products = Product::where('id' , '>',6054)->get();
+        $products = Product::where('id', '>', 6054)->get();
         foreach ($products as $product) {
-            $good = Good::where('name' , $product->name)->first();
-            if($good){
+            $good = Good::where('name', $product->name)->first();
+            if ($good) {
                 $product->update([
                     'good_id' => $good->id,
                 ]);
-            }else{
+            } else {
                 $good = Good::create([
                     'name' => $product->name,
                     'price' => $product->price,
@@ -238,6 +241,26 @@ class SettingController extends Controller
                 'warehouse_id' => $warehouseId[$order->location]
             ]);
         }
+    }
+
+    public function repairShiraz()
+    {
+        $duplicates = DB::select('select   `warehouse_id`,
+         `good_id`
+from     products
+group by `warehouse_id`,
+         `good_id`
+having   count(*) > 1
+');
+        foreach ($duplicates as $duplicate){
+            $products = Product::where('warehouse_id',$duplicate->warehouse_id)->where('good_id',$duplicate->good_id)->get();
+            $product = $products[0];
+            if(!$product->avalaible || !$product->quantity)
+                $product->forceDelete();
+            else
+                $products[1]->forceDelete();
+        }
+
     }
 }
 
