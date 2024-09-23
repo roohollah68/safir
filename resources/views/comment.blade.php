@@ -4,8 +4,7 @@
              title="{{verta($comment->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}">{{$comment->user->name}}: {{$comment->text}}
             @if($comment->photo)<a class="fa fa-image" href="/comment/{{$comment->photo}}" target="_blank"></a>@endif</span><br>
     @endforeach
-    <br>
-    <form action="" method="post" id="commentForm">
+    <br><form action="" method="post" id="commentForm">
         @csrf
         <div class="m-4">
             <div class="form-group input-group">

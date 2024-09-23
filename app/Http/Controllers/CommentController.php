@@ -39,25 +39,26 @@ class CommentController extends Controller
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
         ]);
-        $message = auth()->user()->name. ': '.$req->text . "
-```[مشاهده سفارش]". (new TelegramController)->createOrderMessage(Order::find($id)) ."```"."
-```[مشاهده کامنت های قبلی]". strip_tags($this->view($id))."```";
+
+        $orderText = (new TelegramController)->createOrderMessage(Order::find($id));
+        $commentText = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", strip_tags($this->view($id)));
+        $newComment = auth()->user()->name . ': ' . $req->text;
+        $commentText .= '    '.$newComment;
+        $message = $newComment . " ```[مشاهده سفارش]" . $orderText . "```" . "```[مشاهده کامنت های قبلی]" . $commentText . "```";
 
 
-
-        if($req->file("photo")) {
+        if ($req->file("photo")) {
             $photo = $req->file("photo")->store("", "comment");
-            $content = array("caption" => $message,  "photo" => env('APP_URL') . "comment/{$photo}");
+            $content = array("caption" => $message, "photo" => env('APP_URL') . "comment/{$photo}");
             $this->sendPhotoToBale($content, env('CommentId'));
-        }
-        else {
+        } else {
             $photo = null;
             $this->sendTextToBale($message, env('CommentId'));
         }
         $text = $req->text;
-        if(!$text && !$photo)
+        if (!$text && !$photo)
             abort(403);
-        $this->create($id,auth()->user(),$text,$photo);
+        $this->create($id, auth()->user(), $text, $photo);
         return 'ok';
     }
 }
