@@ -173,6 +173,8 @@ class SettingController extends Controller
 
 //        DB::commit();
 
+        $this->sendTextToBale('hi ```[ljk]lkuvlkwnv```' , env('GroupId'));
+
         return 'ok';
     }
 

@@ -39,16 +39,20 @@ class CommentController extends Controller
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
         ]);
-        $message = 'شماره سفارش: '. $id."
-            ".auth()->user()->name. ': '.$req->text;
+        $message = auth()->user()->name. ': '.$req->text . "
+```[مشاهده سفارش]". (new TelegramController)->createOrderMessage(Order::find($id)) ."```"."
+```[مشاهده کامنت های قبلی]". strip_tags($this->view($id))."```";
+
+
+
         if($req->file("photo")) {
             $photo = $req->file("photo")->store("", "comment");
             $content = array("caption" => $message,  "photo" => env('APP_URL') . "comment/{$photo}");
-            $this->sendPhotoToBale($content, '4943446822');
+            $this->sendPhotoToBale($content, env('CommentId'));
         }
         else {
             $photo = null;
-            $this->sendTextToBale($message,'4943446822');
+            $this->sendTextToBale($message, env('CommentId'));
         }
         $text = $req->text;
         if(!$text && !$photo)
