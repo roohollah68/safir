@@ -715,12 +715,12 @@ class OrderController extends Controller
         $limit = $request->limit;
 
         if ($this->superAdmin() || $this->print()) {
-            $orders = Order::withTrashed()
+            $orders = Order::withTrashed()->with('website')
                 ->whereBetween('created_at', [$from, $to])
                 ->limit($limit)
                 ->get()->keyBy('id');
         } else {
-            $orders = auth()->user()->orders()->withTrashed()
+            $orders = auth()->user()->orders()->withTrashed()->with('website')
                 ->whereBetween('created_at', [$from, $to])
                 ->limit($limit)
                 ->get()->keyBy('id');
