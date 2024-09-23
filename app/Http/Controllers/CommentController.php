@@ -39,12 +39,12 @@ class CommentController extends Controller
         request()->validate([
             'photo' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
         ]);
-
-        $orderText = (new TelegramController)->createOrderMessage(Order::find($id));
+        $order = Order::find($id);
+        $orderText = (new TelegramController)->createOrderMessage($order);
         $commentText = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", strip_tags($this->view($id)));
         $newComment = auth()->user()->name . ': ' . $req->text;
         $commentText .= '    '.$newComment;
-        $message = $newComment . " ```[مشاهده سفارش]" . $orderText . "```" . "```[مشاهده کامنت های قبلی]" . $commentText . "```";
+        $message = $newComment . " ```[مشاهده سفارش ". $order->name ."]" . $orderText . "```" . "```[مشاهده کامنت های قبلی]" . $commentText . "```";
 
 
         if ($req->file("photo")) {
