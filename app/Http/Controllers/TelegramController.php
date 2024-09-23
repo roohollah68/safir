@@ -53,8 +53,7 @@ class TelegramController extends Controller
         $customerCost = number_format($order->customerCost);
         $time = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
         $time = $this->number_En_Fa($time);
-        return "
-شماره سفارش: {$order->id}
+        return "شماره سفارش: {$order->id}
 نام و نام خانوادگی: *{$order->name}*
 شماره همراه: {$order->phone}
 آدرس: {$order->address}

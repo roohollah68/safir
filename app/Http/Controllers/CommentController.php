@@ -44,9 +44,9 @@ class CommentController extends Controller
         $commentText = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", strip_tags($this->view($id)));
         $newComment = auth()->user()->name . ': ' . $req->text;
         $commentText .= '    '.$newComment;
-        $message = $newComment . " ```[مشاهده سفارش ". $order->name ."]" . $orderText . "```" . "```[مشاهده کامنت های قبلی]" . $commentText . "```";
+        $message = $newComment . " ```[مشاهده سفارش ". $order->name ."]" . $orderText. "\n\n * کامنت ها: *  " . $commentText . "```" ;
 
-
+//        . "```[مشاهده کامنت های قبلی]" . $commentText . "```"
         if ($req->file("photo")) {
             $photo = $req->file("photo")->store("", "comment");
             $content = array("caption" => $message, "photo" => env('APP_URL') . "comment/{$photo}");
