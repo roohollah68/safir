@@ -6,7 +6,7 @@
     let products = {!!json_encode($products)!!};
     let cart = {!!json_encode($cart)!!};
     let cities = {!!json_encode($cities)!!};
-    let citiesId = {!!json_encode($citiesId)!!};
+    {{--let citiesId = {!!json_encode($citiesId)!!};--}}
     let creatorIsAdmin = !!'{{$creatorIsAdmin}}';
     let safir = !!'{{$safir}}';
     let edit = !!'{{$edit}}';
@@ -43,21 +43,25 @@
         deliveryAction()
         // $('input[name=paymentMethod]').on('click', paymentAction);
         // $('input[name=deliveryMethod]').on('click', deliveryAction);
+        let cityText = {};
+        $.each(cities , (id,city)=>{
+            cityText[city.name + ` (${city.province.name})`] = id;
+        })
 
         $("#city").autocomplete({
-            source: Object.keys(cities),
+            source: Object.keys(cityText),
             select: function (event, ui) {
                 $('#city').change();
             }
         });
 
         $('#city').change(function () {
-            let city = cities[this.value];
-            if (city)
-                $('#city_id').val(city.id);
+            let id = cityText[this.value];
+            if(id)
+                $('#city_id').val(id);
             else {
-                let city = citiesId[$('#city_id').val()];
-                $('#city').val(city.name)
+                let city = cities[$('#city_id').val()];
+                $('#city').val(city.name + ` (${city.province.name})`)
             }
         });
     });
