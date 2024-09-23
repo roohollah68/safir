@@ -455,12 +455,13 @@ class OrderController extends Controller
     public function invoice($id, Request $request)
     {
         if ($this->superAdmin() || $this->print())
-            $order = Order::findOrFail($id);
+            $order = Order::with('warehouse')->findOrFail($id);
         else
-            $order = auth()->user()->orders()->findOrFail($id);
+            $order = auth()->user()->orders()->with('warehouse')->findOrFail($id);
         $order = $this->addCityToAddress($order);
-        if ($order->location != 't')
-            $order->desc .= '(انبار ' . $this->city[$order->location][0] . ')';
+
+        if ($order->warehouse_id != 1)
+            $order->desc .= '(انبار ' . $order->warehouse->name . ')';
         if ($request->onlyOrderData) {
             return $order;
         }
