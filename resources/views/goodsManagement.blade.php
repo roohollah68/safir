@@ -56,7 +56,7 @@
                     @foreach($warehouses->keys() as $warehouse_id)
                         <th class="warehouse-{{$warehouse_id}}">
                             @if(isset($products[$warehouse_id]))
-                                <span class="btn btn-{{$products[$warehouse_id]->available?'success':'danger'}}"
+                                <span class="btn btn-{{$products[$warehouse_id]->available?'success':'danger'}}" dir="ltr"
                                       onclick="changeAvailable({{$products[$warehouse_id]->id}},this)">
                             {{+$products[$warehouse_id]->quantity}}
                         </span>
@@ -111,7 +111,7 @@
                 'warehouseId': warehouse_id,
             }).done(product => {
                 let text = `
-                <span class="btn btn-${product.available ? 'success' : 'danger'}"
+                <span class="btn btn-${product.available ? 'success' : 'danger'}" dir="ltr"
                     onclick="changeAvailable(${product.id},this)">
                             ${+product.quantity}
                 </span>
