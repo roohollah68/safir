@@ -15,7 +15,6 @@ class ProductController extends Controller
 {
     public function showProducts()
     {
-
         return view('productList', [
             'warehouses' => Warehouse::all(),
             'goods' => Good::all()->keyBy('id'),
@@ -320,5 +319,22 @@ class ProductController extends Controller
         }
         DB::commit();
         return redirect()->route('productList');
+    }
+
+    public function goods(){
+        $goods = Good::with('products')->get()->keyBy('id');
+        return view('goodsManagement',[
+            'goods' => $goods,
+            'warehouses' => Warehouse::all()->keyBy('id'),
+        ]);
+    }
+
+    public function changeAvailable($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->update([
+            'available' => !$product->available,
+        ]);
+        return $product;
     }
 }

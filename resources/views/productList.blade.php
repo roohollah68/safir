@@ -23,6 +23,10 @@
         <span class=" fa fa-warehouse"></span>
         انتقال بین انبارها
     </a>
+    <a class="btn btn-secondary mb-3" href="goods/management">
+        <span class=" fa fa-list"></span>
+        مدیریت کالاها
+    </a>
     <br>
     <div class="container border input-box">
         <div class="row">

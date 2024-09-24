@@ -159,6 +159,9 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'warehouse', 'rol
     Route::post('/productQuantity/add/{id}', [ProductChangeController::class, 'insertRecord']);
     Route::get('/productQuantity/delete/{id}', [ProductChangeController::class, 'deleteRecord']);
 
+    Route::get('goods/management', [ProductController::class, 'goods']);
+    Route::post('/product/change/available/{id}', [ProductController::class, 'changeAvailable']);
+
     Route::get('warehouse/transfer', [ProductController::class, 'transfer']);
     Route::post('warehouse/transfer', [ProductController::class, 'transferSave']);
 

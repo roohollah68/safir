@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="/bootstrap-5.1.3-dist/css/bootstrap.rtl.min.css">
 
     <link rel="stylesheet" href="/css/jquery.dataTables.min.css">
+{{--    <link rel="stylesheet" href="/css/fixedHeader.dataTables.min.css">--}}
 
     <link rel="stylesheet" href="/fontAwesome/css/all.min.css"/>
 
@@ -36,6 +37,7 @@
     <script src="/js/vfs_fonts.js"></script>
     <script src="/js/buttons.html5.min.js"></script>
     <script src="/js/buttons.print.min.js"></script>
+{{--    <script src="/js/dataTables.fixedHeader.min.js"></script>--}}
 
     @include('layout.style_css')
     @include('layout.js')
