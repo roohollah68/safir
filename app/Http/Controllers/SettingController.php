@@ -172,7 +172,7 @@ class SettingController extends Controller
 
         //$this->setWarehouseId2();
 
-        $this->repairShiraz();
+//        $this->repairShiraz();
 
 //        DB::commit();
 

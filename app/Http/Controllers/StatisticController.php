@@ -78,7 +78,7 @@ class StatisticController extends Controller
                 $orderNumber++;
                 foreach ($order->orderProducts as $orderProduct) {
                     $id = $orderProduct->product_id;
-                    if (isset($products[$id])) {
+                    if (isset($products[$id]) && $orderProduct->price > 0) {
                         $products[$id]->number += $orderProduct->number;
                         $productNumber += $orderProduct->number;
                         $products[$id]->total += $orderProduct->number * $orderProduct->price;

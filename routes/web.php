@@ -29,7 +29,6 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'role']], functio
     Route::get('/add_user', [UserController::class, 'addUser']);
     Route::post('/add_user', [UserController::class, 'insertUser']);
 
-
     Route::post('/deposit/changeConfirm/{id}', [DepositController::class, 'changeConfirm']);
 
     Route::get('settings', [SettingController::class, 'showSettings'])->name('settings');
@@ -160,8 +159,8 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'warehouse', 'rol
     Route::post('/productQuantity/add/{id}', [ProductChangeController::class, 'insertRecord']);
     Route::get('/productQuantity/delete/{id}', [ProductChangeController::class, 'deleteRecord']);
 
-    Route::post('warehouse/transfer/{id}', [ProductController::class, 'transfer']);
-    Route::post('transfer/save/{id}', [ProductController::class, 'transferSave']);
+    Route::get('warehouse/transfer', [ProductController::class, 'transfer']);
+    Route::post('warehouse/transfer', [ProductController::class, 'transferSave']);
 
 
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Good;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductChange;
 use App\Models\Warehouse;
@@ -207,7 +208,7 @@ class ProductController extends Controller
         $product = Product::withTrashed()->where('good_id', $id)->where('warehouse_id', $req->warehouseId)->first();
         if ($product) {
             $product->restore();
-        }else{
+        } else {
             $product = Product::create([
                 'good_id' => $id,
                 'available' => false,
@@ -219,44 +220,105 @@ class ProductController extends Controller
         return $product;
     }
 
-    public function transfer($id)
+    public function transfer()
     {
-        $product = Product::with('warehouse')->findOrFail($id);
-        $products = Product::where('good_id', $product->good_id)->where('id', '<>', $id)->with('warehouse')->get();
+        $products = Product::all()->keyby('id');
         return view('transfer', [
-            'warehouses' => Warehouse::all(),
-            'product' => $product,
+            'warehouses' => Warehouse::all()->keyBy('id'),
             'products' => $products,
-            'warehouse2' => $product->warehouse,
         ]);
     }
 
-    public function transferSave($id, Request $req)
+    public function transferSave(Request $req)
     {
         DB::beginTransaction();
-        $product = Product::with('warehouse')->findOrFail($id);
-        $product2 = Product::with('warehouse')->findOrFail($req->productId);
-        $transfer = $req->value;
-        if ($transfer <= 0)
-            return;
-        $product->update([
-            'quantity' => $product->quantity - $transfer,
-        ]);
-        $product->productChange()->create([
-            'change' => - $transfer,
-            'desc' => 'انتقال به انبار '.$product2->warehouse->name,
-            'quantity' => $product->quantity
-        ]);
-        $product2->update([
-            'quantity' => $product2->quantity + $transfer,
-        ]);
-        $product2->productChange()->create([
-            'change' => $transfer,
-            'desc' => 'انتقال از انبار '.$product->warehouse->name,
-            'quantity' => $product2->quantity
-        ]);
-        DB::commit();
-        return $product;
-    }
+        $products1 = Product::where('warehouse_id', $req->warehouseId1)->get()->keyBy('id');
+        $warehouses = Warehouse::all()->keyBy('id');
+        $hasProduct = false;
+        $productList = [];
+        $orders = '';
+        foreach ($products1 as $id => $product) {
+            if ($req[$id]>0) {
+                $productList[$id] = $product;
+                $hasProduct = true;
+                $orders .= ' ' . $product->name . ' ' . +$req[$id] . 'عدد' . '،';
+            }
+        }
+        if (!$hasProduct)
+            return $this->errorBack('محصولی انتخاب نشده است!');
 
+        $order = auth()->user()->orders()->create([
+            'name' => 'انتقال بین انبارها',
+            'phone' => 123456789,
+            'address' => 'انبار ' . $warehouses[$req->warehouseId2]->name,
+            'zip_code' => 123456789,
+            'orders' => $orders,
+            'desc' => "انتقال از انبار {$warehouses[$req->warehouseId1]->name} به انبار {$warehouses[$req->warehouseId2]->name} ",
+            'receipt' => null,
+            'total' => 0,
+            'customerCost' => 0,
+            'paymentMethod' => null,
+            'deliveryMethod' => null,
+            'customer_id' => null,
+            'confirm' => true,
+            'state' => 10,
+            'counter' => 'approved',
+            'warehouse_id' => +$req->warehouseId1,
+        ]);
+        app('Telegram')->sendOrderToBale($order, env('GroupId'));
+
+        $order2 = auth()->user()->orders()->create([
+            'name' => 'انتقال بین انبارها',
+            'phone' => 123456789,
+            'address' => 'انبار ' . $warehouses[$req->warehouseId2]->name,
+            'zip_code' => 123456789,
+            'orders' => $orders,
+            'desc' => "انتقال از انبار {$warehouses[$req->warehouseId1]->name} به انبار {$warehouses[$req->warehouseId2]->name} ",
+            'receipt' => null,
+            'total' => 0,
+            'customerCost' => 0,
+            'paymentMethod' => null,
+            'deliveryMethod' => null,
+            'customer_id' => null,
+            'confirm' => true,
+            'state' => 10,
+            'counter' => 'approved',
+            'warehouse_id' => +$req->warehouseId2,
+        ]);
+        app('Telegram')->sendOrderToBale($order2, env('GroupId'));
+
+        foreach ($productList as $id => $product) {
+            $order->orderProducts()->create([
+                'product_id' => $id,
+                'name' => $product->name,
+                'number' => -$req[$id],
+                'price' => 0,
+            ]);
+            $product2 = Product::where('warehouse_id', $req->warehouseId2)->where('good_id',$product->good_id)->first();
+            $order2->orderProducts()->create([
+                'product_id' => $product2->id,
+                'name' => $product2->name,
+                'number' => $req[$id],
+                'price' => 0,
+            ]);
+            $product->update([
+                'quantity' => $product->quantity - $req[$id],
+            ]);
+            $product2->update([
+                'quantity' => $product2->quantity + $req[$id],
+            ]);
+            $product->productChange()->create([
+                'change' => - $req[$id],
+                'desc' => 'انتقال به انبار ' . $warehouses[$req->warehouseId2]->name,
+                'quantity' => $product->quantity
+            ]);
+            $product2->productChange()->create([
+                'change' =>  $req[$id],
+                'desc' => 'انتقال از انبار ' . $warehouses[$req->warehouseId1]->name,
+                'quantity' => $product2->quantity
+            ]);
+        }
+        DB::commit();
+        return redirect()->route('productList');
+    }
 }

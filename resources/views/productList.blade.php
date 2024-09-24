@@ -19,6 +19,10 @@
         <span class=" fa fa-plus"></span>
         افزودن محصول جدید
     </a>
+    <a class="btn btn-primary mb-3" href="warehouse/transfer">
+        <span class=" fa fa-warehouse"></span>
+        انتقال بین انبارها
+    </a>
     <br>
     <div class="container border input-box">
         <div class="row">

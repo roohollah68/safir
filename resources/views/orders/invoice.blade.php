@@ -64,7 +64,7 @@
                         <tr class="{{$loop->iteration>$firstPageItems?$lastPage:$firstPage}}">
                             <td>{{$loop->iteration}}</td>
                             <td>{{$orderProduct->name}}</td>
-                            <td>{{+$orderProduct->number}}</td>
+                            <td dir="ltr">{{+$orderProduct->number}}</td>
                             <td>{{number_format($price_no_dis)}}</td>
                             <td>{{+$orderProduct->discount}}</td>
                             <td>{{number_format($price_dis)}}</td>
@@ -73,7 +73,7 @@
                     @endforeach
                     <tr class="{{$lastPage}}">
                         <td colspan="2" >مجموع تعداد اقلام</td>
-                        <td>{{$totalProducts}}</td>
+                        <td dir="ltr">{{$totalProducts}}</td>
                         <td colspan="3"></td>
                         <td></td>
                     </tr>

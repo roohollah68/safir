@@ -134,30 +134,6 @@ class OrderController extends Controller
             ];
         }
 
-//        foreach ($products as $id => $product) {
-//            $number = $request['product_' . $id];
-//            if ($number > 0) {
-//                $request->orders .= ' ' . $product->name . ' ' . +$number . 'عدد' . '،';
-//                $discount = +$this->calculateDis($id);
-//                if ($this->superAdmin() || $this->admin())
-//                    $discount = +$request['discount_' . $id];
-//                $price = round((100 - $discount) * $product->price / 100);
-//                if (($this->superAdmin() || $this->admin()) && $discount == 0)
-////                    $price = max(+str_replace(",", "", $request['price_' . $id]), $product->price);
-//                    $price = +str_replace(",", "", $request['price_' . $id]);
-//                $total += $price * $number;
-//                $Total += $product->price * $number;
-//                $request->orderList[$id] = [
-//                    'name' => $product->name,
-//                    'price' => $price,
-//                    'photo' => $product->photo,
-//                    'product_id' => $product->id,
-//                    'number' => $number,
-//                    'discount' => $discount,
-//                    'verified' => $this->safir(),
-//                ];
-//            }
-//        }
         if ($request->orders == '') {
             return $this->errorBack('محصولی انتخاب نشده است!');
         }
