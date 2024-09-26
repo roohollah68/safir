@@ -178,6 +178,8 @@ class SettingController extends Controller
 
 //        $this->sendTextToBale('hi ```[ljk]lkuvlkwnv```' , env('GroupId'));
 
+        $this->addAllTowarehouse();
+
         return 'ok';
     }
 
@@ -261,6 +263,21 @@ having   count(*) > 1
                 $products[1]->forceDelete();
         }
 
+    }
+
+    public function addAllTowarehouse()
+    {
+        $products = Product::where('warehouse_id' , 1)->get();
+        $products2 = Product::withTrashed()->where('warehouse_id' , 6)->get()->keyBy('good_id');
+        foreach ($products as $product){
+            if(isset($products2[$product->good_id]))
+                continue;
+            Product::create([
+                'good_id' => $product->good_id,
+                'available' => $product->available,
+                'warehouse_id' => 6,
+            ]);
+        }
     }
 }
 
