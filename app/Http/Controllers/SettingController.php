@@ -268,14 +268,14 @@ having   count(*) > 1
     public function addAllTowarehouse()
     {
         $products = Product::where('warehouse_id' , 1)->get();
-        $products2 = Product::withTrashed()->where('warehouse_id' , 6)->get()->keyBy('good_id');
+        $products2 = Product::withTrashed()->where('warehouse_id' , 7)->get()->keyBy('good_id');
         foreach ($products as $product){
             if(isset($products2[$product->good_id]))
                 continue;
             Product::create([
                 'good_id' => $product->good_id,
                 'available' => $product->available,
-                'warehouse_id' => 6,
+                'warehouse_id' => 7,
             ]);
         }
     }
