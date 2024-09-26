@@ -299,17 +299,18 @@ class CustomerController extends Controller
         $orderProducts = $order->orderProducts()->with('product');
         $orderProducts->update(['verified' => true]);
         foreach ($orderProducts->get() as $orderProduct) {
-            $product = $orderProduct->product;
-
-            $product->update([
-                'quantity' => $product->quantity - $orderProduct->number,
-            ]);
-            $order->productChange()->create([
-                'product_id' => $product->id,
-                'change' => -$orderProduct->number,
-                'quantity' => $product->quantity,
-                'desc' => ' خرید مشتری ' . $order->name,
-            ]);
+            $product = $orderProduct->product()->withTrashed()->first();
+            if ($product) {
+                $product->update([
+                    'quantity' => $product->quantity - $orderProduct->number,
+                ]);
+                $order->productChange()->create([
+                    'product_id' => $product->id,
+                    'change' => -$orderProduct->number,
+                    'quantity' => $product->quantity,
+                    'desc' => ' خرید مشتری ' . $order->name,
+                ]);
+            }
         }
         $response = app('Telegram')->sendOrderToBale($order, env('GroupId'));
         if (isset($response->result)) {
