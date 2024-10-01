@@ -27,6 +27,9 @@
            href="/customer/edit/{{$customer->id}}"
            title="ویرایش مشتری">
         </a>
+{{--        <a class=" btn btn-secondary"--}}
+{{--           href="/order/refund/{{$customer->id}}">صدور فاکتور برگشت به انبار--}}
+{{--        </a>--}}
     </div>
     <a class="btn btn-info" href="/customerDeposit/add/{{$customer->id}}">ثبت واریزی</a>
     <a class="btn btn-secondary" href="{{route('CustomerList')}}">بازگشت</a>
@@ -117,7 +120,9 @@
                         <input type="text" name="to" class="form-control" placeholder="تا تاریخ" id="date2-text">
                     </div>
                 </div>
-                <br><hr><br>
+                <br>
+                <hr>
+                <br>
                 <label for="allInvoice">به همراه فاکتورها</label>
                 <input class="checkboxradio" type="checkbox" name="allInvoice" id="allInvoice">
                 <br><br>
