@@ -718,7 +718,7 @@ class OrderController extends Controller
     {
         DB::beginTransaction();
         $order = Order::findOrFail($id);
-        if (!$order->deliveryMethod)
+        if (!$order->deliveryMethod || $order->isCreatorAdmin())
             $order->deliveryMethod = '';
         if ($req->note)
             $req->note = ' - کد مرسوله: ' . $req->note;

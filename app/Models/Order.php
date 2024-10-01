@@ -60,10 +60,10 @@ class Order extends Model
         return $this->hasMany(CustomerTransactions::class);
     }
 
-    public function admin()
-    {
-        return $this->belongsTo(User::class, 'admin');
-    }
+//    public function admin()
+//    {
+//        return $this->belongsTo(User::class, 'admin');
+//    }
 
     public function productChange()
     {
@@ -80,9 +80,9 @@ class Order extends Model
         if ($this->user()->first()->safir() || $this->deliveryMethod != 'admin')
             if (isset(config('sendMethods')[$this->deliveryMethod])) {
                 return config('sendMethods')[$this->deliveryMethod];
-            } elseif($this->deliveryMethod) {
+            } elseif ($this->deliveryMethod) {
                 return $this->deliveryMethod;
-            }else{
+            } else {
                 return '';
             }
         else {
@@ -96,9 +96,9 @@ class Order extends Model
         if ($this->user()->first()->safir() || $this->paymentMethod != 'admin')
             if (isset(config('payMethods')[$this->paymentMethod])) {
                 return config('payMethods')[$this->paymentMethod];
-            } elseif($this->paymentMethod) {
+            } elseif ($this->paymentMethod) {
                 return $this->paymentMethod;
-            }else{
+            } else {
                 return '';
             }
         else
@@ -115,6 +115,10 @@ class Order extends Model
         return $this->belongsTo(Warehouse::class);
     }
 
+    public function isCreatorAdmin()
+    {
+        return $this->user()->first()->role == 'admin';
+    }
 
 
 }
