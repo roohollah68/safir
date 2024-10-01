@@ -2,6 +2,9 @@
 <div title="نحوه ارسال" class="dialogs">
     <form method="post" id="sendForm" action="" enctype="multipart/form-data">
         @csrf
+        <input type="radio" id="inPerson" value="{{$sendMethods[7]}}" name="sendMethod" class="checkboxradio">
+        <label for='inPerson' class="btn btn-success my-1">{{$sendMethods[7]}}</label><br>
+
         <input type="radio" id="car" value="{{$sendMethods[1]}}" name="sendMethod" class="checkboxradio">
         <label for='car' class="btn btn-success my-1">{{$sendMethods[1]}}</label><br>
 
