@@ -130,6 +130,8 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'admin', 'role']]
     Route::post('/customerDeposit/delete/{id}', [CustomerController::class, 'deleteDeposit']);
 
     Route::post('/orders/paymentMethod/{id}', [OrderController::class, 'paymentMethod']);
+
+    Route::get('/order/refund/{id}', [OrderController::class, 'refund']);
 });
 
 //**************************************  superAdmin  *****  warehouse  *******************

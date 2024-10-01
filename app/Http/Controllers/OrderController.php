@@ -791,5 +791,11 @@ class OrderController extends Controller
         DB::commit();
         return ['ok', $order];
     }
+
+    public function refund($id)
+    {
+        $orders = Order::where('customer_id' , $id)->with('orderProducts')->get();
+        dd($orders);
+    }
 }
 

@@ -251,8 +251,8 @@
         if ((print || superAdmin) && order.state)
             res += generatePDF
 
-        if (creatorRole === 'admin') {
-            if (order.state < 10 && order.confirm)
+        if (creatorRole === 'admin' && order.state < 10 ) {
+            if (order.confirm)
                 res += cancelInvoice;
             else
                 res += confirmInvoice;
