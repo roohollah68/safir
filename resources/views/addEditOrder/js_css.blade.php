@@ -38,26 +38,25 @@
                 setCustomerInfo(customer);
             }
         });
-        refreshProducts()
-        paymentAction()
-        deliveryAction()
-        // $('input[name=paymentMethod]').on('click', paymentAction);
-        // $('input[name=deliveryMethod]').on('click', deliveryAction);
+        refreshProducts();
+        paymentAction();
+        deliveryAction();
+
         let cityText = {};
-        $.each(cities , (id,city)=>{
+        $.each(cities, (id, city) => {
             cityText[city.name + ` (${city.province.name})`] = id;
         })
 
         $("#city").autocomplete({
             source: Object.keys(cityText),
-            select: function (event, ui) {
+            select: function () {
                 $('#city').change();
             }
         });
 
         $('#city').change(function () {
             let id = cityText[this.value];
-            if(id)
+            if (id)
                 $('#city_id').val(id);
             else {
                 let city = cities[$('#city_id').val()];
@@ -121,9 +120,9 @@
         </td>
         <td>
             <input type="text" class="price-input text-success discount" style="width: 80px;"
-            name="price_${id}" value="${product.priceWithDiscount}"
+            name="price_${id}" id="price_${id}" value="${product.priceWithDiscount}"
             onchange="calculate_discount(${id},this.value)" ${safir ? 'disabled' : ''}>` +
-            ((product.priceWithDiscount == product.price) ? '' :
+            ((+product.priceWithDiscount === +product.price) ? '' :
                 `<span class="text-danger" style="text-decoration: line-through">
             ${priceFormat(product.price)}
         </span>`) +
@@ -134,7 +133,7 @@
         ${creatorIsAdmin ? '' : 'disabled'} min="0" max="100" step="0.25">` +
             (creatorIsAdmin ?
                 `<a class="btn btn-outline-info fa fa-plus" dir="ltr"
-           onclick="$('#discount_${id}').val(+$('#discount_${id}').val()+5).change()">5
+           onclick="$('#discount_${id}').val((index,value)=>{return +value+5}).change()">5
                             <i class="fa fa-percent"></i>
                         </a>
                     ` : ``) +
@@ -148,9 +147,9 @@
     function paymentAction() {
         paymentMethod = $('input[name="paymentMethod"]:checked').val();
         $('.receiptPhoto,#customerDiscount,label[for=customerDiscount]').hide();
-        if (paymentMethod == 'receipt') {
+        if (paymentMethod === 'receipt') {
             $('.receiptPhoto').show();
-        } else if (paymentMethod == 'onDelivery') {
+        } else if (paymentMethod === 'onDelivery') {
             $('#customerDiscount,label[for=customerDiscount]').show();
         }
         refreshProducts()
@@ -168,7 +167,8 @@
         $.each(cart, (id, number) => {
             if (number) {
                 $('#product_' + id).val(number);
-                total += products[id].priceWithDiscount * number; //جمع قیمت با تخفیف;
+                let price = +$('#price_' + id).val().replaceAll(',', '');
+                total += price * number; //جمع قیمت با تخفیف;
                 Total += products[id].price * number;  //قیمت بدون تخفیف;
                 $('#hidden-input').append(`<input type="hidden" name="cart[${id}]" value="${number}">`);
                 hasProduct = true;
@@ -178,61 +178,56 @@
             }
         })
 
-        @if($safir)
         let deliveryCost = 0;
-        if (Total < {{$settings->freeDelivery}} || '{{$user->id}}' == '10')
-            if (deliveryMethod == 'peyk')
+        if (Total < {{$settings->freeDelivery}} || '{{$user->id}}' === '10')
+            if (deliveryMethod === 'peyk')
                 deliveryCost = {{$settings->peykCost}};
-            else if (deliveryMethod == 'post')
+            else if (deliveryMethod === 'post')
                 deliveryCost = {{$settings->postCost}};
-            else if (deliveryMethod == 'peykeShahri')
+            else if (deliveryMethod === 'peykeShahri')
                 deliveryCost = {{$settings->peykeShahri}};
         $('#deliveryCost').html(num(deliveryCost));
         $('#cartSum').html(num(total));
         $('#total').html(num(total + deliveryCost));
-        $('#onDeliveryMode').hide();
+        $('#total-discount').html(num(Total - total));
 
-        if (paymentMethod == 'onDelivery') {
+        if (paymentMethod === 'onDelivery') {
             let customerDiscount = $('#customerDiscount').val()
             $('#onDeliveryMode').show();
             let customerTotal = Math.round(Total * (100 - customerDiscount) / 100 + deliveryCost)
             $('#customerTotal').html(num(customerTotal));
             let safirShare = customerTotal - total - deliveryCost;
             $('#safirShare').html(num(safirShare));
-        }
+        } else
+            $('#onDeliveryMode').hide();
         if (!hasProduct)
             $('#paymentDetails').hide();
         else
             $('#paymentDetails').show();
-        @endif
 
     }
 
     function deleteBTN(id) {
-        @if($creatorIsAdmin || !$edit)
-            return '<span class="btn btn-danger mx-1 fa fa-xmark" ' +
-            'onclick="$(`#product_' + id + '`).val(0);cart[' + id + '] =0 ;refreshProducts()"></span>'
-        @else
+        if (edit && !creatorIsAdmin)
             return '';
-        @endif
-    }
-
-    function priceFormat(price) {
-        return (+(+price).toFixed()).toLocaleString('en-US');
+        return '<span class="btn btn-danger mx-1 fa fa-xmark" ' +
+            'onclick="$(`#product_' + id + '`).val(0);cart[' + id + '] =0 ;refreshProducts()"></span>'
     }
 
     function num_plus(id) {
-        if (edit && (safir || !creatorIsAdmin))
+        if (edit && !creatorIsAdmin)
             return;
-        let n = +$('#product_' + id).val() + 1;
-        $('#product_' + id).val(n).change();
+        $('#product_' + id).val((index, value) => {
+            return +value + 1
+        }).change();
     }
 
     function num_minus(id) {
         if (edit && (safir || !creatorIsAdmin))
             return;
-        let n = +$('#product_' + id).val() - 1;
-        $('#product_' + id).val(n).change();
+        $('#product_' + id).val((index, value) => {
+            return +value - 1
+        }).change();
     }
 
     function num_product(id, value) {
@@ -240,7 +235,7 @@
         value = Math.round(value);
         $('#product_' + id).val(value);
         cart[id] = value;
-        if (value == 0) {
+        if (+value === 0) {
             // $('#product_' + id).val('');
             delete cart[id];
             $('#product-' + id).remove();
@@ -274,7 +269,7 @@
     }
 
     function calculate_discount(id, value) {
-        value = +(value.replaceAll(',', ''));
+        value = +value.replaceAll(',', '');
         if (value <= products[id].price && '{{$user->id}}' !== '61') {
             value = Math.max(0, +value);
             $('#discount_' + id).val((1 - value / products[id].price) * 100).change();

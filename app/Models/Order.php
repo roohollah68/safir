@@ -119,6 +119,4 @@ class Order extends Model
     {
         return $this->user()->first()->role == 'admin';
     }
-
-
 }

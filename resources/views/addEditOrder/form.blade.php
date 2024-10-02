@@ -3,7 +3,8 @@
     <div class="mb-2">
         <span>انتخاب انبار:</span>
         @foreach($warehouses as $warehouse)
-            <a class="btn btn{{($warehouseId == $warehouse->id)?'':'-outline'}}-info" href="/add_order?warehouseId={{$warehouse->id}}">{{$warehouse->name}}</a>
+            <a class="btn btn{{($warehouseId == $warehouse->id)?'':'-outline'}}-info"
+               href="/add_order?warehouseId={{$warehouse->id}}">{{$warehouse->name}}</a>
         @endforeach
 
     </div>
@@ -80,9 +81,9 @@
             @else
                 <div id="edit-payment-method"><p>{{$payMethods[$order->paymentMethod]}}</p>
                     @if($order->receipt)
-                        <a href="/receipt/{{$order->receipt}}" target="_blank"><img
-                                style="max-width: 200px; max-height: 200px"
-                                src="/receipt/{{$order->receipt}}"></a>
+                        <a href="/receipt/{{$order->receipt}}" target="_blank">
+                            <img style="max-width: 200px; max-height: 200px" alt="😔" src="/receipt/{{$order->receipt}}">
+                        </a>
                     @endif
                 </div>
             @endif
@@ -116,12 +117,10 @@
             @endif
         </div>
 
-
-
     @endif
 
     <input type="checkbox" name="addToCustomers" id="addToCustomers" @checked($creatorIsAdmin)
-           class="checkboxradio" onclick="$('#city, #category').prop('disabled', (i, v) => !v);">
+    class="checkboxradio" onclick="$('#city, #category').prop('disabled', (i, v) => !v);">
     <label for="addToCustomers">افزودن/ ویرایش مشتری</label>
 
 
@@ -142,20 +141,26 @@
 
         </tbody>
     </table>
-    @if($safir || !$creatorIsAdmin)
 
-        <div class="p-3 m-2 border" id="paymentDetails">
+    <div class="p-3 m-2 border" id="paymentDetails">
+        @if(!$creatorIsAdmin)
             <span>جمع اقلام: </span><span id="cartSum"></span><span> ریال</span> ||
             <span>هزینه حمل: </span> <span id="deliveryCost"></span><span>  ریال </span> ||
-            <span class="font-weight-bold">مبلغ کل: </span><span id="total"></span></span>  ریال </span>
-            <br>
+        @endif
+        <span>مجموع تخفیف: </span><span id="total-discount"></span><span>  ریال </span> ||
 
-            <span id="onDeliveryMode">
-                <span>پرداختی مشتری: </span><span
-                    id="customerTotal">{{$edit?$order->customerCost:''}}</span><span> ریال </span> ||
-                <span>سهم سفیر: </span><span
-                    id="safirShare">{{$edit?$order->customerCost-$order->total:''}}</span><span>  ریال </span><br>
-            </span>
-        </div>
-    @endif
+        <b>مبلغ کل: </b><b id="total"></b><b> ریال </b>
+        <br/>
+
+        <span id="onDeliveryMode">
+            <span>پرداختی مشتری: </span>
+            <span id="customerTotal">{{$edit?$order->customerCost:''}}</span>
+            <span> ریال </span> ||
+            <span>سهم سفیر: </span>
+            <span id="safirShare">{{$edit?$order->customerCost-$order->total:''}}</span>
+            <span>  ریال </span>
+            <br/>
+        </span>
+    </div>
+
 </div>

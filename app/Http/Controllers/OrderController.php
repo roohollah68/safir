@@ -73,7 +73,6 @@ class OrderController extends Controller
         $customer = new Customer();
         $customer->city_id = 301;
         $cities = City::with('province')->get()->keyBy('id');
-//        $citiesId = $cities->keyBy('id');
 
         return view('addEditOrder.addEditOrder', [
             'customers' => $customers,
@@ -86,7 +85,6 @@ class OrderController extends Controller
             'order' => $order,
             'customer' => $customer,
             'cities' => $cities,
-//            'citiesId' => $citiesId,
             'warehouses' => Warehouse::all(),
             'warehouseId' => $warehouseId,
         ]);
