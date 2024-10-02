@@ -25,6 +25,9 @@
             else
                 delete cart[id];
         });
+        refreshProducts();
+        paymentAction();
+        deliveryAction();
     });
 
     @if($creatorIsAdmin || !$edit)
@@ -38,9 +41,7 @@
                 setCustomerInfo(customer);
             }
         });
-        refreshProducts();
-        paymentAction();
-        deliveryAction();
+
 
         let cityText = {};
         $.each(cities, (id, city) => {
@@ -81,7 +82,7 @@
                 product.name,
                 price,
                 `<span dir="ltr">${+product.quantity}</span>`,
-                `<span class="btn btn-primary fa fa-add" onclick="addProduct(${id})"></span>`,
+                `<span class="btn btn-primary fa fa-add" onclick="addProduct(${id});refreshProducts();"></span>`,
             ]);
 
         });
@@ -141,7 +142,7 @@
         </tr>`
         $('#product-form').append(text)
         priceInput();
-        refreshProducts();
+        // refreshProducts();
     }
 
     function paymentAction() {
