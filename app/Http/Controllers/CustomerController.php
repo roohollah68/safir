@@ -238,8 +238,8 @@ class CustomerController extends Controller
 
     public function customersDepositList(Request $req)
     {
-        if (auth()->user()->username != 'newAdmin')
-            abort(404);
+        if (!auth()->user()->meta('counter'))
+            abort(401);
         return view('customersDepositList', [
             'transactions' => CustomerTransactions::with('customer.user')->get()->keyBy('id'),
             'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
@@ -249,6 +249,8 @@ class CustomerController extends Controller
 
     public function approveDeposit($id)
     {
+        if (!auth()->user()->meta('counter'))
+            abort(401);
         $trans = CustomerTransactions::with('customer')->findOrFail($id);
         if ($trans->verified == 'approved')
             return;
@@ -262,8 +264,9 @@ class CustomerController extends Controller
 
     public function rejectDeposit($id, Request $req)
     {
+        if (!auth()->user()->meta('counter'))
+            abort(401);
         $trans = CustomerTransactions::with('customer')->findOrFail($id);
-
         if ($trans->verified == 'rejected')
             return;
         if ($trans->verified == 'approved')
@@ -278,8 +281,8 @@ class CustomerController extends Controller
 
     public function customersOrderList(Request $req)
     {
-        if (auth()->user()->username != 'newAdmin')
-            abort(404);
+        if (!auth()->user()->meta('counter'))
+            abort(401);
         return view('customersOrderList', [
             'orders' => Order::where('confirm', true)->where('customer_id', '>', '0')
                 ->where('state', false)->with('user')->get()->keyBy('id'),
@@ -291,6 +294,8 @@ class CustomerController extends Controller
 
     public function approveOrder($id)
     {
+        if (!auth()->user()->meta('counter'))
+            abort(401);
         DB::beginTransaction();
         $order = Order::findOrFail($id);
         if ($order->counter == 'approved')
@@ -323,6 +328,8 @@ class CustomerController extends Controller
 
     public function rejectOrder($id, Request $req)
     {
+        if (!auth()->user()->meta('counter'))
+            abort(401);
         DB::beginTransaction();
         $order = Order::findOrFail($id);
         if ($order->counter == 'rejected')

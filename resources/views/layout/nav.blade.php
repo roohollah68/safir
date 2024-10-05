@@ -1,7 +1,8 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary" id="navbar">
     <a class="navbar-brand" href="{{route('editUser')}}/{{auth()->user()->id}}">{{$user}} خوش آمدید</a>
     @if($safir)
-        <a class="navbar-brand" href="{{route('DepositList')}}">| اعتبار <span dir="ltr">{{number_format($balance)}}</span> ریال</a>
+        <a class="navbar-brand" href="{{route('DepositList')}}">| اعتبار <span
+                dir="ltr">{{number_format($balance)}}</span> ریال</a>
     @endif
     {{--    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"--}}
     {{--            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">--}}
@@ -34,7 +35,7 @@
                     <a class="nav-link active" href="{{route('productList')}}">محصولات</a>
                 </li>
             @endif
-            @if($superAdmin)
+            @if(auth()->user()->meta('usersEdit'))
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
                        data-bs-toggle="dropdown"
@@ -46,21 +47,24 @@
                         <a class="dropdown-item" href="{{route('settings')}}">تنظیمات </a>
                     </div>
                 </li>
-                @if(auth()->user()->username == 'newAdmin')
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
-                           data-bs-toggle="dropdown"
-                           aria-haspopup="true" aria-expanded="false">حسابداری</a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{route('customersOrderList')}}">بررسی سفارشات</a>
-                            <a class="dropdown-item" href="{{route('customersDepositList')}}">بررسی واریزی ها</a>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{route('statistic')}}">آمار</a>
-                    </li>
-                @endif
             @endif
+            @if(auth()->user()->meta('counter'))
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
+                       data-bs-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">حسابداری</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{{route('customersOrderList')}}">بررسی سفارشات</a>
+                        <a class="dropdown-item" href="{{route('customersDepositList')}}">بررسی واریزی ها</a>
+                    </div>
+                </li>
+            @endif
+            @if(auth()->user()->meta('statistic'))
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{route('statistic')}}">آمار</a>
+                </li>
+            @endif
+
             @if($safir)
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('DepositList')}}">واریزی ها</a>

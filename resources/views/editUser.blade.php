@@ -41,7 +41,7 @@
                 رمز عبور:
             </x-col-md-6>
 
-            @if($superAdmin)
+            @if(auth()->user()->meta('usersEdit'))
 
                 <div class="col-md-6 mb-2">
                     <div class="form-group input-group">
@@ -86,7 +86,7 @@
         @else
             <input type="submit" class="btn btn-success" value="افزودن">&nbsp;
         @endif
-        @if($superAdmin)
+        @if(auth()->user()->meta('usersEdit'))
             <a href="{{route('manageUsers')}}" class="btn btn-danger">بازگشت</a>
         @else
             <a href="{{route('listOrders')}}" class="btn btn-danger">بازگشت</a>

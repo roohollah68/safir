@@ -78,6 +78,7 @@
                     <td>{{$user->phone}}</td>
                     <td>
                         <a class="btn btn-success" href="/confirm_user/{{$user->id}}">تایید</a>
+                        <a class="btn btn-danger" href="/delete_user/{{$user->id}}">حذف</a>
                     </td>
                 </tr>
             @endunless

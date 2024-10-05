@@ -26,6 +26,7 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'role']], functio
     Route::get('/users', [UserController::class, 'show'])->name('manageUsers');
     Route::get('/confirm_user/{id}', [UserController::class, 'confirm']);
     Route::get('/suspend_user/{id}', [UserController::class, 'suspend']);
+    Route::get('/delete_user/{id}', [UserController::class, 'delete']);
     Route::get('/add_user', [UserController::class, 'addUser']);
     Route::post('/add_user', [UserController::class, 'insertUser']);
 

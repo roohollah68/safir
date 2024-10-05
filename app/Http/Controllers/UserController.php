@@ -20,23 +20,41 @@ class UserController extends Controller
 
     public function show()
     {
+        if (!auth()->user()->meta('usersEdit'))
+            abort(401);
         return view('userList', ['users' => User::all()]);
     }
 
     public function confirm($id)
     {
+        if (!auth()->user()->meta('usersEdit'))
+            abort(401);
         User::find($id)->update(['verified' => true]);
         return redirect()->route('manageUsers');
     }
 
     public function suspend($id)
     {
+        if (!auth()->user()->meta('usersEdit'))
+            abort(401);
         User::where('id', $id)->update(['verified' => false]);
         return redirect()->route('manageUsers');
+
+    }
+
+    public function delete($id)
+    {
+        if (!auth()->user()->meta('usersEdit'))
+            abort(401);
+        User::where('id', $id)->delete();
+        return redirect()->route('manageUsers');
+
     }
 
     public function addUser()
     {
+        if (!auth()->user()->meta('usersEdit'))
+            abort(401);
         $user = new User();
         return view('editUser', [
             'user' => $user,
@@ -47,7 +65,7 @@ class UserController extends Controller
     public function edit($id = null)
     {
         $warehouses = Warehouse::all();
-        if ($this->superAdmin() && $id)
+        if (auth()->user()->meta('usersEdit') && $id)
             return view('editUser', [
                 'user' => User::find($id),
                 'edit' => true,
@@ -63,6 +81,8 @@ class UserController extends Controller
 
     public function insertUser(Request $request)
     {
+        if (!auth()->user()->meta('usersEdit'))
+            abort(401);
         $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|min:5',
@@ -85,7 +105,7 @@ class UserController extends Controller
 
     public function update(Request $request, $id = null)
     {
-        if (!$this->superAdmin())
+        if (!auth()->user()->meta('usersEdit'))
             $id = auth()->user()->id;
         $request->validate([
             'name' => 'required|string|max:255',
@@ -111,19 +131,19 @@ class UserController extends Controller
 
         if ($request->NuRecords) {
             UserMeta::updateOrCreate(
-                ['user_id'=>$id , 'name'=>'NuRecords'],
+                ['user_id' => $id, 'name' => 'NuRecords'],
                 ['value' => $request->NuRecords]
             );
         }
 
         if ($request->warehouseId) {
             UserMeta::updateOrCreate(
-                ['user_id'=>$id , 'name'=>'warehouseId'],
+                ['user_id' => $id, 'name' => 'warehouseId'],
                 ['value' => $request->warehouseId]
             );
         }
 
-        if ($this->superAdmin()) {
+        if (auth()->user()->meta('usersEdit')) {
             User::find($id)->update([
                 'username' => $request->username,
                 'role' => $request->role,

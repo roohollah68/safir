@@ -17,6 +17,8 @@ class StatisticController extends Controller
 {
     public function showStatistic(Request $request)
     {
+        if (!auth()->user()->meta('statistic'))
+            abort(401);
         $users = User::with('customers')->get()->keyBy("id");
         foreach ($users as $id => $user) {
             $users[$id]->customer = $user->customers->keyby('name');
