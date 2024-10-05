@@ -82,7 +82,7 @@
                 <td><a href="/customer/transaction/{{$tran->customer_id}}">{{$tran->customer->name}}</a></td>
                 <td>{{$tran->customer->user->name}}</td>
                 <td>
-                    @if($tran->paymentLink)
+                    @if($tran->paymentLink && isset($transactions[$tran->paymentLink]))
                         <a class="btn btn-info fa fa-eye"
                            onclick="view_order({{$transactions[$tran->paymentLink]->order_id}})"
                            title="مشاهده سفارش"></a>

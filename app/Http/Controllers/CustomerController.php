@@ -241,7 +241,7 @@ class CustomerController extends Controller
         if (!auth()->user()->meta('counter'))
             abort(401);
         return view('customersDepositList', [
-            'transactions' => CustomerTransactions::with('customer.user')->get()->keyBy('id'),
+            'transactions' => CustomerTransactions::with('customer.user')->limit(2000)->orderBy('id', 'desc')->get()->keyBy('id'),
             'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
             'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
         ]);
