@@ -8,4 +8,5 @@ return [
     'usersEdit' => false,
     'counter' => false,
     'statistic' => false,
+    'warehouse' => false,
 ];

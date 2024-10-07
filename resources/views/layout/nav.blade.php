@@ -30,7 +30,7 @@
                     <a class="nav-link active" href="{{route('CustomerList')}}">مشتریان</a>
                 </li>
             @endif
-            @if($superAdmin || $warehouse )
+            @if(auth()->user()->meta('warehouse'))
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('productList')}}">محصولات</a>
                 </li>

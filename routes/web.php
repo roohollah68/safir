@@ -23,13 +23,6 @@ use App\Http\Controllers\WoocommerceController;
 
 Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'role']], function () {
 
-    Route::get('/users', [UserController::class, 'show'])->name('manageUsers');
-    Route::get('/confirm_user/{id}', [UserController::class, 'confirm']);
-    Route::get('/suspend_user/{id}', [UserController::class, 'suspend']);
-    Route::get('/delete_user/{id}', [UserController::class, 'delete']);
-    Route::get('/add_user', [UserController::class, 'addUser']);
-    Route::post('/add_user', [UserController::class, 'insertUser']);
-
     Route::post('/deposit/changeConfirm/{id}', [DepositController::class, 'changeConfirm']);
 
     Route::get('settings', [SettingController::class, 'showSettings'])->name('settings');
@@ -41,9 +34,6 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'role']], functio
     Route::get('coupon/edit/{id}', [CouponController::class, 'editForm']);
     Route::post('coupon/edit/{id}', [CouponController::class, 'update']);
     Route::post('coupon/delete/{id}', [CouponController::class, 'deleteCoupon']);
-
-    Route::get('statistic', [StatisticController::class, 'showStatistic'])->name('statistic');
-    Route::post('statistic', [StatisticController::class, 'showStatistic'])->name('statistic');
 
     Route::get('customers_deposit_list', [CustomerController::class, 'customersDepositList'])->name('customersDepositList');
     Route::get('customers_order_list', [CustomerController::class, 'customersOrderList'])->name('customersOrderList');
@@ -58,10 +48,20 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'role']], functio
 Route::group(['middleware' => ['auth', 'verify']], function () {
 
     Route::get('/', [UserController::class, 'home']);
+
+    Route::get('/users', [UserController::class, 'show'])->name('manageUsers');
+    Route::get('/confirm_user/{id}', [UserController::class, 'confirm']);
+    Route::get('/suspend_user/{id}', [UserController::class, 'suspend']);
+    Route::get('/delete_user/{id}', [UserController::class, 'delete']);
+    Route::get('/add_user', [UserController::class, 'addUser']);
+    Route::post('/add_user', [UserController::class, 'insertUser']);
     Route::get('/edit_user', [UserController::class, 'edit'])->name('editUser');
     Route::post('/edit_user', [UserController::class, 'update']);
     Route::get('/edit_user/{id}', [UserController::class, 'edit']);
     Route::post('/edit_user/{id}', [UserController::class, 'update']);
+
+    Route::get('statistic', [StatisticController::class, 'showStatistic'])->name('statistic');
+    Route::post('statistic', [StatisticController::class, 'showStatistic'])->name('statistic');
 
 });
 

@@ -15,6 +15,8 @@ class ProductController extends Controller
 {
     public function showProducts()
     {
+        if (!auth()->user()->meta('warehouse'))
+            abort(401);
         return view('productList', [
             'warehouses' => Warehouse::all(),
             'goods' => Good::all()->keyBy('id'),
@@ -23,6 +25,8 @@ class ProductController extends Controller
 
     public function getData(Request $req)
     {
+        if (!auth()->user()->meta('warehouse'))
+            abort(401);
         $a = time();
         $products = Product::where('warehouse_id', $req->warehouseId)->
         select('id', 'good_id', 'available', 'warehouse_id', 'quantity', 'alarm', 'high_alarm');
@@ -70,6 +74,8 @@ class ProductController extends Controller
 
     public function showAddForm()
     {
+        if (!auth()->user()->meta('warehouse'))
+            abort(401);
         $good = new Good();
         return view('addEditProduct', [
             'good' => $good,
@@ -80,6 +86,8 @@ class ProductController extends Controller
 
     public function showEditForm($id)
     {
+        if (!auth()->user()->meta('warehouse'))
+            abort(401);
         $product = Product::with('good')->findOrfail($id);
         return view('addEditProduct', [
             'product' => $product,
@@ -91,6 +99,8 @@ class ProductController extends Controller
 
     public function storeNew(Request $req)
     {
+        if (!auth()->user()->meta('warehouse'))
+            abort(401);
         $req->price = +str_replace(",", "", $req->price);
         $req->PPrice = +str_replace(",", "", $req->PPrice);
         request()->validate([
@@ -132,6 +142,8 @@ class ProductController extends Controller
 
     public function editProduct(Request $req, $id)
     {
+        if (!auth()->user()->meta('warehouse'))
+            abort(401);
         DB::beginTransaction();
         $req->price = str_replace(",", "", $req->price);
         $req->PPrice = +str_replace(",", "", $req->PPrice);
@@ -184,6 +196,8 @@ class ProductController extends Controller
 
     public function deleteProduct($id)
     {
+        if (!auth()->user()->meta('warehouse'))
+            abort(401);
         if (Product::find($id)->delete())
             return 'ok';
         else
@@ -193,13 +207,17 @@ class ProductController extends Controller
 
     public function deletePhoto($id)
     {
-        Product::find($id)->update([
+        if (!auth()->user()->meta('warehouse'))
+            abort(401);
+        Good::find($id)->update([
             'photo' => ''
         ]);
     }
 
     public function addToProducts($id, Request $req)
     {
+        if (!auth()->user()->meta('warehouse'))
+            abort(401);
         $product = Product::where('good_id', $id)->where('warehouse_id', $req->warehouseId)->first();
         if ($product) {
             abort(403);
@@ -221,6 +239,8 @@ class ProductController extends Controller
 
     public function transfer()
     {
+        if (!auth()->user()->meta('warehouse'))
+            abort(401);
         $products = Product::all()->keyby('id');
         return view('transfer', [
             'warehouses' => Warehouse::all()->keyBy('id'),
@@ -230,6 +250,8 @@ class ProductController extends Controller
 
     public function transferSave(Request $req)
     {
+        if (!auth()->user()->meta('warehouse'))
+            abort(401);
         DB::beginTransaction();
         $products1 = Product::where('warehouse_id', $req->warehouseId1)->get()->keyBy('id');
         $warehouses = Warehouse::all()->keyBy('id');
@@ -322,6 +344,8 @@ class ProductController extends Controller
     }
 
     public function goods(){
+        if (!auth()->user()->meta('warehouse'))
+            abort(401);
         $goods = Good::with('products')->get()->keyBy('id');
         return view('goodsManagement',[
             'goods' => $goods,
@@ -331,6 +355,8 @@ class ProductController extends Controller
 
     public function changeAvailable($id)
     {
+        if (!auth()->user()->meta('warehouse'))
+            abort(401);
         $product = Product::findOrFail($id);
         $product->update([
             'available' => !$product->available,
