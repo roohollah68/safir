@@ -36,12 +36,18 @@
                 </li>
             @endif
             @if(auth()->user()->meta('usersEdit'))
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{route('manageUsers')}}">مدیریت کاربران</a>
+                </li>
+            @endif
+
+
+            @if(auth()->user()->meta('safir'))
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
                        data-bs-toggle="dropdown"
-                       aria-haspopup="true" aria-expanded="false">مدیریت کاربران</a>
+                       aria-haspopup="true" aria-expanded="false">مدیریت سفیران</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{{route('manageUsers')}}">مدیریت اکانت ها</a>
                         <a class="dropdown-item" href="{{route('DepositList')}}">واریزی های سفیران</a>
                         <a class="dropdown-item" href="{{route('couponList')}}">مدیریت تخفیف ها</a>
                         <a class="dropdown-item" href="{{route('settings')}}">تنظیمات </a>
