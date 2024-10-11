@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helper\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
@@ -45,7 +46,7 @@ class RegisteredUserController extends Controller
             'password' => 'required|string|confirmed|min:8',
         ]);
 
-        $request->phone = $this->number_Fa_En($request->phone);
+        $request->phone = Helper::number_Fa_En($request->phone);
 
         $user = User::create([
             'name' => $request->name,

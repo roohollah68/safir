@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
 use App\Models\City;
 use App\Models\CouponLink;
 use App\Models\Customer;
@@ -20,15 +21,13 @@ class OrderController extends Controller
 {
     public function showOrders()
     {
-
         $user = auth()->user();
-        if ($this->superAdmin() || $this->print()) {
+        if (auth()->user()->meta('showAllOrders')) {
             $users = User::withTrashed()->get()->keyBy("id");
             $orders = Order::withTrashed()->orderBy('id', 'desc')->with('website')
                 ->limit($user->meta('NuRecords'))->get()->keyBy('id');
         } else {
-            $users = array();
-            $users[auth()->user()->id] = auth()->user();
+            $users = array(auth()->user()->id => auth()->user());
             $orders = auth()->user()->orders()->withTrashed()
                 ->orderBy('id', 'desc')->limit($user->meta('NuRecords'))->get()->keyBy('id');
         }
@@ -36,54 +35,38 @@ class OrderController extends Controller
             'users' => $users,
             'orders' => $orders,
             'user' => auth()->user(),
-            'limit' => $this->settings()->loadOrders,
+            'limit' => $user->meta('NuRecords'),
             'warehouses' => Warehouse::all(),
         ]);
     }
 
     public function newForm(Request $req)
     {
-
-        if ($this->superAdmin())
-            return redirect()->back();
+        Helper::access('addOrder');
         $user = auth()->user();
-
         $order = new Order();
-
-        $customersData = $user->customers()->get();
-
         $warehouseId = $req->warehouseId ?: $user->meta('warehouseId');
-        //استثنا آقای عبدی
-        if ($this->safir() || $user->id == 57) {
-            $products = Product::where('warehouse_id', $warehouseId)->where('available', true)->whereHas('good', function (Builder $query) {
-                $query->where('category', 'final');
-            })->get()->keyBy('id');
-
-        } else {
-            $products = Product::where('warehouse_id', $warehouseId)->where('available', true)->whereHas('good', function (Builder $query) {
+        $products = Product::where('warehouse_id', $warehouseId)->where('available', true)->
+        whereHas('good', function (Builder $query) {
+            if (auth()->user()->meta('sellRawProduct'))
                 $query->where('category', '<>', 'pack');
-            })->get()->keyBy('id');
-        }
-        $cart = [];
-
+            else
+                $query->where('category', 'final');
+        })->get()->keyBy('id');
         $products = $this->calculateDis($products);
 
-        $customers = $customersData->keyBy('name');
-        $customersId = $customersData->keyBy('id');
-        $customer = new Customer();
-        $customer->city_id = 301;
+        $order->customer = new Customer();
+        $order->customer->city_id = 301;
         $cities = City::with('province')->get()->keyBy('id');
 
         return view('addEditOrder.addEditOrder', [
-            'customers' => $customers,
-            'customersId' => $customersId,
             'products' => $products,
-            'settings' => $this->settings(),
+            'settings' => Helper::settings(),
             'user' => $user,
-            'cart' => $cart,
+            'cart' => [],
             'creatorIsAdmin' => ($this->superAdmin() || $this->admin()),
             'order' => $order,
-            'customer' => $customer,
+            'customers' => $user->customers()->get()->keyBy('id'),
             'cities' => $cities,
             'warehouses' => Warehouse::all(),
             'warehouseId' => $warehouseId,
@@ -92,6 +75,7 @@ class OrderController extends Controller
 
     public function insertOrder(Request $request)
     {
+        Helper::access('addOrder');
         DB::beginTransaction();
         request()->validate([
             'receipt' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
@@ -100,24 +84,24 @@ class OrderController extends Controller
             'phone' => 'required|string|min:11,max:11',
         ]);
 
-        $request->phone = $this->number_Fa_En($request->phone); //تبدیل اعداد فارسی به انگلیسی
-        $request->zip_code = $this->number_Fa_En($request->zip_code); //تبدیل اعداد فارسی به انگلیسی
+        $request->phone = Helper::number_Fa_En($request->phone);
+        $request->zip_code = Helper::number_Fa_En($request->zip_code);
         $user = auth()->user();
-        $products = Product::where('available', true)->where('warehouse_id',+$request->warehouseId)->get()->keyBy('id');
+        $products = Product::where('available', true)->where('warehouse_id', +$request->warehouseId)->get()->keyBy('id');
         $products = $this->calculateDis($products);
         $request->orders = '';
         $Total = 0;     //جمع بدون احتساب تخفیف
         $total = 0;  //جمع با احتساب تخفیف
         $request->customerCost = 0;
         $request->orderList = [];
-        foreach ($request->cart as $id => $number){
+        foreach ($request->cart as $id => $number) {
             $product = $products[$id];
             $request->orders .= ' ' . $product->name . ' ' . +$number . 'عدد' . '،';
             $discount = +$product->coupon;
-            if ($this->superAdmin() || $this->admin())
+            if (auth()->user()->meta('changeDiscount'))
                 $discount = +$request['discount_' . $id];
             $price = round((100 - $discount) * $product->price / 100);
-            if (($this->superAdmin() || $this->admin()) && $discount == 0)
+            if (auth()->user()->meta('changePrice') && $discount == 0)
                 $price = +str_replace(",", "", $request['price_' . $id]);
             $total += $price * $number;
             $Total += $product->price * $number;
@@ -138,10 +122,10 @@ class OrderController extends Controller
 
         if ($this->safir()) {
             $deliveryCost = $this->deliveryCost($request->deliveryMethod);
-            if ($Total < $this->settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
+            if ($Total < Helper::settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
                 $total += $deliveryCost;
             if ($request->paymentMethod == 'credit') {
-                if ($total > ($user->balance + $this->settings()->negative)) {
+                if ($total > ($user->balance + Helper::settings()->negative)) {
                     return $this->errorBack('اعتبار شما کافی نیست!');
                 } else {
                     $user->update([
@@ -203,63 +187,46 @@ class OrderController extends Controller
 
     public function editForm($id)
     {
-        $user = auth()->user();
-
-        if ($this->superAdmin()) {
+        if (auth()->user()->meta('showAllOrders')) {
             $order = Order::with('customer.city')->with('user')->findOrFail($id);
-            $customersData = Customer::all();
         } else {
-            $order = $user->orders()->with('customer.city')->with('user')->findOrFail($id);
-            $customersData = $user->customers()->get();
+            $order = auth()->user()->orders()->with('customer.city')->with('user')->findOrFail($id);
         }
-
+        $user = $order->user()->first();
         if (($order->state && $order->user->safir()) || ($order->confirm && $order->user->admin()))
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
-
-        //استثنا آقای عبدی
-        if ($this->safir() || $user->id != 57) {
-            $products = Product::where('warehouse_id', $order->warehouse_id)->where('available', true)->whereHas('good', function (Builder $query) {
-                $query->where('category', 'final');
-            })->get()->keyBy('id');
-        } else {
-            $products = Product::where('warehouse_id', $order->warehouse_id)->where('available', true)->whereHas('good', function (Builder $query) {
+        $products = Product::where('warehouse_id', $order->warehouse_id)->where('available', true)->
+        whereHas('good', function (Builder $query) {
+            if (auth()->user()->meta('sellRawProduct'))
                 $query->where('category', '<>', 'pack');
-            })->get()->keyBy('id');
-        }
+            else
+                $query->where('category', 'final');
+        })->get()->keyBy('id');
         $cart = [];
         $products = $this->calculateDis($products);
 
-        $customers = $customersData->keyBy('name');
-        $customersId = $customersData->keyBy('id');
-        $selectedProducts = $order->orderProducts()->get();
-        foreach ($selectedProducts as $product) {
-            if (isset($products[$product->product_id])) {
-                $cart[$product->product_id] = +$product->number;
-                $products[$product->product_id]->coupon = +$product->discount;
-                $products[$product->product_id]->priceWithDiscount = round((100 - +$product->discount) * $products[$product->product_id]->price / 100);
+        $selectedProducts = $order->orderProducts()->get()->keyBy('product_id');
+        foreach ($selectedProducts as $id => $orderProduct) {
+            if (isset($products[$id])) {
+                $cart[$id] = +$orderProduct->number;
+                $products[$id]->coupon = +$orderProduct->discount;
+                $products[$id]->priceWithDiscount = +$orderProduct->price;
             }
         }
-        $customer = $order->customer;
-        if (!$customer) {
-            $customer = new Customer();
-            $customer->city_id = 0;
+        if (!$order->customer) {
+            $order->customer = new Customer();
+            $order->customer->city_id = 0;
         }
-        $cities = City::all()->keyBy('name');
-        $citiesId = $cities->keyBy('id');
-
+        $cities = City::with('province')->get()->keyBy('id');
         return view('addEditOrder.addEditOrder')->with([
             'cart' => $cart,
             'cities' => $cities,
-            'citiesId' => $citiesId,
             'creatorIsAdmin' => $order->user->admin(),
-            'customer' => $customer,
-            'customers' => $customers,
-            'customersId' => $customersId,
+            'customers' => $user->customers()->get()->keyBy('id'),
             'edit' => true,
-            'id' => $user->id,
             'order' => $order,
             'products' => $products,
-            'settings' => $this->settings(),
+            'settings' => Helper::settings(),
             'user' => $user,
             'warehouseId' => $order->warehouse_id
         ]);
@@ -268,8 +235,7 @@ class OrderController extends Controller
     public function update($id, Request $request)
     {
         DB::beginTransaction();
-
-        if ($this->superAdmin())
+        if (auth()->user()->meta('showAllOrders'))
             $order = Order::with('user')->with('orderProducts')->findOrFail($id);
         else
             $order = auth()->user()->orders()->with('orderProducts')->with('user')->findOrFail($id);
@@ -278,11 +244,11 @@ class OrderController extends Controller
             'receipt' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'required|string|min:3',
             'address' => 'required|string|min:3',
-            'phone' => 'required|digits:11',
+            'phone' => 'required|string|min:11,max:11',
         ]);
 
-        $request->phone = $this->number_Fa_En($request->phone);
-        $request->zip_code = $this->number_Fa_En($request->zip_code);
+        $request->phone = Helper::number_Fa_En($request->phone);
+        $request->zip_code = Helper::number_Fa_En($request->zip_code);
 
         if (!$order->user->safir()) {
             $orders = '';
@@ -553,13 +519,13 @@ class OrderController extends Controller
         $dis = [];
         foreach ($couponLinks as $couponLink) {
             $pid = $couponLink->product_id;
-            if(isset($dis[$pid]))
+            if (isset($dis[$pid]))
                 $dis[$pid] = max($dis[$pid], $couponLink->coupon->percent);
             else
                 $dis[$pid] = $couponLink->coupon->percent;
         }
-        foreach ($products as $id => $product){
-            if(isset($dis[$id]))
+        foreach ($products as $id => $product) {
+            if (isset($dis[$id]))
                 $products[$id]->coupon = $dis[$id];
             else
                 $products[$id]->coupon = 0;
@@ -792,7 +758,7 @@ class OrderController extends Controller
 
     public function refund($id)
     {
-        $orders = Order::where('customer_id' , $id)->with('orderProducts')->get();
+        $orders = Order::where('customer_id', $id)->with('orderProducts')->get();
         dd($orders);
     }
 }

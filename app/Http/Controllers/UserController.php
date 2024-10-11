@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
 use App\Models\User;
 use App\Models\UserMeta;
 use App\Models\Warehouse;
@@ -20,23 +21,20 @@ class UserController extends Controller
 
     public function show()
     {
-        if (!auth()->user()->meta('usersEdit'))
-            abort(401);
+        Helper::access('usersEdit');
         return view('userList', ['users' => User::all()]);
     }
 
     public function confirm($id)
     {
-        if (!auth()->user()->meta('usersEdit'))
-            abort(401);
+        Helper::access('usersEdit');
         User::find($id)->update(['verified' => true]);
         return redirect()->route('manageUsers');
     }
 
     public function suspend($id)
     {
-        if (!auth()->user()->meta('usersEdit'))
-            abort(401);
+        Helper::access('usersEdit');
         User::where('id', $id)->update(['verified' => false]);
         return redirect()->route('manageUsers');
 
@@ -44,8 +42,7 @@ class UserController extends Controller
 
     public function delete($id)
     {
-        if (!auth()->user()->meta('usersEdit'))
-            abort(401);
+        Helper::access('usersEdit');
         User::where('id', $id)->delete();
         return redirect()->route('manageUsers');
 
@@ -53,8 +50,7 @@ class UserController extends Controller
 
     public function addUser()
     {
-        if (!auth()->user()->meta('usersEdit'))
-            abort(401);
+        Helper::access('usersEdit');
         $user = new User();
         return view('editUser', [
             'user' => $user,
@@ -81,15 +77,14 @@ class UserController extends Controller
 
     public function insertUser(Request $request)
     {
-        if (!auth()->user()->meta('usersEdit'))
-            abort(401);
+        Helper::access('usersEdit');
         $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|min:5',
             'phone' => 'required|string|max:11|min:11',
             'password' => 'required|string|min:8',
         ]);
-        $request->phone = $this->number_Fa_En($request->phone);
+        $request->phone = Helper::number_Fa_En($request->phone);
 
         User::create([
             'name' => $request->name,
@@ -113,7 +108,7 @@ class UserController extends Controller
             'phone' => 'required|string|max:11|min:11',
             'NuRecords' => 'integer|min:1|max:3000'
         ]);
-        $request->phone = $this->number_Fa_En($request->phone);
+        $request->phone = Helper::number_Fa_En($request->phone);
 
         User::find($id)->update([
             'name' => $request->name,
@@ -148,6 +143,12 @@ class UserController extends Controller
                 'username' => $request->username,
                 'role' => $request->role,
             ]);
+            foreach (config('userMeta.access') as $access => $desc) {
+                UserMeta::updateOrCreate(
+                    ['user_id' => $id, 'name' => $access],
+                    ['value' => $request[$access]]
+                );
+            }
             return redirect()->route('manageUsers');
         }
         return redirect()->route('listOrders');

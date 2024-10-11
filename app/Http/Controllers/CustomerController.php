@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\BaleAPIv2;
+use App\Helper\Helper;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\CustomerTransactions;
@@ -71,8 +72,8 @@ class CustomerController extends Controller
             'phone' => 'required|string|max:11|min:11',
             'address' => 'required|string',
         ]);
-        $request->phone = $this->number_Fa_En($request->phone);
-        $request->zip_code = $this->number_Fa_En($request->zip_code);
+        $request->phone = Helper::number_Fa_En($request->phone);
+        $request->zip_code = Helper::number_Fa_En($request->zip_code);
 
         auth()->user()->customers()->create([
             'name' => $request->name,
@@ -109,8 +110,8 @@ class CustomerController extends Controller
             'address' => 'required|string',
         ]);
 
-        $request->phone = $this->number_Fa_En($request->phone);
-        $request->zip_code = $this->number_Fa_En($request->zip_code);
+        $request->phone = Helper::number_Fa_En($request->phone);
+        $request->zip_code = Helper::number_Fa_En($request->zip_code);
 
         if ($this->superAdmin())
             $customer = Customer::findOrFail($id);

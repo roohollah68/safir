@@ -1,13 +1,10 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary" id="navbar">
-    <a class="navbar-brand" href="{{route('editUser')}}/{{auth()->user()->id}}">{{$user}} خوش آمدید</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary p-2" id="navbar">
+    <a class="navbar-brand" href="{{route('editUser')}}/{{auth()->user()->id}}"> {{auth()->user()->name}} خوش آمدید <span
+            class="fa fa-gear"></span></a>
     @if($safir)
         <a class="navbar-brand" href="{{route('DepositList')}}">| اعتبار <span
-                dir="ltr">{{number_format($balance)}}</span> ریال</a>
+                dir="ltr">{{number_format(auth()->user()->balance)}}</span> ریال</a>
     @endif
-    {{--    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"--}}
-    {{--            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">--}}
-    {{--        <span class="navbar-toggler-icon"></span>--}}
-    {{--    </button>--}}
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -15,16 +12,14 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            @if( $admin || $safir)
+            @if(auth()->user()->meta('addOrder'))
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('newOrder')}}">ایجاد سفارش</a>
                 </li>
             @endif
-            @if($superAdmin || $admin || $safir || $print)
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{route('listOrders')}}">مشاهده سفارشات</a>
-                </li>
-            @endif
+            <li class="nav-item">
+                <a class="nav-link active" href="{{route('listOrders')}}">مشاهده سفارشات</a>
+            </li>
             @if($superAdmin || $admin || $safir)
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('CustomerList')}}">مشتریان</a>

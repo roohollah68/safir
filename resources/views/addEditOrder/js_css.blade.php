@@ -1,14 +1,11 @@
 <script>
     let customers = {!!json_encode($customers)!!};
-    let customersId = {!!json_encode($customersId)!!};
     let paymentMethod = "credit";
     let deliveryMethod = "peyk";
     let products = {!!json_encode($products)!!};
     let cart = {!!json_encode($cart)!!};
     let cities = {!!json_encode($cities)!!};
-    {{--let citiesId = {!!json_encode($citiesId)!!};--}}
     let creatorIsAdmin = !!'{{$creatorIsAdmin}}';
-    let safir = !!'{{$safir}}';
     let edit = !!'{{$edit}}';
     let table;
 
@@ -34,29 +31,33 @@
     $(function () {
         createTable()
 
+        let customersName = {};
+        $.each(customers, (id, customer) => {
+            customersName[customer.name] = id;
+        })
         $("#name").autocomplete({
-            source: Object.keys(customers),
+            source: Object.keys(customersName),
             select: function (event, ui) {
-                let customer = customers[ui.item.value];
-                setCustomerInfo(customer);
+                let id = customersName[ui.item.value];
+                setCustomerInfo(customers[id]);
             }
         });
 
 
-        let cityText = {};
+        let cityName = {};
         $.each(cities, (id, city) => {
-            cityText[city.name + ` (${city.province.name})`] = id;
+            cityName[city.name + ` (${city.province.name})`] = id;
         })
 
         $("#city").autocomplete({
-            source: Object.keys(cityText),
+            source: Object.keys(cityName),
             select: function () {
                 $('#city').change();
             }
         });
 
         $('#city').change(function () {
-            let id = cityText[this.value];
+            let id = cityName[this.value];
             if (id)
                 $('#city_id').val(id);
             else {
@@ -115,14 +116,14 @@
             name="product_${id}" id="product_${id}"
             onchange="num_product(${id},this.value)"
             type="number" value="${cart[id]}"
-            style="width: 50px" min="0" ${(edit && (safir || !creatorIsAdmin)) ? 'readonly' : ''}>
+            style="width: 50px" min="0" ${(edit && (!creatorIsAdmin)) ? 'readonly' : ''}>
             <span class="btn btn-primary fa fa-minus" onclick="num_minus(${id})"></span>
             <span class="btn btn-outline-info" dir="ltr">${+product.quantity}</span>
         </td>
         <td>
             <input type="text" class="price-input text-success discount" style="width: 80px;"
             name="price_${id}" id="price_${id}" value="${product.priceWithDiscount}"
-            onchange="calculate_discount(${id},this.value)" ${safir ? 'disabled' : ''}>` +
+            onchange="calculate_discount(${id},this.value)" ${!creatorIsAdmin ? 'disabled' : ''}>` +
             ((+product.priceWithDiscount === +product.price) ? '' :
                 `<span class="text-danger" style="text-decoration: line-through">
             ${priceFormat(product.price)}
@@ -224,7 +225,7 @@
     }
 
     function num_minus(id) {
-        if (edit && (safir || !creatorIsAdmin))
+        if (edit && ( !creatorIsAdmin))
             return;
         $('#product_' + id).val((index, value) => {
             return +value - 1

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -52,7 +53,7 @@ class TelegramController extends Controller
         $total = number_format($order->total);
         $customerCost = number_format($order->customerCost);
         $time = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
-        $time = $this->number_En_Fa($time);
+        $time = Helper::number_En_Fa($time);
         return "شماره سفارش: {$order->id}
 نام و نام خانوادگی: *{$order->name}*
 شماره همراه: {$order->phone}

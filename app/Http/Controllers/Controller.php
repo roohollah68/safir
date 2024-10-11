@@ -14,29 +14,13 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public $city = [
-        't'=>['تهران' , 'quantity'],
-        'm'=>['مشهد','quantity_m'],
-        'f'=>['فریمان', 'quantity_f'],
-        's'=>['شیراز', 'quantity_s'],
-        'e'=>['اصفهان', 'quantity_e'],
-    ];
-
-    public function number_Fa_En($Number)
-    {
-        foreach (['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'] as $en => $fa) {
-            $Number = str_replace($fa, '' . $en, $Number);
-        }
-        return $Number;
-    }
-
-    public function number_En_Fa($Number)
-    {
-        foreach (['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'] as $en => $fa) {
-            $Number = str_replace($en, '' . $fa, $Number);
-        }
-        return $Number;
-    }
+//    public array $city = [
+//        't'=>['تهران' , 'quantity'],
+//        'm'=>['مشهد','quantity_m'],
+//        'f'=>['فریمان', 'quantity_f'],
+//        's'=>['شیراز', 'quantity_s'],
+//        'e'=>['اصفهان', 'quantity_e'],
+//    ];
 
     public function role()
     {
@@ -77,17 +61,6 @@ class Controller extends BaseController
         }
         return $order;
     }
-
-    public function settings()
-    {
-        $sets = Setting::all();
-        $res = [];
-        foreach ($sets as $set) {
-            $res[$set->name] = $set->value;
-        }
-        return (object)$res;
-    }
-
     public function city($user)
     {
         if($user->city == 't')

@@ -12,6 +12,7 @@
     <script>
         $(function () {
             $('select#role').val('{{$user->role}}').change();
+            $('.checkboxradio').checkboxradio();
         })
     </script>
 @endsection
@@ -74,18 +75,29 @@
                         </div>
                         <select name="warehouseId" id="warehouseId" class="form-control">
                             @foreach($warehouses as $warehouse)
-                                <option value="{{$warehouse->id}}" @selected($warehouse->id == $user->meta('warehouseId'))>{{$warehouse->name}}</option>
+                                <option
+                                    value="{{$warehouse->id}}" @selected($warehouse->id == $user->meta('warehouseId'))>{{$warehouse->name}}</option>
                             @endforeach
                         </select>
                     </div>
                 </div>
+                @if(auth()->user()->meta('usersEdit'))
+                    <h4>دسترسی ها</h4>
+                    <hr>
+                    @foreach(config('userMeta.access') as $access => $desc)
+                        <div class="m-1">
+                            <label for="{{$access}}">{{$desc}}</label>
+                            <input type="checkbox" name="{{$access}}" id="{{$access}}"
+                                   class="checkboxradio" @checked($user->meta($access))>
+                            <br>
+                        </div>
+                    @endforeach
+                @endif
             @endif
         </div>
-        @if($edit)
-            <input type="submit" class="btn btn-success" value="ویرایش">&nbsp;
-        @else
-            <input type="submit" class="btn btn-success" value="افزودن">&nbsp;
-        @endif
+
+
+        <input type="submit" class="btn btn-success" value="ذخیره">&nbsp;
         @if(auth()->user()->meta('usersEdit'))
             <a href="{{route('manageUsers')}}" class="btn btn-danger">بازگشت</a>
         @else

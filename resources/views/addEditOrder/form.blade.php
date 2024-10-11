@@ -38,8 +38,8 @@
         </x-col-md-6>
 
         @if($creatorIsAdmin)
-            <x-col-md-6 :name="'city'" value="{{old('city')?:$customer->city->name}}">شهر:</x-col-md-6>
-            <input type="hidden" id="city_id" name="city_id" value="{{old('city_id')?:$customer->city->id}}">
+            <x-col-md-6 :name="'city'" value="{{old('city')?:$order->customer->city->name}}">شهر:</x-col-md-6>
+            <input type="hidden" id="city_id" name="city_id" value="{{old('city_id')?:$order->customer->city->id}}">
 
         @else
             <input type="hidden" name="city_id" value="0">

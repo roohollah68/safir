@@ -232,6 +232,7 @@ return [
         'Verta' => Hekmatinasser\Verta\Verta::class,
         'PDF' => Mccarlosen\LaravelMpdf\Facades\LaravelMpdf::class,
         'Telegram' => App\Http\Controllers\TelegramController::class,
+        'Helper' => App\Helper\Helper::class
     ],
 
 ];
