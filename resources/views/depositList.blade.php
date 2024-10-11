@@ -33,7 +33,7 @@
             <tr>
                 <td>{{$counter--}}</td>
                 @if($superAdmin)
-                    <th>{{$users[$deposit->user_id]->username}}</th>
+                    <th>{{$users[$deposit->user_id]->name}}</th>
                 @endif
                 <td>{{verta($deposit->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
                 <td>{{number_format($deposit->amount)}}</td>
