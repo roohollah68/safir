@@ -394,7 +394,7 @@ class OrderController extends Controller
 
     public function invoice($id, Request $request)
     {
-        if ($this->superAdmin() || $this->print())
+        if (auth()->user()->meta('showAllOrders'))
             $order = Order::with('warehouse')->findOrFail($id);
         else
             $order = auth()->user()->orders()->with('warehouse')->findOrFail($id);

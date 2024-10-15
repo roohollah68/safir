@@ -37,6 +37,8 @@ class ViewServiceProvider extends ServiceProvider
                 $view->with('safir', auth()->user()->safir());
                 $view->with('print', auth()->user()->print());
                 $view->with('warehouse', auth()->user()->warehouse());
+                $view->with('payMethods', config('payMethods'));
+                $view->with('sendMethods', config('sendMethods'));
             }
             return $view;
         });

@@ -22,6 +22,16 @@ class Controller extends BaseController
 //        'e'=>['اصفهان', 'quantity_e'],
 //    ];
 
+    public function settings()
+    {
+        $sets = Setting::all();
+        $res = [];
+        foreach ($sets as $set) {
+            $res[$set->name] = $set->value;
+        }
+        return (object)$res;
+    }
+
     public function role()
     {
         return auth()->user()->role;
