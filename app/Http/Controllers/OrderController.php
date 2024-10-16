@@ -6,6 +6,7 @@ use App\Helper\Helper;
 use App\Models\City;
 use App\Models\CouponLink;
 use App\Models\Customer;
+use App\Models\Good;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
@@ -759,7 +760,17 @@ class OrderController extends Controller
     public function refund($id)
     {
         $orders = Order::where('customer_id', $id)->with('orderProducts')->get();
-        dd($orders);
+        $goods = Good::all()->keyBy('id');
+        $products = Product::all()->keyBy('id');
+        $customer = Customer::findOrFail($id);
+        $warehouses = Warehouse::all()->keyBy('id');
+        return view('refund' , [
+            'orders' => $orders,
+            'goods' => $goods,
+            'products' => $products,
+            'customer' => $customer,
+            'warehouses' => $warehouses,
+        ]);
     }
 }
 

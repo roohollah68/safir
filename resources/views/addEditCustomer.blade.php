@@ -90,12 +90,12 @@
                         <label for="city" class="input-group-text w-100">شهر:</label>
                     </div>
                     <input name="city" id="city" class="form-control" rows="2"
-                           required value="{{old('city')?:$customer->city()->first()->name}}">
+                           required value="{{old('city')?:$customer->city->name}}">
                     <input type="hidden" id="city_id" name="city_id"
-                           value="{{old('city_id')?:$customer->city()->first()->id}}">
+                           value="{{old('city_id')?:$customer->city->id}}">
                     <div class="input-group-append" style="min-width: 120px">
                         <span id="province" onclick="$('#city').change()"
-                              class="input-group-text w-100">{{$customer->city()->first()->province()->first()->name}}</span>
+                              class="input-group-text w-100">{{$customer->city->province->name}}</span>
                     </div>
                 </div>
             </div>
@@ -109,23 +109,7 @@
                            minlength="10" maxlength="10" pattern="^[۰-۹0-9]*$">
                 </div>
             </div>
-{{--            <div class="col-md-6">--}}
-{{--                <div class="form-group input-group required">--}}
-{{--                    <div class="input-group-append" style="min-width: 160px">--}}
-{{--                        <label for="category" class="input-group-text w-100">دسته بندی:</label>--}}
-{{--                    </div>--}}
-{{--                    <select class="form-control" name="category" id="category">--}}
-{{--                        @for($ii=0;$ii<11;$ii++)--}}
-{{--                            <option value="{{$ii}}"--}}
-{{--                                    @if($ii == $customer->category)--}}
-{{--                                    selected--}}
-{{--                                @endif--}}
-{{--                            >{{$customer->categoryText($ii)}}</option>--}}
-{{--                        @endfor--}}
-{{--                    </select>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-            @if($superAdmin && $customer->name)
+            @if($superAdmin)
             <div class="col-md-6">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
@@ -142,6 +126,9 @@
                     </select>
                 </div>
             </div>
+            @else
+                <input type="hidden" name="user"
+                       value="{{old('user')?:$customer->user->id}}">
             @endif
         </div>
 

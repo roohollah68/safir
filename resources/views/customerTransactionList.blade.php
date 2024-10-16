@@ -9,27 +9,24 @@
     <br>
     <div class="w-100 m-2 p-2 bg-info rounded">
         <span>نام مشتری:</span> <b>{{$customer->name}}</b><br>
-        @if($superAdmin)
-            <span>نام کاربر مرتبط:</span> <b>{{$customer->user()->first()->name}}</b><br>
-        @endif
+        <span>نام کاربر مرتبط:</span> <b>{{$customer->user->name}}</b><br>
         <span>شماره مشتری:</span> <b>{{$customer->id}}</b><br>
         <span>شماره تماس:</span> <b>{{$customer->phone}}</b><br>
-        <span>شهر:</span> <b>{{$customer->cityName()}}</b><br>
+        <span>شهر:</span> <b>{{$customer->city->name}}</b><br>
         <span>آدرس:</span> <b>{{$customer->address}}</b><br>
         <span>کد پستی:</span> <b>{{$customer->zip_code}}</b><br>
-        <span class="h3">بدهکاری:</span> <b dir="ltr"
-                                            class="h3 text-danger">{{number_format($customer->balance)}}</b><span
-            class="h3">ریال</span><br>
-        {{--        <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب" href="/customer/SOA/{{$customer->id}}"></a>--}}
+        <span class="h3">بدهکاری:</span>
+        <b dir="ltr" class="h3 text-danger">{{number_format($customer->balance)}}</b>
+        <span class="h3">ریال</span><br>
         <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب"
            onclick="transactionReport({{$customer->id}})"></a>
         <a class="fa fa-edit btn btn-primary"
            href="/customer/edit/{{$customer->id}}"
            title="ویرایش مشتری">
         </a>
-{{--        <a class=" btn btn-secondary"--}}
-{{--           href="/order/refund/{{$customer->id}}">صدور فاکتور برگشت به انبار--}}
-{{--        </a>--}}
+        <a class=" btn btn-secondary"
+           href="/order/refund/{{$customer->id}}">صدور فاکتور برگشت به انبار
+        </a>
     </div>
     <a class="btn btn-info" href="/customerDeposit/add/{{$customer->id}}">ثبت واریزی</a>
     <a class="btn btn-secondary" href="{{route('CustomerList')}}">بازگشت</a>

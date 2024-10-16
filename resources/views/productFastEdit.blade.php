@@ -52,7 +52,6 @@
                                 @selected($product->warehouse_id == $warehouse->id) >{{$warehouse->name}}</option>
                     @endforeach
                 </select>
-
             </div>
         </div>
         {{-- موجودی--}}
