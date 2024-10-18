@@ -135,6 +135,7 @@
             <th>تعداد</th>
             <th>قیمت(ریال)</th>
             <th>تخفیف(%)</th>
+            <th>عملیات</th>
         </tr>
         </thead>
         <tbody id="product-form">
@@ -147,9 +148,9 @@
             <span>جمع اقلام: </span><span id="cartSum"></span><span> ریال</span> ||
             <span>هزینه حمل: </span> <span id="deliveryCost"></span><span>  ریال </span> ||
         @endif
-        <span>مجموع تخفیف: </span><span id="total-discount"></span><span>  ریال </span> ||
+        <span>مجموع تخفیف: </span><span id="total-discount" dir="ltr"></span><span>  ریال </span> ||
 
-        <b>مبلغ کل: </b><b id="total"></b><b> ریال </b>
+        <b>مبلغ کل: </b><b id="total" dir="ltr"></b><b> ریال </b>
         <br/>
 
         <span id="onDeliveryMode">

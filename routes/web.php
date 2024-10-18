@@ -35,13 +35,6 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'role']], functio
     Route::post('coupon/edit/{id}', [CouponController::class, 'update']);
     Route::post('coupon/delete/{id}', [CouponController::class, 'deleteCoupon']);
 
-    Route::get('customers_deposit_list', [CustomerController::class, 'customersDepositList'])->name('customersDepositList');
-    Route::get('customers_order_list', [CustomerController::class, 'customersOrderList'])->name('customersOrderList');
-    Route::post('approveDeposit/{id}', [CustomerController::class, 'approveDeposit']);
-    Route::post('rejectDeposit/{id}', [CustomerController::class, 'rejectDeposit']);
-    Route::post('approveOrder/{id}', [CustomerController::class, 'approveOrder']);
-    Route::post('rejectOrder/{id}', [CustomerController::class, 'rejectOrder']);
-
     Route::get('/clear/route', [SettingController::class, 'clearRoute']);
 });
 
@@ -62,6 +55,16 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
 
     Route::get('statistic', [StatisticController::class, 'showStatistic'])->name('statistic');
     Route::post('statistic', [StatisticController::class, 'showStatistic'])->name('statistic');
+
+    Route::get('customers_deposit_list', [CustomerController::class, 'customersDepositList'])->name('customersDepositList');
+    Route::get('customers_order_list', [CustomerController::class, 'customersOrderList'])->name('customersOrderList');
+    Route::post('approveDeposit/{id}', [CustomerController::class, 'approveDeposit']);
+    Route::post('rejectDeposit/{id}', [CustomerController::class, 'rejectDeposit']);
+    Route::post('approveOrder/{id}', [CustomerController::class, 'approveOrder']);
+    Route::post('rejectOrder/{id}', [CustomerController::class, 'rejectOrder']);
+
+    Route::post('change_state/{id}', [OrderController::class, 'changeState']);
+    Route::post('/set_send_method/{id}', [OrderController::class, 'setSendMethod']);
 
 });
 
@@ -109,8 +112,7 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'safir', 'role']]
 
 Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'print', 'role']], function () {
 
-    Route::post('change_state/{id}', [OrderController::class, 'changeState']);
-    Route::post('/set_send_method/{id}', [OrderController::class, 'setSendMethod']);
+
 
     Route::post('pdf/{id}', [OrderController::class, 'pdf']);
     Route::get('pdfs/{ids}', [OrderController::class, 'pdfs']);
@@ -133,6 +135,7 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'admin', 'role']]
     Route::post('/orders/paymentMethod/{id}', [OrderController::class, 'paymentMethod']);
 
     Route::get('/order/refund/{id}', [OrderController::class, 'refund']);
+    Route::post('/order/refund/{id}', [OrderController::class, 'insertRefund']);
 });
 
 //**************************************  superAdmin  *****  warehouse  *******************

@@ -5,15 +5,14 @@
     let print = {{$print ? 'true' : 'false'}};
     let admin = {{$admin ? 'true' : 'false'}};
     let safir = {{$safir ? 'true' : 'false'}};
-    {{--let userId = {{$user->id}};--}}
     let table;
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
     let showDeleted, printWait, confirmWait, counterWait, proccessWait, COD, user = 'all',
         warehouseId = '{{$user->meta('warehouseId')}}';
+    let changeOrdersPermit = !!'{{auth()->user()->meta('showAllOrders')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
-    {{--let role = {{$user->role}};--}}
     let dtp1Instance;
     let sendMethods = {!!json_encode(config('sendMethods'))!!};
     let payMethods = {!!json_encode(config('payMethods'))!!};
@@ -248,7 +247,7 @@
         if (!order.confirm || (creatorRole === 'user' && !order.state))
             res += editOrder;
 
-        if ((print || superAdmin) && order.state)
+        if (changeOrdersPermit && order.state)
             res += generatePDF
 
         if (creatorRole === 'admin' && order.state < 10 ) {
@@ -257,7 +256,7 @@
             else
                 res += confirmInvoice;
         }
-        if (creatorRole === 'admin' || creatorRole === 'superAdmin') {
+        if (creatorRole !== 'user') {
             if (order.confirm)
                 res += invoice;
             else
@@ -298,7 +297,7 @@
             })
     }
 
-    @if($print || $superAdmin )
+    @if(auth()->user()->meta('showAllOrders'))
 
     function selectSendMethod(id) {
         if (!orders[id].confirm) {

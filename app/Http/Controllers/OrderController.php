@@ -95,6 +95,8 @@ class OrderController extends Controller
         $total = 0;  //جمع با احتساب تخفیف
         $request->customerCost = 0;
         $request->orderList = [];
+        $request->confirm = $this->safir();
+        $request->counter = $this->safir() ? 'approved' : 'waiting';
         foreach ($request->cart as $id => $number) {
             $product = $products[$id];
             $request->orders .= ' ' . $product->name . ' ' . +$number . 'عدد' . '،';
@@ -109,7 +111,6 @@ class OrderController extends Controller
             $request->orderList[$id] = [
                 'name' => $product->name,
                 'price' => $price,
-                'photo' => $product->photo,
                 'product_id' => $product->id,
                 'number' => $number,
                 'discount' => $discount,
@@ -314,6 +315,7 @@ class OrderController extends Controller
 
     public function changeState($id, Request $req)
     {
+        Helper::access('showAllOrders');
         DB::beginTransaction();
         $order = Order::findOrFail($id);
         $user = $order->user()->first();
@@ -471,7 +473,7 @@ class OrderController extends Controller
     public function deleteOrder($id, Request $request)
     {
         DB::beginTransaction();
-        if ($this->superAdmin())
+        if (auth()->user()->meta('showAllOrders'))
             $order = Order::with('user')->findOrFail($id);
         else
             $order = auth()->user()->orders()->with('user')->findOrFail($id);
@@ -586,7 +588,7 @@ class OrderController extends Controller
 
     public function addToCustomerTransactions($order)
     {
-        $customer = $order->customer()->first();
+        $customer = $order->customer; //()->first()
         $customer->update([
             'balance' => $customer->balance - $order->total,
         ]);
@@ -643,8 +645,8 @@ class OrderController extends Controller
             'paymentMethod' => $request->paymentMethod,
             'deliveryMethod' => $request->deliveryMethod,
             'customer_id' => $request->customerId,
-            'confirm' => $this->safir(),
-            'counter' => $this->safir() ? 'approved' : 'waiting',
+            'confirm' => $request->confirm,
+            'counter' => $request->counter,
             'warehouse_id' => $request->warehouseId,
         ]);
     }
@@ -681,6 +683,7 @@ class OrderController extends Controller
 
     public function setSendMethod($id, Request $req)
     {
+        Helper::access('showAllOrders');
         DB::beginTransaction();
         $order = Order::findOrFail($id);
         if (!$order->deliveryMethod || $order->isCreatorAdmin())
@@ -759,18 +762,70 @@ class OrderController extends Controller
 
     public function refund($id)
     {
-        $orders = Order::where('customer_id', $id)->with('orderProducts')->get();
+        $orders = Order::where('customer_id', $id)->where('total', '>', 0)->with('orderProducts.product')->get()->keyBy('id')->reverse();
         $goods = Good::all()->keyBy('id');
-        $products = Product::all()->keyBy('id');
         $customer = Customer::findOrFail($id);
         $warehouses = Warehouse::all()->keyBy('id');
-        return view('refund' , [
+        return view('refund', [
             'orders' => $orders,
             'goods' => $goods,
-            'products' => $products,
             'customer' => $customer,
             'warehouses' => $warehouses,
         ]);
+    }
+
+    public function insertRefund($Id, Request $req)
+    {
+        DB::beginTransaction();
+
+        $customer = Customer::findOrFail($Id);
+        $req->name = $customer->name;
+        $req->phone = $customer->phone;
+        $req->address = $customer->address;
+        $req->zip_code = $customer->zip_code;
+        $req->orders = '';
+        $req->desc = 'فاکتور برگشت به انبار';
+        $req->total = 0;
+        $req->customerCost = 0;
+        $req->customerId = $Id;
+        $req->confirm = true;
+        $req->counter = 'approved';
+
+        $order = $this->addToOrders($req);
+        $order->user_id = $customer->user_id;
+
+        $goods = Good::all()->keyBy('id');
+        foreach ($req->cart as $id => $number) {
+            $good = $goods[$id];
+            $order->orders .= ' ' . $good->name . ' ' . +$number . 'عدد' . '،';
+            $price = +str_replace(",", "", $req['price_' . $id]);
+            $order->total -= $price * $number;
+            $product = Product::withTrashed()->firstOrNew([
+                'good_id' => $id,
+                'warehouse_id' => $Id,
+            ], [
+                'available' => false,
+            ]);
+            $product->quantity += $number;
+            $product->save();
+            $product->orderProducts()->create([
+                'order_id' => $order->id,
+                'verified' => false,
+                'name' => $good->name,
+                'number' => -$number,
+                'discount' => round(($good->price - $price) / $good->price * 100),
+                'price' => $price,
+            ]);
+            $product->productChange()->create([
+                'order_id' => $order->id,
+                'change' => $number,
+                'quantity' => $product->quantity,
+                'desc' => 'بازگشت به انبار ' . $customer->name
+            ]);
+        }
+        $order->save();
+        DB::commit();
+        return redirect()->route('listOrders');
     }
 }
 

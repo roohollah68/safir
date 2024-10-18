@@ -7,15 +7,15 @@
     let cities = {!!json_encode($cities)!!};
     let creatorIsAdmin = !!'{{$creatorIsAdmin}}';
     let edit = !!'{{$edit}}';
+    let changeDiscountPermit = !!'{{auth()->user()->meta('changeDiscount')}}';
+    let changePricePermit = !!'{{auth()->user()->meta('changePrice')}}';
     let table;
 
     $(function () {
-        //Hide form errors after some time.
         setTimeout(function () {
             $("#errors").hide()
         }, 10000);
-
-        $(".checkboxradio").checkboxradio();//jquery-ui
+        $(".checkboxradio").checkboxradio();
         $.each(cart, (id, number) => {
             if (number)
                 addProduct(id);
@@ -116,14 +116,14 @@
             name="product_${id}" id="product_${id}"
             onchange="num_product(${id},this.value)"
             type="number" value="${cart[id]}"
-            style="width: 50px" min="0" ${(edit && (!creatorIsAdmin)) ? 'readonly' : ''}>
+            style="width: 50px" step="1" ${(edit && (!creatorIsAdmin)) ? 'readonly' : ''}>
             <span class="btn btn-primary fa fa-minus" onclick="num_minus(${id})"></span>
             <span class="btn btn-outline-info" dir="ltr">${+product.quantity}</span>
         </td>
         <td>
             <input type="text" class="price-input text-success discount" style="width: 80px;"
             name="price_${id}" id="price_${id}" value="${product.priceWithDiscount}"
-            onchange="calculate_discount(${id},this.value)" ${!creatorIsAdmin ? 'disabled' : ''}>` +
+            onchange="calculate_discount(${id},this.value)" ${changePricePermit ? '' : 'disabled'}>` +
             ((+product.priceWithDiscount === +product.price) ? '' :
                 `<span class="text-danger" style="text-decoration: line-through">
             ${priceFormat(product.price)}
@@ -132,18 +132,29 @@
         <td>
         <input type="number" name="discount_${id}" class="discount-value" id="discount_${id}"
         value="${product.coupon}" style="width: 80px" onchange="changeDiscount(${id},this.value)"
-        ${creatorIsAdmin ? '' : 'disabled'} min="0" max="100" step="0.25">` +
-            (creatorIsAdmin ?
+        ${changeDiscountPermit ? '' : 'disabled'} min="0" max="100" step="0.25">` +
+            (changeDiscountPermit ?
                 `<a class="btn btn-outline-info fa fa-plus" dir="ltr"
            onclick="$('#discount_${id}').val((index,value)=>{return +value+5}).change()">5
                             <i class="fa fa-percent"></i>
                         </a>
                     ` : ``) +
-            `</td>
+        `</td>
+         <td>
+            <span class="btn btn-danger fa fa-trash" onclick="deleteProduct(${id})"></span>
+         </td>
         </tr>`
         $('#product-form').append(text)
         priceInput();
-        // refreshProducts();
+    }
+
+    function deleteProduct(id){
+        delete cart[id];
+        $('#product-' + id).remove();
+        if (!Object.keys(cart).length) {
+            $('#selected-product-table').hide();
+        }
+        refreshProducts();
     }
 
     function paymentAction() {
@@ -225,7 +236,7 @@
     }
 
     function num_minus(id) {
-        if (edit && ( !creatorIsAdmin))
+        if (edit && (!creatorIsAdmin))
             return;
         $('#product_' + id).val((index, value) => {
             return +value - 1
@@ -233,19 +244,9 @@
     }
 
     function num_product(id, value) {
-        value = Math.max(0, +value);
         value = Math.round(value);
         $('#product_' + id).val(value);
         cart[id] = value;
-        if (+value === 0) {
-            // $('#product_' + id).val('');
-            delete cart[id];
-            $('#product-' + id).remove();
-            let number = Object.keys(cart).length;
-            if (!number) {
-                $('#selected-product-table').hide();
-            }
-        }
         refreshProducts();
     }
 

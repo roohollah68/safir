@@ -68,7 +68,7 @@
                             <td>{{number_format($price_no_dis)}}</td>
                             <td>{{+$orderProduct->discount}}</td>
                             <td>{{number_format($price_dis)}}</td>
-                            <td>{{number_format($sub_total_dis)}}</td>
+                            <td dir="ltr">{{number_format($sub_total_dis)}}</td>
                         </tr>
                     @endforeach
                     <tr class="{{$lastPage}}">
@@ -84,14 +84,14 @@
                     <tr class="{{$lastPage}}">
                         <td colspan="4" style="border: none;"></td>
                         <td colspan="2">مبلغ کل بدون تخفیف</td>
-                        <td>{{number_format($total_no_dis)}}</td>
+                        <td dir="ltr">{{number_format($total_no_dis)}}</td>
                     </tr>
                     <tr class="{{$lastPage}}">
                         <th colspan="4"> شما از این خرید {{number_format(abs($total_no_dis-$total_dis))}} ریال تخفیف
                             گرفتید
                         </th>
                         <th colspan="2">مبلغ قابل پرداخت</th>
-                        <th>{{number_format($total_dis)}}</th>
+                        <th dir="ltr">{{number_format($total_dis)}}</th>
                     </tr>
                 </table>
 
