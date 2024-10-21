@@ -117,7 +117,9 @@ class OrderController extends Controller
                 'verified' => $this->safir(),
             ];
         }
-
+        if (total < 0) {
+            $request->desc .= ' (فاکتور برگشت به انبار)';
+        }
         if ($request->orders == '') {
             return $this->errorBack('محصولی انتخاب نشده است!');
         }
@@ -592,11 +594,16 @@ class OrderController extends Controller
         $customer->update([
             'balance' => $customer->balance - $order->total,
         ]);
+        if ($order->total < 0)
+            $desc = 'بازگشت به انبار با فاکتور ';
+        else
+            $desc = 'تایید سفارش ';
+
         $trans = $customer->transactions()->create([
             'order_id' => $order->id,
             'amount' => $order->total,
             'type' => false,
-            'description' => 'تایید سفارش ' . $order->id . ' - ' . auth()->user()->name,
+            'description' => $desc . $order->id . ' - ' . auth()->user()->name,
         ]);
         return $trans;
     }

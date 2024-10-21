@@ -236,8 +236,7 @@ class CustomerController extends Controller
 
     public function customersDepositList(Request $req)
     {
-        if (!auth()->user()->meta('counter'))
-            abort(401);
+        Helper::meta('counter');
         return view('customersDepositList', [
             'transactions' => CustomerTransactions::with('customer.user')->limit(2000)->orderBy('id', 'desc')->get()->keyBy('id'),
             'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
@@ -247,8 +246,7 @@ class CustomerController extends Controller
 
     public function approveDeposit($id)
     {
-        if (!auth()->user()->meta('counter'))
-            abort(401);
+        Helper::meta('counter');
         $trans = CustomerTransactions::with('customer')->findOrFail($id);
         if ($trans->verified == 'approved')
             return;
@@ -262,8 +260,7 @@ class CustomerController extends Controller
 
     public function rejectDeposit($id, Request $req)
     {
-        if (!auth()->user()->meta('counter'))
-            abort(401);
+        Helper::meta('counter');
         $trans = CustomerTransactions::with('customer')->findOrFail($id);
         if ($trans->verified == 'rejected')
             return;
@@ -279,8 +276,7 @@ class CustomerController extends Controller
 
     public function customersOrderList(Request $req)
     {
-        if (!auth()->user()->meta('counter'))
-            abort(401);
+        Helper::meta('counter');
         return view('customersOrderList', [
             'orders' => Order::where('confirm', true)->where('customer_id', '>', '0')
                 ->where('state', false)->with('user')->get()->keyBy('id'),
@@ -292,8 +288,7 @@ class CustomerController extends Controller
 
     public function approveOrder($id)
     {
-        if (!auth()->user()->meta('counter'))
-            abort(401);
+        Helper::meta('counter');
         DB::beginTransaction();
         $order = Order::findOrFail($id);
         if ($order->counter == 'approved')
@@ -307,11 +302,15 @@ class CustomerController extends Controller
                 $product->update([
                     'quantity' => $product->quantity - $orderProduct->number,
                 ]);
+                if ($order->total < 0)
+                    $desc = 'بازگشت به انبار ';
+                else
+                    $desc = ' خرید مشتری ';
                 $order->productChange()->create([
                     'product_id' => $product->id,
                     'change' => -$orderProduct->number,
                     'quantity' => $product->quantity,
-                    'desc' => ' خرید مشتری ' . $order->name,
+                    'desc' => $desc . $order->name,
                 ]);
             }
         }
@@ -326,17 +325,16 @@ class CustomerController extends Controller
 
     public function rejectOrder($id, Request $req)
     {
-        if (!auth()->user()->meta('counter'))
-            abort(401);
+        Helper::meta('counter');
         DB::beginTransaction();
         $order = Order::findOrFail($id);
-        if ($order->counter == 'rejected')
+        if ($order->counter == 'rejected' || $order->state)
             return;
         if ($order->counter == 'approved') {
             $order->orderProducts()->update(['verified' => false]);
             foreach ($order->productChange()->get() as $productChange) {
-                $product = $productChange->product()->first();
                 $productChange->update(['isDeleted' => true]);
+                $product = $productChange->product;
                 if (!$product)
                     continue;
                 $product->update([
@@ -362,7 +360,6 @@ class CustomerController extends Controller
 
     public function customerSOA($id, Request $request)
     {
-
         $transactions = CustomerTransactions::where('customer_id', $id);
         $timeDescription = 'همه تراکنش ها';
         if ($request->timeFilter == 'specifiedTime') {

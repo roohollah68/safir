@@ -24,9 +24,9 @@
            href="/customer/edit/{{$customer->id}}"
            title="ویرایش مشتری">
         </a>
-        <a class=" btn btn-secondary"
-           href="/order/refund/{{$customer->id}}">صدور فاکتور برگشت به انبار
-        </a>
+{{--        <a class=" btn btn-secondary"--}}
+{{--           href="/order/refund/{{$customer->id}}">صدور فاکتور برگشت به انبار--}}
+{{--        </a>--}}
     </div>
     <a class="btn btn-info" href="/customerDeposit/add/{{$customer->id}}">ثبت واریزی</a>
     <a class="btn btn-secondary" href="{{route('CustomerList')}}">بازگشت</a>

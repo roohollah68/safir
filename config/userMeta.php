@@ -8,6 +8,7 @@ return [
     'access'=>[
         'usersEdit' => 'ویرایش اطلاعات و دسترسی کاربران',
         'addOrder' => 'ثبت سفارش',
+        'refund' => 'ثبت سفارش بازگشت به انبار',
         'showAllOrders' => 'مشاهده و ویرایش همه سفارشات',
         'changeDiscount' => 'تغییر تخفیف هنگام ثبت سفارش',
         'changePrice' => 'تغییر قیمت هنگام ثبت سفارش',
@@ -18,6 +19,7 @@ return [
     ],
     'usersEdit' => false,
     'addOrder' => false,
+    'refund'=> false,
     'showAllOrders' => false,
     'changeDiscount' => false,
     'changePrice' => false,

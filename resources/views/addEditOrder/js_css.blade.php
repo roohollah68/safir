@@ -139,7 +139,7 @@
                             <i class="fa fa-percent"></i>
                         </a>
                     ` : ``) +
-        `</td>
+            `</td>
          <td>
             <span class="btn btn-danger fa fa-trash" onclick="deleteProduct(${id})"></span>
          </td>
@@ -148,7 +148,7 @@
         priceInput();
     }
 
-    function deleteProduct(id){
+    function deleteProduct(id) {
         delete cart[id];
         $('#product-' + id).remove();
         if (!Object.keys(cart).length) {
@@ -185,10 +185,11 @@
                 Total += products[id].price * number;  //قیمت بدون تخفیف;
                 $('#hidden-input').append(`<input type="hidden" name="cart[${id}]" value="${number}">`);
                 hasProduct = true;
-            } else {
-                $('#product_' + id).val('');
-                delete cart[id];
             }
+            // else {
+            //     $('#product_' + id).val('');
+            //     delete cart[id];
+            // }
         })
 
         let deliveryCost = 0;
@@ -247,6 +248,11 @@
         value = Math.round(value);
         $('#product_' + id).val(value);
         cart[id] = value;
+        @if(!$user->meta('refund'))
+        if (value <= 0) {
+            deleteProduct(id)
+        }
+        @endif
         refreshProducts();
     }
 
@@ -256,8 +262,8 @@
         $('#phone').val(customer.phone);
         $('#address').val(customer.address);
         $('#zip_code').val(customer.zip_code);
-        // $('#category').val(customer.category).change();
-        $('#city').val(citiesId[customer.city_id].name).change();
+        let city = cities[customer.city_id];
+        $('#city').val(city.name + ` (${city.province.name})`).change();
     }
 
     function changeDiscount(id, value) {
@@ -287,6 +293,10 @@
 
         if (!number) {
             alert('محصولی انتخاب نشده است');
+            return false;
+        }
+        if(cart.some(x => x >= 0) && cart.some(x => x <= 0)) {
+            alert('تعداد همگی باید مثبت یا منفی باشند');
             return false;
         }
         return true;
