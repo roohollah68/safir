@@ -117,7 +117,7 @@ class OrderController extends Controller
                 'verified' => $this->safir(),
             ];
         }
-        if (total < 0) {
+        if ($total < 0) {
             $request->desc .= ' (فاکتور برگشت به انبار)';
         }
         if ($request->orders == '') {

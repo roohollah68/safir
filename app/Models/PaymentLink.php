@@ -5,18 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OrderProduct extends Model
+class PaymentLink extends Model
 {
 
     public $timestamps = false;
     protected $fillable = [
-        'name',
-        'price',
-        'product_id',
+        'customer_transaction_id',
         'order_id',
-        'number',
-        'discount',
-        'verify',
+        'amount',
     ];
 
     public function order()
@@ -24,8 +20,8 @@ class OrderProduct extends Model
         return $this->belongsTo(Order::class);
     }
 
-    public function product()
+    public function customerTransaction()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(CustomerTransactions::class);
     }
 }
