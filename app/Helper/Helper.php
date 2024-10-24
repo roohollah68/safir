@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Helper;
 
 use App\Models\Setting;
@@ -40,6 +41,18 @@ class Helper
             $res[$set->name] = $set->value;
         }
         return (object)$res;
+    }
+
+    public static function condition($state)
+    {
+        if ($state == 'waiting')
+            return 'در انتظار بررسی';
+        elseif ($state == 'approved')
+            return 'تایید شده';
+        elseif ($state == 'rejected')
+            return 'رد شده';
+        else
+            return 'نامشخص';
     }
 }
 

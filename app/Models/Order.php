@@ -33,6 +33,7 @@ class Order extends Model
         'payInDate',
         'paymentNote',
         'counter',
+        'payPercent',
     ];
 
     public function user()
@@ -57,13 +58,13 @@ class Order extends Model
 
     public function customerTransactions()
     {
-        return $this->hasMany(CustomerTransactions::class);
+        return $this->hasMany(CustomerTransaction::class);
     }
 
-//    public function admin()
-//    {
-//        return $this->belongsTo(User::class, 'admin');
-//    }
+    public function paymentLinks()
+    {
+        return $this->hasMany(PaymentLink::class);
+    }
 
     public function productChange()
     {
@@ -89,7 +90,6 @@ class Order extends Model
             return config('sendMethods')[$this->state % 10];
         }
     }
-
 
     public function payMethod(): string
     {
@@ -118,5 +118,15 @@ class Order extends Model
     public function isCreatorAdmin()
     {
         return $this->user()->first()->role == 'admin';
+    }
+
+    public function orders()
+    {
+        $orderProducts = $this->orderProducts()->get();
+        $text = $this->orders;
+        foreach ($orderProducts as $orderProduct){
+            $text .= ' ' . $orderProduct->name . ' ' . +$orderProduct->number . 'عدد' . '،';
+        }
+        return $text;
     }
 }

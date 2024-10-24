@@ -44,6 +44,7 @@
     function view_order(id) {
         $.post('/viewOrder/' + id, {_token: token})
             .done(res => {
+                dialog && dialog.remove();
                 dialog = Dialog(res);
             })
     }
@@ -84,7 +85,7 @@
         return numeral(x).format(0, 0);
     }
 
-    function Dialog(text){
+    function Dialog(text) {
         dialog = $(text).dialog({
             modal: true,
             open: () => {
@@ -113,7 +114,8 @@
             });
         priceInput();
     })
-    function priceInput(){
+
+    function priceInput() {
         $(".price-input").on("keyup", function (event) {
             // When user select text in the document, also abort.
             var selection = window.getSelection().toString();

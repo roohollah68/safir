@@ -335,9 +335,8 @@
             alert('ابتدا فاکتور باید تایید شود!');
             return;
         }
-        $.post('/change_state/' + id, {
+        $.post('/change_state/' + id + '/' + state, {
             _token: token,
-            state: state,
         })
             .done(state => {
                 orders[id].state = +state;
@@ -437,8 +436,6 @@
 
     }
     @endif
-
-
 
     function dateFilter() {
         let date1 = $('input[name=from]').val();

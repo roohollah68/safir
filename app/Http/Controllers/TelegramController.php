@@ -23,12 +23,15 @@ class TelegramController extends Controller
     public function sendOrderToBale($order, $chatId)
     {
         $message = self::createOrderMessage($order);
-//        dd(env('APP_URL') . "receipt/{$order->receipt}");
         $content = array("caption" => $message, "text" => $message, "photo" => env('APP_URL') . "receipt/{$order->receipt}");
         if ($order->receipt) {
-            return $this->sendPhotoToBale($content, $chatId);
+            $response = $this->sendPhotoToBale($content, $chatId);
         } else {
-            return $this->sendMessageToBale($content, $chatId);
+            $response = $this->sendMessageToBale($content, $chatId);
+        }
+        if (isset($response->result)) {
+            $order->bale_id = $response->result->message_id;
+            $order->save();
         }
     }
 
@@ -58,7 +61,7 @@ class TelegramController extends Controller
 نام و نام خانوادگی: *{$order->name}*
 شماره همراه: {$order->phone}
 آدرس: {$order->address}
-سفارشات: *{$order->orders}*
+سفارشات: *{$order->orders()}*
 کدپستی: {$order->zip_code}
 توضیحات: {$order->desc}
 مبلغ کل: {$total} ریال

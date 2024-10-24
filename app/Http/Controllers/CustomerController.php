@@ -6,9 +6,10 @@ use App\BaleAPIv2;
 use App\Helper\Helper;
 use App\Models\City;
 use App\Models\Customer;
-use App\Models\CustomerTransactions;
+use App\Models\CustomerTransaction;
 use App\Models\Order;
 use App\Models\Province;
+use App\Models\Transaction;
 use App\Models\User;
 use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
@@ -19,7 +20,6 @@ class CustomerController extends Controller
 {
     public function customersList(Request $req)
     {
-
         if ($this->superAdmin()) {
             if (!$req->user || $req->user == 'all')
                 $customers = Customer::with('user')->get()->keyBy("id");
@@ -31,7 +31,7 @@ class CustomerController extends Controller
         foreach ($customers as $customer) {
             $total += $customer->balance;
         }
-        return view('customerList', [
+        return view('customer.customerList', [
             'customers' => $customers,
             'total' => $total,
             'users' => User::where('role', 'admin')->where('verified', true)->get(),
@@ -47,8 +47,11 @@ class CustomerController extends Controller
         $transactions = $customer->transactions()->get()->keyBy('id');
         $orders = $customer->orders()->get();
 
-        return view('customerTransactionList',
-            ['customer' => $customer, 'transactions' => $transactions, 'orders' => $orders]);
+        return view('customer.customerTransactionList', [
+            'customer' => $customer,
+            'transactions' => $transactions,
+            'orders' => $orders
+        ]);
 
     }
 
@@ -57,7 +60,7 @@ class CustomerController extends Controller
         $customer = new Customer;
         $customer->city_id = 301;
 
-        return view('addEditCustomer', [
+        return view('customer.addEditCustomer', [
             'customer' => $customer,
             'cities' => City::all()->keyBy('name'),
             'citiesId' => City::all()->keyBy('id'),
@@ -92,7 +95,7 @@ class CustomerController extends Controller
         else
             $customer = auth()->user()->customers()->findOrFail($id);
 
-        return view('addEditCustomer', [
+        return view('customer.addEditCustomer', [
             'customer' => $customer,
             'cities' => City::all()->keyBy('name'),
             'citiesId' => City::all()->keyBy('id'),
@@ -139,7 +142,11 @@ class CustomerController extends Controller
         else
             $link = false;
 
-        return view('addEditCustomerDeposit', ['customer' => $customer, 'deposit' => false, 'link' => $link]);
+        return view('customer.addEditCustomerDeposit', [
+            'customer' => $customer,
+            'deposit' => false,
+            'link' => $link
+        ]);
     }
 
     public function storeNew(Request $req)
@@ -160,7 +167,7 @@ class CustomerController extends Controller
         }
         $order_id = '';
         if ($req->link)
-            $order_id = CustomerTransactions::find($req->link)->order()->first()->id;
+            $order_id = CustomerTransaction::find($req->link)->order()->first()->id;
 
         if ($this->superAdmin())
             $customer = Customer::findOrFail($req->id);
@@ -203,7 +210,7 @@ class CustomerController extends Controller
     public function deleteDeposit($id)
     {
         DB::beginTransaction();
-        $transaction = CustomerTransactions::findOrFail($id);
+        $transaction = CustomerTransaction::findOrFail($id);
         $customer = $transaction->customer()->first();
         if (!$this->superAdmin())
             $customer = auth()->user()->customers()->findOrFail($customer->id);
@@ -220,7 +227,7 @@ class CustomerController extends Controller
             'deleted' => true,
         ]);
         if ($transaction->paymentLink) {
-            CustomerTransactions::find($transaction->paymentLink)->update([
+            CustomerTransaction::find($transaction->paymentLink)->update([
                 'paymentLink' => null,
             ]);
         }
@@ -237,8 +244,8 @@ class CustomerController extends Controller
     public function customersDepositList(Request $req)
     {
         Helper::meta('counter');
-        return view('customersDepositList', [
-            'transactions' => CustomerTransactions::with('customer.user')->limit(2000)->orderBy('id', 'desc')->get()->keyBy('id'),
+        return view('customer.customersDepositList', [
+            'transactions' => CustomerTransaction::with('customer.user')->limit(2000)->orderBy('id', 'desc')->get()->keyBy('id'),
             'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
             'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
         ]);
@@ -247,7 +254,7 @@ class CustomerController extends Controller
     public function approveDeposit($id)
     {
         Helper::meta('counter');
-        $trans = CustomerTransactions::with('customer')->findOrFail($id);
+        $trans = CustomerTransaction::with('customer')->findOrFail($id);
         if ($trans->verified == 'approved')
             return;
         $trans->customer->update([
@@ -261,7 +268,7 @@ class CustomerController extends Controller
     public function rejectDeposit($id, Request $req)
     {
         Helper::meta('counter');
-        $trans = CustomerTransactions::with('customer')->findOrFail($id);
+        $trans = CustomerTransaction::with('customer')->findOrFail($id);
         if ($trans->verified == 'rejected')
             return;
         if ($trans->verified == 'approved')
@@ -277,7 +284,7 @@ class CustomerController extends Controller
     public function customersOrderList(Request $req)
     {
         Helper::meta('counter');
-        return view('customersOrderList', [
+        return view('customer.customersOrderList', [
             'orders' => Order::where('confirm', true)->where('customer_id', '>', '0')
                 ->where('state', false)->with('user')->get()->keyBy('id'),
             'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
@@ -296,28 +303,8 @@ class CustomerController extends Controller
         $order->counter = 'approved';
         $orderProducts = $order->orderProducts()->with('product');
         $orderProducts->update(['verified' => true]);
-        foreach ($orderProducts->get() as $orderProduct) {
-            $product = $orderProduct->product()->withTrashed()->first();
-            if ($product) {
-                $product->update([
-                    'quantity' => $product->quantity - $orderProduct->number,
-                ]);
-                if ($order->total < 0)
-                    $desc = 'بازگشت به انبار ';
-                else
-                    $desc = ' خرید مشتری ';
-                $order->productChange()->create([
-                    'product_id' => $product->id,
-                    'change' => -$orderProduct->number,
-                    'quantity' => $product->quantity,
-                    'desc' => $desc . $order->name,
-                ]);
-            }
-        }
-        $response = app('Telegram')->sendOrderToBale($order, env('GroupId'));
-        if (isset($response->result)) {
-            $order->bale_id = $response->result->message_id;
-        }
+
+        app('Telegram')->sendOrderToBale($order, env('GroupId'));
         (new CommentController)->create($order, auth()->user(), 'تایید حسابداری');
         $order->save();
         DB::commit();
@@ -332,22 +319,6 @@ class CustomerController extends Controller
             return;
         if ($order->counter == 'approved') {
             $order->orderProducts()->update(['verified' => false]);
-            foreach ($order->productChange()->get() as $productChange) {
-                $productChange->update(['isDeleted' => true]);
-                $product = $productChange->product;
-                if (!$product)
-                    continue;
-                $product->update([
-                    'quantity' => $product->quantity - $productChange->change,
-                ]);
-                $order->productChange()->create([
-                    'product_id' => $productChange->product_id,
-                    'change' => -$productChange->change,
-                    'quantity' => $product->quantity,
-                    'desc' => 'لغو خرید مشتری ' . $order->name,
-                    'isDeleted' => true,
-                ]);
-            }
             $this->deleteFromBale(env('GroupId'), $order->bale_id);
         }
         $order->counter = 'rejected';
@@ -360,7 +331,7 @@ class CustomerController extends Controller
 
     public function customerSOA($id, Request $request)
     {
-        $transactions = CustomerTransactions::where('customer_id', $id);
+        $transactions = CustomerTransaction::where('customer_id', $id);
         $timeDescription = 'همه تراکنش ها';
         if ($request->timeFilter == 'specifiedTime') {
             $timeDescription = 'از ' . $request->from . ' تا ' . $request->to;
@@ -373,7 +344,7 @@ class CustomerController extends Controller
         }
 
         $customer = Customer::find($id);
-        $pdf = PDF::loadView('customerSOA', [
+        $pdf = PDF::loadView('customer.customerSOA', [
                 'customer' => $customer,
                 'transactions' => $transactions->get(),
                 'timeDescription' => $timeDescription,
@@ -396,6 +367,24 @@ class CustomerController extends Controller
         return env('APP_URL') . 'pdf/' . $id . '.pdf';
 //        return $pdf->stream($id . '.pdf');
 //        return $pdf->download($id . '.pdf');
+    }
+
+    public function depositLink($id)
+    {
+        $transaction = CustomerTransaction::findOrFail($id);
+        $customer = $transaction->customer;
+        $payLinks = $transaction->paymentLinks()->get();
+        $payLinkTotal = 0;
+        foreach ($payLinks as $payLink){
+            $payLinkTotal += $payLink->amount;
+        }
+        $orders = $customer->orders()->get();
+        return view('customer.depositLink', [
+            'transaction'=>$transaction,
+            'payLinks'=>$payLinks,
+            'orders'=>$orders,
+            'payLinkTotal'=>$payLinkTotal,
+        ]);
     }
 
 }

@@ -11,7 +11,7 @@
     @if($order->zip_code)
         <span>کد پستی:</span> <b>{{$order->zip_code}}</b> <br>
     @endif
-    <span>سفارشات:</span> <b>{{$order->orders}}</b> <br>
+    <span>سفارشات:</span> <b>{{$order->orders()}}</b> <br>
     <span>مبلغ کل:</span> <b dir="ltr">{{number_format($order->total)}}</b> <b> ریال</b> <br>
     @if($order->customerCost > 0)
         <span>پرداختی مشتری:</span> <b>{{number_format($order->customerCost)}}</b> <b> ریال</b> <br>

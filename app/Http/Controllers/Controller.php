@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
 use App\Models\Setting;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -13,14 +14,6 @@ use App\BaleAPIv2;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-
-//    public array $city = [
-//        't'=>['تهران' , 'quantity'],
-//        'm'=>['مشهد','quantity_m'],
-//        'f'=>['فریمان', 'quantity_f'],
-//        's'=>['شیراز', 'quantity_s'],
-//        'e'=>['اصفهان', 'quantity_e'],
-//    ];
 
     public function settings()
     {
@@ -87,16 +80,16 @@ class Controller extends BaseController
         return redirect()->back()->withInput()->withErrors([$error]);
     }
 
-    public function deliveryCost($deliveryMethod)
-    {
-        $deliveryCosts = [
-            'peyk' => $this->settings()->peykCost,
-            'post' => $this->settings()->postCost,
-            'peykeShahri' => $this->settings()->peykeShahri,
-            'paskerayeh' => 0,
-        ];
-        return $deliveryCosts[$deliveryMethod];
-    }
+//    public function deliveryCost($deliveryMethod)
+//    {
+//        $deliveryCosts = [
+//            'peyk' => Helper::settings()->peykCost,
+//            'post' => Helper::settings()->postCost,
+//            'peykeShahri' => Helper::settings()->peykeShahri,
+//            'paskerayeh' => 0,
+//        ];
+//        return $deliveryCosts[$deliveryMethod];
+//    }
 
     public function sendMessageToBale($array, $chatId)
     {

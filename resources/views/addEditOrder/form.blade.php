@@ -94,11 +94,11 @@
         <div class="p-3 m-2 border">
             <h4>شیوه ارسال</h4>
             @if(!$edit)
-                <x-radio :id="'peyk'" :name="'deliveryMethod'" value="peyk" onclick="deliveryAction()" checked>
+                <x-radio :id="'peyk'" :name="'deliveryMethod'" value="peykCost" onclick="deliveryAction()" checked>
                     {{$sendMethods['peyk']}} ({{number_format($settings->peykCost)}} ریال)
                 </x-radio>
 
-                <x-radio :id="'post'" :name="'deliveryMethod'" value="post" onclick="deliveryAction()">
+                <x-radio :id="'post'" :name="'deliveryMethod'" value="postCost" onclick="deliveryAction()">
                     {{$sendMethods['post']}} ({{number_format($settings->postCost)}} ریال)
                 </x-radio>
 
@@ -113,7 +113,7 @@
                 <br>
 
             @else
-                <p>{{$sendMethods[$order->deliveryMethod]}}</p>
+                <p>{{$sendMethods[$order->deliveryMethod]??$order->deliveryMethod}}</p>
             @endif
         </div>
 

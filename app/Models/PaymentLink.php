@@ -22,6 +22,6 @@ class PaymentLink extends Model
 
     public function customerTransaction()
     {
-        return $this->belongsTo(CustomerTransactions::class);
+        return $this->belongsTo(CustomerTransaction::class);
     }
 }

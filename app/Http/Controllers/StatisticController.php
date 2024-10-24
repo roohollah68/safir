@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
-use App\Models\CustomerTransactions;
+use App\Models\CustomerTransaction;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
@@ -185,7 +185,7 @@ class StatisticController extends Controller
                 'orderNumber' => $orderNumber,
             ]);
         } elseif ($request->base == 'depositBase') {
-            $deposits = CustomerTransactions::where([
+            $deposits = CustomerTransaction::where([
                 ['type', true],
                 ['deleted', false],
                 ['verified', 'approved'],

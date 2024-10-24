@@ -32,7 +32,7 @@ class Customer extends Model
 
     public function transactions()
     {
-        return $this->hasMany(CustomerTransactions::class);
+        return $this->hasMany(CustomerTransaction::class);
     }
 
     public function categoryText($cat)

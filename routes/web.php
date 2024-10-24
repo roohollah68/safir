@@ -63,7 +63,7 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::post('approveOrder/{id}', [CustomerController::class, 'approveOrder']);
     Route::post('rejectOrder/{id}', [CustomerController::class, 'rejectOrder']);
 
-    Route::post('change_state/{id}', [OrderController::class, 'changeState']);
+    Route::post('change_state/{id}/{state}', [OrderController::class, 'changeState']);
     Route::post('/set_send_method/{id}', [OrderController::class, 'setSendMethod']);
 
 });
@@ -131,6 +131,8 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'admin', 'role']]
     Route::get('/customerDeposit/add/{id}/{linkId}', [CustomerController::class, 'newForm']);
     Route::post('/customerDeposit/add/{id}', [CustomerController::class, 'storeNew']);
     Route::post('/customerDeposit/delete/{id}', [CustomerController::class, 'deleteDeposit']);
+    Route::get('/customer/depositLink/{id}', [CustomerController::class, 'depositLink']);
+
 
     Route::post('/orders/paymentMethod/{id}', [OrderController::class, 'paymentMethod']);
 
