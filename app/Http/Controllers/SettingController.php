@@ -71,9 +71,13 @@ class SettingController extends Controller
     {
         $transactions = CustomerTransaction::all();
         foreach ($transactions as $transaction){
+            if($transaction->deleted) {
+                $transaction->delete();
+                continue;
+            }
             if (!$transaction->order_id)
                 continue;
-            if($transaction->deleted || !$transaction->paymentLink) {
+            if(!$transaction->paymentLink) {
                 $transaction->delete();
                 continue;
             }
