@@ -28,8 +28,6 @@
     <a class="btn btn-info" href="/customerDeposit/add/{{$customer->id}}">ثبت واریزی</a>
     <a class="btn btn-secondary" href="{{route('CustomerList')}}">بازگشت</a>
     <br>
-    <span class="btn btn-warning" onclick="$('.deleted').toggle()"><span class="fa fa-check deleted"></span> نمایش موارد حذف شده</span>
-    <br>
     <div id="tabs">
         <ul>
             <li><a href="#deposits">پرداختی ها</a></li>
