@@ -302,7 +302,9 @@ class CustomerController extends Controller
 
     public function customerSOA($id, Request $request)
     {
-        $transactions = CustomerTransaction::where('customer_id', $id);
+        $customer = Customer::find($id);
+        $orders = $customer->orders();
+        $transactions = $customer->transactions();
         $timeDescription = 'همه تراکنش ها';
         if ($request->timeFilter == 'specifiedTime') {
             $timeDescription = 'از ' . $request->from . ' تا ' . $request->to;
@@ -312,15 +314,18 @@ class CustomerController extends Controller
                 ['created_at', '>', $request->from],
                 ['created_at', '<', $request->to]
             ]);
+            $orders = $orders->where([
+                ['created_at', '>', $request->from],
+                ['created_at', '<', $request->to]
+            ]);
         }
-
-        $customer = Customer::find($id);
+//        dd($orders->get('created_at')->merge($transactions->get())->keyBy('created_at')->first()->getTable());
         $pdf = PDF::loadView('customer.customerSOA', [
                 'customer' => $customer,
                 'transactions' => $transactions->get(),
+                'orders' => $orders->get(),
                 'timeDescription' => $timeDescription,
                 'withInvoice' => !!$request->allInvoice,
-                'orders' => [],
                 'total' => 0,
                 'total1' => 0,
                 'total2' => 0,

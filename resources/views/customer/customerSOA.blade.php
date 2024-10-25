@@ -23,25 +23,41 @@
     </thead>
     <tbody>
     @foreach($transactions as $trans)
-        @if($trans->deleted || (!$trans->order_id && $trans->verified != 'approved'))
+        @if($trans->verified != 'approved')
             @continue
         @endif
         @php
-            $total += $trans->type?$trans->amount:-$trans->amount;
-            $total1 += $trans->type?0:$trans->amount;
-            $total2 += $trans->type?$trans->amount:0;
-            if($withInvoice && $trans->order_id){
-                $order = \App\Models\Order::with('orderProducts')->find($trans->order_id);
-                array_push($orders , $order);
-            }
+            $total2 += $trans->amount;
         @endphp
+    @endforeach
+
+    @foreach($orders as $order)
+        @if($order->counter != 'approved')
+            @continue
+        @endif
+        @php
+            $total1 += $order->total;
+        @endphp
+    @endforeach
+    @php
+        $total += $total2 -$total1;
+    @endphp
+
+    @foreach($transactions->merge($orders)->sortBy('created_at') as $trans)
+        @if($trans->getTable() == 'customer_transactions' && $trans->verified != 'approved')
+            @continue
+        @endif
+        @if($trans->getTable() == 'orders' && $trans->counter != 'approved')
+            @continue
+        @endif
+
         <tr>
-            <td>{{$trans->order_id?:$trans->id}}</td>
-            <td>{{verta($trans->created_at)->formatDate()}}</td>
-            <td>{{$trans->order_id?'سفارش '.$trans->order_id:$trans->description}}</td>
-            <td dir="ltr">{{$trans->type?'':number_format($trans->amount)}}</td>
-            <td dir="ltr">{{$trans->type?number_format($trans->amount):''}}</td>
-            <td dir="ltr">{{number_format($total)}}</td>
+            <td>{{$trans->id}}</td>
+            <td>{{verta($trans->created_at)->formatJalaliDate()}}</td>
+            <td>{{$trans->description?:$trans->desc}}</td>
+            <td dir="ltr">{{number_format($trans->total)}}</td>
+            <td dir="ltr">{{number_format($trans->amount)}}</td>
+            <td dir="ltr"></td>
         </tr>
     @endforeach
     <tr>
