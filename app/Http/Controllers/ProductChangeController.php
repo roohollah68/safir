@@ -67,22 +67,4 @@ class ProductChangeController extends Controller
         return redirect('/product/edit/' . $product->id);
     }
 
-    public function productAlarm()
-    {
-        $products = Product::all();
-        $message = 'لیست محصولات با موجودی کم:
-';
-        $condition = false;
-        foreach ($products as $product) {
-            if ($product->available && ($product->alarm > $product->quantity) && $product->alarm > 0) {
-                $message .= '⬅️ ' . $product->name . ' -> ' . $product->quantity . '
-';
-                $condition = true;
-            }
-        }
-        $content = array("text" => $message);
-        $chatId = '6192295684';
-        if ($condition)
-            $this->sendMessageToBale($content, $chatId);
-    }
 }

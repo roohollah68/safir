@@ -13,9 +13,11 @@ return [
         'changeDiscount' => 'تغییر تخفیف هنگام ثبت سفارش',
         'changePrice' => 'تغییر قیمت هنگام ثبت سفارش',
         'sellRawProduct' => 'فروش محصولات از دسته ماده اولیه',
+        'allCustomers' => 'مشاهده و ویرایش اطلاعات همه مشتربان',
         'counter' => 'حسابداری',
         'statistic' => 'مشاهده آمار',
         'warehouse' => 'انبار داری',
+        'manageSafir' => 'کنترل امور سفیران'
     ],
     'usersEdit' => false,
     'addOrder' => false,
@@ -24,7 +26,9 @@ return [
     'changeDiscount' => false,
     'changePrice' => false,
     'sellRawProduct' => false,
+    'allCustomers' => false,
     'counter' => false,
     'statistic' => false,
     'warehouse' => false,
+    'manageSafir' => false,
 ];

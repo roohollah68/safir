@@ -44,7 +44,6 @@
     function view_order(id) {
         $.post('/viewOrder/' + id, {_token: token})
             .done(res => {
-                dialog && dialog.remove();
                 dialog = Dialog(res);
             })
     }
@@ -57,7 +56,6 @@
     }
 
     function addComment(id) {
-
         $('#commentForm').submit(function (e) {
             e.preventDefault();
             $.ajax({
@@ -86,6 +84,7 @@
     }
 
     function Dialog(text) {
+        typeof dialog !== 'undefined' && dialog.remove();
         dialog = $(text).dialog({
             modal: true,
             open: () => {

@@ -17,12 +17,6 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'auth' => \App\Http\Middleware\Authenticate::class,
         'verify' => \App\Http\Middleware\IsVerified::class,
-        'admin' => \App\Http\Middleware\IsAdmin::class,
-        'superAdmin' => \App\Http\Middleware\IsSuperAdmin::class,
-        'safir' => \App\Http\Middleware\IsSafir::class,
-        'print' => \App\Http\Middleware\IsPrinter::class,
-        'warehouse' => \App\Http\Middleware\IsWarehouse::class,
-        'role' => \App\Http\Middleware\Role::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,

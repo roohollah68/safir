@@ -21,27 +21,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WoocommerceController;
 
 
-Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'role']], function () {
-
-    Route::post('/deposit/changeConfirm/{id}', [DepositController::class, 'changeConfirm']);
-
-    Route::get('settings', [SettingController::class, 'showSettings'])->name('settings');
-    Route::post('settings', [SettingController::class, 'editSettings']);
-
-    Route::get('coupons', [CouponController::class, 'couponList'])->name('couponList');
-    Route::get('coupon/add', [CouponController::class, 'newForm'])->name('addCoupon');
-    Route::post('coupon/add', [CouponController::class, 'storeNew']);
-    Route::get('coupon/edit/{id}', [CouponController::class, 'editForm']);
-    Route::post('coupon/edit/{id}', [CouponController::class, 'update']);
-    Route::post('coupon/delete/{id}', [CouponController::class, 'deleteCoupon']);
-
-    Route::get('/clear/route', [SettingController::class, 'clearRoute']);
-});
-
 Route::group(['middleware' => ['auth', 'verify']], function () {
 
     Route::get('/', [UserController::class, 'home']);
 
+    ///USER
     Route::get('/users', [UserController::class, 'show'])->name('manageUsers');
     Route::get('/confirm_user/{id}', [UserController::class, 'confirm']);
     Route::get('/suspend_user/{id}', [UserController::class, 'suspend']);
@@ -53,9 +37,28 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::get('/edit_user/{id}', [UserController::class, 'edit']);
     Route::post('/edit_user/{id}', [UserController::class, 'update']);
 
+    ///ORDER
+    Route::get('orders', [OrderController::class, 'showOrders'])->name('listOrders');
+    Route::get('add_order', [OrderController::class, 'newOrder'])->name('newOrder');
+    Route::post('add_order', [OrderController::class, 'insertOrder']);
+    Route::get('edit_order/{id}', [OrderController::class, 'editOrder']);
+    Route::post('edit_order/{id}', [OrderController::class, 'updateOrder']);
+    Route::post('delete_order/{id}', [OrderController::class, 'deleteOrder']);
+
+    Route::post('/viewOrder/{id}', [OrderController::class, 'viewOrder']);
+    Route::post('/invoice/{id}', [OrderController::class, 'invoice']);
+    Route::post('/viewComment/{id}', [CommentController::class, 'view']);
+    Route::post('/addComment/{id}', [CommentController::class, 'add']);
+    Route::post('/orders/dateFilter', [OrderController::class, 'dateFilter']);
+    Route::get('/pdfs/{ids}', [OrderController::class, 'pdfs']);
+    Route::post('/orders/paymentMethod/{id}', [OrderController::class, 'paymentMethod']);
+    Route::post('cancel_invoice/{id}', [OrderController::class, 'cancelInvoice']);
+
+    ///STATISTIC
     Route::get('statistic', [StatisticController::class, 'showStatistic'])->name('statistic');
     Route::post('statistic', [StatisticController::class, 'showStatistic'])->name('statistic');
 
+    ///COUNTER
     Route::get('customers_deposit_list', [CustomerController::class, 'customersDepositList'])->name('customersDepositList');
     Route::get('customers_order_list', [CustomerController::class, 'customersOrderList'])->name('customersOrderList');
     Route::post('approveDeposit/{id}', [CustomerController::class, 'approveDeposit']);
@@ -63,21 +66,11 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::post('approveOrder/{id}', [CustomerController::class, 'approveOrder']);
     Route::post('rejectOrder/{id}', [CustomerController::class, 'rejectOrder']);
 
+    ///WAREHOUSE
     Route::post('change_state/{id}/{state}', [OrderController::class, 'changeState']);
     Route::post('/set_send_method/{id}', [OrderController::class, 'setSendMethod']);
 
-});
-
-Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'admin', 'safir', 'role']], function () {
-
-    Route::get('add_order', [OrderController::class, 'newForm'])->name('newOrder');
-    Route::post('add_order', [OrderController::class, 'insertOrder']);
-
-    Route::get('edit_order/{id}', [OrderController::class, 'editForm']);
-    Route::post('edit_order/{id}', [OrderController::class, 'update']);
-
-    Route::post('delete_order/{id}', [OrderController::class, 'deleteOrder']);
-
+    ///CUSTOMER
     Route::get('/customers', [CustomerController::class, 'customersList'])->name('CustomerList');
     Route::get('/customer/add', [CustomerController::class, 'addForm'])->name('newCustomer');
     Route::post('/customer/add', [CustomerController::class, 'storeNewCustomer']);
@@ -85,69 +78,50 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'admin', 'safir',
     Route::get('/customer/edit/{id}', [CustomerController::class, 'showEditForm']);
     Route::post('/customer/edit/{id}', [CustomerController::class, 'updateCustomer']);
 
-});
+    ///CUSTOMER DEPOSIT
+    Route::get('/customer/transaction/{id}', [CustomerController::class, 'customersTransactionList'])
+        ->name('customersTransactionList');
+    Route::get('/customer/SOA/{id}', [CustomerController::class, 'customerSOA']);
+    Route::post('/customer/SOA/{id}', [CustomerController::class, 'customerSOA']);
+    Route::get('/customerDeposit/add/{id}', [CustomerController::class, 'newForm']);
+    Route::post('/customerDeposit/add/{id}', [CustomerController::class, 'storeNew']);
+    Route::post('/customerDeposit/delete/{id}', [CustomerController::class, 'deleteDeposit']);
+    Route::get('/customerPaymentTracking', [CustomerController::class, 'paymentTracking']);
+    Route::get('/postpondDay/{id}/{days}', [CustomerController::class, 'postpondDay']);
 
-Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'admin', 'safir', 'print', 'role']], function () {
+    ///PAYMENTLINK
+    Route::get('/customer/depositLink/{id}', [CustomerController::class, 'depositLink']);
+    Route::get('/customer/orderLink/{id}', [CustomerController::class, 'orderLink']);
+    Route::post('/payLink/add/{transaction_id}/{order_id}', [CustomerController::class, 'addPayLink']);
+    Route::post('/payLink/delete/{id}', [CustomerController::class, 'deletePayLink']);
 
-    Route::get('orders', [OrderController::class, 'showOrders'])->name('listOrders');
-    Route::post('/invoice/{id}', [OrderController::class, 'invoice']);
-    Route::post('/orders/dateFilter', [OrderController::class, 'dateFilter']);
-
-    Route::post('/viewOrder/{id}', [OrderController::class, 'viewOrder']);
-    Route::post('/viewComment/{id}', [CommentController::class, 'view']);
-    Route::post('/addComment/{id}', [CommentController::class, 'add']);
-
-});
-
-Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'safir', 'role']], function () {
-
+    ///SAFIR DEPOSIT
     Route::get('/deposits', [DepositController::class, 'depositList'])->name('DepositList');
     Route::get('/deposit/add', [DepositController::class, 'newForm'])->name('addDeposit');
     Route::post('/deposit/add', [DepositController::class, 'storeNew']);
     Route::post('/deposit/delete/{id}', [DepositController::class, 'deleteDeposit']);
     Route::get('/deposit/edit/{id}', [DepositController::class, 'editDeposit']);
     Route::post('/deposit/edit/{id}', [DepositController::class, 'updateDeposit']);
+    Route::post('/deposit/changeConfirm/{id}', [DepositController::class, 'changeConfirm']);
 
-});
+    ///SAFIR DISCOUNT
+    Route::get('coupons', [CouponController::class, 'couponList'])->name('couponList');
+    Route::get('coupon/add', [CouponController::class, 'newForm'])->name('addCoupon');
+    Route::post('coupon/add', [CouponController::class, 'storeNew']);
+    Route::get('coupon/edit/{id}', [CouponController::class, 'editForm']);
+    Route::post('coupon/edit/{id}', [CouponController::class, 'update']);
+    Route::post('coupon/delete/{id}', [CouponController::class, 'deleteCoupon']);
 
-Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'print', 'role']], function () {
+    ///SAFIR SETTINGS
+    Route::get('settings', [SettingController::class, 'showSettings'])->name('settings');
+    Route::post('settings', [SettingController::class, 'editSettings']);
 
+    ///
+    Route::get('/transactions', [TransactionController::class, 'show'])->name('transactions');
 
-
-    Route::post('pdf/{id}', [OrderController::class, 'pdf']);
-    Route::get('pdfs/{ids}', [OrderController::class, 'pdfs']);
-});
-
-Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'admin', 'role']], function () {
-
-    Route::post('confirm_invoice/{id}', [OrderController::class, 'confirmInvoice']);
-    Route::post('cancel_invoice/{id}', [OrderController::class, 'cancelInvoice']);
-
-    Route::get('/customer/transaction/{id}', [CustomerController::class, 'customersTransactionList'])
-        ->name('customersTransactionList');
-    Route::get('/customer/SOA/{id}', [CustomerController::class, 'customerSOA']);
-    Route::post('/customer/SOA/{id}', [CustomerController::class, 'customerSOA']);
-    Route::get('/customerDeposit/add/{id}', [CustomerController::class, 'newForm']);
-    Route::get('/customerDeposit/add/{id}/{linkId}', [CustomerController::class, 'newForm']);
-    Route::post('/customerDeposit/add/{id}', [CustomerController::class, 'storeNew']);
-    Route::post('/customerDeposit/delete/{id}', [CustomerController::class, 'deleteDeposit']);
-    Route::get('/customer/depositLink/{id}', [CustomerController::class, 'depositLink']);
-
-
-    Route::post('/orders/paymentMethod/{id}', [OrderController::class, 'paymentMethod']);
-
-    Route::get('/order/refund/{id}', [OrderController::class, 'refund']);
-    Route::post('/order/refund/{id}', [OrderController::class, 'insertRefund']);
-});
-
-//**************************************  superAdmin  *****  warehouse  *******************
-
-Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'warehouse', 'role']], function () {
-
-    Route::get('products', [ProductController::class, 'showProducts'])
-        ->name('productList');
-    Route::get('product/add', [ProductController::class, 'showAddForm'])
-        ->name('addProduct');
+    ///PRODUCT
+    Route::get('products', [ProductController::class, 'showProducts'])->name('productList');
+    Route::get('product/add', [ProductController::class, 'showAddForm'])->name('addProduct');
     Route::post('product/add', [ProductController::class, 'storeNew']);
     Route::post('product/getData', [ProductController::class, 'getData']);
     Route::post('addToProducts/{id}', [ProductController::class, 'addToProducts']);
@@ -155,13 +129,7 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'warehouse', 'rol
     Route::post('product/edit/{id}', [ProductController::class, 'editProduct']);
     Route::post('product/deletePhoto/{id}', [ProductController::class, 'deletePhoto']);
     Route::post('product/delete/{id}', [ProductController::class, 'deleteProduct']);
-    Route::get('product/fastEdit/{id}', function ($id){
-        $product = Product::find($id);
-        return view('productFastEdit',[
-            'product'=>$product,
-            'warehouses' => Warehouse::all(),
-        ]);
-    });
+    Route::get('product/fastEdit/{id}', [ProductController::class, 'fastEdit']);
 
     Route::get('/productQuantity/add/{id}', [ProductChangeController::class, 'addQuantity']);
     Route::post('/productQuantity/add/{id}', [ProductChangeController::class, 'insertRecord']);
@@ -173,24 +141,18 @@ Route::group(['middleware' => ['auth', 'verify', 'superAdmin', 'warehouse', 'rol
     Route::get('warehouse/transfer', [ProductController::class, 'transfer']);
     Route::post('warehouse/transfer', [ProductController::class, 'transferSave']);
 
+    ///PROGRAMMER
+    Route::get('/clear/route', [SettingController::class, 'clearRoute']);
+    Route::get('/command', [SettingController::class, 'command']);
 
-
-});
-
-//**************************************  safir  *************************************
-
-Route::group(['middleware' => ['auth', 'verify', 'safir', 'role']], function () {
-
-    Route::get('/transactions', [TransactionController::class, 'show'])->name('transactions');
 });
 
 Route::post('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteOrder']);
 Route::get('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteOrder']);
 Route::get('/backup', [TelegramController::class, 'backUpDatabase']);
 
-Route::get('/product/alarm', [ProductChangeController::class, 'productAlarm']);
 
-Route::get('/command', [SettingController::class, 'command']);
+
 
 
 require __DIR__ . '/auth.php';

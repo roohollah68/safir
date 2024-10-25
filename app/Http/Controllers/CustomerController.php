@@ -8,11 +8,13 @@ use App\Models\City;
 use App\Models\Customer;
 use App\Models\CustomerTransaction;
 use App\Models\Order;
+use App\Models\PaymentLink;
 use App\Models\Province;
 use App\Models\Transaction;
 use App\Models\User;
 use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 
@@ -20,13 +22,13 @@ class CustomerController extends Controller
 {
     public function customersList(Request $req)
     {
-        if ($this->superAdmin()) {
+        if (auth()->user()->meta('allCustomers')) {
             if (!$req->user || $req->user == 'all')
                 $customers = Customer::with('user')->get()->keyBy("id");
             else
                 $customers = Customer::where('user_id', $req->user)->with('user')->get();
         } else
-            $customers = auth()->user()->customers()->get()->keyBy("id");
+            $customers = auth()->user()->customers->keyBy("id");
         $total = 0;
         foreach ($customers as $customer) {
             $total += $customer->balance;
@@ -34,18 +36,18 @@ class CustomerController extends Controller
         return view('customer.customerList', [
             'customers' => $customers,
             'total' => $total,
-            'users' => User::where('role', 'admin')->where('verified', true)->get(),
+            'users' => User::where('role', 'admin')->where('verified', true)->get()->keyBy('id'),
         ]);
     }
 
     public function customersTransactionList($id)
     {
-        if ($this->superAdmin())
+        if (auth()->user()->meta('allCustomers'))
             $customer = Customer::findOrFail($id);
         else
             $customer = auth()->user()->customers()->findOrFail($id);
         $transactions = $customer->transactions()->get()->keyBy('id');
-        $orders = $customer->orders()->get();
+        $orders = $customer->orders()->get()->keyBy('id');
 
         return view('customer.customerTransactionList', [
             'customer' => $customer,
@@ -90,7 +92,7 @@ class CustomerController extends Controller
 
     public function showEditForm($id)
     {
-        if ($this->superAdmin())
+        if (auth()->user()->meta('allCustomers'))
             $customer = Customer::findOrFail($id);
         else
             $customer = auth()->user()->customers()->findOrFail($id);
@@ -115,7 +117,7 @@ class CustomerController extends Controller
         $request->phone = Helper::number_Fa_En($request->phone);
         $request->zip_code = Helper::number_Fa_En($request->zip_code);
 
-        if ($this->superAdmin())
+        if (auth()->user()->meta('allCustomers'))
             $customer = Customer::findOrFail($id);
         else
             $customer = auth()->user()->customers()->findOrFail($id);
@@ -132,7 +134,7 @@ class CustomerController extends Controller
 
     public function newForm($id, $linkId = false)
     {
-        if ($this->superAdmin())
+        if (auth()->user()->meta('allCustomers'))
             $customer = Customer::findOrFail($id);
         else
             $customer = auth()->user()->customers()->findOrFail($id);
@@ -165,38 +167,24 @@ class CustomerController extends Controller
         if ($req->file("photo")) {
             $photo = $req->file("photo")->store("", 'deposit');
         }
-        $order_id = '';
-        if ($req->link)
-            $order_id = CustomerTransaction::find($req->link)->order()->first()->id;
 
-        if ($this->superAdmin())
+        if (auth()->user()->meta('allCustomers'))
             $customer = Customer::findOrFail($req->id);
         else
             $customer = auth()->user()->customers()->findOrFail($req->id);
 
         $newTransaction = $customer->transactions()->create([
             'amount' => $req->amount,
-            'description' => 'واریزی ' . $order_id . ' * ' . $req->desc . ' - ' . auth()->user()->name,
-            'type' => true,
+            'description' => $req->desc,
             'photo' => $photo,
-            'paymentLink' => $req->link,
             'verified' => 'waiting',
         ]);
-        if ($req->link) {
-            $transaction = $customer->transactions()->find($req->link);
-            $transaction->update([
-                'paymentLink' => $newTransaction->id,
-            ]);
-            Order::find($transaction->order_id)->update([
-                'receipt' => $photo,
-            ]);
-        }
         $req->amount = number_format($req->amount);
 
         $message = "ثبت سند واریزی مشتری
-        نام:{$customer->name}
-        مبلغ: {$req->amount} ریال
-         توضیحات:{$newTransaction->description}
+نام: {$customer->name}
+مبلغ: {$req->amount} ریال
+توضیحات: {$newTransaction->description}
         ";
 
         $array = array("caption" => $message, "photo" => env('APP_URL') . "deposit/{$photo}");
@@ -209,36 +197,13 @@ class CustomerController extends Controller
 
     public function deleteDeposit($id)
     {
-        DB::beginTransaction();
         $transaction = CustomerTransaction::findOrFail($id);
         $customer = $transaction->customer()->first();
-        if (!$this->superAdmin())
-            $customer = auth()->user()->customers()->findOrFail($customer->id);
-
-        if ($transaction->deleted)
-            return;
-
-        $customer->transactions()->create([
-            'amount' => $transaction->amount,
-            'description' => 'ابطال ثبت واریزی - ' . $transaction->desc . ' - ' . auth()->user()->name,
-            'type' => false,
-            'verified' => 'rejected',
-            'photo' => $transaction->photo,
-            'deleted' => true,
-        ]);
-        if ($transaction->paymentLink) {
-            CustomerTransaction::find($transaction->paymentLink)->update([
-                'paymentLink' => null,
-            ]);
-        }
-        $transaction->update([
-            'paymentLink' => null,
-            'deleted' => true,
-            'verified' => 'rejected',
-            'description' => $transaction->description . '* باطل شد',
-        ]);
-
-        DB::commit();
+        if (!auth()->user()->meta('allCustomers'))
+            if ($customer->user_id != auth()->user()->id)
+                abort(403);
+        $transaction->paymentLinks()->delete();
+        $transaction->delete();
     }
 
     public function customersDepositList(Request $req)
@@ -279,6 +244,14 @@ class CustomerController extends Controller
             'verified' => 'rejected',
             'description' => $trans->description . ' _ ' . $req->reason,
         ]);
+
+        $payLinks = $trans->paymentLinks()->delete();
+        foreach ($payLinks as $payLink) {
+            $order = $payLink->order;
+            $payLink->delete();
+            $order->payPercent = $order->payPercent();
+            $order->save();
+        }
     }
 
     public function customersOrderList(Request $req)
@@ -322,9 +295,7 @@ class CustomerController extends Controller
             $this->deleteFromBale(env('GroupId'), $order->bale_id);
         }
         $order->counter = 'rejected';
-        if (isset($req->reason)) {
-            (new CommentController)->create($order, auth()->user(), 'عدم تایید حسابداری: ' . $req->reason);
-        }
+        (new CommentController)->create($order, auth()->user(), 'عدم تایید حسابداری: ' . ($req->reason ?? ''));
         $order->save();
         DB::commit();
     }
@@ -365,26 +336,108 @@ class CustomerController extends Controller
             ]);
         $pdf->getMpdf()->OutputFile('pdf/' . $id . '.pdf');
         return env('APP_URL') . 'pdf/' . $id . '.pdf';
-//        return $pdf->stream($id . '.pdf');
-//        return $pdf->download($id . '.pdf');
     }
 
     public function depositLink($id)
     {
         $transaction = CustomerTransaction::findOrFail($id);
         $customer = $transaction->customer;
-        $payLinks = $transaction->paymentLinks()->get();
+        $payLinks = $transaction->paymentLinks;
         $payLinkTotal = 0;
-        foreach ($payLinks as $payLink){
+        foreach ($payLinks as $payLink) {
             $payLinkTotal += $payLink->amount;
         }
-        $orders = $customer->orders()->get();
+        $orders = $customer->orders->keyBy('id')->reverse();
         return view('customer.depositLink', [
-            'transaction'=>$transaction,
-            'payLinks'=>$payLinks,
-            'orders'=>$orders,
-            'payLinkTotal'=>$payLinkTotal,
+            'transaction' => $transaction,
+            'payLinks' => $payLinks,
+            'orders' => $orders,
+            'payLinkTotal' => $payLinkTotal,
         ]);
+    }
+
+    public function orderLink($id)
+    {
+        $order = Order::findOrFail($id);
+        $customer = $order->customer;
+        $payLinks = $order->paymentLinks;
+        $payLinkTotal = 0;
+        foreach ($payLinks as $payLink) {
+            $payLinkTotal += $payLink->amount;
+        }
+        $transactions = $customer->transactions->reverse();
+        return view('customer.orderLink', [
+            'transactions' => $transactions,
+            'payLinks' => $payLinks,
+            'order' => $order,
+            'payLinkTotal' => $payLinkTotal,
+        ]);
+    }
+
+    public function deletePayLink($id)
+    {
+        $payLink = PaymentLink::findOrfail($id);
+        $payLink->delete();
+    }
+
+    public function addPayLink($transaction_id, $order_id)
+    {
+        DB::beginTransaction();
+        $order = Order::findOrFail($order_id);
+        $payLinks = $order->paymentLinks;
+        $total = 0;
+        foreach ($payLinks as $payLink) {
+            $total += $payLink->amount;
+        }
+        $orderRemain = max(0, $order->total - $total);
+        $transaction = CustomerTransaction::findOrFail($transaction_id);
+        $payLinks = $transaction->paymentLinks;
+        $total = 0;
+        foreach ($payLinks as $payLink) {
+            $total += $payLink->amount;
+        }
+        $transRemain = max(0, $transaction->amount - $total);
+        if ($transaction->verified != 'rejected' && $order->customer_id == $transaction->customer_id)
+            $order->paymentLinks()->create([
+                'customer_transaction_id' => $transaction_id,
+                'amount' => min($orderRemain, $transRemain),
+            ]);
+        DB::commit();
+    }
+
+    public function paymentTracking()
+    {
+        $orders = [];
+        $Orders = Order::with('paymentLinks')->get()->keyBy('id')->reverse();
+        foreach ($Orders as $id => $Order) {
+            if (count($orders) >= 100)
+                break;
+            if($Order->counter == 'rejected')
+                continue;
+            if (!auth()->user()->meta('allCustomers') && auth()->user()->id != $Order->user_id)
+                continue;
+            if ($Order->payPercent() < 100 && time() > strtotime($Order->payInDate) && $Order->total > 0)
+                $orders[$id] = $Order;
+        }
+        return view('customer.paymentTracking', [
+            'orders' => $orders,
+        ]);
+    }
+
+    function postpondDay($id, $days)
+    {
+        if (auth()->user()->meta('allCustomers'))
+            $order = Order::findOrFail($id);
+        else {
+            $order = auth()->user()->orders->find($id);
+            $days = max($days, 7);
+        }
+        $date = Carbon::now();
+        $date->addDays(+$days);
+//        $date = new DateTime('now');
+//        $date->modify('+ ' . $days . 'days');
+        $order->payInDate = $date;
+        $order->save();
     }
 
 }

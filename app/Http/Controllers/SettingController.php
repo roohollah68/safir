@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 //use App\Models\Customer;
 //use App\Models\CustomerTransaction;
 //use App\Models\Good;
+use App\Helper\Helper;
 use App\Models\Order;
 //use App\Models\Product;
 //use App\Models\ProductData;
@@ -19,12 +20,14 @@ class SettingController extends Controller
 {
     public function showSettings()
     {
+        Helper::meta('manageSafir');
         $setting = $this->settings();
         return view('settings', ['setting' => $setting,]);
     }
 
     public function editSettings(Request $req)
     {
+        Helper::meta('manageSafir');
         foreach ($req->all() as $name => $value) {
             $value = str_replace(",", "", $value);
             Setting::where('name', $name)->update([
@@ -44,7 +47,8 @@ class SettingController extends Controller
     {
 //        $this->orders();
 //        $this->customerTransactions();
-        $this->orderPrecent();
+//        $this->orderPrecent();
+//        $this->orderSafir100();
         return 'ok';
     }
 
@@ -97,6 +101,17 @@ class SettingController extends Controller
                     $order->orders = str_replace($text, '', $order->orders);
                 }
             $order->save();
+        }
+    }
+
+    public function orderSafir100()
+    {
+        $orders = Order::all();
+        foreach ($orders as $order) {
+            if($order->user->safir()) {
+                $order->payPercent = 100;
+                $order->save();
+            }
         }
     }
 }

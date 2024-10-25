@@ -64,8 +64,10 @@
                         </td>
                         <td dir="ltr">{{number_format($tran->amount)}}</td>
                         <td>
-                            <span class="btn btn-primary fa fa-chain" onclick="showDepositLink({{$id}})"></span>
-                            @if($tran->type && !$tran->deleted && $tran->verified != 'approved')
+                            @if( $tran->verified != 'rejected')
+                                <span class="btn btn-primary fa fa-chain" onclick="showDepositLink({{$id}})"></span>
+                            @endif
+                            @if( $tran->verified != 'approved')
                                 <a class="btn btn-danger fa fa-trash" onclick="deleteDeposit({{$id}})"></a>
                             @endif
                             @if($tran->photo)
@@ -104,12 +106,12 @@
                             @endif
                         </td>
                         <td>
-                            @if($order->payPercent == 0)
+                            @if($order->payPercent() == 0)
                                 <i class="btn btn-danger">0 %</i>
-                            @elseif($order->payPercent == 100)
+                            @elseif($order->payPercent() == 100)
                                 <i class="btn btn-success">100 %</i>
                             @else
-                                <i class="btn btn-warning">{{$order->payPercent}} %</i>
+                                <i class="btn btn-warning">{{$order->payPercent()}} %</i>
                             @endif
                         </td>
                         <td>
@@ -160,25 +162,6 @@
 
         </div>
     </div>
-
-    <div>
-        <div title="اتصال پرداختی به سفارشات" class="dialogs">
-            <form method="post" id="form" action="">
-                @csrf
-                <span>پرداختی: </span><span id="depositId"></span>
-                <span>مبلغ: </span><span id="depositId"></span>
-                <br>
-                <hr>
-                <br>
-                <label for="allInvoice">به همراه فاکتورها</label>
-                <input class="checkboxradio" type="checkbox" name="allInvoice" id="allInvoice">
-                <br><br>
-                <input type="submit" class="btn btn-outline-success" name="submit" value="دریافت فایل">
-            </form>
-
-        </div>
-    </div>
-
 @endsection
 
 
@@ -186,34 +169,21 @@
     <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
     <link rel="stylesheet" href="/date-time-picker/mds.bs.datetimepicker.style.css">
     <script>
-        let token;
+        let token = '{{csrf_token()}}';
         let transactionReportTXT;
         $(function () {
-            // $('#transaction-table').DataTable({
-            //     dom: 'lBfrtip',
-            //     buttons: [
-            //         'excelHtml5',
-            //     ],
-            //     columnDefs: [
-            //         {
-            //             targets: [2, 3, 4],
-            //             orderable: false
-            //         },
-            //
-            //         {
-            //             targets: [0],
-            //             visible: false
-            //         }
-            //     ],
-            //     order: [[0, "desc"]],
-            //     paging: false,
-            // });
             token = $('input[name=_token]').val();
             transactionReportTXT = $('#transactionReportTXT').html();
             $('#transactionReportTXT').html('');
             $('#tabs').tabs();
-            $('#deposit').DataTable();
-            $('#orders-table').DataTable();
+            $('#deposit').DataTable({
+                paging: false,
+                order: [[0, "desc"]],
+            });
+            $('#orders-table').DataTable({
+                paging: false,
+                order: [[0, "desc"]],
+            });
         });
 
         function deleteDeposit(id) {
@@ -268,39 +238,31 @@
         }
 
         function showDepositLink(id) {
-            $.get('/customer/depositLink/'+id).done((res)=>{
+            $.get('/customer/depositLink/' + id).done((res) => {
                 let dialog = Dialog(res);
             })
-
-            // $(".checkboxradio").checkboxradio();
-            //
-            // const date1 = new mds.MdsPersianDateTimePicker($('#date1')[0], {
-            //     targetTextSelector: '#date1-text',
-            // });
-            // const date2 = new mds.MdsPersianDateTimePicker($('#date2')[0], {
-            //     targetTextSelector: '#date2-text',
-            // });
-            //
-            // $("#report").submit(function (e) {
-            //     e.preventDefault();
-            //     $.ajax({
-            //         type: "post",
-            //         url: '/customer/SOA/' + id,
-            //         data: new FormData(this),
-            //         processData: false,
-            //         contentType: false,
-            //         headers: {
-            //             "Accept": "application/pdf"
-            //         }
-            //     }).done(res => {
-            //         window.open(res, '_blank');
-            //     })
-            //     dialog.remove();
-            // });
         }
 
         function showOrderLink(id) {
+            $.get('/customer/orderLink/' + id).done((res) => {
+                let dialog = Dialog(res);
+            })
+        }
 
+        function removePayLink(id) {
+            $.post('/payLink/delete/' + id, {
+                _token: token,
+            }).done(() => {
+                location.reload();
+            })
+        }
+
+        function addPayLink(transaction_id, order_id) {
+            $.post('/payLink/add/' + transaction_id + '/' + order_id, {
+                _token: token,
+            }).done(() => {
+                location.reload();
+            })
         }
 
     </script>

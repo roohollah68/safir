@@ -33,7 +33,6 @@ class Order extends Model
         'payInDate',
         'paymentNote',
         'counter',
-        'payPercent',
     ];
 
     public function user()
@@ -122,11 +121,25 @@ class Order extends Model
 
     public function orders()
     {
-        $orderProducts = $this->orderProducts()->get();
+        $orderProducts = $this->orderProducts;
         $text = $this->orders;
         foreach ($orderProducts as $orderProduct){
             $text .= ' ' . $orderProduct->name . ' ' . +$orderProduct->number . 'عدد' . '،';
         }
         return $text;
+    }
+
+    public function payPercent()
+    {
+        if($this->user->safir())
+            return 100;
+        $payLinks = $this->paymentLinks;
+        $Total = 0;
+        foreach ($payLinks as $payLink){
+            $Total += $payLink->amount;
+        }
+        if($this->total == 0)
+            return 0;
+        return round($Total/$this->total*100);
     }
 }

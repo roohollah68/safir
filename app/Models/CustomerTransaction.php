@@ -39,4 +39,14 @@ class CustomerTransaction extends Model
         return $this->hasMany(PaymentLink::class);
     }
 
+    public function linkedAmount()
+    {
+        $payLinks = $this->paymentLinks()->get();
+        $Total = 0;
+        foreach ($payLinks as $payLink) {
+            $Total += $payLink->amount;
+        }
+        return $Total;
+    }
+
 }

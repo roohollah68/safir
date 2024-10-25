@@ -37,7 +37,7 @@
             @endif
 
 
-            @if(auth()->user()->meta('safir'))
+            @if(auth()->user()->meta('manageSafir'))
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
                        data-bs-toggle="dropdown"

@@ -25,6 +25,7 @@
     @if($order->paymentNote)
         <span>توضیح پرداخت:</span> <b>{{$order->paymentNote}}</b> <br>
     @endif
+    <span>درصد پرداخت شده: </span><b>{{$order->payPercent()}} %</b> <br>
     @if($order->sendMethod())
         <span>نحوه ارسال:</span> <b>{{$order->sendMethod()}}</b> <br>
     @endif

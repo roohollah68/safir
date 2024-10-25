@@ -24,13 +24,18 @@ class OrderController extends Controller
         $user = auth()->user();
         if (auth()->user()->meta('showAllOrders')) {
             $users = User::withTrashed()->get()->keyBy("id");
-            $orders = Order::withTrashed()->orderBy('id', 'desc')->with('website')
+            $orders = Order::withTrashed()->orderBy('id', 'desc')->with(['website', 'orderProducts'])
                 ->limit($user->meta('NuRecords'))->get()->keyBy('id');
         } else {
             $users = array(auth()->user()->id => auth()->user());
             $orders = auth()->user()->orders()->withTrashed()
-                ->orderBy('id', 'desc')->limit($user->meta('NuRecords'))->get()->keyBy('id');
+                ->orderBy('id', 'desc')->with(['orderProducts'])->limit($user->meta('NuRecords'))->get()->keyBy('id');
         }
+
+        foreach ($orders as $order) {
+            $order->orders = $order->orders();
+        }
+
         return view('orders.orders', [
             'users' => $users,
             'orders' => $orders,
@@ -40,7 +45,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function newForm(Request $req)
+    public function newOrder(Request $req)
     {
         Helper::access('addOrder');
         $user = auth()->user();
@@ -53,7 +58,7 @@ class OrderController extends Controller
             else
                 $query->where('category', 'final');
         })->get()->keyBy('id');
-        $products = $this->calculateDis($products,$user);
+        $products = $this->calculateDis($products, $user);
 
         $order->customer = new Customer();
         $order->customer->city_id = 301;
@@ -83,6 +88,8 @@ class OrderController extends Controller
             'address' => 'required|string|min:3',
             'phone' => 'required|string|min:11,max:11',
         ]);
+        $user = auth()->user();
+
         $order = new Order;
         $order->name = $request->name;
         $order->phone = Helper::number_Fa_En($request->phone);
@@ -95,9 +102,10 @@ class OrderController extends Controller
         $order->deliveryMethod = $request->deliveryMethod;
         $order->confirm = $this->safir();
         $order->counter = $this->safir() ? 'approved' : 'waiting';
-        $user = auth()->user();
+        $order->user_id = $user->id;
+        $order->address = $request->address;
         $products = Product::find(array_keys($request->cart))->keyBy('id');
-        $products = $this->calculateDis($products,$user);
+        $products = $this->calculateDis($products, $user);
         $request->orderList = [];
         if (count($request->cart) == 0) {
             return $this->errorBack('محصولی انتخاب نشده است!');
@@ -113,6 +121,7 @@ class OrderController extends Controller
                 $price = +str_replace(",", "", $request['price_' . $id]);
             $order->total += $price * $number;
             $Total += $product->price * $number;
+            $order->save();
             $order->orderProducts()->create([
                 'name' => $product->name,
                 'price' => $price,
@@ -121,12 +130,12 @@ class OrderController extends Controller
                 'discount' => $discount,
                 'verified' => $this->safir(),
             ]);
-
         }
         if ($order->total < 0) {
             $order->desc .= ' (فاکتور برگشت به انبار)';
         }
         if ($this->safir()) {
+//            $order->payPercent = 100;
             $deliveryCost = Helper::settings()->{$request->deliveryMethod};
             if ($Total < Helper::settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
                 $order->total += $deliveryCost;
@@ -150,8 +159,8 @@ class OrderController extends Controller
             } else
                 return $this->errorBack('روش پرداخت به درستی انتخاب نشده است!');
         }
-        $order->customerId = $this->addToCustomers($request,$order);
-        if ($request->customerId == 'not match')
+        $order->customer_id = $this->addToCustomers($request, $order);
+        if ($order->customer_id == 'not match')
             return $this->errorBack('نام مشتری مطابقت ندارد!');
 
         $this->addToTransactions($request, $order);
@@ -167,7 +176,7 @@ class OrderController extends Controller
         return redirect()->route('listOrders');
     }
 
-    public function editForm($id)
+    public function editOrder($id)
     {
         if (auth()->user()->meta('showAllOrders')) {
             $order = Order::with('customer.city')->with('user')->findOrFail($id);
@@ -186,7 +195,7 @@ class OrderController extends Controller
         })->get()->keyBy('id');
         $cart = [];
 
-        $products = $this->calculateDis($products,$user);
+        $products = $this->calculateDis($products, $user);
 
         $selectedProducts = $order->orderProducts()->get()->keyBy('product_id');
         foreach ($selectedProducts as $id => $orderProduct) {
@@ -215,7 +224,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function update($id, Request $request)
+    public function updateOrder($id, Request $request)
     {
         DB::beginTransaction();
         if (auth()->user()->meta('showAllOrders'))
@@ -283,11 +292,12 @@ class OrderController extends Controller
             'desc' => $request->desc,
             'orders' => $orders,
             'total' => $total,
+            //'payPercent' => $order->user->safir()?100:0,
         ]);
-
+        $order->paymentLinks()->delete();
         (new CommentController)->create($order, auth()->user(), 'سفارش ویرایش شد');
 
-        $this->addToCustomers($request , $order);
+        $this->addToCustomers($request, $order);
         app('Telegram')->editOrderInBale($order, env('GroupId'));
         DB::commit();
 
@@ -502,6 +512,9 @@ class OrderController extends Controller
 
         if ($order->delete()) {
             $order->orders = $order->orders();
+//            $order->payPercent = 0;
+            $order->paymentLinks()->delete();
+            $order->
             $order->save();
             $order->orderProducts()->delete();
             if ($order->user->safir()) {
@@ -537,9 +550,9 @@ class OrderController extends Controller
         return 'مشکلی به وجود آمده!';
     }
 
-    public function calculateDis($products,$user)
+    public function calculateDis($products, $user)
     {
-        if($user->safir()) {
+        if ($user->safir()) {
             $couponLinks = CouponLink::where('user_id', $user->id)->with('coupon')->get();
             $dis = [];
             foreach ($couponLinks as $couponLink) {
@@ -556,7 +569,7 @@ class OrderController extends Controller
                     $products[$id]->coupon = 0;
                 $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->good->price / 100);
             }
-        }else{
+        } else {
             foreach ($products as $id => $product) {
                 $products[$id]->coupon = 0;
                 $products[$id]->priceWithDiscount = $product->good->price;
@@ -565,7 +578,7 @@ class OrderController extends Controller
         return $products;
     }
 
-    public function addToCustomers($request,$order)
+    public function addToCustomers($request, $order)
     {
         if ($this->safir()) {
             $request->customerId = false;
@@ -580,14 +593,14 @@ class OrderController extends Controller
             'zip_code' => $order->zip_code,
             'city_id' => $request->city_id,
         ];
-        if ($request->customerId){
+        if ($request->customerId) {
             $customer = Customer::findOrFail($request->customerId);
             if ($request->addToCustomers)
                 $customer->update($data);
             else
                 if ($customer->name != $request->name)
                     return 'not match';
-        }else
+        } else
             $customer = auth()->user()->customers()->Create($data);
 
         return $customer->id;
@@ -695,14 +708,13 @@ class OrderController extends Controller
         if ($photo) {
             $trans = $order->customer->transactions()->create([
                 'amount' => $order->total,
-                'type' => true,
                 'verified' => 'waiting',
                 'description' => $req->note . '/ ' . $order->payMethod(),
                 'photo' => $photo->store("", 'deposit'),
             ]);
             $order->paymentLinks()->create([
-                'customer_transaction_id'=>$trans->id,
-                'amount'=>$order->total,
+                'customer_transaction_id' => $trans->id,
+                'amount' => $order->total,
             ]);
             $order->update([
                 'receipt' => $photo->store("", 'receipt'),

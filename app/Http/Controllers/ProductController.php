@@ -363,4 +363,13 @@ class ProductController extends Controller
         ]);
         return $product;
     }
+
+    public function fastEdit($id)
+    {
+        $product = Product::find($id);
+        return view('productFastEdit', [
+            'product' => $product,
+            'warehouses' => Warehouse::all(),
+        ]);
+    }
 }

@@ -5,35 +5,33 @@
 @endsection
 
 @section('content')
-    @if($superAdmin)
+    @if(!$safir)
         <span class="h5">مجموع بدهکاری مشتریان </span>
         <span class="h3 btn btn-danger" dir="ltr" onclick="$('#table-container ,#brief-table ').toggle(); ">
             {{number_format($total)}}
-        </span>
-        <span class="h5">ریال</span><br><br>
-        <form method="get" action="">
-            <div class="col-md-6">
-                <div class="form-group input-group required">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label for="user" class="input-group-text w-100">کاربر مرتبط:</label>
+        </span><span class="h5">ریال</span><br><br>
+        <a class="btn btn-warning m-3" href="/customerPaymentTracking">پیگیری پرداختی مشتریان</a>
+        @if(auth()->user()->meta('allCustomers'))
+            <form method="get" action="">
+                <div class="col-md-6">
+                    <div class="form-group input-group required">
+                        <div class="input-group-append" style="min-width: 160px">
+                            <label for="user" class="input-group-text w-100">کاربر مرتبط:</label>
+                        </div>
+                        <select class="form-control" name="user" id="user">
+                            <option value="all" selected>همه</option>
+                            @foreach($users as $id=>$user)
+                                <option value="{{$id}}" @selected(isset($_GET['user']) &&  $id == $_GET['user'])>
+                                    {{$user->name}}
+                                </option>
+                            @endforeach
+                        </select> <input type="submit" class="btn btn-primary" value="فیلتر">
                     </div>
-                    <select class="form-control" name="user" id="user">
-                        <option value="all"
-                                selected
-                        >همه
-                        </option>
-                        @foreach($users as $user)
-                            <option
-                                value="{{$user->id}}" @selected( isset($_GET['user']) && $user->id == $_GET['user'])>
-                                {{$user->name}}</option>
-                        @endforeach
-                    </select> <input type="submit" class="btn btn-primary" value="فیلتر">
                 </div>
-            </div>
-
-        </form>
+            </form>
+        @endif
     @endif
-    <a class="btn btn-info" href="{{route('newCustomer')}}">افزودن مشتری جدید</a>
+    <a class="btn btn-info m-3 fa fa-user-plus" title="افزودن مشتری جدید" href="{{route('newCustomer')}}"></a>
     <br>
     <br>
     <div id="table-container">
@@ -76,11 +74,11 @@
                     @endif
 
                     <td>
-                        <a class="btn btn-primary" href="/customer/edit/{{$customer->id}}">ویرایش</a>
-
+                        <a class="btn btn-primary fa fa-user-edit" title="ویرایش مشتری"
+                           href="/customer/edit/{{$customer->id}}"></a>
                         @if(!$safir)
-                            <a class="btn btn-info" href="/customer/transaction/{{$customer->id}}">تراکنش ها</a>
-{{--                            <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب" href="/customer/SOA/{{$customer->id}}"></a>--}}
+                            <a class="btn btn-info fa fa-file-invoice" title="تراکنش ها"
+                               href="/customer/transaction/{{$customer->id}}"></a>
                         @endif
                     </td>
                 </tr>
