@@ -47,7 +47,7 @@ class SettingController extends Controller
     public function command()
     {
 //        $this->orders();
-        $this->customerTransactions();
+//        $this->customerTransactions();
 //        $this->orderSafir100();
         return 'ok';
     }
