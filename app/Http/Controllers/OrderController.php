@@ -511,9 +511,7 @@ class OrderController extends Controller
 
         if ($order->delete()) {
             $order->orders = $order->orders();
-//            $order->payPercent = 0;
             $order->paymentLinks()->delete();
-            $order->
             $order->save();
             $order->orderProducts()->delete();
             if ($order->user->safir()) {
