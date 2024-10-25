@@ -412,7 +412,7 @@ class CustomerController extends Controller
         foreach ($Orders as $id => $Order) {
             if (count($orders) >= 100)
                 break;
-            if($Order->counter == 'rejected')
+            if($Order->counter != 'approved' || !$Order->confirm)
                 continue;
             if (!auth()->user()->meta('allCustomers') && auth()->user()->id != $Order->user_id)
                 continue;

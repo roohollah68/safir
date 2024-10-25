@@ -292,7 +292,6 @@ class OrderController extends Controller
             'desc' => $request->desc,
             'orders' => $orders,
             'total' => $total,
-            //'payPercent' => $order->user->safir()?100:0,
         ]);
         $order->paymentLinks()->delete();
         (new CommentController)->create($order, auth()->user(), 'سفارش ویرایش شد');

@@ -52,21 +52,6 @@ class SettingController extends Controller
         return 'ok';
     }
 
-    public function orderPrecent()
-    {
-        $orders = Order::withTrashed()->get();
-//        $orders = Order::where('id' , 22414)->get();
-        foreach ($orders as $order) {
-            $paymentLink = $order->paymentLinks()->first();
-            if(!$paymentLink)
-                continue;
-            $transaction = $paymentLink->customerTransaction;
-            if($transaction->verified == 'approved' && $transaction->amount == $order->total){
-                $order->payPercent = 100;
-                $order->save();
-            }
-        }
-    }
 
     public function customerTransactions()
     {
@@ -108,16 +93,7 @@ class SettingController extends Controller
         }
     }
 
-    public function orderSafir100()
-    {
-        $orders = Order::all();
-        foreach ($orders as $order) {
-            if($order->user->safir()) {
-                $order->payPercent = 100;
-                $order->save();
-            }
-        }
-    }
+
 }
 
 
