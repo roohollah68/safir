@@ -39,7 +39,6 @@ class WoocommerceController extends Controller
             $product_id = (int)filter_var($item->sku, FILTER_SANITIZE_NUMBER_INT);
             $product = Product::find($product_id);
             if ($product && substr($item->sku, 0, 1) == 's') {
-//                $orders .= ' ' . $product->name . ' ' . $item->quantity . 'عدد' . '،';
                 $products[$product->id] = [$item->quantity, $product];
             } else {
                 $orders .= ' ' . $item->name . ' ' . $item->quantity . 'عدد' . '،';
@@ -120,40 +119,28 @@ class WoocommerceController extends Controller
                 }
             }
             (new CommentController)->create($order, $user, 'سفارش دوباره ارسال شد');
-        } else {
+        } else if ($request->status == 'processing' || $request->status == 'completed') {
             $order = $user->orders()->create($orderData);
             $web = $order->website()->create([
                 'website' => $website,
                 'website_id' => $request->id,
                 'status' => $request->status,
             ]);
-
-            if ($request->status == 'processing' || $request->status == 'completed') {
-                (new CommentController)->create($order, $user, 'سفارش ایجاد شد');
-                app('Telegram')->sendOrderToBale($order, env('GroupId'));
-                $order->save();
-                foreach ($products as $id => $data) {
-                    $product = $data[1];
-                    $order->orderProducts()->create([
-                        'product_id' => $product->id,
-                        'verified' => true,
-                        'name' => $product->name,
-                        'number' => $data[0],
-                        'price' => $product->price,
-                    ]);
-                }
-
-            } else {
-                $order->delete();
-                if ($request->status != 'pending') {
-                    $baleReq = app('Telegram')->sendOrderToBale($order, '5742084958');
-                    if ($baleReq) {
-                        $order->bale_id = $baleReq->result->message_id;
-                    }
-                    $order->save();
-                }
+            (new CommentController)->create($order, $user, 'سفارش ایجاد شد');
+            $order->save();
+            foreach ($products as $id => $data) {
+                $product = $data[1];
+                $order->orderProducts()->create([
+                    'product_id' => $product->id,
+                    'verified' => true,
+                    'name' => $product->name,
+                    'number' => $data[0],
+                    'price' => $product->price,
+                ]);
             }
+            app('Telegram')->sendOrderToBale($order, env('GroupId'));
         }
+
 
         DB::commit();
         return 'order saved!';
