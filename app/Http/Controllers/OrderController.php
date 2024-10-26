@@ -104,6 +104,7 @@ class OrderController extends Controller
         $order->counter = $this->safir() ? 'approved' : 'waiting';
         $order->user_id = $user->id;
         $order->address = $request->address;
+        $order->warehouse_id -> $request->warehouseId;
         $products = Product::find(array_keys($request->cart))->keyBy('id');
         $products = $this->calculateDis($products, $user);
         $request->orderList = [];
