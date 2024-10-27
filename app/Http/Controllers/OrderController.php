@@ -249,15 +249,14 @@ class OrderController extends Controller
             $productOrders = $order->orderProducts->keyBy('product_id');
             $total = 0;
             foreach ($products as $id => $product) {
-                $number = $request['product_' . $id];
+                $number = (int)$request['product_' . $id];
                 if ($number > 0) {
-                    $coupon = +$request['discount_' . $id];
-                    if ($coupon == 0)
-                        $price = +str_replace(",", "", $request['price_' . $id]);
-                    else
-                        $price = round((100 - $coupon) * (+$product->price) / 100);
+                    $coupon = (int)$request['discount_' . $id];
+                    if ($coupon == 0) {
+                        $price = (int)str_replace(",", "", $request['price_' . $id]);
+                    } else
+                        $price = round((100 - $coupon) * ((int)$product->price) / 100);
                     $total += $price * $number;
-//                    $orders .= ' ' . $product->name . ' ' . +$number . 'عدد' . '،';
 
                     if (isset($productOrders[$id]))
                         $productOrders[$id]->update([

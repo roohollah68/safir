@@ -18,7 +18,7 @@
         @if($order->total-$payLinkTotal>0)
             <b>پرداختی های غیر متصل</b><br>
             @foreach($transactions as $transaction)
-                @continue(+$transaction->linkedAmount() == $transaction->amount || $transaction->verified != 'approved')
+                @continue(+$transaction->linkedAmount() == $transaction->amount || $transaction->verified == 'rejected')
                 <span>شماره: </span>
                 <span class="btn btn-secondary">{{$transaction->id}}</span>
                 <span>واریزی: </span><i>{{number_format($transaction->amount)}}</i> <sapn>ریال</sapn>
