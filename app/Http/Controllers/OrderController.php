@@ -255,7 +255,7 @@ class OrderController extends Controller
                     if ($coupon == 0)
                         $price = +str_replace(",", "", $request['price_' . $id]);
                     else
-                        $price = round((100 - $coupon) * $product->price / 100);
+                        $price = round((100 - $coupon) * (+$product->price) / 100);
                     $total += $price * $number;
 //                    $orders .= ' ' . $product->name . ' ' . +$number . 'عدد' . '،';
 

@@ -17,7 +17,7 @@ class ProductController extends Controller
     {
         if (!auth()->user()->meta('warehouse'))
             abort(401);
-        return view('productList', [
+        return view('product.productList', [
             'warehouses' => Warehouse::all(),
             'goods' => Good::all()->keyBy('id'),
         ]);
@@ -27,47 +27,8 @@ class ProductController extends Controller
     {
         if (!auth()->user()->meta('warehouse'))
             abort(401);
-        $a = time();
         $products = Product::where('warehouse_id', $req->warehouseId)->
-        select('id', 'good_id', 'available', 'warehouse_id', 'quantity', 'alarm', 'high_alarm');
-//        $goods = Good::where('id','>=', 0);
-//        if (!$req->available) {
-//            $products = $products->where('available', false);
-//        }
-//        if (!$req->unavailable) {
-//            $products = $products->where('available', true);
-//        }
-//        if (!$req->final) {
-////            $goods = $goods->where('category','<>', 'final');
-//            $products = $products->whereHas('good', function (Builder $query) {
-//                $query->where('category','<>', 'final');
-//            });
-//        }
-//        if (!$req->raw) {
-////            $goods = $goods->where('category','<>', 'raw');
-//            $products = $products->whereHas('good', function (Builder $query) {
-//                $query->where('category','<>', 'raw');
-//            });
-//        }
-//        if (!$req->pack) {
-////            $goods = $goods->where('category','<>', 'pack');
-//            $products = $products->whereHas('good', function (Builder $query) {
-//                $query->where('category','<>', 'pack');
-//            });
-//        }
-//        if (!$req->low) {
-//            $products = $products->whereRaw('products.alarm < products.quantity');
-//        }
-//        if (!$req->high) {
-//            $products = $products->whereRaw('products.high_alarm > products.quantity');
-//        }
-//        if(!$req->normal){
-//            $products = $products->whereRaw('products.high_alarm < products.quantity')->
-//            whereRaw('products.alarm > products.quantity');
-//        }
-        $products = $products->get()->keyBy('id');
-//        $goods = $goods->get()->keyBy('id');
-
+        select('id', 'good_id', 'available', 'warehouse_id', 'quantity', 'alarm', 'high_alarm')->get()->keyBy('id');
         return $products;
 
     }
@@ -77,7 +38,7 @@ class ProductController extends Controller
         if (!auth()->user()->meta('warehouse'))
             abort(401);
         $good = new Good();
-        return view('addEditProduct', [
+        return view('product.addEditProduct', [
             'good' => $good,
             'edit' => false,
             'warehouses' => Warehouse::all(),
@@ -89,7 +50,7 @@ class ProductController extends Controller
         if (!auth()->user()->meta('warehouse'))
             abort(401);
         $product = Product::with('good')->findOrfail($id);
-        return view('addEditProduct', [
+        return view('product.addEditProduct', [
             'product' => $product,
             'good' => $product->good,
             'edit' => true,
@@ -104,39 +65,18 @@ class ProductController extends Controller
         $req->price = +str_replace(",", "", $req->price);
         $req->PPrice = +str_replace(",", "", $req->PPrice);
         request()->validate([
-//            'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'required|unique:goods|string|max:255|min:4',
             'price' => 'required',
         ]);
-//        $photo = '';
-//        if ($req->file("photo")) {
-//            $photo = $req->file("photo")->store("", 'p-photo');
-//        }
-//        $available = $req->available == 'true';
 
-//        $product = Product::where('name', $req->name)->where('location', $req->location)->first();
-//        if ($product) {
-//            return $this->errorBack('این محصول تکراری است.');
-//        } else
-        $good = Good::create([
+        Good::create([
             'name' => $req->name,
             'price' => $req->price,
             'productPrice' => $req->PPrice,
-//                'available' => $available,
-//                'photo' => $photo,
             'category' => $req->category,
-//                'location' => $req->location,
-//                'quantity' => $req->quantity,
-//                'alarm' => $req->alarm,
-//                'high_alarm' => $req->high_alarm,
+            'code' => $req->code,
         ]);
-//        if ($req->quantity > 0) {
-//            $product->productChange()->create([
-//                'change' => $product->quantity,
-//                'quantity' => $product->quantity,
-//                'desc' => 'مقدار اولیه',
-//            ]);
-//        }
+
         return redirect()->route('productList');
     }
 
@@ -156,14 +96,10 @@ class ProductController extends Controller
         $good = $product->good;
         $productChange = new ProductChange();
         $productChange->product_id = $product->id;
-//        if (!$product->photo)
-//            $product->photo = '';
-//        if ($req->file("photo")) {
-//            $product->photo = $req->file("photo")->store("", 'p-photo');
-//        }
         $good->name = $req->name;
         $good->price = $req->price;
         $good->productPrice = $req->PPrice;
+        $good->code = $req->code;
         if ($req->addType == 'add') {
             $productChange->change = +$req->add;
             $product->quantity += $req->add;
@@ -242,7 +178,7 @@ class ProductController extends Controller
         if (!auth()->user()->meta('warehouse'))
             abort(401);
         $products = Product::all()->keyby('id');
-        return view('transfer', [
+        return view('product.transfer', [
             'warehouses' => Warehouse::all()->keyBy('id'),
             'products' => $products,
         ]);
@@ -347,7 +283,7 @@ class ProductController extends Controller
         if (!auth()->user()->meta('warehouse'))
             abort(401);
         $goods = Good::with('products')->get()->keyBy('id');
-        return view('goodsManagement',[
+        return view('product.goodsManagement',[
             'goods' => $goods,
             'warehouses' => Warehouse::all()->keyBy('id'),
         ]);
@@ -367,7 +303,7 @@ class ProductController extends Controller
     public function fastEdit($id)
     {
         $product = Product::find($id);
-        return view('productFastEdit', [
+        return view('product.productFastEdit', [
             'product' => $product,
             'warehouses' => Warehouse::all(),
         ]);

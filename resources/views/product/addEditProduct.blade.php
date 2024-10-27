@@ -103,18 +103,7 @@
                                disabled>
                     </div>
                 </div>
-{{--            @else--}}
-{{--                <div class="col-md-6">--}}
-{{--                    <div class="form-group input-group">--}}
-{{--                        <div class="input-group-append" style="min-width: 160px">--}}
-{{--                            <label for="quantity" class="input-group-text w-100">موجودی :</label>--}}
-{{--                        </div>--}}
-{{--                        <input type="number" step="0.01" id="quantity" class="form-control" name="quantity" value="0"--}}
-{{--                               required>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
 
-            {{--حد آلارم--}}
             <div class="col-md-6 my-2">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
@@ -137,6 +126,17 @@
                 </div>
             </div>
             @endif
+            {{--کد محصول--}}
+            <div class="col-md-6">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="code" class="input-group-text w-100">کد محصول:</label>
+                    </div>
+                    <input type="text" id="code" class="form-control" name="code"
+                           value="{{old('code')?:$good->code}}" >
+                </div>
+            </div>
+
             {{--دسته بندی محصول--}}
             <div class="col-md-6 bg-light">
                 <div class="form-group input-group">
