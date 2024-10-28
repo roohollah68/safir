@@ -401,15 +401,15 @@ class OrderController extends Controller
             $font = 32;
             $order = $this->addCityToAddress($order);
             do {
-                if ($font < 19 && !$order->user()->first()->safir()) {
+                if ($font < 18 && !$order->user->safir()) {
                     $order->orders = 'طبق فاکتور';
-                    $font = 32;
+                    $font = 33;
                 }
                 $font = $font - 1;
 
                 $pdf = PDF::loadView('pdfs', ['orders' => [$order], 'fonts' => [$font]], []);
                 $mpdf = $pdf->getMpdf();
-            } while ($mpdf->page > 1 || $font < 6);
+            } while ($mpdf->page > 1 || $font < 6 || $font === 32);
             $fonts[] = $font;
             $orders[] = $order;
         }
