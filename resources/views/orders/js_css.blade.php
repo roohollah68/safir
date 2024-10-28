@@ -57,7 +57,7 @@
                 return
             if (print && !order.confirm)
                 return
-            if (+warehouseId !== +order.warehouse_id)
+            if (+warehouseId !== +order.warehouse_id && warehouseId !== 'all')
                 return;
             if (COD && order.paymentMethod !== 'cod' && order.paymentMethod !== 'پرداخت در محل' && order.paymentMethod !== 'onDelivery')
                 return;

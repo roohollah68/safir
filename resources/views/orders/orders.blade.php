@@ -47,6 +47,7 @@
         @endif
         <br>
         <br>
+        <x-radio :id="'warehouse-all'"  onclick="warehouseId = 'all';prepare_data()" name="warehouse">همه</x-radio>
         @foreach($warehouses as $warehouse)
             <x-radio :id="'warehouse-'.$warehouse->id"  onclick="warehouseId = {{$warehouse->id}};prepare_data()" name="warehouse">{{$warehouse->name}}</x-radio>
         @endforeach

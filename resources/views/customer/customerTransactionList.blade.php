@@ -85,6 +85,7 @@
                     <th>شماره</th>
                     <th>زمان</th>
                     <th>وضعیت</th>
+                    <th>مبلغ(ریال)</th>
                     <th>درصد پرداخت</th>
                     <th>عملیات</th>
                 </tr>
@@ -103,6 +104,7 @@
                                 <i class="btn btn-danger">رد شده</i>
                             @endif
                         </td>
+                        <td>{{number_format($order->total)}}</td>
                         <td>
                             @if($order->payPercent() == 0)
                                 <i class="btn btn-danger">0 %</i>

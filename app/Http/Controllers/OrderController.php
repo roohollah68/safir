@@ -201,7 +201,7 @@ class OrderController extends Controller
         $selectedProducts = $order->orderProducts()->get()->keyBy('product_id');
         foreach ($selectedProducts as $id => $orderProduct) {
             if (isset($products[$id])) {
-                $cart[$id] = +$orderProduct->number;
+                $cart[$id] = (int)$orderProduct->number;
                 $products[$id]->coupon = +$orderProduct->discount;
                 $products[$id]->priceWithDiscount = +$orderProduct->price;
             }
@@ -394,9 +394,8 @@ class OrderController extends Controller
                 $order->update([
                     'state' => 2
                 ]);
-//                (new CommentController)->create($order, auth()->user(), 'لیبل سفارش پرینت شد.');
             }
-            if ($order->warehouse_id != 1)
+            if ($order->warehouse->name != 'تهران')
                 $order->desc .= '(انبار ' . $order->warehouse->name . ')';
 
             $font = 32;
@@ -725,5 +724,9 @@ class OrderController extends Controller
         return ['ok', $order];
     }
 
+    public function orderExcel()
+    {
+
+    }
 }
 

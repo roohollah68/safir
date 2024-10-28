@@ -58,9 +58,9 @@ class Controller extends BaseController
     public function addCityToAddress($order)
     {
         if ($order->customer_id) {
-            $city = $order->customer()->first()->city()->first();
+            $city = $order->customer->city;
             if ($city->id > 0)
-                $order->address = $city->province()->first()->name . '- ' . $city->name . '- ' . $order->address;
+                $order->address = $city->province->name . '- ' . $city->name . '- ' . $order->address;
         }
         return $order;
     }
