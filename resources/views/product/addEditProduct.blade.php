@@ -126,16 +126,6 @@
                 </div>
             </div>
             @endif
-            {{--کد محصول--}}
-            <div class="col-md-6">
-                <div class="form-group input-group">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label for="code" class="input-group-text w-100">کد محصول:</label>
-                    </div>
-                    <input type="text" id="code" class="form-control" name="code"
-                           value="{{old('code')?:$good->code}}" >
-                </div>
-            </div>
 
             {{--دسته بندی محصول--}}
             <div class="col-md-6 bg-light">

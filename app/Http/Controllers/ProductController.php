@@ -74,7 +74,6 @@ class ProductController extends Controller
             'price' => $req->price,
             'productPrice' => $req->PPrice,
             'category' => $req->category,
-            'code' => $req->code,
         ]);
 
         return redirect()->route('productList');
@@ -99,7 +98,6 @@ class ProductController extends Controller
         $good->name = $req->name;
         $good->price = $req->price;
         $good->productPrice = $req->PPrice;
-        $good->code = $req->code;
         if ($req->addType == 'add') {
             $productChange->change = +$req->add;
             $product->quantity += $req->add;
