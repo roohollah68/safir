@@ -19,7 +19,7 @@
                     <span>آدرس </span>: <b>{{$order->address}}</b>
                     <br>
 
-                    <span>سفارشات </span>: <b>{{$order->orders()}}</b>
+                    <span>سفارشات </span>: <b>{{$order->orders}}</b>
 
 
                     @if($order->desc)

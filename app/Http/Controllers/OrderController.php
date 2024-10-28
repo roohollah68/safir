@@ -397,19 +397,19 @@ class OrderController extends Controller
             }
             if ($order->warehouse->name != 'تهران')
                 $order->desc .= '(انبار ' . $order->warehouse->name . ')';
-
+            $order->orders = $order->orders();
             $font = 32;
             $order = $this->addCityToAddress($order);
             do {
                 if ($font < 18 && !$order->user->safir()) {
                     $order->orders = 'طبق فاکتور';
-                    $font = 33;
+                    $font = 32;
                 }
                 $font = $font - 1;
 
                 $pdf = PDF::loadView('pdfs', ['orders' => [$order], 'fonts' => [$font]], []);
                 $mpdf = $pdf->getMpdf();
-            } while ($mpdf->page > 1 || $font < 6 || $font === 32);
+            } while ($mpdf->page > 1 || $font < 6 );
             $fonts[] = $font;
             $orders[] = $order;
         }
