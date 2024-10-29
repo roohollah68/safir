@@ -186,7 +186,6 @@ class StatisticController extends Controller
             ]);
         } elseif ($request->base == 'depositBase') {
             $deposits = CustomerTransaction::where([
-                ['type', true],
                 ['deleted', false],
                 ['verified', 'approved'],
                 ['created_at', '>', $request->from],

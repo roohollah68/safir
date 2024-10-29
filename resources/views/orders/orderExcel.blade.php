@@ -10,7 +10,7 @@
     <span>مبلغ سفارش: </span><b>{{number_format($order->total)}}</b><span> ریال</span><br>
     <label for="customer_code">شماره: </label>
     <input type="text" value=""
-           onchange="$('.number').html(this.value)">
+           onchange="$('.number').html(this.value);reDraw()">
 
     <br>
     <span>نام مشتری: </span><b>{{$customer->name}}</b><br>
@@ -18,7 +18,7 @@
     <br>
     <label for="customer_code">کد مشتری: </label>
     <input type="text" id="customer_code" value="{{$customerMeta->customer_code ?? ''}}"
-           onchange="$('.CC').html(this.value)">
+           onchange="$('.CC').html(this.value);reDraw()">
     <br>
     <br>
     <span class="btn btn-success fa fa-save" title="ذخیره تغییرات"></span>
@@ -46,7 +46,7 @@
                     <span class="hide">{{$orderProduct->product->good->goodMetas->first()->warehouse_code ?? ''}}"</span>
                     <input type="text" id="warehouse_code_{{$id}}" class="w-101"
                            value="{{$orderProduct->product->good->goodMetas->first()->warehouse_code ?? ''}}"
-                           onchange="$(this).prev().html(this.value)">
+                           onchange="$(this).prev().html(this.value);reDraw()">
                 </td>
                 <td class="CC"></td>
                 <td><input type="text" id="stuff_code_{{$id}}" class="w-101"
@@ -71,10 +71,19 @@
 @section('files')
     @csrf
     <script>
+        let table;
+        data =
         $(function () {
-            $('#orderExcel').DataTable({
+            draw()
+        });
+
+
+
+        function draw(){
+            table = $('#orderExcel').DataTable({
                 searching: false,
                 paging: false,
+                ordering: false,
                 layout: {
                     topStart: {
                         buttons: [
@@ -93,7 +102,12 @@
                     }
                 }
             });
-        });
+        }
+
+        function reDraw(){
+            table.destroy();
+            draw();
+        }
 
         {{--function delete_deposit(id) {--}}
         {{--    confirm("برای همیشه حذف شود؟") ?--}}

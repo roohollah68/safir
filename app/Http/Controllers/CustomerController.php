@@ -47,7 +47,7 @@ class CustomerController extends Controller
         else
             $customer = auth()->user()->customers()->findOrFail($id);
         $transactions = $customer->transactions()->get()->keyBy('id');
-        $orders = $customer->orders()->get()->keyBy('id');
+        $orders = $customer->orders()->get()->keyBy('id')->where('confirm' , true);
 
         return view('customer.customerTransactionList', [
             'customer' => $customer,
@@ -324,7 +324,7 @@ class CustomerController extends Controller
         $pdf = PDF::loadView('customer.customerSOA', [
                 'customer' => $customer,
                 'transactions' => $transactions->get(),
-                'orders' => $orders->get(),
+                'orders' => $orders->get()->where('confirm' , true),
                 'timeDescription' => $timeDescription,
                 'withInvoice' => !!$request->allInvoice,
                 'total' => 0,
