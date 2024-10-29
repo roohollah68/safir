@@ -251,8 +251,8 @@
         if (changeOrdersPermit && order.state)
             res += generatePDF
 
-        // if (changeOrdersPermit)
-        //     res += excel
+        if (order.customer_id)
+            res += excel
 
         if (creatorRole === 'admin' && order.state < 10 ) {
             if (order.confirm)

@@ -6,6 +6,8 @@ use App\Helper\Helper;
 use App\Models\City;
 use App\Models\CouponLink;
 use App\Models\Customer;
+use App\Models\CustomerMeta;
+use App\Models\GoodMeta;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
@@ -728,7 +730,7 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($id);
         $customer = $order->customer;
-        $customerMeta = $customer->customerMetas()->first();
+        $customerMeta = $customer->customerMetas->first();
 
         return view('orders.orderExcel',[
             'order' => $order,
@@ -736,6 +738,28 @@ class OrderController extends Controller
             'customerMeta' => $customerMeta,
             'orderProducts' => $order->orderProducts->keyBy('id')
         ]);
+    }
+
+    public function saveExcelData($id , Request $req)
+    {
+        $order = Order::findOrFail($id);
+        CustomerMeta::updateOrCreate(
+            ['customer_id' =>  $order->customer_id],
+            [
+                'customer_code' => $req->customer_code
+            ]
+        );
+        foreach ($order->orderProducts as $orderProduct){
+            GoodMeta::updateOrCreate(
+                ['good_id' =>  $orderProduct->product->good->id],
+                [
+                    'warehouse_code' => $req->{'warehouse_code_' . $orderProduct->id},
+                    'stuff_code' => $req->{'stuff_code_' . $orderProduct->id},
+                    'added_value' => $req->{'added_value_' . $orderProduct->id},
+                ]
+            );
+        }
+        return 'با موفقیت ذخیره شد.';
     }
 }
 

@@ -8,7 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class GoodMeta extends Model
 {
     protected $fillable = [
-       '*'
+        'good_id',
+        'warehouse_code',
+        'stuff_code',
+        'added_value',
     ];
     public $timestamps = false;
 

@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class CustomerMeta extends Model
 {
     protected $fillable = [
-        '*'
+        'customer_code',
+        'customer_id',
     ];
     public $timestamps = false;
 
