@@ -25,4 +25,9 @@ class Good extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    public function goodMetas()
+    {
+        return $this->hasMany(GoodMeta::class);
+    }
 }

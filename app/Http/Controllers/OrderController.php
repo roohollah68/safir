@@ -724,9 +724,18 @@ class OrderController extends Controller
         return ['ok', $order];
     }
 
-    public function orderExcel()
+    public function orderExcel($id)
     {
+        $order = Order::findOrFail($id);
+        $customer = $order->customer;
+        $customerMeta = $customer->customerMetas()->first();
 
+        return view('orders.orderExcel',[
+            'order' => $order,
+            'customer' => $customer,
+            'customerMeta' => $customerMeta,
+            'orderProducts' => $order->orderProducts->keyBy('id')
+        ]);
     }
 }
 

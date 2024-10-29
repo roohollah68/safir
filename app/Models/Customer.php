@@ -68,4 +68,9 @@ class Customer extends Model
     {
         return $this->city()->first()->name;
     }
+
+    public function customerMetas()
+    {
+        return $this->hasMany(CustomerMeta::class);
+    }
 }

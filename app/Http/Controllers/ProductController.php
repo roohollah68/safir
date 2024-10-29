@@ -114,11 +114,7 @@ class ProductController extends Controller
         $good->category = $req->category;
         $product->save();
         $good->save();
-//        Product::where('name', $product->name)->update([
-//            'price' => $product->price,
-//            'productPrice' => $product->productPrice,
-//            'category' => $product->category,
-//        ]);
+
         if ($productChange->change != 0)
             $productChange->save();
         DB::commit();

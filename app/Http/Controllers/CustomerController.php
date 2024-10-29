@@ -180,10 +180,11 @@ class CustomerController extends Controller
             'verified' => 'waiting',
         ]);
         $req->amount = number_format($req->amount);
-
-        $message = "ثبت سند واریزی مشتری
+        $userName = auth()->user()->name;
+        $message = "*ثبت سند واریزی مشتری*
 نام: {$customer->name}
 مبلغ: {$req->amount} ریال
+توسط: {$userName}
 توضیحات: {$newTransaction->description}
         ";
 
