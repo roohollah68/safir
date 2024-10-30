@@ -4,6 +4,7 @@
 /public/product_photo
 /public/pdf
 /public/woo
+/public/comment
 /storage/*.key
 .idea
 .git
