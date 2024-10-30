@@ -47,7 +47,7 @@ class CustomerController extends Controller
         else
             $customer = auth()->user()->customers()->findOrFail($id);
         $transactions = $customer->transactions()->get()->keyBy('id');
-        $orders = $customer->orders()->get()->keyBy('id')->where('confirm' , true);
+        $orders = $customer->orders()->get()->keyBy('id')->where('confirm', true);
 
         return view('customer.customerTransactionList', [
             'customer' => $customer,
@@ -324,7 +324,7 @@ class CustomerController extends Controller
         $pdf = PDF::loadView('customer.customerSOA', [
                 'customer' => $customer,
                 'transactions' => $transactions->get(),
-                'orders' => $orders->get()->where('confirm' , true),
+                'orders' => $orders->get()->where('confirm', true),
                 'timeDescription' => $timeDescription,
                 'withInvoice' => !!$request->allInvoice,
                 'total' => 0,
@@ -418,7 +418,7 @@ class CustomerController extends Controller
         foreach ($Orders as $id => $Order) {
             if (count($orders) >= 100)
                 break;
-            if($Order->counter != 'approved' || !$Order->confirm)
+            if ($Order->counter != 'approved' || !$Order->confirm)
                 continue;
             if (!auth()->user()->meta('allCustomers') && auth()->user()->id != $Order->user_id)
                 continue;
@@ -432,16 +432,10 @@ class CustomerController extends Controller
 
     function postpondDay($id, $days)
     {
-        if (auth()->user()->meta('allCustomers'))
-            $order = Order::findOrFail($id);
-        else {
-            $order = auth()->user()->orders->find($id);
-            $days = max($days, 7);
-        }
+        Helper::access('allCustomers');
+        $order = Order::findOrFail($id);
         $date = Carbon::now();
         $date->addDays(+$days);
-//        $date = new DateTime('now');
-//        $date->modify('+ ' . $days . 'days');
         $order->payInDate = $date;
         $order->save();
     }

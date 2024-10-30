@@ -37,7 +37,9 @@
                     <a class="btn btn-info fa fa-eye" onclick="view_order({{$id}})" title="مشاهده سفارش"></a>
                     <a class="fa fa-comment btn btn-info" onclick="view_comment({{$id}})"></a>
                     <span class="btn btn-primary fa fa-chain" onclick="showOrderLink({{$id}})"></span>
-                    <span class="btn btn-secondary fa fa-clock" onclick="postpond({{$id}})"></span>
+                    @if(auth()->user()->meta('allCustomers'))
+                        <span class="btn btn-secondary fa fa-clock" onclick="postpond({{$id}})"></span>
+                    @endif
                 </td>
             </tr>
         @endforeach
@@ -46,13 +48,13 @@
 
     <div id="postpond">
         <div title="به تعویق انداختن پرداخت" class="dialogs">
-            <span class="btn btn-outline-success m-3" onclick="postpondDay(1)">1 روز بعد</span><br>
-            <span class="btn btn-outline-success m-3" onclick="postpondDay(7)">1 هفته بعد</span><br>
-            @if(auth()->user()->meta('allCustomers'))
-                <span class="btn btn-outline-success m-3" onclick="postpondDay(14)">2 هفته بعد</span><br>
-                <span class="btn btn-outline-success m-3" onclick="postpondDay(30)">1 ماه بعد</span><br>
-                <span class="btn btn-outline-success m-3" onclick="postpondDay(180)">6 ماه بعد</span><br>
-            @endif
+            <input type="number" value="" id="days" style="width: 120px">
+            <span class="btn btn-info m-1" onclick="postpondDay($('#days').val())">روز بعد</span><br>
+            <span class="btn btn-outline-success m-1" onclick="postpondDay(1)">1 روز بعد</span><br>
+            <span class="btn btn-outline-success m-1" onclick="postpondDay(7)">1 هفته بعد</span><br>
+            <span class="btn btn-outline-success m-1" onclick="postpondDay(14)">2 هفته بعد</span><br>
+            <span class="btn btn-outline-success m-1" onclick="postpondDay(30)">1 ماه بعد</span><br>
+            <span class="btn btn-outline-success m-1" onclick="postpondDay(180)">6 ماه بعد</span><br>
         </div>
     </div>
 
@@ -95,17 +97,19 @@
                 location.reload();
             })
         }
-
-        function postpond(id){
+        @if(auth()->user()->meta('allCustomers'))
+        function postpond(id) {
             postpondId = id;
-            let dialog = Dialog(postpondText);
+            dialog = Dialog(postpondText);
         }
 
-        function postpondDay(days){
-            $.get('/postpondDay/'+postpondId+'/'+days).done(()=>{
+        function postpondDay(days) {
+            dialog.remove();
+            $.get('/postpondDay/' + postpondId + '/' + days).done(() => {
                 location.reload();
             })
         }
+        @endif
 
     </script>
 @endsection
