@@ -62,7 +62,7 @@
                             $totalProducts += $orderProduct->number;
                         @endphp
                         <tr class="{{$loop->iteration>$firstPageItems?$lastPage:$firstPage}}">
-                            <td>{{$loop->iteration}}</td>
+                            <td dir="ltr">{{$loop->iteration}} <span>{{$price_no_dis!=$orderProduct->product->good->price?'*':''}}</span></td>
                             <td>{{$orderProduct->name}}</td>
                             <td dir="ltr">{{+$orderProduct->number}}</td>
                             <td>{{number_format($price_no_dis)}}</td>

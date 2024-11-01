@@ -231,8 +231,11 @@
         if (showDeleted)
             return res;
         @if($safir)
-        if (!order.state)
-            res += deleteOrder + editOrder;
+        if (!order.state) {
+            res += deleteOrder;
+            if(order.total >= 0)
+                res += editOrder
+        }
         @else
         let creatorRole = users[order.user_id].role
 

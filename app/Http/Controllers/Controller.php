@@ -64,17 +64,6 @@ class Controller extends BaseController
         }
         return $order;
     }
-    public function city($user)
-    {
-        if($user->city == 't')
-            return ['تهران' , 'quantity'];
-        if($user->city == 'f')
-            return ['فریمان', 'quantity_f'];
-        if($user->city == 'm')
-            return ['مشهد','quantity_m'];
-        return ['',''];
-    }
-
     public function errorBack($error)
     {
         return redirect()->back()->withInput()->withErrors([$error]);

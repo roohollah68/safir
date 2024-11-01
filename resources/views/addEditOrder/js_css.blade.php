@@ -123,12 +123,11 @@
         <td>
             <input type="text" class="price-input text-success discount" style="width: 80px;"
             name="price_${id}" id="price_${id}" value="${product.priceWithDiscount}"
-            onchange="calculate_discount(${id},this.value)" ${changePricePermit ? '' : 'disabled'}>` +
-            ((+product.priceWithDiscount === +product.price) ? '' :
-                `<span class="text-danger" style="text-decoration: line-through">
-            ${priceFormat(product.price)}
-        </span>`) +
-            `</td>
+            onchange="calculate_discount(${id},this.value)" ${changePricePermit ? '' : 'disabled'}>
+            <span class="text-danger">
+                ${priceFormat(product.price)}
+            </span>
+        </td>
         <td>
         <input type="number" name="discount_${id}" class="discount-value" id="discount_${id}"
         value="${product.coupon}" style="width: 80px" onchange="changeDiscount(${id},this.value)"
@@ -279,11 +278,15 @@
 
     function calculate_discount(id, value) {
         value = +value.replaceAll(',', '');
-        if (value <= products[id].price && '{{$user->id}}' !== '61') {
+        if ( $('#discount_' + id).val() > 0) {
+            if(value > products[id].price){
+                $('price_'+id).val(products[id].price).change();
+                return;
+            }
             value = Math.max(0, +value);
             $('#discount_' + id).val((1 - value / products[id].price) * 100).change();
         } else {
-            $('#discount_' + id).val(0);
+            $.notify('هشدار قیمت تغییر کرده است!','warn');
         }
     }
 

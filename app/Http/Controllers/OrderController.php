@@ -115,20 +115,19 @@ class OrderController extends Controller
         }
         foreach ($request->cart as $id => $number) {
             $product = $products[$id];
-//            $order->orders .= ' ' . $product->name . ' ' . +$number . 'عدد' . '،';
             $discount = +$product->coupon;
             if (auth()->user()->meta('changeDiscount'))
                 $discount = +$request['discount_' . $id];
             $price = round((100 - $discount) * $product->price / 100);
             if (auth()->user()->meta('changePrice') && $discount == 0)
                 $price = +str_replace(",", "", $request['price_' . $id]);
-            $order->total += $price * $number;
-            $Total += $product->price * $number;
+            $order->total += $price * (+$number);
+            $Total += $product->price * (+$number);
             $order->save();
             $order->orderProducts()->create([
                 'name' => $product->name,
                 'price' => $price,
-                'product_id' => $product->id,
+                'product_id' => $id,
                 'number' => $number,
                 'discount' => $discount,
                 'verified' => $this->safir(),
@@ -186,10 +185,12 @@ class OrderController extends Controller
         } else {
             $order = auth()->user()->orders()->with('customer.city')->with('user')->findOrFail($id);
         }
-        $user = $order->user()->first();
+        $user = $order->user;
         if (($order->state && $order->user->safir()) || ($order->confirm && $order->user->admin()))
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
-        $products = Product::where('warehouse_id', $order->warehouse_id)->where('available', true)->
+        if ($order->total<0)
+            return view('error')->with(['message' => 'فاکتور بازگشت به انبار قابل ویرایش نیست، لطفا حذف کنید و مجدد ثبت کنید.']);
+        $products = Product::withTrashed()->where('warehouse_id', $order->warehouse_id)->where('available', true)->
         whereHas('good', function (Builder $query) {
             if (auth()->user()->meta('sellRawProduct'))
                 $query->where('category', '<>', 'pack');
@@ -200,7 +201,7 @@ class OrderController extends Controller
 
         $products = $this->calculateDis($products, $user);
 
-        $selectedProducts = $order->orderProducts()->get()->keyBy('product_id');
+        $selectedProducts = $order->orderProducts->keyBy('product_id');
         foreach ($selectedProducts as $id => $orderProduct) {
             if (isset($products[$id])) {
                 $cart[$id] = (int)$orderProduct->number;
@@ -216,7 +217,7 @@ class OrderController extends Controller
         return view('addEditOrder.addEditOrder')->with([
             'cart' => $cart,
             'cities' => $cities,
-            'creatorIsAdmin' => $order->user->admin(),
+            'creatorIsAdmin' => $order->user->admin() || $order->user->superAdmin(),
             'customers' => $user->customers()->get()->keyBy('id'),
             'edit' => true,
             'order' => $order,
@@ -248,53 +249,40 @@ class OrderController extends Controller
         if (!$order->user->safir()) {
             $orders = '';
             $products = Product::where('available', true)->where('warehouse_id', $order->warehouse_id)->get()->keyBy('id');
-            $productOrders = $order->orderProducts->keyBy('product_id');
-            $total = 0;
-            foreach ($products as $id => $product) {
-                $number = (int)$request['product_' . $id];
-                if ($number > 0) {
-                    $coupon = (int)$request['discount_' . $id];
-                    if ($coupon == 0) {
-                        $price = (int)str_replace(",", "", $request['price_' . $id]);
-                    } else
-                        $price = round((100 - $coupon) * ((int)$product->price) / 100);
-                    $total += $price * $number;
-
-                    if (isset($productOrders[$id]))
-                        $productOrders[$id]->update([
-                            'discount' => $request['discount_' . $id],
-                            'number' => $number,
-                            'price' => $price,
-                        ]);
-                    else
-                        $order->orderProducts()->create([
-                            'discount' => $request['discount_' . $id],
-                            'number' => $number,
-                            'price' => $price,
-                            'name' => $product->name,
-                            'product_id' => $id,
-                        ]);
-                }
+            $order->orderProducts()->delete();
+            if (count($request->cart) == 0) {
+                return $this->errorBack('محصولی انتخاب نشده است!');
             }
-            foreach ($productOrders as $product_id => $productOrder) {
-                $number = $request['product_' . $product_id];
-                if ($number < 1 && $productOrder->number > 0)
-                    $productOrder->delete();
+            $order->total = 0;
+            foreach ($request->cart as $id => $number) {
+                $product = $products[$id];
+                $discount = 0;
+                if (auth()->user()->meta('changeDiscount'))
+                    $discount = +$request['discount_' . $id];
+                $price = round((100 - $discount) * $product->price / 100);
+                if (auth()->user()->meta('changePrice') && $discount == 0)
+                    $price = +str_replace(",", "", $request['price_' . $id]);
+                $order->total += $price * (+$number);
+                $order->orderProducts()->create([
+                    'name' => $product->name,
+                    'price' => $price,
+                    'product_id' => $id,
+                    'number' => $number,
+                    'discount' => $discount,
+                    'verified' => false,
+                ]);
             }
-        } else {
-            $orders = $order->orders;
-            $total = $order->total;
         }
 
+        $order->save();
         $order->update([
             'name' => $order->user->safir() ? $request->name : $order->name,
             'phone' => $request->phone,
             'address' => $request->address,
             'zip_code' => $request->zip_code,
             'desc' => $request->desc,
-            'orders' => $orders,
-            'total' => $total,
         ]);
+
         $order->paymentLinks()->delete();
         (new CommentController)->create($order, auth()->user(), 'سفارش ویرایش شد');
 
@@ -310,7 +298,7 @@ class OrderController extends Controller
         Helper::access('showAllOrders');
         DB::beginTransaction();
         $order = Order::findOrFail($id);
-        $user = $order->user()->first();
+        $user = $order->user;
         $order->state = +$state;
 
         if ($order->paymentMethod == 'onDelivery') {
@@ -356,7 +344,7 @@ class OrderController extends Controller
         }
         if ($order->state == 1) {
             $text = 'سفارش در حال پردازش برای ارسال';
-            foreach ($order->orderProducts()->get() as $orderProduct) {
+            foreach ($order->orderProducts as $orderProduct) {
                 $product = $orderProduct->product()->withTrashed()->first();
                 if ($product) {
                     $product->update([
@@ -411,7 +399,7 @@ class OrderController extends Controller
 
                 $pdf = PDF::loadView('pdfs', ['orders' => [$order], 'fonts' => [$font]], []);
                 $mpdf = $pdf->getMpdf();
-            } while ($mpdf->page > 1 || $font < 6 );
+            } while ($mpdf->page > 1 || $font < 6);
             $fonts[] = $font;
             $orders[] = $order;
         }
@@ -435,7 +423,6 @@ class OrderController extends Controller
         if ($request->onlyOrderData) {
             return $order;
         }
-        $order->city = $this->city($order->user()->first())[0];
         $firstPageItems = $request->firstPageItems;
         $totalPages = $request->totalPages;
         $orderProducts = OrderProduct::where('order_id', $id)->with('product')->get();
@@ -732,7 +719,7 @@ class OrderController extends Controller
         $customer = $order->customer;
         $customerMeta = $customer->customerMetas->first();
 
-        return view('orders.orderExcel',[
+        return view('orders.orderExcel', [
             'order' => $order,
             'customer' => $customer,
             'customerMeta' => $customerMeta,
@@ -740,18 +727,18 @@ class OrderController extends Controller
         ]);
     }
 
-    public function saveExcelData($id , Request $req)
+    public function saveExcelData($id, Request $req)
     {
         $order = Order::findOrFail($id);
         CustomerMeta::updateOrCreate(
-            ['customer_id' =>  $order->customer_id],
+            ['customer_id' => $order->customer_id],
             [
                 'customer_code' => $req->customer_code
             ]
         );
-        foreach ($order->orderProducts as $orderProduct){
+        foreach ($order->orderProducts as $orderProduct) {
             GoodMeta::updateOrCreate(
-                ['good_id' =>  $orderProduct->product->good->id],
+                ['good_id' => $orderProduct->product->good->id],
                 [
                     'warehouse_code' => $req->{'warehouse_code_' . $orderProduct->id},
                     'stuff_code' => $req->{'stuff_code_' . $orderProduct->id},
