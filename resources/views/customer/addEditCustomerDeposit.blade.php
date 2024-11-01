@@ -23,10 +23,10 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="amount" class="input-group-text w-100">میزان واریزی:</label>
                     </div>
-                    <input value="{{old('amount')?:($link?$link->amount:'')}}" type="text" id="amount"
+                    <input value="{{old('amount')?:($order?$order->total:'')}}" type="text" id="amount"
                            class="form-control price-input" name="amount"
                            pattern="^([-+,0-9.]+)" dir="ltr" required>
-                    <input type="hidden" name="link" value="{{$link?$link->id:''}}">
+                    <input type="hidden" name="order" value="{{$order?$order->id:''}}">
                     <div class="input-group-prepend" style="min-width: 120px">
                         <label for="amount" class="input-group-text w-100"> ریال</label>
                     </div>

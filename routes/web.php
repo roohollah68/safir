@@ -86,6 +86,7 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::get('/customer/SOA/{id}', [CustomerController::class, 'customerSOA']);
     Route::post('/customer/SOA/{id}', [CustomerController::class, 'customerSOA']);
     Route::get('/customerDeposit/add/{id}', [CustomerController::class, 'newForm']);
+    Route::get('/customerDeposit/add/{customerId}/{orderId}', [CustomerController::class, 'newForm']);
     Route::post('/customerDeposit/add/{id}', [CustomerController::class, 'storeNew']);
     Route::post('/customerDeposit/delete/{id}', [CustomerController::class, 'deleteDeposit']);
     Route::get('/customerPaymentTracking', [CustomerController::class, 'paymentTracking']);

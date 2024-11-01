@@ -132,22 +132,20 @@ class CustomerController extends Controller
         return redirect()->route('CustomerList');
     }
 
-    public function newForm($id, $linkId = false)
+    public function newForm($id, $orderId = null)
     {
         if (auth()->user()->meta('allCustomers'))
             $customer = Customer::findOrFail($id);
         else
             $customer = auth()->user()->customers()->findOrFail($id);
-
-        if ($linkId)
-            $link = $customer->transactions()->findOrFail($linkId);
+        if ($orderId)
+            $order = Order::findOrFail($orderId);
         else
-            $link = false;
-
+            $order = null;
         return view('customer.addEditCustomerDeposit', [
             'customer' => $customer,
             'deposit' => false,
-            'link' => $link
+            'order' => $order,
         ]);
     }
 
@@ -168,10 +166,7 @@ class CustomerController extends Controller
             $photo = $req->file("photo")->store("", 'deposit');
         }
 
-        if (auth()->user()->meta('allCustomers'))
-            $customer = Customer::findOrFail($req->id);
-        else
-            $customer = auth()->user()->customers()->findOrFail($req->id);
+        $customer = Customer::findOrFail($req->id);
 
         $newTransaction = $customer->transactions()->create([
             'amount' => $req->amount,
@@ -179,6 +174,12 @@ class CustomerController extends Controller
             'photo' => $photo,
             'verified' => 'waiting',
         ]);
+        if ($req->order)
+            $newTransaction->paymentLinks()->create([
+                'order_id' => $req->order,
+                'amount' => $req->amount,
+            ]);
+
         $req->amount = number_format($req->amount);
         $userName = auth()->user()->name;
         $message = "*ثبت سند واریزی مشتری*

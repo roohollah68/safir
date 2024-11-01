@@ -120,6 +120,9 @@
                             <a class="fa fa-file-invoice-dollar btn btn-secondary"
                                onclick="invoice({{$id}})" title=" فاکتور"></a>
                             <span class="btn btn-primary fa fa-chain" onclick="showOrderLink({{$id}})"></span>
+                            @if($order->payPercent() < 100)
+                                <a href="/customerDeposit/add/{{$customer->id}}/{{$order->id}}" class="btn btn-outline-warning fa fa-money-bill" title="پرداخت فاکتور"></a>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
@@ -159,7 +162,6 @@
                 <br><br>
                 <input type="submit" class="btn btn-outline-success" name="submit" value="دریافت فایل">
             </form>
-
         </div>
     </div>
 @endsection
