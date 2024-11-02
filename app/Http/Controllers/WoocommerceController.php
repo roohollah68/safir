@@ -16,7 +16,7 @@ class WoocommerceController extends Controller
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
         $request = json_decode(file_get_contents('php://input'));
         if (env('APP_ENV') == 'local')
-            $request = json_decode(file_get_contents('woo/1403-7-24_04-57-04 _ peptina _ تینا شمسایی.txt'));
+            $request = json_decode(file_get_contents('woo/1403-8-12_00-42-55 _ peptina _ asal sheikhmiri.txt'));
         if (!isset($request->billing))
             return 'not used';
         file_put_contents('woo/' . verta(null, "Asia/Tehran")->
@@ -77,6 +77,7 @@ class WoocommerceController extends Controller
             'deliveryMethod' => $request->shipping_lines[0]->method_title . ' _ ' . $deliveryTime,
             'counter' => 'approved',
             'confirm' => true,
+            'warehouse_id' => ($request->billing->city == 'تهران') ? 1 : 2,
         ];
         if ($web) {
             $web->update([

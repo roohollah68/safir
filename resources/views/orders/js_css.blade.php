@@ -226,6 +226,8 @@
         let viewOrder = `<i id="view_order_${id}" class="fa fa-eye btn btn-info" onclick="view_order(${id})"></i> `;
         let viewComment = `<i id="view_comment_${id}" class="fa fa-comment btn btn-info" onclick="view_comment(${id})"></i> `;
         let deleteOrder = `<i class="fa fa-trash-alt btn btn-danger" onclick="delete_order(${id},this)" title="حذف سفارش" ></i> `;
+        // let changeWarehouse = `<i class="fa fa-warehouse btn btn-warning" onclick="changeWarehouse(${id})" title="تغییر انبار" ></i> `;
+        let changeWarehouse = ``;
         let editOrder = `<a class="fa fa-edit btn btn-primary" href="edit_order/${id}" title="ویرایش سفارش"></a> `;
         let res = viewOrder + viewComment;
         if (showDeleted)
@@ -233,8 +235,8 @@
         @if($safir)
         if (!order.state) {
             res += deleteOrder;
-            if(order.total >= 0)
-                res += editOrder
+            if (order.total >= 0)
+                res += editOrder + changeWarehouse;
         }
         @else
         let creatorRole = users[order.user_id].role
@@ -249,7 +251,7 @@
         if (!order.state && (!order.confirm || creatorRole === 'user'))
             res += deleteOrder;
         if (!order.confirm || (creatorRole === 'user' && !order.state))
-            res += editOrder;
+            res += editOrder + changeWarehouse;
 
         if (changeOrdersPermit && order.state)
             res += generatePDF
@@ -257,7 +259,7 @@
         if (order.customer_id)
             res += excel
 
-        if (creatorRole === 'admin' && order.state < 10 ) {
+        if (creatorRole === 'admin' && order.state < 10) {
             if (order.confirm)
                 res += cancelInvoice;
             else
@@ -457,6 +459,31 @@
 
         return false;
 
+    }
+
+    function changeWarehouse(id) {
+        let order = orders[id];
+        let text = `
+        <div title="تغییر انبار" class="dialogs">
+<span>انتقال از انبار</span><br>
+<span class="btn btn-info">${order.warehouse.name}</span><br><br>
+<span>به انبار</span><br>
+@foreach($warehouses as $warehouse)
+        <span class="btn btn-outline-secondary" onclick="warehouseChange(${id},{{$warehouse->id}});dialog.remove()">{{$warehouse->name}}</span>
+@endforeach
+</div>
+        `;
+
+        dialog = Dialog(text);
+        $(".checkboxradio").checkboxradio();
+    }
+
+    function warehouseChange(order_id , warehouse_id){
+        $.post(`changeWarehouse/${order_id}/${warehouse_id}`, {_token: token}).done((res)=>{
+            $.notify(res,'success');
+        }).fail(()=>{
+            $.notify('مشکلی پیش آمده','warn');
+        })
     }
 
 </script>

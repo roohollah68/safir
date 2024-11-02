@@ -26,12 +26,12 @@ class OrderController extends Controller
         $user = auth()->user();
         if (auth()->user()->meta('showAllOrders')) {
             $users = User::withTrashed()->get()->keyBy("id");
-            $orders = Order::withTrashed()->orderBy('id', 'desc')->with(['website', 'orderProducts'])
+            $orders = Order::withTrashed()->orderBy('id', 'desc')->with(['website', 'orderProducts','warehouse'])
                 ->limit($user->meta('NuRecords'))->get()->keyBy('id');
         } else {
             $users = array(auth()->user()->id => auth()->user());
             $orders = auth()->user()->orders()->withTrashed()
-                ->orderBy('id', 'desc')->with(['orderProducts'])->limit($user->meta('NuRecords'))->get()->keyBy('id');
+                ->orderBy('id', 'desc')->with(['orderProducts', 'warehose'])->limit($user->meta('NuRecords'))->get()->keyBy('id');
         }
 
         foreach ($orders as $order) {
@@ -53,6 +53,8 @@ class OrderController extends Controller
         $user = auth()->user();
         $order = new Order();
         $warehouseId = $req->warehouseId ?: $user->meta('warehouseId');
+//        if($user->safir())
+//            $warehouseId = 2;
         $products = Product::where('warehouse_id', $warehouseId)->where('available', true)->
         whereHas('good', function (Builder $query) {
             if (auth()->user()->meta('sellRawProduct'))
@@ -747,6 +749,13 @@ class OrderController extends Controller
             );
         }
         return 'با موفقیت ذخیره شد.';
+    }
+
+    public function changeWarehose($orderId , $warehouseId)
+    {
+        $order = Order::findOrFail($orderId);
+        $productOrders = $order->productOrders;
+        dd($productOrders);
     }
 }
 

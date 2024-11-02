@@ -16,6 +16,7 @@ use App\Models\Setting;
 use Illuminate\Http\Request;
 //use Illuminate\Support\Carbon;
 //use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Artisan;
 
 class SettingController extends Controller
 {
@@ -40,8 +41,8 @@ class SettingController extends Controller
 
     public function clearRoute()
     {
-        \Artisan::call('route:cache');
-        \Artisan::call('config:clear');
+        Artisan::call('route:cache');
+        Artisan::call('config:clear');
     }
 
     public function command()
