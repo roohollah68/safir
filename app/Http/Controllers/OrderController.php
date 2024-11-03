@@ -31,7 +31,7 @@ class OrderController extends Controller
         } else {
             $users = array(auth()->user()->id => auth()->user());
             $orders = auth()->user()->orders()->withTrashed()
-                ->orderBy('id', 'desc')->with(['orderProducts', 'warehose'])->limit($user->meta('NuRecords'))->get()->keyBy('id');
+                ->orderBy('id', 'desc')->with(['orderProducts', 'warehouse'])->limit($user->meta('NuRecords'))->get()->keyBy('id');
         }
 
         foreach ($orders as $order) {
