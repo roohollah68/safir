@@ -15,8 +15,10 @@ class WoocommerceController extends Controller
 
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
         $request = json_decode(file_get_contents('php://input'));
-        if (env('APP_ENV') == 'local')
+        if (env('APP_ENV') == 'local') {
             $request = json_decode(file_get_contents('woo/1403-8-12_00-42-55 _ peptina _ asal sheikhmiri.txt'));
+            dd($request);
+        }
         if (!isset($request->billing))
             return 'not used';
         file_put_contents('woo/' . verta(null, "Asia/Tehran")->
@@ -67,7 +69,7 @@ class WoocommerceController extends Controller
         $orderData = [
             'name' => $request->billing->first_name . ' ' . $request->billing->last_name,
             'phone' => $request->billing->phone,
-            'address' => $request->billing->city . ' ' . $request->billing->address_1,
+            'address' => $request->billing->state . ' ' .$request->billing->city . ' ' . $request->billing->address_1,
             'zip_code' => $request->billing->postcode,
             'orders' => $orders,
             'desc' => $request->customer_note . ($desc ? ' - ' . $desc : ''),
@@ -145,5 +147,12 @@ class WoocommerceController extends Controller
 
         DB::commit();
         return 'order saved!';
+    }
+
+    public function viewFile()
+    {
+        $file = '1403-8-1_23-02-18 _ peptina _ فریبا رمضان پور';
+        $data = json_decode(file_get_contents("woo/{$file}.txt"));
+        dd($data);
     }
 }

@@ -149,10 +149,12 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::get('/clear/route', [SettingController::class, 'clearRoute']);
     Route::get('/command', [SettingController::class, 'command']);
 
+    Route::get('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteOrder']);
+    Route::get('/woocommerce', [WoocommerceController::class, 'viewFile']);
+
 });
 
 Route::post('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteOrder']);
-Route::get('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteOrder']);
 Route::get('/backup', [TelegramController::class, 'backUpDatabase']);
 
 
