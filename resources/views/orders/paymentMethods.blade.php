@@ -13,12 +13,12 @@
         <br>
         <input type="radio" id="cod" value="cod" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">
         <label for='cod' class="btn btn-primary my-1">پرداخت در محل</label>
-        <br>
-        <input type="radio" id="factor" value="factorFactor" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">
-        <label for='factor' class="btn btn-secondary my-1">فاکتور به فاکتور</label>
-        <br>
-        <input type="radio" id="barrow" value="barrow" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">
-        <label for='barrow' class="btn btn-warning my-1">امانی</label>
+{{--        <br>--}}
+{{--        <input type="radio" id="factor" value="factorFactor" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">--}}
+{{--        <label for='factor' class="btn btn-secondary my-1">فاکتور به فاکتور</label>--}}
+{{--        <br>--}}
+{{--        <input type="radio" id="barrow" value="barrow" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">--}}
+{{--        <label for='barrow' class="btn btn-warning my-1">امانی</label>--}}
         <br>
         <input type="radio" id="payInDate" value="payInDate" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('#dateOfPayment').show()">
         <label for="payInDate" class="btn btn-danger my-1">پرداخت در تاریخ</label>
