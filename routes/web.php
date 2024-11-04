@@ -44,7 +44,7 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::get('edit_order/{id}', [OrderController::class, 'editOrder']);
     Route::post('edit_order/{id}', [OrderController::class, 'updateOrder']);
     Route::post('delete_order/{id}', [OrderController::class, 'deleteOrder']);
-    Route::post('changeWarehouse/${orderId}/${warehouseId}', [OrderController::class, 'changeWarehose']);
+    Route::get('changeWarehouse/{orderId}/{warehouseId}', [OrderController::class, 'changeWarehose']);
 
     Route::post('/viewOrder/{id}', [OrderController::class, 'viewOrder']);
     Route::post('/invoice/{id}', [OrderController::class, 'invoice']);

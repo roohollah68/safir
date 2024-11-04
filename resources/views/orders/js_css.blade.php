@@ -226,8 +226,7 @@
         let viewOrder = `<i id="view_order_${id}" class="fa fa-eye btn btn-info" onclick="view_order(${id})"></i> `;
         let viewComment = `<i id="view_comment_${id}" class="fa fa-comment btn btn-info" onclick="view_comment(${id})"></i> `;
         let deleteOrder = `<i class="fa fa-trash-alt btn btn-danger" onclick="delete_order(${id},this)" title="حذف سفارش" ></i> `;
-        // let changeWarehouse = `<i class="fa fa-warehouse btn btn-warning" onclick="changeWarehouse(${id})" title="تغییر انبار" ></i> `;
-        let changeWarehouse = ``;
+        let changeWarehouse = `<i class="fa fa-warehouse btn btn-warning" onclick="changeWarehouse(${id})" title="تغییر انبار" ></i> `;
         let editOrder = `<a class="fa fa-edit btn btn-primary" href="edit_order/${id}" title="ویرایش سفارش"></a> `;
         let res = viewOrder + viewComment;
         if (showDeleted)
@@ -471,18 +470,20 @@
 @foreach($warehouses as $warehouse)
         <span class="btn btn-outline-secondary" onclick="warehouseChange(${id},{{$warehouse->id}});dialog.remove()">{{$warehouse->name}}</span>
 @endforeach
-</div>
-        `;
+        </div>
+`;
 
         dialog = Dialog(text);
         $(".checkboxradio").checkboxradio();
     }
 
-    function warehouseChange(order_id , warehouse_id){
-        $.post(`changeWarehouse/${order_id}/${warehouse_id}`, {_token: token}).done((res)=>{
-            $.notify(res,'success');
-        }).fail(()=>{
-            $.notify('مشکلی پیش آمده','warn');
+    function warehouseChange(order_id, warehouse_id) {
+        $.get(`changeWarehouse/${order_id}/${warehouse_id}`, {_token: token}).done((res) => {
+            orders[order_id] = res;
+            prepare_data();
+            $.notify('با موفقیت ذخیره شد.', 'success');
+        }).fail(() => {
+            $.notify('مشکلی پیش آمده', 'warn');
         })
     }
 

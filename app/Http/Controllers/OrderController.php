@@ -11,6 +11,7 @@ use App\Models\GoodMeta;
 use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
+use App\Models\ProductChange;
 use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ class OrderController extends Controller
         $user = auth()->user();
         if (auth()->user()->meta('showAllOrders')) {
             $users = User::withTrashed()->get()->keyBy("id");
-            $orders = Order::withTrashed()->orderBy('id', 'desc')->with(['website', 'orderProducts','warehouse'])
+            $orders = Order::withTrashed()->orderBy('id', 'desc')->with(['website', 'orderProducts', 'warehouse'])
                 ->limit($user->meta('NuRecords'))->get()->keyBy('id');
         } else {
             $users = array(auth()->user()->id => auth()->user());
@@ -190,7 +191,7 @@ class OrderController extends Controller
         $user = $order->user;
         if (($order->state && $order->user->safir()) || ($order->confirm && $order->user->admin()))
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
-        if ($order->total<0)
+        if ($order->total < 0)
             return view('error')->with(['message' => 'فاکتور بازگشت به انبار قابل ویرایش نیست، لطفا حذف کنید و مجدد ثبت کنید.']);
         $products = Product::withTrashed()->where('warehouse_id', $order->warehouse_id)->where('available', true)->
         whereHas('good', function (Builder $query) {
@@ -751,11 +752,26 @@ class OrderController extends Controller
         return 'با موفقیت ذخیره شد.';
     }
 
-    public function changeWarehose($orderId , $warehouseId)
+    public function changeWarehose($orderId, $warehouseId)
     {
+        DB::beginTransaction();
         $order = Order::findOrFail($orderId);
-        $productOrders = $order->productOrders;
-        dd($productOrders);
+        $productOrders = $order->orderProducts;
+        foreach ($productOrders as $productOrder) {
+            $product = $productOrder->product;
+            $product2 = Product::withTrashed()->firstOrCreate([
+                'warehouse_id' => $warehouseId,
+                'good_id' => $product->good_id,
+            ], []);
+            $product2->available = true;
+            $product2->save();
+            $productOrder->product_id = $product2->id;
+            $productOrder->save();
+        }
+        $order->warehouse_id = $warehouseId;
+        $order->save();
+        DB::commit();
+        return $order;
     }
 }
 
