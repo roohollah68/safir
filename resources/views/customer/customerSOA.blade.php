@@ -46,20 +46,20 @@
 
     @foreach($transactions->merge($orders)->sortBy('created_at') as $trans)
         @if($trans->getTable() == 'customer_transactions')
-            @php
-                $total2 += $trans->amount;
-            @endphp
             @if( $trans->verified != 'approved')
                 @continue
             @endif
+            @php
+                $total2 += $trans->amount;
+            @endphp
         @endif
         @if($trans->getTable() == 'orders')
-            @php
-                $total1 += $trans->total;
-            @endphp
             @if(!$trans->confirm)
                 @continue
             @endif
+            @php
+                $total1 += $trans->total;
+            @endphp
         @endif
         @php
             $total = $total2-$total1;
