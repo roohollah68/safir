@@ -64,7 +64,7 @@ class SettingController extends Controller
             }
             if($customer->balance != $total2-$total1) {
                 echo $customer->name . ' / ' . $customer->id . '<br>';
-                dd([$customer->balance , $total2 ,$total1, $total2-$total1]);
+                dd([$customer->balance , $total2 ,$total1, $total2-$total1 , $transactions]);
             }
         }
 
