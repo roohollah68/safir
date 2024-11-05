@@ -321,7 +321,6 @@ class CustomerController extends Controller
                 ['created_at', '<', $request->to]
             ]);
         }
-//        dd($orders->get('created_at')->merge($transactions->get())->keyBy('created_at')->first()->getTable());
         $pdf = PDF::loadView('customer.customerSOA', [
                 'customer' => $customer,
                 'transactions' => $transactions->get(),

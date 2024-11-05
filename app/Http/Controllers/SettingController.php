@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 //use App\Models\CustomerTransaction;
 //use App\Models\Good;
 use App\Helper\Helper;
+use App\Models\Customer;
 use App\Models\CustomerTransaction;
 use App\Models\Order;
 //use App\Models\Product;
@@ -13,10 +14,12 @@ use App\Models\Order;
 use App\Models\Setting;
 //use App\Models\User;
 //use GuzzleHttp\Psr7\Query;
+use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
 //use Illuminate\Support\Carbon;
 //use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
+use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 
 class SettingController extends Controller
 {
@@ -47,53 +50,25 @@ class SettingController extends Controller
 
     public function command()
     {
-//        $this->orders();
-//        $this->customerTransactions();
-//        $this->orderSafir100();
-        return 'ok';
-    }
-
-
-    public function customerTransactions()
-    {
-        $transactions = CustomerTransaction::all();
-        foreach ($transactions as $transaction){
-            if($transaction->deleted) {
-                $transaction->delete();
-                continue;
+        $costomers = Customer::all();
+        foreach ($costomers as $customer){
+            $orders = $customer->orders()->where('confirm' , true)->get();
+            $transactions = $customer->transactions()->where('verified', 'approved')->get();
+            $total1 = 0;
+            foreach ($orders as $order){
+                $total1 += $order->total;
             }
-            if (!$transaction->order_id)
-                continue;
-            if(!$transaction->paymentLink) {
-                $transaction->delete();
-                continue;
+            $total2 = 0;
+            foreach ($transactions as $transaction) {
+                $total2 += $transaction->amount;
             }
-            $order = $transaction->order;
-            $order->paymentLinks()->create([
-                'customer_transaction_id'=>$transaction->paymentLink,
-                'amount'=>$order->total,
-            ]);
-            $transaction->delete();
+            if($customer->balance != $total2-$total1) {
+                echo $customer->name . ' / ' . $customer->id . '<br>';
+                dd([$customer->balance , $total2 ,$total1,$orders ]);
+            }
         }
-    }
 
-    public function orders()
-    {
-        $orders = Order::withTrashed()->get();
-        foreach ($orders as $order) {
-            if($order->orders == '')
-                continue;
-            if ($order->orders == 'طبق فاکتور') {
-                $order->orders = '';
-            } else
-                foreach ($order->orderProducts()->get() as $orderProduct) {
-                    $text = ' ' . $orderProduct->name . ' ' . +$orderProduct->number . 'عدد' . '،';
-                    $order->orders = str_replace($text, '', $order->orders);
-                }
-            $order->save();
-        }
     }
-
 
 }
 
