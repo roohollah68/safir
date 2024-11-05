@@ -52,6 +52,8 @@ class SettingController extends Controller
     {
         $costomers = Customer::all();
         foreach ($costomers as $customer){
+            if($customer->user->safir())
+                continue;
             $orders = $customer->orders()->where('confirm' , true)->get();
             $transactions = $customer->transactions()->where('verified', 'approved')->get();
             $total1 = 0;
