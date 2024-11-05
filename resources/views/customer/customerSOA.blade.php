@@ -22,34 +22,48 @@
     </tr>
     </thead>
     <tbody>
-    @foreach($transactions as $trans)
-        @if($trans->verified != 'approved')
-            @continue
-        @endif
-        @php
-            $total2 += $trans->amount;
-        @endphp
-    @endforeach
+    {{--    @foreach($transactions as $trans)--}}
+    {{--        @if($trans->verified != 'approved')--}}
+    {{--            @continue--}}
+    {{--        @endif--}}
+    {{--        @php--}}
+    {{--            $total2 += $trans->amount;--}}
+    {{--        @endphp--}}
+    {{--    @endforeach--}}
 
-    @foreach($orders as $order)
-        @if($order->counter != 'approved')
-            @continue
-        @endif
-        @php
-            $total1 += $order->total;
-        @endphp
-    @endforeach
-    @php
-        $total += $total2 -$total1;
-    @endphp
+    {{--    @foreach($orders as $order)--}}
+    {{--        @if(!$order->confirm)--}}
+    {{--            @continue--}}
+    {{--        @endif--}}
+    {{--        @php--}}
+    {{--            $total1 += $order->total;--}}
+    {{--        @endphp--}}
+    {{--    @endforeach--}}
+
+    {{--    @php--}}
+    {{--        $total = $total2 -$total1;--}}
+    {{--    @endphp--}}
 
     @foreach($transactions->merge($orders)->sortBy('created_at') as $trans)
-        @if($trans->getTable() == 'customer_transactions' && $trans->verified != 'approved')
-            @continue
+        @if($trans->getTable() == 'customer_transactions')
+            @php
+                $total2 += $trans->amount;
+            @endphp
+            @if( $trans->verified != 'approved')
+                @continue
+            @endif
         @endif
-        @if($trans->getTable() == 'orders' && $trans->counter != 'approved')
-            @continue
+        @if($trans->getTable() == 'orders')
+            @php
+                $total1 += $trans->total;
+            @endphp
+            @if(!$trans->confirm)
+                @continue
+            @endif
         @endif
+        @php
+            $total = $total2-$total1;
+        @endphp
 
         <tr>
             <td>{{$trans->id}}</td>
@@ -57,7 +71,7 @@
             <td>{{$trans->description?:$trans->desc}}</td>
             <td dir="ltr">{{number_format($trans->total)}}</td>
             <td dir="ltr">{{number_format($trans->amount)}}</td>
-            <td dir="ltr"></td>
+            <td dir="ltr">{{number_format($total)}}</td>
         </tr>
     @endforeach
     <tr>
