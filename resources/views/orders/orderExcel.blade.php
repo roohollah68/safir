@@ -48,6 +48,7 @@
             </thead>
             <tbody>
             @foreach($orderProducts as $id => $orderProduct)
+                @continue(!isset($orderProduct->product))
                 @php
                     $goodMeta = $orderProduct->product->good->goodMetas->first();
                 @endphp
