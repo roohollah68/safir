@@ -33,7 +33,8 @@
                                 ،کدپستی:&nbsp;{{$order->zip_code}}
                             @endif
                         </th>
-                        <td class="text-center" id="invoice-time">{{verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
+                        <td class="text-center"
+                            id="invoice-time">{{verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
                     </tr>
                 </table>
                 <table class="border w-100 table2 round table-striped">
@@ -62,7 +63,11 @@
                             $totalProducts += $orderProduct->number;
                         @endphp
                         <tr class="{{$loop->iteration>$firstPageItems?$lastPage:$firstPage}}">
-                            <td dir="ltr">{{$loop->iteration}} <span>{{$price_no_dis!=$orderProduct->product->good->price?'*':''}}</span></td>
+                            <td dir="ltr">{{$loop->iteration}}
+                                @isset($orderProduct->product)
+                                    <span>{{$price_no_dis!=$orderProduct->product->good->price?'*':''}}</span>
+                                @endisset
+                            </td>
                             <td>{{$orderProduct->name}}</td>
                             <td dir="ltr">{{+$orderProduct->number}}</td>
                             <td>{{number_format($price_no_dis)}}</td>
@@ -72,13 +77,13 @@
                         </tr>
                     @endforeach
                     <tr class="{{$lastPage}}">
-                        <td colspan="2" >مجموع تعداد اقلام</td>
+                        <td colspan="2">مجموع تعداد اقلام</td>
                         <td dir="ltr">{{$totalProducts}}</td>
                         <td colspan="3"></td>
                         <td></td>
                     </tr>
                     <tr class="{{$lastPage}}">
-                        <td colspan="6" style="border-bottom: none;" ><br><br></td>
+                        <td colspan="6" style="border-bottom: none;"><br><br></td>
                         <td></td>
                     </tr>
                     <tr class="{{$lastPage}}">
@@ -104,17 +109,19 @@
                 توضیحات: {{$order->desc}}
                 <br>
                 @unless($order->confirm)
-                    <<اعتبار این پیش فاکتور برای ۴۸ ساعت است>>
+                    <
+                    <اعتبار این پیش فاکتور برای ۴۸ ساعت است>>
                 @endunless
             </div>
-           <div class="{{$lastPage}}">
-            <div class="w-100 normal d-flex justify-content-around">
-                <span>امضای خریدار</span>
-                <span>تایید حسابداری</span>
-                <span>امضای فروشنده</span>
+            <div class="{{$lastPage}}">
+                <div class="w-100 normal d-flex justify-content-around">
+                    <span>امضای خریدار</span>
+                    <span>تایید حسابداری</span>
+                    <span>امضای فروشنده</span>
+                </div>
             </div>
-           </div>
-        <</div>
+            <
+        </div>
 
         <style>
 
