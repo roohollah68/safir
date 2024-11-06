@@ -65,7 +65,8 @@ class SettingController extends Controller
                 $total2 += $transaction->amount;
             }
             if($customer->balance != $total2-$total1) {
-                echo $customer->name . ' / ' . $customer->id . '<br>';
+                $customer->balance = $total2-$total1;
+                $customer->save();
             }
         }
 
