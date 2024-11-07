@@ -10,6 +10,7 @@
     let changeDiscountPermit = !!'{{auth()->user()->meta('changeDiscount')}}';
     let changePricePermit = !!'{{auth()->user()->meta('changePrice')}}';
     let table;
+    let submitStatus = false;
 
     $(function () {
         setTimeout(function () {
@@ -302,6 +303,9 @@
             alert('تعداد همگی باید مثبت یا منفی باشند');
             return false;
         }
+        if(submitStatus)
+            return false;
+        submitStatus = true
         return true;
     }
 
