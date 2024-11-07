@@ -31,7 +31,6 @@
     <x-checkbox :id="'showDeleted'"> سفارشات حذف شده</x-checkbox>
 
     @if(!$safir)
-
         <x-checkbox :id="'confirmWait'">در انتظار تایید کاربر</x-checkbox>
         <x-checkbox :id="'counterWait'">در انتظار تایید حسابدار</x-checkbox>
         <x-checkbox :id="'printWait'"> در انتظار پرینت</x-checkbox>

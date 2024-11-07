@@ -10,7 +10,7 @@
     let orders = {!!json_encode($orders)!!};
     let ids;
     let showDeleted, printWait, confirmWait, counterWait, proccessWait, COD, user = 'all',
-        warehouseId = '{{$user->meta('warehouseId')}}';
+        warehouseId = 'all';
     let changeOrdersPermit = !!'{{auth()->user()->meta('showAllOrders')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     let dtp1Instance;
