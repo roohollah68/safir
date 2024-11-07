@@ -109,7 +109,8 @@
                            minlength="10" maxlength="10" pattern="^[۰-۹0-9]*$">
                 </div>
             </div>
-            @if($superAdmin)
+
+            @if(auth()->user()->meta('allCustomers'))
             <div class="col-md-6">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">

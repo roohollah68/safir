@@ -61,12 +61,14 @@ class CustomerController extends Controller
     {
         $customer = new Customer;
         $customer->city_id = 301;
+        $customer->user_id = auth()->user()->id;
 
         return view('customer.addEditCustomer', [
             'customer' => $customer,
             'cities' => City::all()->keyBy('name'),
             'citiesId' => City::all()->keyBy('id'),
             'province' => Province::all()->keyBy('id'),
+            'users' => User::where('verified', true)->get(),
         ]);
     }
 
@@ -80,12 +82,13 @@ class CustomerController extends Controller
         $request->phone = Helper::number_Fa_En($request->phone);
         $request->zip_code = Helper::number_Fa_En($request->zip_code);
 
-        auth()->user()->customers()->create([
+        Customer::create([
             'name' => $request->name,
             'phone' => $request->phone,
             'address' => $request->address,
             'zip_code' => $request->zip_code,
             'city_id' => $request->city_id,
+            'user_id' => $request->user,
         ]);
         return redirect()->route('CustomerList');
     }
