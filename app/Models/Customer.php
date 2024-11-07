@@ -17,6 +17,7 @@ class Customer extends Model
         'category',
         'city_id',
         'user_id',
+        'discount',
     ];
 
     public function user()

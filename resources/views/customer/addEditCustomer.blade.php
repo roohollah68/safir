@@ -9,46 +9,45 @@
 @endsection
 
 @section('files')
-<script>
-    let cities = {!!json_encode($cities)!!};
-    let citiesId = {!!json_encode($citiesId)!!};
-    let province = {!!json_encode($province)!!};
-    $(function () {
+    <script>
+        let cities = {!!json_encode($cities)!!};
+        let citiesId = {!!json_encode($citiesId)!!};
+        let province = {!!json_encode($province)!!};
+        $(function () {
 
-        $("#city").autocomplete({
-            source: Object.keys(cities),
-            select: function (event, ui) {
-                $('#city').change();
-            }
+            $("#city").autocomplete({
+                source: Object.keys(cities),
+                select: function (event, ui) {
+                    $('#city').change();
+                }
+            });
+
+            $('#city').change(function () {
+                let city = cities[this.value];
+                if (city) {
+                    $('#city_id').val(city.id);
+                    $('#province').html(province[city.province_id].name);
+                } else {
+                    let city = citiesId[$('#city_id').val()];
+                    $('#city').val(city.name)
+                    $('#province').html(province[city.province_id].name);
+                }
+            }).click(function () {
+                this.value = '';
+                $('#province').html('<sapn class="fa fa-arrow-rotate-back"></span>');
+            });
+
         });
 
-        $('#city').change(function (){
-            let city = cities[this.value];
-            if(city) {
-                $('#city_id').val(city.id);
-                $('#province').html(province[city.province_id].name);
-            }
-            else {
-                let city = citiesId[$('#city_id').val()];
-                $('#city').val(city.name)
-                $('#province').html(province[city.province_id].name);
-            }
-        }).click(function (){
-            this.value = '';
-            $('#province').html('<sapn class="fa fa-arrow-rotate-back"></span>');
-        });
-
-    });
-
-</script>
-<style>
-    .ui-autocomplete {
-        max-height: 150px;
-        overflow-y: auto;
-        /* prevent horizontal scrollbar */
-        overflow-x: hidden;
-    }
-</style>
+    </script>
+    <style>
+        .ui-autocomplete {
+            max-height: 150px;
+            overflow-y: auto;
+            /* prevent horizontal scrollbar */
+            overflow-x: hidden;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -111,26 +110,37 @@
             </div>
 
             @if(auth()->user()->meta('allCustomers'))
-            <div class="col-md-6">
-                <div class="form-group input-group required">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label for="user" class="input-group-text w-100">کاربر مرتبط:</label>
+                <div class="col-md-6">
+                    <div class="form-group input-group required">
+                        <div class="input-group-append" style="min-width: 160px">
+                            <label for="user" class="input-group-text w-100">کاربر مرتبط:</label>
+                        </div>
+                        <select class="form-control" name="user" id="user">
+                            @foreach($users as $user)
+                                <option value="{{$user->id}}"
+                                        @if($user->id == $customer->user_id)
+                                            selected
+                                    @endif
+                                >{{$user->name}}</option>
+                            @endforeach
+                        </select>
                     </div>
-                    <select class="form-control" name="user" id="user">
-                        @foreach($users as $user)
-                            <option value="{{$user->id}}"
-                                    @if($user->id == $customer->user_id)
-                                    selected
-                                @endif
-                            >{{$user->name}}</option>
-                        @endforeach
-                    </select>
                 </div>
-            </div>
             @else
                 <input type="hidden" name="user"
                        value="{{old('user')?:$customer->user->id}}">
             @endif
+            @unless(auth()->user()->safir())
+                <div class="col-md-6">
+                    <div class="form-group input-group">
+                        <div class="input-group-append" style="min-width: 160px">
+                            <label for="discount" class="input-group-text w-100">تخفیف پیشفرض:</label>
+                        </div>
+                        <input value="{{old('discount')?:$customer->discount?:0}}" type="number" id="discount"
+                               class="form-control" name="discount" min="0" max="100" step="1">
+                    </div>
+                </div>
+            @endunless
         </div>
 
         @if($customer->name)

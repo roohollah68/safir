@@ -238,7 +238,7 @@ class OrderController extends Controller
             $order = Order::with('user')->with('orderProducts')->findOrFail($id);
         else
             $order = auth()->user()->orders()->with('orderProducts')->with('user')->findOrFail($id);
-
+        $user = $order->user;
         request()->validate([
             'receipt' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'required|string|min:3',
@@ -260,10 +260,10 @@ class OrderController extends Controller
             foreach ($request->cart as $id => $number) {
                 $product = $products[$id];
                 $discount = 0;
-                if (auth()->user()->meta('changeDiscount'))
+                if ($user->meta('changeDiscount'))
                     $discount = +$request['discount_' . $id];
                 $price = round((100 - $discount) * $product->price / 100);
-                if (auth()->user()->meta('changePrice') && $discount == 0)
+                if ($user->meta('changePrice') && $discount == 0)
                     $price = +str_replace(",", "", $request['price_' . $id]);
                 $order->total += $price * (+$number);
                 $order->orderProducts()->create([

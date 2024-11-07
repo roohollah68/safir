@@ -46,8 +46,8 @@ class CustomerController extends Controller
             $customer = Customer::findOrFail($id);
         else
             $customer = auth()->user()->customers()->findOrFail($id);
-        $transactions = $customer->transactions()->get()->keyBy('id');
-        $orders = $customer->orders()->get()->keyBy('id')->where('confirm', true);
+        $transactions = $customer->transactions->keyBy('id');
+        $orders = $customer->orders->keyBy('id')->where('confirm', true)->where('total', '>', 0);
 
         return view('customer.customerTransactionList', [
             'customer' => $customer,
@@ -62,7 +62,6 @@ class CustomerController extends Controller
         $customer = new Customer;
         $customer->city_id = 301;
         $customer->user_id = auth()->user()->id;
-
         return view('customer.addEditCustomer', [
             'customer' => $customer,
             'cities' => City::all()->keyBy('name'),
@@ -89,6 +88,7 @@ class CustomerController extends Controller
             'zip_code' => $request->zip_code,
             'city_id' => $request->city_id,
             'user_id' => $request->user,
+            'discount' => $request->discount,
         ]);
         return redirect()->route('CustomerList');
     }
@@ -131,6 +131,7 @@ class CustomerController extends Controller
             'zip_code' => $request->zip_code,
             'city_id' => $request->city_id,
             'user_id' => $request->user,
+            'discount' => $request->discount,
         ]);
         return redirect()->route('CustomerList');
     }
@@ -308,8 +309,8 @@ class CustomerController extends Controller
     public function customerSOA($id, Request $request)
     {
         $customer = Customer::find($id);
-        $orders = $customer->orders();
-        $transactions = $customer->transactions();
+        $orders = $customer->orders->where('total', '>', 0)->where('confirm', true);
+        $transactions = $customer->transactions;
         $timeDescription = 'همه تراکنش ها';
         if ($request->timeFilter == 'specifiedTime') {
             $timeDescription = 'از ' . $request->from . ' تا ' . $request->to;
@@ -326,8 +327,8 @@ class CustomerController extends Controller
         }
         $pdf = PDF::loadView('customer.customerSOA', [
                 'customer' => $customer,
-                'transactions' => $transactions->get(),
-                'orders' => $orders->get()->where('confirm', true),
+                'transactions' => $transactions,
+                'orders' => $orders,
                 'timeDescription' => $timeDescription,
                 'withInvoice' => !!$request->allInvoice,
                 'total' => 0,

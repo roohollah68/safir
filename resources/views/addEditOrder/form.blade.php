@@ -23,6 +23,9 @@
                 <input value="{{old('name')?:$order->name}}" type="text" id="name" class="form-control"
                        name="name" required @readonly($edit && $creatorIsAdmin)>
                 @if($creatorIsAdmin)
+                    @if($user->meta('changeDiscount'))
+                        <span class="btn btn-info" id="set-customer-discount"></span>
+                    @endif
                     <input type="number" value="{{old('customerId')?:$order->customer_id}}" name="customerId"
                            id="customerId" style="width: 70px" readonly>
                 @endif
@@ -118,8 +121,8 @@
 
     @endif
 
-    <input type="checkbox" name="addToCustomers" id="addToCustomers" @checked($creatorIsAdmin)
-    class="checkboxradio" onclick="$('#city, #category').prop('disabled', (i, v) => !v);">
+    <input type="checkbox" name="addToCustomers" id="addToCustomers"
+           class="checkboxradio" onclick="$('#city, #category').prop('disabled', (i, v) => !v);">
     <label for="addToCustomers">افزودن/ ویرایش مشتری</label>
 
 

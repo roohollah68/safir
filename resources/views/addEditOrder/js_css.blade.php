@@ -7,10 +7,11 @@
     let cities = {!!json_encode($cities)!!};
     let creatorIsAdmin = !!'{{$creatorIsAdmin}}';
     let edit = !!'{{$edit}}';
-    let changeDiscountPermit = !!'{{auth()->user()->meta('changeDiscount')}}';
-    let changePricePermit = !!'{{auth()->user()->meta('changePrice')}}';
+    let changeDiscountPermit = !!'{{$user->meta('changeDiscount')}}';
+    let changePricePermit = !!'{{$user->meta('changePrice')}}';
     let table;
     let submitStatus = false;
+
 
     $(function () {
         setTimeout(function () {
@@ -123,7 +124,8 @@
         </td>
         <td>
             <input type="text" class="price-input text-success discount" style="width: 80px;"
-            name="price_${id}" id="price_${id}" value="${product.priceWithDiscount}"
+            name="price_${id}" id="price_${id}"
+            value="${product.priceWithDiscount}"
             onchange="calculate_discount(${id},this.value)" ${changePricePermit ? '' : 'disabled'}>
             <span class="text-danger">
                 ${priceFormat(product.price)}
@@ -186,10 +188,6 @@
                 $('#hidden-input').append(`<input type="hidden" name="cart[${id}]" value="${number}">`);
                 hasProduct = true;
             }
-            // else {
-            //     $('#product_' + id).val('');
-            //     delete cart[id];
-            // }
         })
 
         let deliveryCost = 0;
@@ -262,6 +260,9 @@
         $('#phone').val(customer.phone);
         $('#address').val(customer.address);
         $('#zip_code').val(customer.zip_code);
+        $('#set-customer-discount').html(customer.discount + ' %').click(()=>{
+            $('.discount-value').val(customer.discount).change();
+        })
         let city = cities[customer.city_id];
         $('#city').val(city.name + ` (${city.province.name})`).change();
     }
@@ -279,15 +280,15 @@
 
     function calculate_discount(id, value) {
         value = +value.replaceAll(',', '');
-        if ( $('#discount_' + id).val() > 0) {
-            if(value > products[id].price){
-                $('price_'+id).val(products[id].price).change();
+        if ($('#discount_' + id).val() > 0) {
+            if (value > products[id].price) {
+                $('price_' + id).val(products[id].price).change();
                 return;
             }
             value = Math.max(0, +value);
             $('#discount_' + id).val((1 - value / products[id].price) * 100).change();
         } else {
-            $.notify('هشدار قیمت تغییر کرده است!','warn');
+            $.notify('هشدار قیمت تغییر کرده است!', 'warn');
         }
     }
 
@@ -299,11 +300,11 @@
             alert('محصولی انتخاب نشده است');
             return false;
         }
-        if(cart.some(x => x >= 0) && cart.some(x => x <= 0)) {
+        if (cart.some(x => x >= 0) && cart.some(x => x <= 0)) {
             alert('تعداد همگی باید مثبت یا منفی باشند');
             return false;
         }
-        if(submitStatus)
+        if (submitStatus)
             return false;
         submitStatus = true
         return true;
