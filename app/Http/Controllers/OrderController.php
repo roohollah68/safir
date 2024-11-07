@@ -298,7 +298,7 @@ class OrderController extends Controller
 
     public function changeState($id, $state)
     {
-        Helper::access('showAllOrders');
+        Helper::access('changeOrderState');
         DB::beginTransaction();
         $order = Order::findOrFail($id);
         $user = $order->user;
@@ -388,8 +388,7 @@ class OrderController extends Controller
                     'state' => 2
                 ]);
             }
-            if ($order->warehouse->name != 'تهران')
-                $order->desc .= '(انبار ' . $order->warehouse->name . ')';
+            $order->desc .= '(انبار ' . $order->warehouse->name . ')';
             $order->orders = $order->orders();
             $font = 32;
             $order = $this->addCityToAddress($order);
@@ -638,7 +637,7 @@ class OrderController extends Controller
 
     public function setSendMethod($id, Request $req)
     {
-        Helper::access('showAllOrders');
+        Helper::access('changeOrderState');
         DB::beginTransaction();
         $order = Order::findOrFail($id);
         if (!$order->deliveryMethod || $order->isCreatorAdmin())

@@ -1,7 +1,7 @@
 <script>
 
     let token = "{{ csrf_token() }}";
-    let superAdmin = {{$superAdmin ? 'true' : 'false'}};
+    let superAdmin = !!"{{$superAdmin ? 'true' : ''}}";
     let print = {{$print ? 'true' : 'false'}};
     let admin = {{$admin ? 'true' : 'false'}};
     let safir = {{$safir ? 'true' : 'false'}};
@@ -11,7 +11,7 @@
     let ids;
     let showDeleted, printWait, confirmWait, counterWait, proccessWait, COD, user = 'all',
         warehouseId = 'all';
-    let changeOrdersPermit = !!'{{auth()->user()->meta('showAllOrders')}}';
+    let changeOrdersPermit = !!'{{$user->meta('showAllOrders')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     let dtp1Instance;
     let sendMethods = {!!json_encode(config('sendMethods'))!!};
@@ -41,6 +41,9 @@
         ids = [];
         let res = [];
         let counter = 0;
+        let select = (id) => {
+            return `<input type="checkbox" class="orders_checkbox" onclick="ids.includes(${id})?removeFromIds(${id}):ids.push(${id})">`;
+        }
 
         $.each(orders, (id, order) => {
             if (user !== 'all' && +user !== order.user_id)
@@ -72,7 +75,7 @@
                 return
             counter++;
             res.push([
-                `<input type="checkbox" class="orders_checkbox" onclick="ids.includes(${id})?removeFromIds(${id}):ids.push(${id})">`,
+                !!order.deleted_at ? '' : select(id),
 
                 counter,
 
@@ -258,7 +261,7 @@
         if (order.customer_id)
             res += excel
 
-        if (creatorRole === 'admin' && order.state < 10) {
+        if (creatorRole !== 'user' && order.state < 10) {
             if (order.confirm)
                 res += cancelInvoice;
             else
@@ -305,7 +308,7 @@
             })
     }
 
-    @if(auth()->user()->meta('showAllOrders'))
+    @if($user->meta('changeOrderState'))
 
     function selectSendMethod(id) {
         if (!orders[id].confirm) {
@@ -354,6 +357,10 @@
 
             });
     }
+
+    @endif
+
+    @if($user->meta('showAllOrders') || $user->meta('changeOrderState'))
 
     function generatePDF(Ids) {
 
