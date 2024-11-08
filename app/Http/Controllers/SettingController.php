@@ -53,6 +53,8 @@ class SettingController extends Controller
     {
         $couponLinks = CouponLink::with('product')->get();
         foreach ($couponLinks as $couponLink){
+            if($couponLink->good_id)
+                continue;
             if($couponLink->product){
                 $couponLink->good_id = $couponLink->product->good_id;
                 $couponLink->save();
