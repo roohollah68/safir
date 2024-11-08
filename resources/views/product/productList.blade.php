@@ -196,17 +196,17 @@
                     return;
                 if (!product.available && !unavailableFilter)
                     return;
-                if (product.category === 'final' && !final)
+                if (product.good.category === 'final' && !final)
                     return;
-                if (product.category === 'pack' && !pack)
+                if (product.good.category === 'pack' && !pack)
                     return;
-                if (product.category === 'raw' && !raw)
+                if (product.good.category === 'raw' && !raw)
                     return;
                 data.push([
                     id,
-                    product.name,
-                    priceFormat(product.price),
-                    priceFormat(product.productPrice),
+                    product.good.name,
+                    priceFormat(product.good.price),
+                    priceFormat(product.good.productPrice),
                     quantity(product.alarm, product.high_alarm, product.quantity),
                     alarm(product.alarm, product.quantity),
                     high_alarm(product.high_alarm, product.quantity),

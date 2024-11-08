@@ -27,8 +27,7 @@ class ProductController extends Controller
     {
         if (!auth()->user()->meta('warehouse'))
             abort(401);
-        $products = Product::where('warehouse_id', $req->warehouseId)->
-        select('id', 'good_id', 'available', 'warehouse_id', 'quantity', 'alarm', 'high_alarm')->get()->keyBy('id');
+        $products = Product::where('warehouse_id', $req->warehouseId)->with('good')->get()->keyBy('id');
         return $products;
 
     }

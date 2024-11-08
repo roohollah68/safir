@@ -80,9 +80,9 @@
             if (product.coupon > 0)
                 price = `${priceFormat(product.priceWithDiscount)} (${product.coupon}%)`;
             else
-                price = priceFormat(product.price);
+                price = priceFormat(product.good.price);
             data.push([
-                product.name,
+                product.good.name,
                 price,
                 `<span dir="ltr">${+product.quantity}</span>`,
                 `<span class="btn btn-primary fa fa-add" onclick="addProduct(${id});refreshProducts();"></span>`,
@@ -111,7 +111,7 @@
             cart[id] = 1;
         $('#selected-product-table').show();
         let text = `<tr id="product-${id}">
-        <td>${product.name}</td>
+        <td>${product.good.name}</td>
         <td>
             <span class="btn btn-primary fa fa-plus" onclick="num_plus(${id})"></span>
             <input class="product-number"
@@ -128,7 +128,7 @@
             value="${product.priceWithDiscount}"
             onchange="calculate_discount(${id},this.value)" ${changePricePermit ? '' : 'disabled'}>
             <span class="text-danger">
-                ${priceFormat(product.price)}
+                ${priceFormat(product.good.price)}
             </span>
         </td>
         <td>

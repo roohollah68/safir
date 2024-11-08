@@ -54,15 +54,13 @@ class OrderController extends Controller
         $user = auth()->user();
         $order = new Order();
         $warehouseId = $req->warehouseId ?: $user->meta('warehouseId');
-//        if($user->safir())
-//            $warehouseId = 2;
         $products = Product::where('warehouse_id', $warehouseId)->where('available', true)->
         whereHas('good', function (Builder $query) {
             if (auth()->user()->meta('sellRawProduct'))
                 $query->where('category', '<>', 'pack');
             else
                 $query->where('category', 'final');
-        })->get()->keyBy('id');
+        })->with('good')->get()->keyBy('id');
         $products = $this->calculateDis($products, $user);
 
         $order->customer = new Customer();
