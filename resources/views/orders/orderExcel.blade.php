@@ -28,7 +28,7 @@
                onchange="$('.CC').html(this.value);reDraw()">
         <br>
         <br>
-        <input type="submit" class="btn btn-success" title="ذخیره تغییرات" onclick="save()" value = "ذخیره">
+        <input type="submit" class="btn btn-success" title="ذخیره تغییرات" onclick="save()" value="ذخیره">
         <br>
         <br>
         <table class="table table-striped" id="orderExcel">
@@ -39,11 +39,14 @@
                 <th>کد کالا</th>
                 <th>محصول</th>
                 <th>تاریخ</th>
-                <th>مبلغ</th>
+                <th>نرخ</th>
                 <th>شماره</th>
                 <th>مقدار</th>
                 <th>تخفیف</th>
-                <th>ارزش افزوده</th>
+                <th>
+                    <label for="added_value">ارزش افزوده</label>
+                    <input type="checkbox" id="added_value" onclick="addedValue(this.checked)">
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -54,15 +57,15 @@
                 @endphp
                 <tr>
                     <td>
-                        <span class="hide">{{$goodMeta->warehouse_code ?? ''}}</span>
-                        <input type="text" id="warehouse_code_{{$id}}" name="warehouse_code_{{$id}}" class="w-101"
-                               value="{{$goodMeta->warehouse_code ?? ''}}"
+                        <span class="hide">{{$goodMeta->warehouse_code ?? '50'}}</span>
+                        <input type="text" id="warehouse_code_{{$id}}" name="warehouse_code_{{$id}}" class="w-63"
+                               value="{{$goodMeta->warehouse_code ?? '50'}}"
                                onchange="$(this).prev().html(this.value);reDraw()">
                     </td>
                     <td class="CC">{{$customerMeta->customer_code ?? ''}}</td>
                     <td>
                         <span class="hide">{{$goodMeta->stuff_code ?? ''}}</span>
-                        <input type="text" id="stuff_code_{{$id}}" name="stuff_code_{{$id}}" class="w-101"
+                        <input type="text" id="stuff_code_{{$id}}" name="stuff_code_{{$id}}" class="w-63"
                                value="{{$goodMeta->stuff_code ?? ''}}"
                                onchange="$(this).prev().html(this.value);reDraw()">
                     </td>
@@ -71,15 +74,12 @@
                         <input type="text" id="name_{{$id}}" value="{{$orderProduct->name}}">
                     </td>
                     <td class="date">{{verta($order->created_at)->formatJalaliDate()}}</td>
-                    <td>{{+$orderProduct->price}}</td>
+                    <td>{{($orderProduct->discount==100)? 0 : +round($orderProduct->price*100/(100-$orderProduct->discount))}}</td>
                     <td class="number"></td>
                     <td>{{+$orderProduct->number}}</td>
                     <td>{{+$orderProduct->discount}}</td>
                     <td>
-                        <span class="">{{isset($goodMeta->added_value) ? round((+$goodMeta->added_value)*(+$orderProduct->price)/100): ''}}</span>
-                        <input type="text" id="added_value_{{$id}}" name="added_value_{{$id}}" class="w-101"
-                               value="{{$goodMeta->added_value ?? ''}}"
-                               onchange="$(this).prev().html(Math.round((+this.value)*(+{{$orderProduct->price}})/100));reDraw()">
+                        <span class="added_value" id="added_value_{{$id}}">0</span>
                     </td>
                 </tr>
             @endforeach
@@ -90,7 +90,6 @@
 
 
 @section('files')
-    @csrf
     <script>
         let table;
         data =
@@ -113,6 +112,7 @@
                         $.notify('خطایی رخ داده است.', 'warn');
                     });
                 });
+
             });
 
         function draw() {
@@ -145,11 +145,30 @@
             draw();
         }
 
+        function addedValue(checked) {
+            if (checked) {
+                @foreach($orderProducts as $id => $orderProduct)
+                $('#added_value_{{$id}}').html({{$orderProduct->price * $orderProduct->number * 0.1}});
+                @endforeach
+            } else {
+                @foreach($orderProducts as $id => $orderProduct)
+                $('#added_value_{{$id}}').html(0);
+                @endforeach
+            }
+            reDraw();
+        }
+
     </script>
 
     <style>
         .w-101 {
             width: 120px;
         }
+
+        .w-63 {
+            width: 63px;
+        }
+
+
     </style>
 @endsection
