@@ -12,6 +12,7 @@ class CouponLink extends Model
         'user_id',
         'product_id',
         'coupon_id',
+        'good_id',
     ];
 
     public $timestamps = false;
@@ -23,11 +24,18 @@ class CouponLink extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class)->first();
+        return $this->belongsTo(User::class);
     }
 
     public function product()
     {
-        return $this->belongsTo(Product::class)->first();
+        return $this->belongsTo(Product::class);
     }
+
+    public function good()
+    {
+        return $this->belongsTo(Good::class);
+    }
+
+
 }

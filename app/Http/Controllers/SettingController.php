@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 //use App\Models\CustomerTransaction;
 //use App\Models\Good;
 use App\Helper\Helper;
+use App\Models\CouponLink;
 use App\Models\Customer;
 use App\Models\CustomerTransaction;
 use App\Models\Order;
@@ -50,25 +51,21 @@ class SettingController extends Controller
 
     public function command()
     {
-//        $costomers = Customer::all();
-//        foreach ($costomers as $customer){
-//            if($customer->user->safir())
-//                continue;
-//            $orders = $customer->orders()->where('confirm' , true)->get();
-//            $transactions = $customer->transactions()->where('verified', 'approved')->get();
-//            $total1 = 0;
-//            foreach ($orders as $order){
-//                $total1 += $order->total;
-//            }
-//            $total2 = 0;
-//            foreach ($transactions as $transaction) {
-//                $total2 += $transaction->amount;
-//            }
-//            if($customer->balance != $total2-$total1) {
-//                $customer->balance = $total2-$total1;
-//                $customer->save();
-//            }
-//        }
+        $couponLinks = CouponLink::with('product')->get();
+        foreach ($couponLinks as $couponLink){
+            if($couponLink->product){
+                $couponLink->good_id = $couponLink->product->good_id;
+                $couponLink->save();
+            }else{
+                $product = $couponLink->product()->withTrashed()->first();
+                if($product){
+                    $couponLink->good_id = $product->good_id;
+                    $couponLink->save();
+                }else{
+                    $couponLink->delete();
+                }
+            }
+        }
 
     }
 
