@@ -14,9 +14,8 @@ class CouponController extends Controller
     public function couponList()
     {
         return view('coupons', [
-            'coupons' => Coupon::with('couponLinks.good')->get(),
+            'coupons' => Coupon::with(['couponLinks.good','couponLinks.user'])->get(),
             'users' => User::all()->keyBy('id'),
-            'products' => Product::where('warehouse_id', 1)->get()->keyBy('id')
         ]);
     }
 

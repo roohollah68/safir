@@ -51,23 +51,23 @@ class SettingController extends Controller
 
     public function command()
     {
-        $couponLinks = CouponLink::with('product')->get();
-        foreach ($couponLinks as $couponLink){
-            if($couponLink->good_id)
-                continue;
-            if($couponLink->product){
-                $couponLink->good_id = $couponLink->product->good_id;
-                $couponLink->save();
-            }else{
-                $product = $couponLink->product()->withTrashed()->first();
-                if($product){
-                    $couponLink->good_id = $product->good_id;
-                    $couponLink->save();
-                }else{
-                    $couponLink->delete();
-                }
-            }
-        }
+//        $couponLinks = CouponLink::with('product')->get();
+//        foreach ($couponLinks as $couponLink){
+//            if($couponLink->good_id)
+//                continue;
+//            if($couponLink->product){
+//                $couponLink->good_id = $couponLink->product->good_id;
+//                $couponLink->save();
+//            }else{
+//                $product = $couponLink->product()->withTrashed()->first();
+//                if($product){
+//                    $couponLink->good_id = $product->good_id;
+//                    $couponLink->save();
+//                }else{
+//                    $couponLink->delete();
+//                }
+//            }
+//        }
 
     }
 

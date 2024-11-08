@@ -25,11 +25,10 @@
             @endphp
             @foreach($coupon->couponLinks as $couponLink)
                 @php
-                    if(isset($users[$couponLink->user_id]) && isset($products[$couponLink->product_id])){
-                        $user_names[$couponLink->user_id] = $users[$couponLink->user_id]->name;
-                        $product_names[$couponLink->product_id] = $products[$couponLink->product_id]->name;
+                    if($couponLink->user && $couponLink->good){
+                        $user_names[$couponLink->user->id] = $couponLink->user->name;
+                        $product_names[$couponLink->good->id] = $couponLink->good->name;
                     }
-
                 @endphp
             @endforeach
             <tr>
