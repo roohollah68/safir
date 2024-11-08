@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Coupon;
 use App\Models\CouponLink;
+use App\Models\Good;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CouponController extends Controller
 {
@@ -22,74 +24,71 @@ class CouponController extends Controller
     public function newForm()
     {
         return view('addEditCoupon', [
-            'coupon' => false,
+            'coupon' => new Coupon(),
             'users' => User::where('role','user')->get(),
-            'products' => Product::where('warehouse_id', 1)->whereHas('good', function (Builder $query) {
-                $query->where('category', 'final');
-            })->get(),
+            'goods' => Good::where('category', 'final')->get(),
         ]);
     }
 
     public function storeNew(Request $req)
     {
+        DB::beginTransaction();
         request()->validate([
             'percent' => 'required|numeric|min:0|max:99'
         ]);
-
-        $coupon = Coupon::create([
-            'percent' => $req->percent
-        ]);
-
-        $users = User::all();
-        $products = Product::where('warehouse_id', 1)->get();
+        $coupon = new Coupon();
+        $coupon->percent = $req->percent;
+        $coupon->save();
+        $users = User::where('role','user')->get();
+        $goods = Good::where('category', 'final')->get();
         foreach ($users as $user) {
-            foreach ($products as $product) {
-                if ($req['user_' . $user->id] && $req['product_' . $product->id]) {
+            foreach ($goods as $good) {
+                if ($req['user_' . $user->id] && $req['good_' . $good->id]) {
                     $coupon->couponLinks()->create([
                         'user_id' => $user->id,
-                        'product_id' => $product->id,
+                        'good_id' => $good->id,
                     ]);
                 }
             }
         }
-
-        return redirect(route('addCoupon'));
+        DB::commit();
+        return redirect(route('couponList'));
     }
 
     public function editForm($id)
     {
         return view('addEditCoupon', [
-            'coupon' => Coupon::with('couponLinks')->find($id),
-            'users' => User::all(),
-            'products' => Product::where('warehouse_id', 1)->get()
+            'coupon' => Coupon::with(['couponLinks.good','couponLinks.user'])->find($id),
+            'users' => User::where('role','user')->get(),
+            'goods' => Good::where('category', 'final')->get(),
         ]);
     }
 
     public function update(Request $req, $id)
     {
+        DB::beginTransaction();
         request()->validate([
             'percent' => 'required|numeric|min:0|max:99'
         ]);
         $coupon = Coupon::find($id);
-        $coupon->update([
-            'percent' => $req->percent
-        ]);
+        $coupon->percent = $req->percent;
+        $coupon->save();
 
         CouponLink::where('coupon_id', $id)->delete();
 
-        $users = User::all();
-        $products = Product::where('warehouse_id', 1)->get();
+        $users = User::where('role','user')->get();
+        $goods = Good::where('category', 'final')->get();
         foreach ($users as $user) {
-            foreach ($products as $product) {
-                if ($req['user_' . $user->id] && $req['product_' . $product->id]) {
+            foreach ($goods as $good) {
+                if ($req['user_' . $user->id] && $req['good_' . $good->id]) {
                     $coupon->couponLinks()->create([
                         'user_id' => $user->id,
-                        'product_id' => $product->id,
+                        'good_id' => $good->id,
                     ]);
                 }
             }
         }
-
+        DB::commit();
         return redirect(route('couponList'));
     }
 

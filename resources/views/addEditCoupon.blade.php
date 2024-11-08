@@ -1,10 +1,10 @@
 @extends('layout.main')
 
 @section('title')
-    @if(!$coupon)
-        افزودن کد تخفیف
-    @else
+    @if($coupon->id)
         ویرایش کد تخفیف
+    @else
+        افزودن کد تخفیف
     @endif
 @endsection
 
@@ -13,19 +13,23 @@
         $(function () {
             $("input[type=checkbox]").checkboxradio();
         });
-        function selectAllUsers(){
+
+        function selectAllUsers() {
             selectNoUsers()
-            $('.users input[type=checkbox]').click( );
+            $('.users input[type=checkbox]').click();
         }
-        function selectNoUsers(){
-            $('.users input[type=checkbox]:checked').click( );
+
+        function selectNoUsers() {
+            $('.users input[type=checkbox]:checked').click();
         }
-        function selectAllProducts(){
-            selectNoProducts()
-            $('.products input[type=checkbox]').click( );
+
+        function selectAllGoods() {
+            selectNoGoods()
+            $('.goods input[type=checkbox]').click();
         }
-        function selectNoProducts(){
-            $('.products input[type=checkbox]:checked').click( );
+
+        function selectNoGoods() {
+            $('.goods input[type=checkbox]:checked').click();
         }
     </script>
     <style>
@@ -35,11 +39,10 @@
 
 @section('content')
 
-
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
     <form action="" method="post">
         @csrf
-        @if($coupon)
+        @if($coupon->id)
             <input type="submit" class="btn btn-success" value="ویرایش">
         @else
             <input type="submit" class="btn btn-success" value="افزودن">
@@ -49,13 +52,13 @@
         <br>
         <br>
         @php
-            $percent = old('percent')?old('percent'):($coupon?$coupon->percent:'');
-            if($coupon){
+
+            if($coupon->id){
                 $user_ids  = [];
-                $product_ids = [];
+                $good_ids = [];
                 foreach($coupon->couponLinks as $couponLink){
                     $user_ids[$couponLink->user_id] = true;
-                    $product_ids[$couponLink->product_id] = true;
+                    $good_ids[$couponLink->good_id] = true;
                 }
             }
 
@@ -63,7 +66,7 @@
         <div class="row">
             <div class="col-md-12">
                 <label for="percent">میزان تخفیف(درصد):</label>
-                <input id="percent" type="number" name="percent" value="{{$percent}}" required>
+                <input id="percent" type="number" name="percent" value="{{old('percent')?:$coupon->percent}}" required>
             </div>
             <div class="col-md-6 users">
                 <h3>کاربران</h3>
@@ -71,35 +74,37 @@
                 <span onclick="selectNoUsers()" class="btn btn-secondary">هیچ</span>
                 <br>
                 @foreach($users as $user)
-                    <label for="user_{{$user->id}}">{{$user->name}}({{$user->username}})</label>
                     <input id="user_{{$user->id}}" type="checkbox" name="user_{{$user->id}}"
-                           @if($coupon && isset($user_ids[$user->id])) checked @endif >
+                        @checked(isset($user_ids[$user->id])) >
+                    <label class="btn btn-info m-1" for="user_{{$user->id}}">{{$user->name}}({{$user->username}}
+                        )</label>
                     <br>
                 @endforeach
             </div>
 
-            <div class="col-md-6 products">
+            <div class="col-md-6 goods">
                 <h3>محصولات</h3>
-                <span onclick="selectAllProducts()" class="btn btn-info">همه</span>
-                <span onclick="selectNoProducts()" class="btn btn-secondary">هیچ</span>
+                <span onclick="selectAllGoods()" class="btn btn-info">همه</span>
+                <span onclick="selectNoGoods()" class="btn btn-secondary">هیچ</span>
                 <br>
-                @foreach($products as $product)
-                    <label for="product_{{$product->id}}">{{$product->name}}({{$product->price}})</label>
-                    <input id="product_{{$product->id}}" type="checkbox" name="product_{{$product->id}}"
-                           @if($coupon && isset($product_ids[$product->id])) checked @endif>
+                @foreach($goods as $good)
+                    <input id="good_{{$good->id}}" type="checkbox" name="good_{{$good->id}}"
+                           @checked( isset($good_ids[$good->id]))>
+                    <label class="btn btn-primary m-1" for="good_{{$good->id}}">{{$good->name}}
+                        ({{number_format($good->price)}})</label>
                     <br>
                 @endforeach
             </div>
 
-
-            @if($coupon)
-                <input type="submit" class="btn btn-success" value="ویرایش">
-            @else
-                <input type="submit" class="btn btn-success" value="افزودن">
-            @endif
-            &nbsp;
-            <a href="{{route('couponList')}}" class="btn btn-danger">بازگشت</a>
         </div>
+        @if($coupon->id)
+            <input type="submit" class="btn btn-success" value="ویرایش">
+        @else
+            <input type="submit" class="btn btn-success" value="افزودن">
+        @endif
+        &nbsp;
+        <a href="{{route('couponList')}}" class="btn btn-danger">بازگشت</a>
+
     </form>
 
 @endsection

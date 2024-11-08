@@ -10,7 +10,7 @@ class Coupon extends Model
     use HasFactory;
 
     protected $fillable=[
-        'percent'
+        'percent',
     ];
 
     public function couponLinks()

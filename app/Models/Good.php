@@ -30,4 +30,9 @@ class Good extends Model
     {
         return $this->hasMany(GoodMeta::class);
     }
+
+    public function couponLinks()
+    {
+        return $this->hasMany(CouponLink::class);
+    }
 }

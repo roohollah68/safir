@@ -61,11 +61,6 @@ class Product extends Model
         return $this->hasMany(ProductChange::class);
     }
 
-    public function couponLinks()
-    {
-        return $this->hasMany(CouponLink::class);
-    }
-
     public function good()
     {
         return $this->belongsTo(Good::class);
