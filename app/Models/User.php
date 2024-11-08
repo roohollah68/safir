@@ -124,4 +124,9 @@ class User extends Authenticatable
             return config('userMeta.' . $name);
     }
 
+    public function couponLinks()
+    {
+        return $this->hasMany(CouponLink::class);
+    }
+
 }

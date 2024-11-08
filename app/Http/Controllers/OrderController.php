@@ -540,20 +540,15 @@ class OrderController extends Controller
     public function calculateDis($products, $user)
     {
         if ($user->safir()) {
-            $couponLinks = CouponLink::where('user_id', $user->id)->with('coupon')->get();
-            $dis = [];
-            foreach ($couponLinks as $couponLink) {
-                $pid = $couponLink->product_id;
-                if (isset($dis[$pid]))
-                    $dis[$pid] = max($dis[$pid], $couponLink->coupon->percent);
+            $discounts = [];
+            foreach ($user->couponLinks as $couponLink) {
+                if (isset($discounts[$couponLink->good_id]))
+                    $discounts[$couponLink->good_id] = max($discounts[$couponLink->good_id], $couponLink->coupon->percent);
                 else
-                    $dis[$pid] = $couponLink->coupon->percent;
+                    $discounts[$couponLink->good_id] = $couponLink->coupon->percent;
             }
             foreach ($products as $id => $product) {
-                if (isset($dis[$id]))
-                    $products[$id]->coupon = $dis[$id];
-                else
-                    $products[$id]->coupon = 0;
+                $products[$id]->coupon = $discounts[$product->good_id] ?? 0;
                 $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->good->price / 100);
             }
         } else {
