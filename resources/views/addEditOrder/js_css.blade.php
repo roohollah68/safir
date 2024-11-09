@@ -273,7 +273,7 @@
         value = Math.round(value * 4) / 4;
         $('#discount_' + id).val(value);
         products[id].coupon = value;
-        products[id].priceWithDiscount = (products[id].price * (100 - products[id].coupon) / 100);
+        products[id].priceWithDiscount = (products[id].good.price * (100 - products[id].coupon) / 100);
         $("input[name=price_" + id + "]").val(priceFormat(products[id].priceWithDiscount));
         refreshProducts();
     }
