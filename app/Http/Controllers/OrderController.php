@@ -434,13 +434,13 @@ class OrderController extends Controller
         if ($request->pageContent == 'all')
             $pageContents = [$number];
         else {
-            $pageContents = [17, $number-17];
-            if($number > 37)
-                $pageContents = [17, 30, $number - 47];
-            if ($number > 67)
-                $pageContents = [17, 30, 30, $number - 47];
-            if ($number > 97)
-                $pageContents = [17, 30, 30, 30, $number - 47];
+            $pageContents = [20, $number-20];
+            if($number > 40)
+                $pageContents = [20, 35, $number - 55];
+            if ($number > 75)
+                $pageContents = [20, 35, 35, $number - 90];
+            if ($number > 110)
+                $pageContents = [20, 35, 35, 35, $number - 125];
         }
         $res = [];
         $start = 0;
