@@ -1,127 +1,183 @@
-<div id="invoice" style="background: white; width: 2100px;height: 2970px;" class="bg-white m-3">
-    <div id="invoice-content" class="m-3 p-3">
-        <div class="d-flex">
-                <span class="m-3 w-25" style="font-size: 35px; display:flex;">&nbsp; صفحه&nbsp;
-                    {{$page}}  &nbsp;از&nbsp; {{$pages}}</span>
-            <h4 class="text-center m-3 title w-50 " id="invoice-title">
-                @if($order->confirm)
-                    فاکتور فروش
-                @else
-                    پیش فاکتور
-                @endif
-            </h4>
-
+<div id="invoice" style="width: 2100px;height: 2970px; padding: 70px;" class="bg-white">
+    <div id="invoice-content" class="">
+        <div class="d-flex" style="border: 3px solid;border-bottom:0;height: 310px;z-index: 5;position: relative;">
+            <span style="width: 25%">
+                <img style="width: 90%; margin: 50px 5%" src="/Peptina-Logo.webp">
+            </span>
+            <span id="invoice-title" style="width: 50%">
+                <p style="font-size: 45px;text-align: center;margin: 30px;font-weight: bold;">
+                @if(!$order->confirm)
+                        پیش
+                    @endif فاکتور فروش کالا و خدمات
+            </p>
+                <p style="font-size: 85px;text-align: center;margin: 20px;font-weight: bold;">
+                پپتینا
+                </p>
+                <p style="font-size: 45px; text-align: center;padding: 0; border:3px solid; border-radius: 30px; margin: 0 250px;background: #ddd;">
+                    @if(!$firstPage)
+                        مشخصات فروشنده
+                    @else
+                        اطلاعات فاکتور
+                    @endif
+                </p>
+            </span>
+            <span style="width: 25%">
+                <p style="font-size: 35px; text-align: center;margin: 50px 0 20px 0;">&nbsp; صفحه&nbsp;
+                    {{$page}}  &nbsp;از&nbsp; {{$pages}}</p>
+                <p style="font-size: 35px; text-align: center;margin: 20px; border:3px solid;padding: 10px;border-radius: 20px;">شماره:
+                    {{$order->id}}
+                </p>
+                <p style="font-size: 35px; text-align: center;margin: 20px; border:3px solid;padding: 10px;border-radius: 20px;">تاریخ:
+                    {{verta($order->created_at)->formatJalaliDate()}}
+                </p>
+            </span>
         </div>
-        <div id="main">
+        <div style="border:3px solid;border-bottom:0;height: 315px;z-index: 4;position: relative;"
+             class="{{$firstPage}}">
+            <div style="margin: 40px 40px 10px 0">
+                <span style="font-size: 40px; padding: 0;">آدرس: شهرک صنعتی فریمان، تلاش 2، پلاک 3، شرکت سلامت تدبیر اصیل مهر آسا</span>
+            </div>
+            <div class="w-100" style="padding: 10px 40px">
+                <span style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">تلفن: 05134685346</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 24%;">ثبت / کدملی:</span>
+                <span
+                        style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شناسه ملی: 14008245509</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: خراسان رضوی</span>
+            </div>
+            <div class="w-100" style="padding: 10px 40px 20px 0">
+                <span style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">موبایل: 09128576027</span>
+                <span
+                        style="font-size: 35px; padding: 0;display: inline-block;width: 24%;">کد اقتصادی: 411647355789</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">کدپستی: 9391181341</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شهر: فریمان</span>
+            </div>
+            <p style="font-size: 45px; text-align: center;padding: 0; border:3px solid; border-radius: 30px; margin: 0 750px;background: #ddd;">
+                مشخصات خریدار</p>
+        </div>
 
-            <div class="w-100">
-                <table class="w-100 border table1 round {{$firstPage}}" style="text-align: right;">
-                    <tr>
-                        <th rowspan="3" class="w-5 border-left text-center" style="writing-mode:vertical-rl;">
-                            خریدار
-                        </th>
-                        <th class="w-42 p-2"> نام: {{$order->name}}</th>
-                        <th class="w-33 p-2"> تلفن: {{$order->phone}}</th>
-                        <th rowspan="2" class="w-20 text-center border-bottom">شماره فاکتور: {{$order->id%1000}}</th>
-                    </tr>
-                    <tr>
-                        <td colspan="3"><br></td>
-                    </tr>
-                    <tr>
-                        <th colspan="2" class="p-2">آدرس: {{$order->address}}
-                            @if($order->zip_code)
-                                ،کدپستی:&nbsp;{{$order->zip_code}}
-                            @endif
-                        </th>
-                        <td class="text-center"
-                            id="invoice-time">{{verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
-                    </tr>
-                </table>
-                <table class="border w-100 table2 round table-striped">
-                    <tr class="w-100" id="invoice-head">
-                        <th class="w-5 border-left smaller">ردیف</th>
-                        <th class="w-35 border-left ">شرح کالا/خدمات</th>
-                        <th class="w-8 border-left">مقدار</th>
-                        <th class="w-12 border-left">قیمت (ریال)</th>
-                        <th class="w-8 border-left">درصد تخفیف</th>
-                        <th class="w-9 border-left smaller">قیمت بعد تخفیف</th>
-                        <th class="w-23 border-left">جمع (ریال)</th>
-                    </tr>
-                    @props(['total_dis'=>0,'total_no_dis'=>0,'totalProducts'=>0])
+        <div style="border:3px solid;border-bottom:0;height: 450px;z-index: 3;position: relative;"
+             class="{{$firstPage}}">
+            <div style="margin: 30px 40px 10px 0">
+                <span style="font-size: 40px; padding: 0;">عنوان: {{$order->name}}</span>
+            </div>
+            <div style="margin: 10px 40px 10px 0; height: 130px;">
+                <span style="font-size: 40px; padding: 0;">آدرس: {{$order->address}}</span>
+            </div>
+            <div class="w-100" style="padding: 10px 40px">
+                <span style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">تلفن: </span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 24%;">ثبت / کدملی:</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شناسه ملی: </span>
+                <span
+                        style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: {{$order->customer->city->province->name}}</span>
+            </div>
+            <div class="w-100" style="padding: 10px 40px 20px 0">
+                <span
+                        style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">موبایل: {{$order->phone}}</span>
+                <span style="font-size: 35px; padding: 0;display: inline-block;width: 24%;">کد اقتصادی: </span>
+                <span
+                        style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">کدپستی: {{$order->zip_code}}</span>
+                <span
+                        style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شهر: {{$order->customer->city->name}}</span>
+            </div>
+            <p style="font-size: 45px; text-align: center;padding: 0; border:3px solid; border-radius: 30px; margin: 0 750px;background: #ddd;">
+                اطلاعات فاکتور</p>
+        </div>
+        <div id="main" style="border: 3px solid;border-bottom:0; padding-top: 40px">
+            <table class="border w-100 table2 round table-striped">
+                <tr class="w-100" id="invoice-head">
+                    <th style="width: 5%" class="border-left smaller">ردیف</th>
+                    <th style="width: 43%" class="border-left ">شرح کالا/خدمات</th>
+                    <th style="width: 5%" class="border-left">مقدار</th>
+                    <th style="width: 12%" class="border-left">قیمت (ریال)</th>
+                    <th style="width: 8%" class="border-left">درصد تخفیف</th>
+                    <th style="width: 9%" class="border-left smaller">قیمت بعد تخفیف</th>
+                    <th style="width: 18%" class="border-left">جمع (ریال)</th>
+                </tr>
+                @props(['total_dis'=>0,'total_no_dis'=>0,'totalProducts'=>0])
 
-                    @foreach($orderProducts as $orderProduct)
-                        @php
-                            $price_dis = $orderProduct->price;
-                            $sub_total_dis= ($orderProduct->price * $orderProduct->number); //قیمت * تعداد
-                            if($orderProduct->discount != 100)
-                                $price_no_dis = round((100/(100-$orderProduct->discount))*$orderProduct->price);
-                            else
-                                $price_no_dis = $orderProduct->product->price;
-                            $sub_total_no_dis = $price_no_dis * $orderProduct->number;
-                            $total_no_dis = $total_no_dis + $sub_total_no_dis;
-                            $total_dis = $total_dis + $sub_total_dis;
-                            $totalProducts += $orderProduct->number;
-                        @endphp
-                        <tr class="{{$loop->iteration>$firstPageItems?$lastPage:$firstPage}}">
-                            <td dir="ltr">{{$loop->iteration}}
-                                @isset($orderProduct->product)
-                                    <span>{{$price_no_dis!=$orderProduct->product->good->price?'*':''}}</span>
-                                @endisset
-                            </td>
-                            <td>{{$orderProduct->name}}</td>
-                            <td dir="ltr">{{+$orderProduct->number}}</td>
-                            <td>{{number_format($price_no_dis)}}</td>
-                            <td>{{+$orderProduct->discount}}</td>
-                            <td>{{number_format($price_dis)}}</td>
-                            <td dir="ltr">{{number_format($sub_total_dis)}}</td>
-                        </tr>
-                    @endforeach
-                    <tr class="{{$lastPage}}">
-                        <td colspan="2">مجموع تعداد اقلام</td>
-                        <td dir="ltr">{{$totalProducts}}</td>
-                        <td colspan="3"></td>
-                        <td></td>
+                @foreach($order->orderProducts as $id => $orderProduct)
+                    @continue(($id < $start) || ($id >= $end))
+                    <tr>
+                        <td dir="ltr">{{$id + 1}}
+                            @isset($orderProduct->product)
+                                <span>{{$orderProduct->price_no_dis!=$orderProduct->product->good->price?'*':''}}</span>
+                            @endisset
+                        </td>
+                        <td>{{$orderProduct->name}}</td>
+                        <td dir="ltr">{{+$orderProduct->number}}</td>
+                        <td>{{number_format($orderProduct->price_no_dis)}}</td>
+                        <td>{{+$orderProduct->discount}}</td>
+                        <td>{{number_format($orderProduct->price)}}</td>
+                        <td dir="ltr">{{number_format($orderProduct->price*(+$orderProduct->number))}}</td>
                     </tr>
-                    <tr class="{{$lastPage}}">
-                        <td colspan="6" style="border-bottom: none;"><br><br></td>
-                        <td></td>
-                    </tr>
-                    <tr class="{{$lastPage}}">
-                        <td colspan="4" style="border: none;"></td>
-                        <td colspan="2">مبلغ کل بدون تخفیف</td>
-                        <td dir="ltr">{{number_format($total_no_dis)}}</td>
-                    </tr>
-                    <tr class="{{$lastPage}}">
-                        <th colspan="4"> شما از این خرید {{number_format(abs($total_no_dis-$total_dis))}} ریال تخفیف
-                            گرفتید
-                        </th>
-                        <th colspan="2">مبلغ قابل پرداخت</th>
-                        <th dir="ltr">{{number_format($total_dis)}}</th>
-                    </tr>
-                </table>
-
+                @endforeach
+                <tr class="{{$lastPage}}">
+                    <td colspan="2">مجموع تعداد اقلام</td>
+                    <td dir="ltr">{{$totalProducts}}</td>
+                    <td colspan="3"></td>
+                    <td></td>
+                </tr>
+                <tr class="{{$lastPage}}">
+                    <td colspan="6" style="border-bottom: none;"><br><br></td>
+                    <td></td>
+                </tr>
+                <tr class="{{$lastPage}}">
+                    <td colspan="4" style="border: none;"></td>
+                    <td colspan="2" style="font-size: 35px;">مبلغ کل بدون تخفیف</td>
+                    <td dir="ltr">{{number_format($total_no_dis)}}</td>
+                </tr>
+                <tr class="{{$lastPage}}">
+                    <th colspan="4"> شما از این خرید {{number_format(abs($total_no_dis-$total_dis))}} ریال تخفیف
+                        گرفتید
+                    </th>
+                    <th colspan="2">مبلغ قابل پرداخت</th>
+                    <th dir="ltr">{{number_format($total_dis)}}</th>
+                </tr>
+            </table>
+            <div class="d-flex {{$lastPage}}" id="acount" style="padding: 20px 30px">
+                <span style="width: 49%">
+                    <p>حساب بانک سپه شرکت سلامت تدبیر اصیل مهر آسا</p>
+                    <p>شماره شبا: IR750150000003100006261636</p>
+                    <p>شماره حساب: 3100006261636</p>
+                    <p>شماره کارت: 5892108833365860</p>
+                </span>
+                <span style="width: 49%">
+                    <p>حساب بانک ملت شرکت سلامت تدبیر اصیل مهر آسا</p>
+                    <p>شماره شبا: IR350120010000009189825188</p>
+                    <p>شماره حساب: 9189825188</p>
+                    <p>شماره کارت: 6104338400026973</p>
+                </span>
+            </div>
+        </div>
+        <div id="main" style="border: 3px solid; padding-top: 40px" class="{{$lastPage}}">
+            <div class="d-flex" style="padding: 40px 30px">
+                <span style="width: 49%">
+                    <p style="text-align: center;font-size: 50px">مدیر فروش</p>
+                </span>
+                <span style="width: 49%">
+                    <p style="text-align: center;font-size: 50px">خریدار</p>
+                </span>
             </div>
             <div class="w-100 normal {{$lastPage}}">
-                نحوه پرداخت: {{$order->payMethod()}}
-                /
-                نحوه ارسال: {{$order->sendMethod()}}
-                /
-                توضیحات: {{$order->desc}}
-                <br>
+                @if($order->payMethod())
+                    نحوه پرداخت: {{$order->payMethod()}}
+                    /
+                @endif
+                @if($order->sendMethod())
+                    نحوه ارسال: {{$order->sendMethod()}}
+                    /
+                @endif
+                @if($order->desc)
+                    توضیحات: {{$order->desc}}
+                    /
+                @endif
                 @unless($order->confirm)
                     <
                     <اعتبار این پیش فاکتور برای ۴۸ ساعت است>>
                 @endunless
             </div>
-            <div class="{{$lastPage}}">
-                <div class="w-100 normal d-flex justify-content-around">
-                    <span>امضای خریدار</span>
-                    <span>تایید حسابداری</span>
-                    <span>امضای فروشنده</span>
-                </div>
-            </div>
-            <
         </div>
+
 
         <style>
 
@@ -138,16 +194,12 @@
                 border: 1px solid #000000 !important;
             }
 
-            #invoice .text-center, #invoice .table2 th {
+            #invoice .table2 th {
                 text-align: center !important;
             }
 
-            #invoice h4 {
-                font-size: 80px;
-            }
-
             #invoice th, #invoice .normal {
-                font-size: 45px;
+                font-size: 35px;
             }
 
             #invoice td, #invoice .smaller {
@@ -160,48 +212,13 @@
                 font-family: IranSans;
             }
 
-        </style>
-
-        <style>
-            .w-5 {
-                width: 5%;
-            }
-
-            .w-8 {
-                width: 8%;
-            }
-
-            .w-9 {
-                width: 9%;
-            }
-
-            .w-12 {
-                width: 12%;
-            }
-
-            .w-20 {
-                width: 20%;
-            }
-
-            .w-23 {
-                width: 23%;
-            }
-
-            .w-33 {
-                width: 33%;
-            }
-
-            .w-35 {
-                width: 35%;
-            }
-
-            .w-42 {
-                width: 42%;
+            #acount {
+                font-size: 40px;
+                font-weight: bold;
             }
 
             .w-100 {
                 width: 100%;
             }</style>
     </div>
-</div>
 </div>

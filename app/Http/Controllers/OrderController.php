@@ -119,14 +119,14 @@ class OrderController extends Controller
             $discount = +$product->coupon;
             if (auth()->user()->meta('changeDiscount'))
                 $discount = +$request['discount_' . $id];
-            $price = round((100 - $discount) * $product->price / 100);
+            $price = round((100 - $discount) * $product->good->price / 100);
             if (auth()->user()->meta('changePrice') && $discount == 0)
                 $price = +str_replace(",", "", $request['price_' . $id]);
             $order->total += $price * (+$number);
-            $Total += $product->price * (+$number);
+            $Total += $product->good->price * (+$number);
             $order->save();
             $order->orderProducts()->create([
-                'name' => $product->name,
+                'name' => $product->good->name,
                 'price' => $price,
                 'product_id' => $id,
                 'number' => $number,
@@ -260,12 +260,12 @@ class OrderController extends Controller
                 $discount = 0;
                 if ($user->meta('changeDiscount'))
                     $discount = +$request['discount_' . $id];
-                $price = round((100 - $discount) * $product->price / 100);
+                $price = round((100 - $discount) * $product->good->price / 100);
                 if ($user->meta('changePrice') && $discount == 0)
                     $price = +str_replace(",", "", $request['price_' . $id]);
                 $order->total += $price * (+$number);
                 $order->orderProducts()->create([
-                    'name' => $product->name,
+                    'name' => $product->good->name,
                     'price' => $price,
                     'product_id' => $id,
                     'number' => $number,
@@ -413,50 +413,54 @@ class OrderController extends Controller
     public function invoice($id, Request $request)
     {
         if (auth()->user()->meta('showAllOrders') || auth()->user()->meta('counter'))
-            $order = Order::with('warehouse')->findOrFail($id);
+            $order = Order::findOrFail($id);
         else
-            $order = auth()->user()->orders()->with('warehouse')->findOrFail($id);
-        $order = $this->addCityToAddress($order);
-
-        if ($order->warehouse_id != 1)
-            $order->desc .= '(انبار ' . $order->warehouse->name . ')';
-        if ($request->onlyOrderData) {
-            return $order;
+            $order = auth()->user()->orders->with('orderProducts')->findOrFail($id);
+        $order->desc .= '(انبار ' . $order->warehouse->name . ')';
+        $total_no_dis = 0;
+        $total_dis = 0;
+        $totalProducts = 0;
+        foreach ($order->orderProducts as $id => $orderProduct) {
+            if ($orderProduct->discount != 100)
+                $orderProduct->price_no_dis = round((100 / (100 - $orderProduct->discount)) * $orderProduct->price);
+            else
+                $orderProduct->price_no_dis = $orderProduct->product->good->price;
+            $orderProduct->sub_total_no_dis = $orderProduct->price_no_dis * $orderProduct->number;
+            $total_no_dis = $total_no_dis + $orderProduct->sub_total_no_dis;
+            $total_dis = $total_dis + ($orderProduct->price * $orderProduct->number);
+            $totalProducts += $orderProduct->number;
         }
-        $firstPageItems = $request->firstPageItems;
-        $totalPages = $request->totalPages;
-        $orderProducts = OrderProduct::where('order_id', $id)->with('product')->get();
-        if ($totalPages > 1) {
-            $v1 = view('orders.invoice', [
-                'firstPage' => '',
-                'lastPage' => 'd-none',
-                'page' => '1',
-                'pages' => '2',
-                'order' => $order,
-                'orderProducts' => $orderProducts,
-                'firstPageItems' => $firstPageItems,
-            ])->render();
-            $v2 = view('orders.invoice', [
-                'firstPage' => 'd-none',
-                'lastPage' => '',
-                'page' => '2',
-                'pages' => '2',
-                'order' => $order,
-                'orderProducts' => $orderProducts,
-                'firstPageItems' => $firstPageItems,
-            ])->render();
-            return [[$v1, $order->id . '(page1)'], [$v2, $order->id . '(page2)']];
-        } else {
-            return [[view('orders.invoice', [
-                'firstPage' => '',
-                'lastPage' => '',
-                'page' => '1',
-                'pages' => '1',
-                'order' => $order,
-                'orderProducts' => $orderProducts,
-                'firstPageItems' => $firstPageItems,
-            ])->render(), $order->id]];
+        $number = $order->orderProducts->count();
+        if ($request->pageContent == 'all')
+            $pageContents = [$number];
+        else {
+            $pageContents = [17, $number-17];
+            if($number > 37)
+                $pageContents = [17, 30, $number - 47];
+            if ($number > 67)
+                $pageContents = [17, 30, 30, $number - 47];
+            if ($number > 97)
+                $pageContents = [17, 30, 30, 30, $number - 47];
         }
+        $res = [];
+        $start = 0;
+        foreach ($pageContents as $id => $pageContent) {
+            $page = view('orders.invoice', [
+                'firstPage' => ($id == 0) ? '' : 'd-none',
+                'lastPage' => ($id == count($pageContents) - 1) ? '' : 'd-none',
+                'page' => $id + 1,
+                'pages' => count($pageContents),
+                'order' => $order,
+                'start' => $start,
+                'end' => $start + $pageContent,
+                'total_no_dis' => $total_no_dis,
+                'total_dis' => $total_dis,
+                'totalProducts' => $totalProducts,
+            ])->render();
+            $start += $pageContent;
+            array_push($res, $page);
+        }
+        return $res;
     }
 
     public function cancelInvoice($id, Request $req)
@@ -733,7 +737,7 @@ class OrderController extends Controller
         );
         foreach ($order->orderProducts as $orderProduct) {
             GoodMeta::updateOrCreate(
-                ['good_id' => $orderProduct->product->good->id],
+                ['good_id' => $orderProduct->product->good_id],
                 [
                     'warehouse_code' => $req->{'warehouse_code_' . $orderProduct->id},
                     'stuff_code' => $req->{'stuff_code_' . $orderProduct->id},
