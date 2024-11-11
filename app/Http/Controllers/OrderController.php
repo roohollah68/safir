@@ -434,8 +434,8 @@ class OrderController extends Controller
         if ($request->pageContent == 'all')
             $pageContents = [$number];
         else {
-            $pageContents = [20, $number-20];
-            if($number > 40)
+            $pageContents = [20, $number - 20];
+            if ($number > 40)
                 $pageContents = [20, 35, $number - 55];
             if ($number > 75)
                 $pageContents = [20, 35, 35, $number - 90];
@@ -729,19 +729,20 @@ class OrderController extends Controller
     public function saveExcelData($id, Request $req)
     {
         $order = Order::findOrFail($id);
-        CustomerMeta::updateOrCreate(
-            ['customer_id' => $order->customer_id],
-            [
-                'customer_code' => $req->customer_code
-            ]
-        );
+        if ($req->customer_code)
+            CustomerMeta::updateOrCreate(
+                ['customer_id' => $order->customer_id],
+                [
+                    'customer_code' => $req->customer_code
+                ]
+            );
         foreach ($order->orderProducts as $orderProduct) {
             GoodMeta::updateOrCreate(
                 ['good_id' => $orderProduct->product->good_id],
                 [
                     'warehouse_code' => $req->{'warehouse_code_' . $orderProduct->id},
                     'stuff_code' => $req->{'stuff_code_' . $orderProduct->id},
-                    'added_value' => $req->{'added_value_' . $orderProduct->id},
+//                    'added_value' => $req->{'added_value_' . $orderProduct->id},
                 ]
             );
         }
