@@ -2,9 +2,6 @@
 
     @if($admin || $superAdmin || $print)
 
-    // let totalPages = 1;
-    // let firstPageItems = 40;
-
     function invoice(id) {
 
         let printInvoice = (page) => {
@@ -13,12 +10,12 @@
                 domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
                     .then(function (dataUrl) {
                         let link = document.createElement('a');
-                        link.download = id + '.jpg';
+                        link.download = id + `_` + makeid(3) + '.jpg';
                         link.href = dataUrl;
                         link.click();
                         $('#invoice-wrapper').html('');
                     })
-            } , 100)
+            }, 100)
 
         }
 
@@ -43,39 +40,8 @@
                 })
             }
         })
-
-        // .done(res => {
-        //     $('#invoice-wrapper').html(res[0][0]);
-        //     if ($('#invoice-content')[0].offsetHeight > 2900) {
-        //         totalPages = 2;
-        //         firstPageItems--;
-        //         invoice(id);
-        //         return
-        //     }
-        //     domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
-        //         .then(function (dataUrl) {
-        //             let link = document.createElement('a');
-        //             link.download = res[0][1] + '.jpg';
-        //             link.href = dataUrl;
-        //             //link.click();
-        //             // $('#invoice-wrapper').html('');
-        //             if (res.length > 1) {
-        //                 $('#invoice-wrapper').html(res[1][0]);
-        //                 domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
-        //                     .then(function (dataUrl) {
-        //                         let link = document.createElement('a');
-        //                         link.download = res[1][1] + '.jpg';
-        //                         link.href = dataUrl;
-        //                         link.click();
-        //                         $('#invoice-wrapper').html('');
-        //                         totalPages = 1;
-        //                         firstPageItems = 40;
-        //                     });
-        //             }
-        //         });
-        // })
-
     }
+
     @endif
 
     function view_order(id) {
@@ -203,4 +169,15 @@
         return (+(+price).toFixed()).toLocaleString('en-US');
     }
 
+    function makeid(length) { //generate random string
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        let counter = 0;
+        while (counter < length) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            counter += 1;
+        }
+        return result;
+    }
 </script>

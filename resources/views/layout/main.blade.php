@@ -42,6 +42,7 @@
     @include('layout.style_css')
     @include('layout.js')
     @yield('files')
+    <img src="/Peptina-Logo.webp" class="d-none">
 </head>
 
 <body>
