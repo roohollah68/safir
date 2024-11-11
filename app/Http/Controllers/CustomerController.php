@@ -415,12 +415,15 @@ class CustomerController extends Controller
         DB::commit();
     }
 
-    public function paymentTracking()
+    public function paymentTracking(Request $req)
     {
         $orders = [];
-        $Orders = Order::with('paymentLinks')->get()->keyBy('id')->reverse();
+        $Orders = Order::with('paymentLinks');
+        if(isset($req->user) && $req->user != 'all')
+            $Orders = $Orders->where('user_id', $req->user);
+        $Orders = $Orders->get()->keyBy('id')->reverse();
         foreach ($Orders as $id => $Order) {
-            if (count($orders) >= 100)
+            if (count($orders) >= ($req->number ?? 100))
                 break;
             if ($Order->counter != 'approved' || !$Order->confirm)
                 continue;
@@ -431,6 +434,7 @@ class CustomerController extends Controller
         }
         return view('customer.paymentTracking', [
             'orders' => $orders,
+            'users' => User::where('role' , '<>', 'user')->get()->keyBy('id'),
         ]);
     }
 

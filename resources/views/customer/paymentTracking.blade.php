@@ -5,12 +5,41 @@
 @endsection
 
 @section('content')
+    <form method="get" action="">
+        <div class="col-md-6 m-1">
+            <div class="form-group input-group ">
+                <div class="input-group-append" style="min-width: 160px">
+                    <label for="user" class="input-group-text w-100">کاربر مرتبط:</label>
+                </div>
+                <select class="form-control" name="user" id="user">
+                    <option value="all" selected>همه</option>
+                    @foreach($users as $id=>$user)
+                        <option value="{{$id}}" @selected(isset($_GET['user']) &&  $id == $_GET['user'])>
+                            {{$user->name}}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6 m-1">
+            <div class="form-group input-group ">
+                <div class="input-group-append" style="min-width: 160px">
+                    <label for="number" class="input-group-text w-100">تعداد رکورد:</label>
+                </div>
+                <input type="number" min="1" step="1" id="number" name="number" value="{{old('number')?:$_GET['number']??100}}">
+            </div>
+        </div>
+        <br>
+        <input type="submit" class="btn btn-primary" value="فیلتر">
+    </form>
+
     <table class="table table-striped" id="orders-table">
         <thead>
         <tr>
             <th>شماره</th>
             <th>تاریخ ثبت</th>
             <th>نام مشتری</th>
+            <th>نوع پرداخت</th>
             <th>کاربر مرتبط</th>
             <th>مبلغ(ریال)</th>
             <th>درصد پرداخت شده</th>
@@ -23,6 +52,7 @@
                 <td>{{$id}}</td>
                 <td>{{verta($order->created_at)->formatJalaliDate()}}</td>
                 <td><a href="/customer/transaction/{{$order->customer_id}}">{{$order->name}}</a></td>
+                <td>{{$order->payMethod()}}</td>
                 <td><a href="/customers?user={{$order->user->id}}">{{$order->user->name}}</a></td>
                 <td>{{number_format($order->total)}}</td>
                 <td>@if($order->payPercent() == 0)
@@ -71,7 +101,8 @@
             $('#postpond').html('');
 
             $('#orders-table').DataTable({
-                paging: false,
+                // paging: false,
+                pageLength: 100,
                 order: [[0, "desc"]],
             });
         });
