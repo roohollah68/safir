@@ -86,7 +86,7 @@
             $.each(products, (id, product) => {
                 if (+product.warehouse_id !== +warehouseId1)
                     return;
-                $bodyText += `<tr><td>${id}</td><td>${product.name}</td>
+                $bodyText += `<tr><td>${id}</td><td>${product.good.name}</td>
 <td>${+product.quantity}</td><td><input type="number" name="${id}" ${warehouses[warehouseId2][product.good_id] ? '' : 'disabled'}> </td></tr>`
             })
             $('#tableWrapper').html('');

@@ -59,7 +59,7 @@ class Controller extends BaseController
     {
         if ($order->customer_id) {
             $city = $order->customer->city;
-            if ($city->id > 0)
+            if ($city->id > 0 && $city->name != 'تهران')
                 $order->address = $city->province->name . '- ' . $city->name . '- ' . $order->address;
         }
         return $order;

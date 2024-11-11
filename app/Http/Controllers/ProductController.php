@@ -170,7 +170,7 @@ class ProductController extends Controller
     {
         if (!auth()->user()->meta('warehouse'))
             abort(401);
-        $products = Product::all()->keyby('id');
+        $products = Product::with('good')->get()->keyby('id');
         return view('product.transfer', [
             'warehouses' => Warehouse::all()->keyBy('id'),
             'products' => $products,

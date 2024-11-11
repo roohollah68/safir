@@ -415,7 +415,7 @@ class OrderController extends Controller
         if (auth()->user()->meta('showAllOrders') || auth()->user()->meta('counter'))
             $order = Order::findOrFail($id);
         else
-            $order = auth()->user()->orders->with('orderProducts')->findOrFail($id);
+            $order = auth()->user()->orders()->findOrFail($id);
         $order->desc .= '(انبار ' . $order->warehouse->name . ')';
         $total_no_dis = 0;
         $total_dis = 0;
