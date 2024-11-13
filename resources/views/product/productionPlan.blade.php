@@ -62,6 +62,7 @@
         </thead>
         <tbody>
         @foreach($products as $id => $product)
+            @continue($product->good->category != 'final')
             <tr>
                 <td>{{$id}}</td>
                 <td>{{$product->good->name}}</td>

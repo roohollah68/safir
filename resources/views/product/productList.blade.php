@@ -27,7 +27,7 @@
         <span class=" fa fa-list"></span>
         مدیریت کالاها
     </a>
-    <a class="btn btn-secondary mb-3" href="production/schedule">
+    <a class="btn btn-secondary mb-3" id="production_schedule" href="production/schedule">
         <span class=" fa fa-industry"></span>
         برنامه تولید
     </a>
