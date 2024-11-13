@@ -301,4 +301,13 @@ class ProductController extends Controller
             'warehouses' => Warehouse::all(),
         ]);
     }
+
+    public function production()
+    {
+        $products = Product::where('warehouse_id', 2)->where('available' , true)
+            ->whereRaw('products.quantity < products.alarm')->with('good')->get()->keyBy('id');
+        return view('product.productionPlan', [
+        'products' => $products,
+    ]);
+    }
 }

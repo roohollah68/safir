@@ -38,10 +38,10 @@
                 <th>کد مشتری</th>
                 <th>کد کالا</th>
                 <th>محصول</th>
+                <th>مقدار</th>
                 <th>تاریخ</th>
                 <th>نرخ</th>
                 <th>شماره</th>
-                <th>مقدار</th>
                 <th>تخفیف</th>
                 <th>
                     <label for="added_value">ارزش افزوده</label>
@@ -73,10 +73,10 @@
                         <span class="hide">{{$orderProduct->name}}</span>
                         <input type="text" id="name_{{$id}}" value="{{$orderProduct->name}}">
                     </td>
+                    <td>{{+$orderProduct->number}}</td>
                     <td class="date">{{verta($order->created_at)->formatJalaliDate()}}</td>
                     <td>{{($orderProduct->discount==100)? 0 : +round($orderProduct->price*100/(100-$orderProduct->discount))}}</td>
                     <td class="number"></td>
-                    <td>{{+$orderProduct->number}}</td>
                     <td>{{+$orderProduct->discount}}</td>
                     <td>
                         <span class="added_value" id="added_value_{{$id}}">0</span>

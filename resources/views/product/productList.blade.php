@@ -27,6 +27,10 @@
         <span class=" fa fa-list"></span>
         مدیریت کالاها
     </a>
+    <a class="btn btn-secondary mb-3" href="production/schedule">
+        <span class=" fa fa-industry"></span>
+        برنامه تولید
+    </a>
     <br>
     <div class="container border input-box">
         <div class="row">
