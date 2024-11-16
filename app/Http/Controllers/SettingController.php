@@ -60,7 +60,7 @@ class SettingController extends Controller
             if(!isset($products[$orderProduct->product_id]))
                 continue;
             $product  = $products[$orderProduct->product_id];
-            if($product->good->price != $orderProduct->price){
+            if($product->good->price != $orderProduct->price && !$orderProduct->editPrice){
                 $orderProduct->update([
                     'editPrice' => true,
                 ]);
