@@ -100,7 +100,6 @@ class WoocommerceController extends Controller
                         $product = $data[1];
                         $order->orderProducts()->create([
                             'product_id' => $product->id,
-                            'verified' => true,
                             'name' => $product->name,
                             'number' => $data[0],
                             'price' => $product->price,
@@ -135,7 +134,6 @@ class WoocommerceController extends Controller
                 $product = $data[1];
                 $order->orderProducts()->create([
                     'product_id' => $product->id,
-                    'verified' => true,
                     'name' => $product->name,
                     'number' => $data[0],
                     'price' => $product->price,

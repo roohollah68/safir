@@ -281,7 +281,6 @@ class CustomerController extends Controller
             return;
         $order->counter = 'approved';
         $orderProducts = $order->orderProducts()->with('product');
-        $orderProducts->update(['verified' => true]);
 
         app('Telegram')->sendOrderToBale($order, env('GroupId'));
         (new CommentController)->create($order, auth()->user(), 'تایید حسابداری');
@@ -297,7 +296,6 @@ class CustomerController extends Controller
         if ($order->counter == 'rejected' || $order->state)
             return;
         if ($order->counter == 'approved') {
-            $order->orderProducts()->update(['verified' => false]);
             $this->deleteFromBale(env('GroupId'), $order->bale_id);
         }
         $order->counter = 'rejected';
