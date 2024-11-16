@@ -9,7 +9,7 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let showDeleted, printWait, confirmWait, counterWait, proccessWait, COD, user = 'all',
+    let showDeleted, printWait, confirmWait, counterWait, proccessWait, sent, COD, user = 'all',
         warehouseId = 'all';
     let changeOrdersPermit = !!'{{$user->meta('showAllOrders')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
@@ -49,6 +49,8 @@
             if (user !== 'all' && +user !== order.user_id)
                 return
             if (showDeleted ^ !!order.deleted_at)
+                return
+            if (sent && order.state != 10)
                 return
             if (confirmWait && order.confirm)
                 return
