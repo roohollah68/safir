@@ -215,7 +215,7 @@
         if (order.deleted_at) {
             res = timestamp + `<span class="btn btn-secondary">${text}</span>`
         } else if (!order.state) {
-            let btn = order.confirm?(order.counter=='waiting'?'info':'primary'):'secondary';
+            let btn = order.confirm ? (order.counter === 'waiting' ? 'info' : 'secondary') : 'primary';
             res = timestamp + `<span class="btn btn-${btn}" onclick="change_state(${order.id}, 1)">${text}</span>`
         } else if (order.state < 3) {
             res = timestamp + `<span class="btn btn-warning" onclick="selectSendMethod(${order.id})">${text}<i class="fas fa-check"></i></span>`
