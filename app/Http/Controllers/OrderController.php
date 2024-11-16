@@ -773,6 +773,7 @@ class OrderController extends Controller
         }
         $order->warehouse_id = $warehouseId;
         $order->save();
+        $order->warehouse = $order->warehouse;
         DB::commit();
         return $order;
     }
