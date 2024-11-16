@@ -355,7 +355,7 @@ class CustomerController extends Controller
         foreach ($payLinks as $payLink) {
             $payLinkTotal += $payLink->amount;
         }
-        $orders = $customer->orders->keyBy('id')->reverse();
+        $orders = $customer->orders->keyBy('id')->where('confirm', true)->where('total', '>', 0);
         return view('customer.depositLink', [
             'transaction' => $transaction,
             'payLinks' => $payLinks,

@@ -74,11 +74,11 @@
                     <a class="nav-link active" href="{{route('transactions')}}">تراکنش ها</a>
                 </li>
             @endif
-            @if(!$superAdmin)
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{route('editUser')}}">ویرایش حساب کاربری</a>
-                </li>
-            @endif
+{{--            @if(!$superAdmin)--}}
+{{--                <li class="nav-item">--}}
+{{--                    <a class="nav-link active" href="{{route('editUser')}}">ویرایش حساب کاربری</a>--}}
+{{--                </li>--}}
+{{--            @endif--}}
             <li class="nav-item">
                 <a class="nav-link active" href="{{route('logout')}}">خروج</a>
             </li>

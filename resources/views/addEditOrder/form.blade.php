@@ -96,22 +96,21 @@
         <div class="p-3 m-2 border">
             <h4>شیوه ارسال</h4>
             @if(!$edit)
-                <x-radio :id="'peyk'" :name="'deliveryMethod'" value="peykCost" onclick="deliveryAction()" checked>
-                    {{$sendMethods['peyk']}} ({{number_format($settings->peykCost)}} ریال)
-                </x-radio>
+                <label for="peyk" onclick="deliveryMethod=`peyk`;refreshProducts()">{{$sendMethods['peyk']}} ({{number_format($settings->peykCost)}} ریال)</label>
+                <input value="peykCost" onclick="deliveryMethod=`peyk`;refreshProducts()" type="radio" name="deliveryMethod"
+                       id="peyk" class="checkboxradio" checked>
 
-                <x-radio :id="'post'" :name="'deliveryMethod'" value="postCost" onclick="deliveryAction()">
-                    {{$sendMethods['post']}} ({{number_format($settings->postCost)}} ریال)
-                </x-radio>
+                <label for="post" onclick="deliveryMethod=`post`;refreshProducts()">{{$sendMethods['post']}} ({{number_format($settings->postCost)}} ریال)</label>
+                <input value="postCost" onclick="deliveryMethod=`post`;refreshProducts()" type="radio" name="deliveryMethod"
+                       id="post" class="checkboxradio">
 
-                <x-radio :id="'peykeShahri'" :name="'deliveryMethod'" value="peykeShahri" onclick="deliveryAction()">
-                    {{$sendMethods['peykeShahri']}} ({{number_format($settings->peykeShahri)}} ریال)
-                </x-radio>
+                <label for="peykeShahri" onclick="deliveryMethod=`peykeShahri`;refreshProducts()">{{$sendMethods['peykeShahri']}} ({{number_format($settings->peykeShahri)}} ریال)</label>
+                <input value="peykeShahri" onclick="deliveryMethod=`peykeShahri`;refreshProducts()" type="radio" name="deliveryMethod"
+                       id="peykeShahri" class="checkboxradio">
 
-                <x-radio :id="'paskerayeh'" :name="'deliveryMethod'" value="paskerayeh" onclick="deliveryAction()">
-                    {{$sendMethods['paskerayeh']}} (هزینه ارسال به عهده مشتری)
-                </x-radio>
-
+                <label for="paskerayeh" onclick="deliveryMethod=`paskerayeh`;refreshProducts()">{{$sendMethods['paskerayeh']}} (هزینه ارسال به عهده مشتری)</label>
+                <input value="paskerayeh" onclick="deliveryMethod=`paskerayeh`;refreshProducts()" type="radio" name="deliveryMethod"
+                       id="paskerayeh" class="checkboxradio">
                 <br>
 
             @else

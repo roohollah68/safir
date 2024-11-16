@@ -66,7 +66,6 @@ class OrderController extends Controller
         $order->customer = new Customer();
         $order->customer->city_id = 301;
         $cities = City::with('province')->get()->keyBy('id');
-
         return view('addEditOrder.addEditOrder', [
             'products' => $products,
             'settings' => Helper::settings(),

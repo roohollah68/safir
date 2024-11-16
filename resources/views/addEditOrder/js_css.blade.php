@@ -12,7 +12,6 @@
     let table;
     let submitStatus = false;
 
-
     $(function () {
         setTimeout(function () {
             $("#errors").hide()
@@ -26,7 +25,7 @@
         });
         refreshProducts();
         paymentAction();
-        deliveryAction();
+        // deliveryAction();
     });
 
     @if($creatorIsAdmin || !$edit)
@@ -172,10 +171,10 @@
         refreshProducts()
     }
 
-    function deliveryAction() {
-        deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
-        refreshProducts();
-    }
+    // function deliveryAction() {
+    //     deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
+    //     refreshProducts();
+    // }
 
     function refreshProducts() {
         let total = 0, Total = 0;
