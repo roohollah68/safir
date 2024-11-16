@@ -140,7 +140,7 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::get('/productQuantity/delete/{id}', [ProductChangeController::class, 'deleteRecord']);
 
     Route::get('goods/management', [ProductController::class, 'goods']);
-    Route::get('production/schedule', [ProductController::class, 'production']);
+    Route::get('production/schedule/{id}', [ProductController::class, 'production']);
     Route::post('/product/change/available/{id}', [ProductController::class, 'changeAvailable']);
 
     Route::get('warehouse/transfer', [ProductController::class, 'transfer']);

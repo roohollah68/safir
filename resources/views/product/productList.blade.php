@@ -27,7 +27,7 @@
         <span class=" fa fa-list"></span>
         مدیریت کالاها
     </a>
-    <a class="btn btn-secondary mb-3" id="production_schedule" href="production/schedule">
+    <a class="btn btn-secondary mb-3" id="production_schedule" onclick="window.location.href = `production/schedule/${warehouseId}`">
         <span class=" fa fa-industry"></span>
         برنامه تولید
     </a>
@@ -86,6 +86,9 @@
         <input type="checkbox" id="col-high_alarm">
         <label class="btn btn-secondary" for="col-high_alarm">حد بالا</label>
 
+        <input type="checkbox" id="col-production">
+        <label class="btn btn-secondary" for="col-production">برنامه تولید</label>
+
         <input type="checkbox" id="col-available">
         <label class="btn btn-secondary" for="col-available">وضعیت موجودی</label>
     </div>
@@ -101,6 +104,7 @@
             <th>موجودی</th>
             <th>حد پایین</th>
             <th>حد بالا</th>
+            <th>برنامه تولید</th>
             <th>وضعیت</th>
             <th>عملیات</th>
         </tr>
@@ -214,6 +218,7 @@
                     quantity(product.alarm, product.high_alarm, product.quantity),
                     alarm(product.alarm, product.quantity),
                     high_alarm(product.high_alarm, product.quantity),
+                    (product.quantity < product.alarm)?product.high_alarm-product.quantity:0,
                     product.available ? available : unavailable,
                     edit(id) + fastEditFilter(id) + saveFilter(id) + Delete(id),
                 ])
@@ -253,6 +258,23 @@
                             visible: false
                         }
                     ],
+                    layout: {
+                        topStart: {
+                            buttons: [
+                                {
+                                    extend: 'excel',
+                                    text: 'دریافت فایل اکسل',
+                                    filename:  'محصولات ' + '{{verta()->formatJalaliDate()}}',
+                                    title: null,
+                                    exportOptions: {
+                                        modifier: {
+                                            page: 'current'
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
                 });
             }
 
@@ -291,7 +313,8 @@
             $('#col-quantity')[0].checked ? null : hideCols.push(4);
             $('#col-alarm')[0].checked ? null : hideCols.push(5);
             $('#col-high_alarm')[0].checked ? null : hideCols.push(6);
-            $('#col-available')[0].checked ? null : hideCols.push(7);
+            $('#col-production')[0].checked ? null : hideCols.push(7);
+            $('#col-available')[0].checked ? null : hideCols.push(8);
         }
 
         function changeWarehouse(element) {

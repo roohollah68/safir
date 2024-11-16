@@ -188,7 +188,7 @@ class ProductController extends Controller
         $productList = [];
         $orders = '';
         foreach ($products1 as $id => $product) {
-            if ($req[$id]>0) {
+            if ($req[$id] > 0) {
                 $productList[$id] = $product;
                 $hasProduct = true;
                 $orders .= ' ' . $product->name . ' ' . +$req[$id] . 'عدد' . '،';
@@ -244,7 +244,7 @@ class ProductController extends Controller
                 'number' => -$req[$id],
                 'price' => 0,
             ]);
-            $product2 = Product::where('warehouse_id', $req->warehouseId2)->where('good_id',$product->good_id)->first();
+            $product2 = Product::where('warehouse_id', $req->warehouseId2)->where('good_id', $product->good_id)->first();
             $order2->orderProducts()->create([
                 'product_id' => $product2->id,
                 'name' => $product2->name,
@@ -258,12 +258,12 @@ class ProductController extends Controller
                 'quantity' => $product2->quantity + $req[$id],
             ]);
             $product->productChange()->create([
-                'change' => - $req[$id],
+                'change' => -$req[$id],
                 'desc' => 'انتقال به انبار ' . $warehouses[$req->warehouseId2]->name,
                 'quantity' => $product->quantity
             ]);
             $product2->productChange()->create([
-                'change' =>  $req[$id],
+                'change' => $req[$id],
                 'desc' => 'انتقال از انبار ' . $warehouses[$req->warehouseId1]->name,
                 'quantity' => $product2->quantity
             ]);
@@ -272,11 +272,12 @@ class ProductController extends Controller
         return redirect()->route('productList');
     }
 
-    public function goods(){
+    public function goods()
+    {
         if (!auth()->user()->meta('warehouse'))
             abort(401);
         $goods = Good::with('products')->get()->keyBy('id');
-        return view('product.goodsManagement',[
+        return view('product.goodsManagement', [
             'goods' => $goods,
             'warehouses' => Warehouse::all()->keyBy('id'),
         ]);
@@ -302,12 +303,14 @@ class ProductController extends Controller
         ]);
     }
 
-    public function production()
+    public function production($id)
     {
-        $products = Product::where('warehouse_id', 2)->where('available' , true)
+        $warehouse = Warehouse::findOrFail($id);
+        $products = Product::where('warehouse_id', $id)->where('available', true)
             ->whereRaw('products.quantity < products.alarm')->with('good')->get()->keyBy('id');
         return view('product.productionPlan', [
-        'products' => $products,
-    ]);
+            'products' => $products,
+            'ware' => $warehouse,
+        ]);
     }
 }
