@@ -17,6 +17,7 @@ class OrderProduct extends Model
         'number',
         'discount',
         'verify',
+        'editPrice',
     ];
 
     public function order()

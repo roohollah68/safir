@@ -99,9 +99,7 @@
                     @continue(($id < $start) || ($id >= $end))
                     <tr>
                         <td dir="ltr">{{$id + 1}}
-                            @isset($orderProduct->product)
-                                <span>{{$orderProduct->price_no_dis!=$orderProduct->product->good->price?'*':''}}</span>
-                            @endisset
+                            <span>{{$orderProduct->editPrice?'*':''}}</span>
                         </td>
                         <td>{{$orderProduct->name}}</td>
                         <td dir="ltr">{{+$orderProduct->number}}</td>

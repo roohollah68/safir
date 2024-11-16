@@ -12,6 +12,8 @@ use App\Models\CustomerTransaction;
 use App\Models\Order;
 //use App\Models\Product;
 //use App\Models\ProductData;
+use App\Models\OrderProduct;
+use App\Models\Product;
 use App\Models\Setting;
 //use App\Models\User;
 //use GuzzleHttp\Psr7\Query;
@@ -51,23 +53,19 @@ class SettingController extends Controller
 
     public function command()
     {
-//        $couponLinks = CouponLink::with('product')->get();
-//        foreach ($couponLinks as $couponLink){
-//            if($couponLink->good_id)
-//                continue;
-//            if($couponLink->product){
-//                $couponLink->good_id = $couponLink->product->good_id;
-//                $couponLink->save();
-//            }else{
-//                $product = $couponLink->product()->withTrashed()->first();
-//                if($product){
-//                    $couponLink->good_id = $product->good_id;
-//                    $couponLink->save();
-//                }else{
-//                    $couponLink->delete();
-//                }
-//            }
-//        }
+        set_time_limit(0);
+        $orderProducts = OrderProduct::all();
+        $products = Product::with('good')->get()->keyBy('id');
+        foreach ($orderProducts as $orderProduct){
+            if(!isset($products[$orderProduct->product_id]))
+                continue;
+            $product  = $products[$orderProduct->product_id];
+            if($product->good->price != $orderProduct->price){
+                $orderProduct->update([
+                    'editPrice' => true,
+                ]);
+            }
+        }
 
     }
 

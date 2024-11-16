@@ -120,8 +120,12 @@ class OrderController extends Controller
             if (auth()->user()->meta('changeDiscount'))
                 $discount = +$request['discount_' . $id];
             $price = round((100 - $discount) * $product->good->price / 100);
-            if (auth()->user()->meta('changePrice') && $discount == 0)
+            $editPrice = false;
+            if (auth()->user()->meta('changePrice')) {
                 $price = +str_replace(",", "", $request['price_' . $id]);
+                $editPrice = $price != $product->good->price;
+                $price = $price = round((100 - $discount) * $price / 100);
+            }
             $order->total += $price * (+$number);
             $Total += $product->good->price * (+$number);
             $order->save();
@@ -131,14 +135,13 @@ class OrderController extends Controller
                 'product_id' => $id,
                 'number' => $number,
                 'discount' => $discount,
-                'verified' => $this->safir(),
+                'editPrice' => $editPrice
             ]);
         }
         if ($order->total < 0) {
             $order->desc .= ' (فاکتور برگشت به انبار)';
         }
         if ($this->safir()) {
-//            $order->payPercent = 100;
             $deliveryCost = Helper::settings()->{$request->deliveryMethod};
             if ($Total < Helper::settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
                 $order->total += $deliveryCost;
@@ -248,8 +251,8 @@ class OrderController extends Controller
         $request->zip_code = Helper::number_Fa_En($request->zip_code);
 
         if (!$order->user->safir()) {
-            $orders = '';
             $products = Product::where('available', true)->where('warehouse_id', $order->warehouse_id)->get()->keyBy('id');
+            $products = $this->calculateDis($products, $user);
             $order->orderProducts()->delete();
             if (count($request->cart) == 0) {
                 return $this->errorBack('محصولی انتخاب نشده است!');
@@ -257,12 +260,16 @@ class OrderController extends Controller
             $order->total = 0;
             foreach ($request->cart as $id => $number) {
                 $product = $products[$id];
-                $discount = 0;
+                $discount = $product->coupon;
+                $editPrice = false;
                 if ($user->meta('changeDiscount'))
                     $discount = +$request['discount_' . $id];
                 $price = round((100 - $discount) * $product->good->price / 100);
-                if ($user->meta('changePrice') && $discount == 0)
+                if ($user->meta('changePrice')) {
                     $price = +str_replace(",", "", $request['price_' . $id]);
+                    $editPrice = $price != $product->good->price;
+                    $price = round((100 - $discount) * $price / 100);
+                }
                 $order->total += $price * (+$number);
                 $order->orderProducts()->create([
                     'name' => $product->good->name,
@@ -270,7 +277,7 @@ class OrderController extends Controller
                     'product_id' => $id,
                     'number' => $number,
                     'discount' => $discount,
-                    'verified' => false,
+                    'editPrice' => $editPrice,
                 ]);
             }
         }

@@ -110,6 +110,10 @@
         } else
             cart[id] = 1;
         $('#selected-product-table').show();
+        if(product.coupon != 100)
+            product.price = product.priceWithDiscount * 100 / (100-product.coupon)
+        else
+            product.price = product.good.price;
         let text = `<tr id="product-${id}">
         <td>${product.good.name}</td>
         <td>
@@ -123,30 +127,28 @@
             <span class="btn btn-outline-info" dir="ltr">${+product.quantity}</span>
         </td>
         <td>
-            <input type="text" class="price-input text-success discount" style="width: 80px;"
-            name="price_${id}" id="price_${id}"
-            value="${product.priceWithDiscount}"
-            onchange="calculate_discount(${id},this.value)" ${changePricePermit ? '' : 'disabled'}>
-            <span class="text-danger">
-                ${priceFormat(product.good.price)}
-            </span>
+            <input type="text" class="price-input" style="width: 80px;"
+            name="price_${id}" id="price_${id}" value="${product.price}"
+            onchange="changePrice(${id},this.value)" ${changePricePermit ? '' : 'disabled'}>
         </td>
         <td>
-        <input type="number" name="discount_${id}" class="discount-value" id="discount_${id}"
-        value="${product.coupon}" style="width: 80px" onchange="changeDiscount(${id},this.value)"
-        ${changeDiscountPermit ? '' : 'disabled'} min="0" max="100" step="0.25">` +
-            (changeDiscountPermit ?
-                `<a class="btn btn-outline-info fa fa-plus" dir="ltr"
-           onclick="$('#discount_${id}').val((index,value)=>{return +value+5}).change()">5
-                            <i class="fa fa-percent"></i>
-                        </a>
-                    ` : ``) +
-            `</td>
-         <td>
+            <input type="number" name="discount_${id}" class="discount-value" id="discount_${id}"
+            value="${product.coupon}" style="width: 80px" onchange="changeDiscount(${id},this.value)"
+            ${changeDiscountPermit ? '' : 'disabled'} min="0" max="100" step="0.25">
+        @if($user->meta('changeDiscount'))
+            <a class="btn btn-outline-info fa fa-plus" dir="ltr"
+            onclick="$('#discount_${id}').val((index,value)=>{return +value+5}).change()">5
+            <i class="fa fa-percent"></i></a>
+        @endif
+        </td>
+        <td>
+            <span class="text-success" id="price_discount_${id}">${priceFormat(product.priceWithDiscount)}</span>
+        </td>
+        <td>
             <span class="btn btn-danger fa fa-trash" onclick="deleteProduct(${id})"></span>
-         </td>
-        </tr>`
-        $('#product-form').append(text)
+        </td>
+        </tr>`;
+        $('#product-form').append(text);
         priceInput();
     }
 
@@ -183,8 +185,9 @@
             if (number) {
                 $('#product_' + id).val(number);
                 let price = +$('#price_' + id).val().replaceAll(',', '');
-                total += price * number; //جمع قیمت با تخفیف;
-                Total += products[id].price * number;  //قیمت بدون تخفیف;
+                let price_discount = +$('#price_discount_' + id).html().replaceAll(',', '');
+                total += price_discount * number; //جمع قیمت با تخفیف;
+                Total += price * number;  //قیمت بدون تخفیف;
                 $('#hidden-input').append(`<input type="hidden" name="cart[${id}]" value="${number}">`);
                 hasProduct = true;
             }
@@ -267,29 +270,23 @@
         $('#city').val(city.name + ` (${city.province.name})`).change();
     }
 
-    function changeDiscount(id, value) {
-        value = Math.min(100, +value);
-        value = Math.max(0, +value);
-        value = Math.round(value * 4) / 4;
-        $('#discount_' + id).val(value);
-        products[id].coupon = value;
-        products[id].priceWithDiscount = (products[id].good.price * (100 - products[id].coupon) / 100);
-        $("input[name=price_" + id + "]").val(priceFormat(products[id].priceWithDiscount));
+    function changeDiscount(id, discount) {
+        discount = Math.min(100, +discount);
+        discount = Math.max(0, +discount);
+        discount = Math.round(discount * 4) / 4;
+        $('#discount_' + id).val(discount);
+        let price = $(`#price_${id}`).val().replaceAll(',', '');
+        let price_discount = Math.round(price*(100-discount)/100);
+        $(`#price_discount_${id}`).html(priceFormat(price_discount));
         refreshProducts();
     }
 
-    function calculate_discount(id, value) {
-        value = +value.replaceAll(',', '');
-        if ($('#discount_' + id).val() > 0) {
-            if (value > products[id].price) {
-                $('price_' + id).val(products[id].price).change();
-                return;
-            }
-            value = Math.max(0, +value);
-            $('#discount_' + id).val((1 - value / products[id].price) * 100).change();
-        } else {
-            $.notify('هشدار قیمت تغییر کرده است!', 'warn');
-        }
+    function changePrice(id, value) {
+        let price = value.replaceAll(',', '');
+        let discount = $(`#discount_${id}`).val();
+        let price_discount = Math.round(price*(100-discount)/100);
+        $(`#price_discount_${id}`).html(priceFormat(price_discount));
+        refreshProducts();
     }
 
     function beforeSubmit() {
@@ -308,6 +305,16 @@
             return false;
         submitStatus = true
         return true;
+    }
+
+    function enableEditPrice(id , checked){
+        let priceInput = $(`#price_${id}`).prop('disabled', checked);
+        if(checked){
+            priceInput.val(products[id].good.price).change();
+        }else{
+
+        }
+        refreshProducts();
     }
 
 </script>
