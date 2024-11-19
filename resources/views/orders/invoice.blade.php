@@ -45,7 +45,7 @@
                 <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: خراسان رضوی</span>
             </div>
             <div class="w-100" style="padding: 10px 40px 20px 0">
-                <span style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">موبایل: 09128576027</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">موبایل: </span>
                 <span
                         style="font-size: 35px; padding: 0;display: inline-block;width: 24%;">کد اقتصادی: 411647355789</span>
                 <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">کدپستی: 9391181341</span>
