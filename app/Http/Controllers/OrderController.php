@@ -723,12 +723,22 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
         $customer = $order->customer;
         $customerMeta = $customer->customerMetas->first();
-
+        $orderProducts = $order->orderProducts->keyBy('id');
+        foreach ($orderProducts as $orderProduct) {
+            if ($orderProduct->discount == 100) {
+                if (isset($orderProduct->product))
+                    $orderProduct->original_price = $orderProduct->product->good->price;
+                else
+                    $orderProduct->original_price =0;
+            } else
+                $orderProduct->original_price = +round($orderProduct->price * 100 / (100 - $orderProduct->discount));
+            $orderProduct->add_value = $orderProduct->price * $orderProduct->number * 0.1;
+        }
         return view('orders.orderExcel', [
             'order' => $order,
             'customer' => $customer,
             'customerMeta' => $customerMeta,
-            'orderProducts' => $order->orderProducts->keyBy('id')
+            'orderProducts' => $orderProducts,
         ]);
     }
 

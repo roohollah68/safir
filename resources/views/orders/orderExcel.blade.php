@@ -41,12 +41,10 @@
                 <th>مقدار</th>
                 <th>تاریخ</th>
                 <th>نرخ</th>
+                <th>مبلغ</th>
                 <th>شماره</th>
                 <th>تخفیف</th>
-                <th>
-                    <label for="added_value">ارزش افزوده</label>
-                    <input type="checkbox" id="added_value" onclick="addedValue(this.checked)">
-                </th>
+                <th>ارزش افزوده</th>
             </tr>
             </thead>
             <tbody>
@@ -75,11 +73,13 @@
                     </td>
                     <td>{{+$orderProduct->number}}</td>
                     <td class="date">{{verta($order->created_at)->formatJalaliDate()}}</td>
-                    <td>{{($orderProduct->discount==100)? 0 : +round($orderProduct->price*100/(100-$orderProduct->discount))}}</td>
+                    <td>{{$orderProduct->original_price}}</td>
+                    <td>{{$orderProduct->original_price * (+$orderProduct->number)}}</td>
                     <td class="number"></td>
-                    <td>{{+$orderProduct->discount}}</td>
+                    <td>{{(+$orderProduct->discount)/100*$orderProduct->original_price * (+$orderProduct->number)}}</td>
                     <td>
-                        <span class="added_value" id="added_value_{{$id}}">0</span>
+                        <input type="checkbox" onclick="$(this).next().html(this.checked?{{$orderProduct->add_value}}:0);reDraw();">
+                        <span>0</span>
                     </td>
                 </tr>
             @endforeach
@@ -145,18 +145,18 @@
             draw();
         }
 
-        function addedValue(checked) {
-            if (checked) {
-                @foreach($orderProducts as $id => $orderProduct)
-                $('#added_value_{{$id}}').html({{$orderProduct->price * $orderProduct->number * 0.1}});
-                @endforeach
-            } else {
-                @foreach($orderProducts as $id => $orderProduct)
-                $('#added_value_{{$id}}').html(0);
-                @endforeach
-            }
-            reDraw();
-        }
+        {{--function addedValue(checked) {--}}
+        {{--    if (checked) {--}}
+        {{--        @foreach($orderProducts as $id => $orderProduct)--}}
+        {{--        $('#added_value_{{$id}}').html({{$orderProduct->price * $orderProduct->number * 0.1}});--}}
+        {{--        @endforeach--}}
+        {{--    } else {--}}
+        {{--        @foreach($orderProducts as $id => $orderProduct)--}}
+        {{--        $('#added_value_{{$id}}').html(0);--}}
+        {{--        @endforeach--}}
+        {{--    }--}}
+        {{--    reDraw();--}}
+        {{--}--}}
 
     </script>
 
