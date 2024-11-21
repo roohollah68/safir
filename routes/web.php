@@ -91,7 +91,7 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::post('/customerDeposit/add/{id}', [CustomerController::class, 'storeNew']);
     Route::post('/customerDeposit/delete/{id}', [CustomerController::class, 'deleteDeposit']);
     Route::get('/customerPaymentTracking', [CustomerController::class, 'paymentTracking']);
-    Route::get('/postpondDay/{id}/{days}', [CustomerController::class, 'postpondDay']);
+    Route::get('/postponedDay/{id}/{days}', [CustomerController::class, 'postponedDay']);
 
     ///PAYMENTLINK
     Route::get('/customer/depositLink/{id}', [CustomerController::class, 'depositLink']);

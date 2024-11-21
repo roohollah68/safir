@@ -68,7 +68,7 @@
                     <a class="fa fa-comment btn btn-info" onclick="view_comment({{$id}})"></a>
                     <span class="btn btn-primary fa fa-chain" onclick="showOrderLink({{$id}})"></span>
                     @if(auth()->user()->meta('allCustomers'))
-                        <span class="btn btn-secondary fa fa-clock" onclick="postpond({{$id}})"></span>
+                        <span class="btn btn-secondary fa fa-clock" onclick="postponed({{$id}})"></span>
                     @endif
                 </td>
             </tr>
@@ -76,15 +76,15 @@
         </tbody>
     </table>
 
-    <div id="postpond">
+    <div id="postponed">
         <div title="به تعویق انداختن پرداخت" class="dialogs">
             <input type="number" value="" id="days" style="width: 120px">
-            <span class="btn btn-info m-1" onclick="postpondDay($('#days').val())">روز بعد</span><br>
-            <span class="btn btn-outline-success m-1" onclick="postpondDay(1)">1 روز بعد</span><br>
-            <span class="btn btn-outline-success m-1" onclick="postpondDay(7)">1 هفته بعد</span><br>
-            <span class="btn btn-outline-success m-1" onclick="postpondDay(14)">2 هفته بعد</span><br>
-            <span class="btn btn-outline-success m-1" onclick="postpondDay(30)">1 ماه بعد</span><br>
-            <span class="btn btn-outline-success m-1" onclick="postpondDay(180)">6 ماه بعد</span><br>
+            <span class="btn btn-info m-1" onclick="postponedDay($('#days').val())">روز بعد</span><br>
+            <span class="btn btn-outline-success m-1" onclick="postponedDay(1)">1 روز بعد</span><br>
+            <span class="btn btn-outline-success m-1" onclick="postponedDay(7)">1 هفته بعد</span><br>
+            <span class="btn btn-outline-success m-1" onclick="postponedDay(14)">2 هفته بعد</span><br>
+            <span class="btn btn-outline-success m-1" onclick="postponedDay(30)">1 ماه بعد</span><br>
+            <span class="btn btn-outline-success m-1" onclick="postponedDay(180)">6 ماه بعد</span><br>
         </div>
     </div>
 
@@ -94,11 +94,11 @@
 @section('files')
     <script>
         let token = '{{csrf_token()}}';
-        let postpondText;
-        let postpondId;
+        let postponedText;
+        let postponedId;
         $(function () {
-            postpondText = $('#postpond').html();
-            $('#postpond').html('');
+            postponedText = $('#postponed').html();
+            $('#postponed').html('');
 
             $('#orders-table').DataTable({
                 // paging: false,
@@ -129,14 +129,14 @@
             })
         }
         @if(auth()->user()->meta('allCustomers'))
-        function postpond(id) {
-            postpondId = id;
-            dialog = Dialog(postpondText);
+        function postponed(id) {
+            postponedId = id;
+            dialog = Dialog(postponedText);
         }
 
-        function postpondDay(days) {
+        function postponedDay(days) {
             dialog.remove();
-            $.get('/postpondDay/' + postpondId + '/' + days).done(() => {
+            $.get('/postponedDay/' + postponedId + '/' + days).done(() => {
                 location.reload();
             })
         }

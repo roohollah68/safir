@@ -436,7 +436,7 @@ class CustomerController extends Controller
         ]);
     }
 
-    function postpondDay($id, $days)
+    function postponedDay($id, $days)
     {
         Helper::access('allCustomers');
         $order = Order::findOrFail($id);
