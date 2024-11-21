@@ -68,6 +68,7 @@ class TelegramController extends Controller
 پرداختی مشتری: {$customerCost} ریال
 نحوه پرداخت: {$order->payMethod()}
 نحوه ارسال: {$order->sendMethod()}
+انبار: {$order->warehouse->name}
 زمان ثبت: {$time}
 سفیر: {$order->user()->first()->name}";
 
