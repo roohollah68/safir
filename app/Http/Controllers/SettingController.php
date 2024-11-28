@@ -54,12 +54,7 @@ class SettingController extends Controller
     public function command()
     {
         set_time_limit(0);
-        $orders = Order::where('payInDate' , '<>' , null)->get()->keyBy('id');
-        foreach ($orders as $id => $order){
-            $order->update([
-                'postponeDate' => $order->payInDate,
-            ]);
-        }
+
     }
 
 }
