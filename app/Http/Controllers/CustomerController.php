@@ -427,7 +427,7 @@ class CustomerController extends Controller
                 continue;
             if (!auth()->user()->meta('allCustomers') && auth()->user()->id != $Order->user_id)
                 continue;
-            if ($Order->payPercent() < 100 && time() > strtotime($Order->payInDate) && $Order->total > 0)
+            if ($Order->payPercent() < 100 && time() > strtotime($Order->payInDate) && time() > strtotime($Order->postponeDate) && $Order->total > 0)
                 $orders[$id] = $Order;
         }
         return view('customer.paymentTracking', [
@@ -442,7 +442,7 @@ class CustomerController extends Controller
         $order = Order::findOrFail($id);
         $date = Carbon::now();
         $date->addDays(+$days);
-        $order->payInDate = $date;
+        $order->postponeDate = $date;
         $order->save();
     }
 
