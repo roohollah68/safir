@@ -38,7 +38,7 @@
                 <span style="font-size: 40px; padding: 0;">آدرس: شهرک صنعتی فریمان، تلاش 2، پلاک 3، شرکت سلامت تدبیر اصیل مهر آسا</span>
             </div>
             <div class="w-100" style="padding: 10px 40px">
-                <span style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">تلفن: 05134685346</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">تلفن: 05134685278</span>
                 <span style="font-size: 40px; padding: 0;display: inline-block;width: 24%;">ثبت / کدملی:</span>
                 <span
                         style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شناسه ملی: 14008245509</span>
@@ -170,8 +170,8 @@
                     /
                 @endif
                 @unless($order->confirm)
-                    <
-                    <اعتبار این پیش فاکتور برای ۴۸ ساعت است>>
+                    * اعتبار این پیش فاکتور برای ۴۸ ساعت است.
+                    * فقط پرداخت به شماره حساب های ذکر شده قابل قبول است.
                 @endunless
             </div>
         </div>
