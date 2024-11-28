@@ -54,19 +54,12 @@ class SettingController extends Controller
     public function command()
     {
         set_time_limit(0);
-        $orderProducts = OrderProduct::all();
-        $products = Product::with('good')->get()->keyBy('id');
-        foreach ($orderProducts as $orderProduct){
-            if(!isset($products[$orderProduct->product_id]))
-                continue;
-            $product  = $products[$orderProduct->product_id];
-            if($product->good->price != $orderProduct->price && !$orderProduct->editPrice){
-                $orderProduct->update([
-                    'editPrice' => true,
-                ]);
-            }
+        $orders = Order::where('payInDate' , '<>' , null)->get()->keyBy('id');
+        foreach ($orders as $id => $order){
+            $order->update([
+                'postponeDate' => $order->payInDate,
+            ]);
         }
-
     }
 
 }

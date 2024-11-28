@@ -31,6 +31,7 @@ class Order extends Model
         'location',
         'warehouse_id',
         'payInDate',
+        'postponeDate',
         'paymentNote',
         'counter',
     ];
