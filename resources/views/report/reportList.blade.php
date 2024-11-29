@@ -1,55 +1,64 @@
 @extends('layout.main')
 
 @section('title')
-    تاریخچه تراکنش ها
+    'گزارش کار نمایندگی ها'
 @endsection
 
 @section('content')
-
+    <h3>گزارش کار نمایندگی ها</h3>
     <br>
-    <table class="table table-striped" id="transaction-table">
-        <thead>
-        <tr>
-            <th>id</th>
-            <th>تاریخ</th>
-            <th>توضیح</th>
-            <th>مقدار(ریال)</th>
-            <th>اعتبار(ریال)</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach($transactions as $tran)
-            <tr style="color:{{$tran->type?'green':'red'}}">
-                <td>{{$tran->id}}</td>
-                <td>{{verta($tran->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
-                <td>{{$tran->description}}</td>
-                <td>{{number_format($tran->amount)}}</td>
-                <td dir="ltr">{{number_format($tran->balance)}}</td>
-            </tr>
+    <hr>
+    <span style="font-weight: bold">ثبت گزارش کار امروز:</span><br>
+    @foreach($warehouses as $id => $warehouse)
+        <a class="btn btn-primary" href="/report/add/{{$id}}"> {{$warehouse->name}}</a>
+    @endforeach
+{{--    <br>--}}
+{{--    <hr>--}}
+{{--    <span style="font-weight: bold">امروز:</span><br>--}}
+{{--    @foreach($warehouses as $id => $warehouse)--}}
+{{--        <span class="btn btn-{{isset($reports[0][$id])?'success':'danger'}}"--}}
+{{--              @isset($reports[0][$id])--}}
+{{--                onclick="showDesc(`{{$reports[0][$id]->description}}`,`{{$warehouse->name}}` , `{{$reports[0][$id]->user->name}}`)"--}}
+{{--                  @endisset--}}
+{{--        >{{$warehouse->name}}</span>--}}
+{{--    @endforeach--}}
+{{--    <br>--}}
+{{--    <hr>--}}
+{{--    <span style="font-weight: bold">دیروز:</span><br>--}}
+{{--    @foreach($warehouses as $id => $warehouse)--}}
+{{--        <span class="btn btn-{{isset($reports[1][$id])?'success':'danger'}}"--}}
+{{--              @isset($reports[1][$id])--}}
+{{--                  onclick="showDesc(`{{$reports[1][$id]->description}}`,`{{$warehouse->name}}` , `{{$reports[1][$id]->user->name}}`)"--}}
+{{--                  @endisset--}}
+{{--        >{{$warehouse->name}}</span>--}}
+{{--    @endforeach--}}
+    @foreach($reports as $day => $reportArray)
+        <br>
+        <hr>
+        <span style="font-weight: bold">{{$day==0?'امروز':($day==1?'دیروز':verta('-'.$day.' day')->formatWord('l dS F'))}}:</span><br>
+        @foreach($warehouses as $id => $warehouse)
+            <span class="btn btn-{{isset($reports[$day][$id])?'success':'danger'}}"
+                  @isset($reports[$day][$id])
+                      onclick="showDesc(`{{$reports[$day][$id]->description}}`,`{{$warehouse->name}}` , `{{$reports[$day][$id]->user->name}}`)"
+                  @endisset
+        >{{$warehouse->name}}</span>
         @endforeach
-        </tbody>
-    </table>
+    @endforeach
+
 
 @endsection
 
-
 @section('files')
     <script>
-        $(function () {
-            $('#transaction-table').DataTable({
-                columnDefs: [
-                    {
-                        targets: [2, 3, 4],
-                        orderable: false
-                    },
-
-                    {
-                        targets: [0],
-                        visible: false
-                    }
-                ],
-                order: [[0, "desc"]],
-            });
-        });
+        let dialog;
+        function showDesc(desc,warehouse,user){
+            let text = `<div title="گزارش کار نمایندگی ${warehouse}" class="dialogs">
+<span>نمایندگی: </sapn><span style="font-weight: bold">${warehouse}</span><br>
+<span>ثبت کننده: </span><span style="font-weight: bold">${user}</span><br>
+<span>توضیحات: </span><br>
+<span style="white-space: pre-wrap">${desc}</span>
+            </div>`;
+            dialog = Dialog(text);
+        }
     </script>
 @endsection

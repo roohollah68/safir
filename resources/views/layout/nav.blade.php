@@ -1,5 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary p-2" id="navbar">
-    <a class="navbar-brand" href="{{route('editUser')}}/{{auth()->user()->id}}"> {{auth()->user()->name}} خوش آمدید <span
+    <a class="navbar-brand" href="{{route('editUser')}}/{{auth()->user()->id}}"> {{auth()->user()->name}} خوش آمدید
+        <span
             class="fa fa-gear"></span></a>
     @if($safir)
         <a class="navbar-brand" href="{{route('DepositList')}}">| اعتبار <span
@@ -35,8 +36,6 @@
                     <a class="nav-link active" href="{{route('manageUsers')}}">مدیریت کاربران</a>
                 </li>
             @endif
-
-
             @if(auth()->user()->meta('manageSafir'))
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
@@ -73,12 +72,11 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('transactions')}}">تراکنش ها</a>
                 </li>
+            @else
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{route('reportList')}}">گزارش کار</a>
+                </li>
             @endif
-{{--            @if(!$superAdmin)--}}
-{{--                <li class="nav-item">--}}
-{{--                    <a class="nav-link active" href="{{route('editUser')}}">ویرایش حساب کاربری</a>--}}
-{{--                </li>--}}
-{{--            @endif--}}
             <li class="nav-item">
                 <a class="nav-link active" href="{{route('logout')}}">خروج</a>
             </li>
