@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
 use App\Models\ProductChange;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
@@ -462,6 +463,7 @@ class OrderController extends Controller
                 'total_no_dis' => $total_no_dis,
                 'total_dis' => $total_dis,
                 'totalProducts' => $totalProducts,
+                'setting' => $this->settings(),
             ])->render();
             $start += $pageContent;
             array_push($res, $page);

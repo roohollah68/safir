@@ -11,7 +11,7 @@
                     @endif فاکتور فروش کالا و خدمات
             </p>
                 <p style="font-size: 85px;text-align: center;margin: 20px;font-weight: bold;">
-                پپتینا
+                {{$setting->invoice_title}}
                 </p>
                 <p style="font-size: 45px; text-align: center;padding: 0; border:3px solid; border-radius: 30px; margin: 0 250px;background: #ddd;">
                     @if(!$firstPage)
@@ -35,21 +35,19 @@
         <div style="border:3px solid;border-bottom:0;height: 315px;z-index: 4;position: relative;"
              class="{{$firstPage}}">
             <div style="margin: 40px 40px 10px 0">
-                <span style="font-size: 40px; padding: 0;">آدرس: شهرک صنعتی فریمان، تلاش 2، پلاک 3، شرکت سلامت تدبیر اصیل مهر آسا</span>
+                <span style="font-size: 40px; padding: 0;">{{$setting->invoice_address}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px">
-                <span style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">تلفن: 05134685278</span>
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 24%;">ثبت / کدملی:</span>
-                <span
-                        style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شناسه ملی: 14008245509</span>
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: خراسان رضوی</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">تلفن: {{$setting->invoice_phone}}</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 24%;">ثبت / کدملی: {{$setting->invoice_code}}</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شناسه ملی: {{$setting->invoice_id}}</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: {{$setting->invoice_province}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px 20px 0">
-                <span style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">موبایل: </span>
-                <span
-                        style="font-size: 35px; padding: 0;display: inline-block;width: 24%;">کد اقتصادی: 411647355789</span>
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">کدپستی: 9391181341</span>
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شهر: فریمان</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">موبایل: {{$order->warehouse->phone}}</span>
+                <span style="font-size: 35px; padding: 0;display: inline-block;width: 24%;">کد اقتصادی: {{$setting->invoice_e_code}}</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">کدپستی: {{$setting->invoice_zip_code}}</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شهر: {{$setting->invoice_city}}</span>
             </div>
             <p style="font-size: 45px; text-align: center;padding: 0; border:3px solid; border-radius: 30px; margin: 0 750px;background: #ddd;">
                 مشخصات خریدار</p>

@@ -48,6 +48,8 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
 
     Route::post('/viewOrder/{id}', [OrderController::class, 'viewOrder']);
     Route::post('/invoice/{id}', [OrderController::class, 'invoice']);
+    Route::get('/invoiceData', [SettingController::class, 'invoiceData']);
+    Route::post('/invoiceData', [SettingController::class, 'invoiceDataSave']);
     Route::get('/orderExcel/{id}', [OrderController::class, 'orderExcel']);
     Route::post('/saveExcelData/{id}', [OrderController::class, 'saveExcelData']);
     Route::post('/viewComment/{id}', [CommentController::class, 'view']);

@@ -82,6 +82,7 @@
                     </div>
                 </div>
                 @if(auth()->user()->meta('usersEdit'))
+                    <a href="/invoiceData" class="btn btn-secondary" style="width: 200px">ویرایش اطلاعات فاکتور</a>
                     <h4>دسترسی ها</h4>
                     <hr>
                     @foreach(config('userMeta.access') as $access => $desc)

@@ -17,6 +17,7 @@ use App\Models\Product;
 use App\Models\Setting;
 //use App\Models\User;
 //use GuzzleHttp\Psr7\Query;
+use App\Models\Warehouse;
 use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
 //use Illuminate\Support\Carbon;
@@ -43,6 +44,32 @@ class SettingController extends Controller
             ]);
         }
         return redirect(route('settings'));
+    }
+
+    public function invoiceData()
+    {
+        Helper::meta('usersEdit');
+        return view('invoiceData', [
+            'setting' => $this->settings(),
+            'warehouses' => Warehouse::all()->keyBy('id'),
+            ]);
+    }
+
+    public function invoiceDataSave(Request $req)
+    {
+        Helper::meta('usersEdit');
+        foreach ($req->all() as $name => $value) {
+            Setting::where('name', $name)->update([
+                'value' => $value
+            ]);
+        }
+        $warehouses = Warehouse::all()->keyBy('id');
+        foreach ($warehouses as $id => $warehouse){
+            $warehouse->update([
+                'phone'=> $req['invoice_mobile_'.$id],
+            ]);
+        }
+        return redirect(route('listOrders'));
     }
 
     public function clearRoute()

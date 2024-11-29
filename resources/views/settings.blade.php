@@ -8,10 +8,6 @@
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
     <form action="" method="post">
         @csrf
-{{--        <label for="loadOrders">تعداد سفارشات قابل نمایش:</label>--}}
-{{--        <input id="loadOrders" name="loadOrders" type="text" class="price-input" value="{{$setting->loadOrders}}">--}}
-
-{{--        <br>--}}
 
         <label for="minCoupon"> تخفیف مازاد کل سامانه(درصد) این عدد به کل تخفیف ها افزوده میشود:</label>
         <input id="minCoupon" name="minCoupon" type="number" value="{{$setting->minCoupon}}">
@@ -42,7 +38,7 @@
         <input id="freeDelivery" name="freeDelivery" type="text" class="price-input" value="{{$setting->freeDelivery}}">
 
         <br>
-        <input type="submit" value="اعمال">
+        <input type="submit" value="ذخیره">
     </form>
 @endsection
 
