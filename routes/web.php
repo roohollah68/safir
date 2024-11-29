@@ -7,6 +7,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DepositController;
 use App\Http\Controllers\OrderProductController;
 use App\Http\Controllers\ProductChangeController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\TransactionController;
@@ -147,6 +148,11 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
 
     Route::get('warehouse/transfer', [ProductController::class, 'transfer']);
     Route::post('warehouse/transfer', [ProductController::class, 'transferSave']);
+
+    ///REPORTS
+    Route::get('report/add/{id}', [ReportController::class, 'newReport']);
+    Route::post('report/add/{id}', [ReportController::class, 'saveReport']);
+    Route::get('report/list', [ReportController::class, 'list'])->name('reportList');
 
     ///PROGRAMMER
     Route::get('/clear/route', [SettingController::class, 'clearRoute']);

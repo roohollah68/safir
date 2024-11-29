@@ -12,4 +12,9 @@ class Warehouse extends Model
     protected $fillable = [
         'phone',
     ];
+
+    public function reports()
+    {
+        return $this->hasMany(Report::class);
+    }
 }
