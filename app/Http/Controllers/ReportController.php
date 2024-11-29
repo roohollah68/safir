@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
 use App\Models\Report;
 use App\Models\Warehouse;
 use Carbon\Carbon;
@@ -11,6 +12,7 @@ class ReportController extends Controller
 {
     public function newReport($id)
     {
+        Helper::meta('workReport');
         $warehouse = Warehouse::findOrFail($id);
         $report = Report::whereDate('created_at', Carbon::today())->where('warehouse_id', $id)->first();
         if (!$report) {
@@ -24,7 +26,7 @@ class ReportController extends Controller
 
     public function saveReport($id, Request $req)
     {
-        $warehouse = Warehouse::findOrFail($id);
+        Helper::meta('workReport');
         $report = Report::whereDate('created_at', Carbon::today())->where('warehouse_id', $id)->first();
         if (!$report) {
             $report = new Report();
@@ -41,6 +43,7 @@ class ReportController extends Controller
 
     public function list()
     {
+        Helper::meta('workReport');
         $reports = [];
         for ($day = 0; $day > -60; $day--) {
             $reports[-$day] = Report::whereDate('created_at', Carbon::today()->addDay($day))->get()->keyBy('warehouse_id');

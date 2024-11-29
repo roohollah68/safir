@@ -18,7 +18,8 @@ return [
         'counter' => 'حسابداری',
         'statistic' => 'مشاهده آمار',
         'warehouse' => 'انبار داری',
-        'manageSafir' => 'کنترل امور سفیران'
+        'manageSafir' => 'کنترل امور سفیران',
+        'workReport' => 'گزارش کار نمایندگی ها',
     ],
     'usersEdit' => false,
     'addOrder' => false,
@@ -33,4 +34,5 @@ return [
     'statistic' => false,
     'warehouse' => false,
     'manageSafir' => false,
+    'workReport' => false,
 ];
