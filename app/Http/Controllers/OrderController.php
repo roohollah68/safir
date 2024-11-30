@@ -632,7 +632,8 @@ class OrderController extends Controller
 
     public function viewOrder($id)
     {
-        if ($this->superAdmin())
+
+        if (auth()->user()->meta('showAllOrders'))
             $order = Order::withTrashed()->findOrFail($id);
         else
             $order = auth()->user()->orders()->withTrashed()->findOrFail($id);
