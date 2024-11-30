@@ -30,45 +30,46 @@
             $counter = count($deposits);
         @endphp
         @foreach($deposits as $deposit)
-            @isset($users[$deposit->user_id])
-                <tr>
-                    <td>{{$counter--}}</td>
-                    @if($superAdmin)
-                        <th>{{$users[$deposit->user_id]->name}}</th>
+            @if(!isset($users[$deposit->user_id]))
+                @continue
+            @endif
+            <tr>
+                <td>{{$counter--}}</td>
+                @if($superAdmin)
+                    <th>{{$users[$deposit->user_id]->name}}</th>
+                @endif
+                <td>{{verta($deposit->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
+                <td>{{number_format($deposit->amount)}}</td>
+
+                <td>{{$deposit->desc}}</td>
+                <td>
+                    @if($deposit->photo)
+                        <a target="_blank" href="/deposit/{{$deposit->photo}}">
+                            <p>مشاهده سند</p>
+                        </a>
                     @endif
-                    <td>{{verta($deposit->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
-                    <td>{{number_format($deposit->amount)}}</td>
+                </td>
 
-                    <td>{{$deposit->desc}}</td>
-                    <td>
-                        @if($deposit->photo)
-                            <a target="_blank" href="/deposit/{{$deposit->photo}}">
-                                <p>مشاهده سند</p>
-                            </a>
-                        @endif
-                    </td>
-
-                    <td>
-                        @if($deposit->confirmed)
-                            <p class="btn btn-success" @if($superAdmin) id="confirm{{$deposit->id}}"
-                               onclick="confirm_deposit({{$deposit->id}})" @endif>
-                                تایید شده</p>
-                        @else
-                            <p class="btn btn-danger" @if($superAdmin) id="confirm{{$deposit->id}}"
-                               onclick="confirm_deposit({{$deposit->id}})" @endif>تایید
-                                نشده</p>
-                        @endif
-                    </td>
-                    <td>
-                        <div id="operation{{$deposit->id}}" @if($deposit->confirmed) style="display: none" @endif>
-                            <a class="fa fa-edit btn btn-primary" href="/deposit/edit/{{$deposit->id}}"
-                               title="ویرایش"></a>
-                            <i class="fa fa-trash-alt btn btn-danger" onclick="delete_deposit({{$deposit->id}})"
-                               title="حذف"></i>
-                        </div>
-                    </td>
-                </tr>
-            @endisset
+                <td>
+                    @if($deposit->confirmed)
+                        <p class="btn btn-success" @if($superAdmin) id="confirm{{$deposit->id}}"
+                           onclick="confirm_deposit({{$deposit->id}})" @endif>
+                            تایید شده</p>
+                    @else
+                        <p class="btn btn-danger" @if($superAdmin) id="confirm{{$deposit->id}}"
+                           onclick="confirm_deposit({{$deposit->id}})" @endif>تایید
+                            نشده</p>
+                    @endif
+                </td>
+                <td>
+                    <div id="operation{{$deposit->id}}" @if($deposit->confirmed) style="display: none" @endif>
+                        <a class="fa fa-edit btn btn-primary" href="/deposit/edit/{{$deposit->id}}"
+                           title="ویرایش"></a>
+                        <i class="fa fa-trash-alt btn btn-danger" onclick="delete_deposit({{$deposit->id}})"
+                           title="حذف"></i>
+                    </div>
+                </td>
+            </tr>
         @endforeach
         </tbody>
     </table>

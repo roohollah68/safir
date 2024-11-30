@@ -56,6 +56,9 @@
             </thead>
             <tbody>
             @foreach($customers as $customer)
+                @if(!$customer->user)
+                    @continue
+                @endif
                 <tr>
                     <td>{{$customer->id}}</td>
                     <td>{{$customer->name}}</td>

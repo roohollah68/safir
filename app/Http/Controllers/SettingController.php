@@ -80,7 +80,7 @@ class SettingController extends Controller
 
     public function command()
     {
-        
+
         set_time_limit(0);
 
     }
