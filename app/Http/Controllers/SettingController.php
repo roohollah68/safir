@@ -80,12 +80,7 @@ class SettingController extends Controller
 
     public function command()
     {
-        $customers = Customer::with('user')->get();
-        foreach ($customers as $customer){
-            if(!$customer->user){
-                $customer->forceDelete();
-            }
-        }
+        
         set_time_limit(0);
 
     }
