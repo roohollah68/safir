@@ -251,7 +251,7 @@ class OrderController extends Controller
         $request->zip_code = Helper::number_Fa_En($request->zip_code);
 
         if (!$order->user->safir()) {
-            $products = Product::where('available', true)->where('warehouse_id', $order->warehouse_id)->get()->keyBy('id');
+            $products = Product::withTrashed()->where('available', true)->where('warehouse_id', $order->warehouse_id)->get()->keyBy('id');
             $products = $this->calculateDis($products, $user);
             $order->orderProducts()->delete();
             if (count($request->cart) == 0) {
