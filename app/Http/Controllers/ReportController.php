@@ -31,6 +31,10 @@ class ReportController extends Controller
         if (!$report) {
             $report = new Report();
         }
+//        $photo = '';
+//        if ($req->file("photo")) {
+//            $report->photo = $req->file("photo")->store("", 'deposit');
+//        }
         $report->warehouse_id = $id;
         $report->user_id = auth()->user()->id;
         $report->description = $req->description;

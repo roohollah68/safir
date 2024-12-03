@@ -12,26 +12,6 @@
     @foreach($warehouses as $id => $warehouse)
         <a class="btn btn-primary" href="/report/add/{{$id}}"> {{$warehouse->name}}</a>
     @endforeach
-{{--    <br>--}}
-{{--    <hr>--}}
-{{--    <span style="font-weight: bold">امروز:</span><br>--}}
-{{--    @foreach($warehouses as $id => $warehouse)--}}
-{{--        <span class="btn btn-{{isset($reports[0][$id])?'success':'danger'}}"--}}
-{{--              @isset($reports[0][$id])--}}
-{{--                onclick="showDesc(`{{$reports[0][$id]->description}}`,`{{$warehouse->name}}` , `{{$reports[0][$id]->user->name}}`)"--}}
-{{--                  @endisset--}}
-{{--        >{{$warehouse->name}}</span>--}}
-{{--    @endforeach--}}
-{{--    <br>--}}
-{{--    <hr>--}}
-{{--    <span style="font-weight: bold">دیروز:</span><br>--}}
-{{--    @foreach($warehouses as $id => $warehouse)--}}
-{{--        <span class="btn btn-{{isset($reports[1][$id])?'success':'danger'}}"--}}
-{{--              @isset($reports[1][$id])--}}
-{{--                  onclick="showDesc(`{{$reports[1][$id]->description}}`,`{{$warehouse->name}}` , `{{$reports[1][$id]->user->name}}`)"--}}
-{{--                  @endisset--}}
-{{--        >{{$warehouse->name}}</span>--}}
-{{--    @endforeach--}}
     @foreach($reports as $day => $reportArray)
         <br>
         <hr>

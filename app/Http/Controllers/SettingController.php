@@ -9,6 +9,7 @@ use App\Helper\Helper;
 use App\Models\CouponLink;
 use App\Models\Customer;
 use App\Models\CustomerTransaction;
+use App\Models\Oldcustomer;
 use App\Models\Order;
 //use App\Models\Product;
 //use App\Models\ProductData;
@@ -80,7 +81,15 @@ class SettingController extends Controller
 
     public function command()
     {
-
+        $customers = Customer::all()->keyBy('id');
+        $oldcustomers = Oldcustomer::all()->keyBy('id');
+        foreach ($customers as $id => $customer){
+            if(isset($oldcustomers[$id])){
+                if($oldcustomers[$id]->user_id != $customer->user_id){
+                    echo '('.$id.')=>'.$customer->name.' => '.$oldcustomers[$id]->user->name.' => '.$customer->user->name.'<br>';
+                }
+            }
+        }
         set_time_limit(0);
 
     }

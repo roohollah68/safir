@@ -616,7 +616,7 @@ class OrderController extends Controller
         $to = date($request->date2 . ' 23:59:59');
         $limit = $request->limit;
 
-        if ($this->superAdmin() || $this->print()) {
+        if (auth()->user()->meta('showAllOrders')) {
             $orders = Order::withTrashed()->with('website')
                 ->whereBetween('created_at', [$from, $to])
                 ->limit($limit)
@@ -632,7 +632,6 @@ class OrderController extends Controller
 
     public function viewOrder($id)
     {
-
         if (auth()->user()->meta('showAllOrders'))
             $order = Order::withTrashed()->findOrFail($id);
         else
