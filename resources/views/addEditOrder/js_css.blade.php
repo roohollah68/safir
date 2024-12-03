@@ -135,9 +135,9 @@
             value="${product.coupon}" style="width: 80px" onchange="changeDiscount(${id},this.value)"
             ${changeDiscountPermit ? '' : 'disabled'} min="0" max="100" step="0.25">
         @if($user->meta('changeDiscount'))
-            <a class="btn btn-outline-info fa fa-plus" dir="ltr"
+            <span class="btn btn-outline-info fa fa-plus" dir="ltr"
             onclick="$('#discount_${id}').val((index,value)=>{return +value+5}).change()">5
-            <i class="fa fa-percent"></i></a>
+            <i class="fa fa-percent"></i></span>
         @endif
         </td>
         <td>
