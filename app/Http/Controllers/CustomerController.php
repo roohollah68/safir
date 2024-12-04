@@ -249,6 +249,7 @@ class CustomerController extends Controller
 
     public function rejectDeposit($id, Request $req)
     {
+        DB::beginTransaction();
         Helper::meta('counter');
         $trans = CustomerTransaction::with('customer')->findOrFail($id);
         if ($trans->verified == 'rejected')
@@ -262,6 +263,7 @@ class CustomerController extends Controller
             'description' => $trans->description . ' _ ' . $req->reason,
         ]);
         $trans->paymentLinks()->delete();
+        DB::commit();
     }
 
     public function customersOrderList(Request $req)
@@ -284,7 +286,6 @@ class CustomerController extends Controller
         if ($order->counter == 'approved')
             return;
         $order->counter = 'approved';
-        $orderProducts = $order->orderProducts()->with('product');
 
         app('Telegram')->sendOrderToBale($order, env('GroupId'));
         (new CommentController)->create($order, auth()->user(), 'تایید حسابداری');
@@ -306,6 +307,8 @@ class CustomerController extends Controller
         (new CommentController)->create($order, auth()->user(), 'عدم تایید حسابداری: ' . ($req->reason ?? ''));
         $order->save();
         DB::commit();
+
+        (new OrderController())->cancelInvoice($id, $req);
     }
 
     public function customerSOA($id, Request $request)

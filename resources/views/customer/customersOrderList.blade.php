@@ -64,7 +64,7 @@
                     $order->user->admin() &&
                     ($selectedUser == 'all' || $order->customer->user->id == $selectedUser))
 
-                <tr class="hide {{$order->counter}}">
+                <tr class="hide {{$order->counter}}" id="row-{{$order->id}}">
                     <td>
                         <span class="d-none">
                             {{verta($order->created_at)->getTimestamp()}}
@@ -91,27 +91,33 @@
                            title="مشاهده سفارش"></a>
                         <a class="btn btn-info fa fa-comment"
                            onclick="view_comment({{$order->id}})"
-                           title="مشاهده سفارش"></a>
-                        <a class="fa fa-file-invoice-dollar btn btn-secondary"
-                           onclick="invoice({{$order->id}})"
-                           title=" فاکتور"></a>
+                           title="مشاهده کامنت ها"></a>
+{{--                        <a class="fa fa-file-invoice-dollar btn btn-secondary"--}}
+{{--                           onclick="invoice({{$order->id}})"--}}
+{{--                           title=" فاکتور"></a>--}}
                         @if($order->receipt)
                             <a class="btn btn-info fa fa-image" href="/deposit/{{$order->receipt}}" target="_blank"></a>
-
                         @endif
                         <span id="button_{{$order->id}}">
-                                @if($order->counter == 'waiting')
-                                <span id="" class="btn btn-success fa fa-check"
-                                      onclick="approveOrder({{$order->id}})"></span>
+                            @unless($order->counter == 'rejected')
                                 <span class="btn btn-danger fa fa-x"
                                       onclick="rejectOrder({{$order->id}})"></span>
-                            @elseif($order->counter == 'rejected')
-                                <span class="btn btn-success fa fa-check"
-                                      onclick="approveOrder({{$order->id}})"></span>
-                            @elseif($order->counter == 'approved')
-                                <span class="btn btn-danger fa fa-x"
-                                      onclick="rejectOrder({{$order->id}})"></span>
-                            @endif
+                            @endunless
+                            @unless($order->counter == 'approved')
+                                    <span class="btn btn-success fa fa-check"
+                                          onclick="approveOrder({{$order->id}})"></span>
+                            @endunless
+{{--                                @if($order->counter == 'waiting')--}}
+{{--                                <span class="btn btn-success fa fa-check"--}}
+{{--                                      onclick="approveOrder({{$order->id}})"></span>--}}
+{{--                                <span class="btn btn-danger fa fa-x"--}}
+{{--                                      onclick="rejectOrder({{$order->id}})"></span>--}}
+{{--                            @elseif($order->counter == 'rejected')--}}
+{{--                                <span class="btn btn-success fa fa-check"--}}
+{{--                                      onclick="approveOrder({{$order->id}})"></span>--}}
+{{--                            @elseif($order->counter == 'approved')--}}
+{{--                                --}}
+{{--                            @endif--}}
                             </span>
                     </td>
                 </tr>
@@ -148,16 +154,17 @@
             if (reason != null) {
                 $.post('/rejectOrder/' + id, {_token: token, reason: reason})
                     .done(res => {
-                        $('#button_' + id).html(approveButton(id));
-                        $('#status_' + id).html('<i class="btn btn-danger">رد شده</i>');
+                        $(`#row-${id}`).remove();
+                        // $('#button_' + id).html(approveButton(id));
+                        // $('#status_' + id).html('<i class="btn btn-danger">رد شده</i>');
                     })
             }
         }
 
-        function approveButton(id) {
-            return `<span class="btn btn-success fa fa-check"
-          onclick="approveOrder(${id})"></span>`;
-        }
+        // function approveButton(id) {
+        //     return `<span class="btn btn-success fa fa-check"
+        //   onclick="approveOrder(${id})"></span>`;
+        // }
 
         function rejectButton(id) {
             return `<span class="btn btn-danger fa fa-x"
