@@ -261,14 +261,7 @@ class CustomerController extends Controller
             'verified' => 'rejected',
             'description' => $trans->description . ' _ ' . $req->reason,
         ]);
-
-        $payLinks = $trans->paymentLinks()->delete();
-        foreach ($payLinks as $payLink) {
-            $order = $payLink->order;
-            $payLink->delete();
-            $order->payPercent = $order->payPercent();
-            $order->save();
-        }
+        $trans->paymentLinks()->delete();
     }
 
     public function customersOrderList(Request $req)
@@ -428,7 +421,7 @@ class CustomerController extends Controller
     {
         $orders = [];
         $Orders = Order::with('paymentLinks');
-        if(isset($req->user) && $req->user != 'all')
+        if (isset($req->user) && $req->user != 'all')
             $Orders = $Orders->where('user_id', $req->user);
         $Orders = $Orders->get()->keyBy('id')->reverse();
         foreach ($Orders as $id => $Order) {
@@ -443,7 +436,7 @@ class CustomerController extends Controller
         }
         return view('customer.paymentTracking', [
             'orders' => $orders,
-            'users' => User::where('role' , '<>', 'user')->get()->keyBy('id'),
+            'users' => User::where('role', '<>', 'user')->get()->keyBy('id'),
         ]);
     }
 
