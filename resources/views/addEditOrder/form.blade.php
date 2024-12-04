@@ -147,7 +147,7 @@
             <th>قیمت قبل تخفیف</th>
             <th>تخفیف(%)
                 @if($user->meta('changeDiscount'))
-                    <input type="number" min="0" max="100" step="0.25" style="width: 50px" onchange="$('.discount-value').val(this.value)">
+                    <input type="number" min="0" max="100" step="0.25" style="width: 50px" onchange="$('.discount-value').val(this.value).change()">
                 @endif
             </th>
             <th>قیمت بعد تخفیف</th>

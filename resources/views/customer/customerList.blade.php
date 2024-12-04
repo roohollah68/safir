@@ -7,7 +7,7 @@
 @section('content')
     @if(!$safir)
         <span class="h5">مجموع بدهکاری مشتریان </span>
-        <span class="h3 btn btn-danger" dir="ltr" onclick="$('#table-container ,#brief-table ').toggle(); ">
+        <span class="h3 btn btn-danger" dir="ltr">
             {{number_format($total)}}
         </span><span class="h5">ریال</span><br><br>
         <a class="btn btn-warning m-3" href="/customerPaymentTracking">پیگیری پرداختی مشتریان</a>
@@ -33,6 +33,10 @@
     @endif
     <a class="btn btn-info m-3 fa fa-user-plus" title="افزودن مشتری جدید" href="{{route('newCustomer')}}"></a>
     <br>
+    <a href="/customers" class="btn btn-info">همه</a>
+    <a href="?trust=1" class="btn btn-success">مطمئن</a>
+    <a href="?trust=0" class="btn btn-danger">نا مطمئن</a>
+    <br>
     <br>
     <div id="table-container">
         <table class="table table-striped" id="customer-table">
@@ -56,9 +60,10 @@
             </thead>
             <tbody>
             @foreach($customers as $customer)
-                @if(!$customer->user)
-                    @continue
-                @endif
+                @continue(!$customer->user)
+                @isset($_GET['trust'])
+                    @continue(+$_GET['trust'] ^ $customer->trust)
+                @endisset
                 <tr>
                     <td>{{$customer->id}}</td>
                     <td>{{$customer->name}}</td>
@@ -82,6 +87,14 @@
                         @if(!$safir)
                             <a class="btn btn-info fa fa-file-invoice" title="تراکنش ها"
                                href="/customer/transaction/{{$customer->id}}"></a>
+                            @if($customer->trust)
+                                <span class="btn btn-success fa fa-check"
+                                      onclick="changeTrust({{$customer->id}} , this)" title="مورد اطمینان است."></span>
+                            @else
+                                <span class="btn btn-danger fa fa-x" onclick="changeTrust({{$customer->id}} , this)"
+                                      title="هنوز قابل اطمینان نیست."></span>
+                            @endif
+
                         @endif
                     </td>
                 </tr>
@@ -89,32 +102,6 @@
             </tbody>
         </table>
     </div>
-    @if($superAdmin)
-        <div id="brief-table">
-            <table class="stripe">
-                <thead>
-                <tr>
-                    <th>شماره مشتری</th>
-                    <th>نام</th>
-                    <th>بدهی(ریال)</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($customers as $customer)
-                    @if($customer->balance == 0)
-                        @continue
-                    @endif
-                    <tr>
-                        <td>{{$customer->id}}</td>
-                        <td>{{$customer->name}}</td>
-                        <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
-                                         class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-        </div>
-    @endif
 
 @endsection
 
@@ -133,12 +120,17 @@
             });
             $('#brief-table').hide();
         });
-        // function customerSOA(id){
-        //     const doc = new jsPDF();
-        //
-        //     doc.text("Hello world!", 10, 10);
-        //     doc.save("a4.pdf");
-        // }
 
+        function changeTrust(id, object) {
+            $.get('/changeTrust/' + id).done((res) => {
+                if (res) {
+                    $(object).addClass('fa-check btn-success').removeClass('fa-x btn-danger');
+                } else {
+                    $(object).removeClass('fa-check btn-success').addClass('fa-x btn-danger');
+                }
+            }).fail(() => {
+                $.notify('مشکلی پیش آمده است.')
+            })
+        }
     </script>
 @endsection

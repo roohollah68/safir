@@ -193,7 +193,7 @@
         })
 
         let deliveryCost = 0;
-        if (Total < {{$settings->freeDelivery}} || '{{$user->id}}' === '10')
+        if (!creatorIsAdmin && (Total < {{$settings->freeDelivery}} || '{{$user->id}}' === '10'))
             if (deliveryMethod === 'peyk')
                 deliveryCost = {{$settings->peykCost}};
             else if (deliveryMethod === 'post')

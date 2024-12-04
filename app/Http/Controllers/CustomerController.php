@@ -136,6 +136,17 @@ class CustomerController extends Controller
         return redirect()->route('CustomerList');
     }
 
+    public function changeTrust($id)
+    {
+        if (auth()->user()->meta('allCustomers'))
+            $customer = Customer::findOrFail($id);
+        else
+            $customer = auth()->user()->customers()->findOrFail($id);
+        $customer->trust = !$customer->trust;
+        $customer->save();
+        return $customer->trust;
+    }
+
     public function newForm($id, $orderId = null)
     {
         if (auth()->user()->meta('allCustomers'))
