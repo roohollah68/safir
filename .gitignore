@@ -5,6 +5,7 @@
 /public/pdf
 /public/woo
 /public/comment
+/public/report
 /storage/*.key
 .idea
 .git
