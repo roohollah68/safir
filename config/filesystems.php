@@ -70,6 +70,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'report' => [
+            'driver' => 'local',
+            'root' => public_path('report'),
+            'url' => env('APP_URL').'',
+            'visibility' => 'public',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

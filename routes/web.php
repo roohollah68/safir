@@ -154,6 +154,7 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::get('report/add/{id}', [ReportController::class, 'newReport']);
     Route::post('report/add/{id}', [ReportController::class, 'saveReport']);
     Route::get('report/list', [ReportController::class, 'list'])->name('reportList');
+    Route::post('commentResponse/{id}', [ReportController::class, 'response']);
 
     ///PROGRAMMER
     Route::get('/clear/route', [SettingController::class, 'clearRoute']);

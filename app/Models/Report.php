@@ -13,6 +13,7 @@ class Report extends Model
         'user_id',
         'warehouse_id',
         'description',
+        'response',
         'photo',
     ];
 

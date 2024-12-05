@@ -45,8 +45,6 @@ class CommentController extends Controller
         $newComment = auth()->user()->name . ': ' . $req->text;
         $commentText .= '    '.$newComment;
         $message = $newComment . " ```[مشاهده سفارش ". $order->name ."]" . $orderText. "\n\n * کامنت ها: *  " . $commentText . "```" ;
-
-//        . "```[مشاهده کامنت های قبلی]" . $commentText . "```"
         if ($req->file("photo")) {
             $photo = $req->file("photo")->store("", "comment");
             $content = array("caption" => $message, "photo" => env('APP_URL') . "comment/{$photo}");
