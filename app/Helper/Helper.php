@@ -2,7 +2,10 @@
 
 namespace App\Helper;
 
+use App\Models\Order;
 use App\Models\Setting;
+use App\Models\User;
+use App\Models\Warehouse;
 
 class Helper
 {
@@ -53,6 +56,32 @@ class Helper
             return 'رد شده';
         else
             return 'نامشخص';
+    }
+
+    public static function orderAccess($order , $userId = null)
+    {
+        if(!$userId)
+            $userId = auth()->user()->id;
+        $user = User::findOrFail($userId);
+        $warehouses = Warehouse::where('user_id' , $userId)->get()->keyBy('id');
+        if($order->user_id == $userId || $user->meta('showAllOrders') ||
+            $user->meta('counter') || $warehouses[$order->warehouse_id])
+            return true;
+        return false;
+    }
+
+    public static function Order()
+    {
+        $user = auth()->user();
+        $orders = Order::withTrashed();
+        if(!$user->meta('showAllOrders') && !$user->meta('counter')){
+            $orders = $orders->where(function ($query) {
+                $user = auth()->user();
+                $warehouses = Warehouse::where('user_id' , $user->id)->get()->keyBy('id')->keys();
+                $query->orWhere('user_id',$user->id)->orWhereIn('warehouse_id',$warehouses);
+            });
+        }
+        return $orders;
     }
 }
 

@@ -22,41 +22,15 @@
     </tr>
     </thead>
     <tbody>
-    {{--    @foreach($transactions as $trans)--}}
-    {{--        @if($trans->verified != 'approved')--}}
-    {{--            @continue--}}
-    {{--        @endif--}}
-    {{--        @php--}}
-    {{--            $total2 += $trans->amount;--}}
-    {{--        @endphp--}}
-    {{--    @endforeach--}}
-
-    {{--    @foreach($orders as $order)--}}
-    {{--        @if(!$order->confirm)--}}
-    {{--            @continue--}}
-    {{--        @endif--}}
-    {{--        @php--}}
-    {{--            $total1 += $order->total;--}}
-    {{--        @endphp--}}
-    {{--    @endforeach--}}
-
-    {{--    @php--}}
-    {{--        $total = $total2 -$total1;--}}
-    {{--    @endphp--}}
-
     @foreach($transactions->merge($orders)->sortBy('created_at') as $trans)
         @if($trans->getTable() == 'customer_transactions')
-            @if( $trans->verified != 'approved')
-                @continue
-            @endif
+            @continue($trans->verified != 'approved')
             @php
                 $total2 += $trans->amount;
             @endphp
         @endif
         @if($trans->getTable() == 'orders')
-            @if(!$trans->confirm)
-                @continue
-            @endif
+                @continue(!$trans->confirm)
             @php
                 $total1 += $trans->total;
             @endphp

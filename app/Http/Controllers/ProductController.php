@@ -6,6 +6,7 @@ use App\Models\Good;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductChange;
+use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -312,5 +313,29 @@ class ProductController extends Controller
             'products' => $products,
             'ware' => $warehouse,
         ]);
+    }
+
+    public function warehouseManager()
+    {
+        return view('product.warehouseManager',[
+            'warehouses' => Warehouse::all()->keyBy('id'),
+            'users' => User::where('verified' , true)->get()->keyBy('id'),
+        ]);
+    }
+
+    public function saveWarehouseManager(Request $req)
+    {
+        $warehouses = Warehouse::all()->keyBy('id');
+        $users = User::where('verified' , true)->get()->keyBy('id');
+        foreach ($warehouses as $id => $warehouse){
+            $warehouse->user_id = null;
+            if($req['user-'.$id]){
+                if($users[$req['user-'.$id]]){
+                    $warehouse->user_id = $req['user-'.$id];
+                }
+            }
+            $warehouse->save();
+        }
+        return redirect('/warehouse/manager');
     }
 }

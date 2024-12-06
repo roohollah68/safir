@@ -31,6 +31,10 @@
         <span class=" fa fa-industry"></span>
         برنامه تولید
     </a>
+    <a class="btn btn-dark mb-3" href="warehouse/manager">
+        <span class=" fa fa-user"></span>
+        تعیین مسئول انبار
+    </a>
     <br>
     <div class="container border input-box">
         <div class="row">

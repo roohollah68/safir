@@ -57,15 +57,12 @@
         </thead>
         <tbody>
         @foreach($transactions as $tran)
-            @if($tran->deleted || $tran->order_id || ($selectedUser != 'all' && $tran->customer->user->id != $selectedUser))
-                @continue
-            @endif
-
+            @continue($selectedUser != 'all' && $tran->customer->user->id != $selectedUser)
             <tr class="hide {{$tran->verified}}">
                 <td>
-                        <span class="d-none">
-                            {{verta($tran->created_at)->getTimestamp()}}
-                        </span>
+                    <span class="d-none">
+                         {{verta($tran->created_at)->getTimestamp()}}
+                    </span>
                     {{verta($tran->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}
                 </td>
                 <td dir="ltr">{{number_format($tran->amount)}}</td>

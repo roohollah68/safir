@@ -45,12 +45,6 @@
         <input id="invoice_city" name="invoice_city" type="text" class="w-50" value="{{$setting->invoice_city}}">
         <br>
         <br>
-        @foreach($warehouses as $id => $warehouse)
-            <label for="invoice_mobile_{{$id}}">موبایل {{$warehouse->name}}:</label>
-            <input id="invoice_mobile_{{$id}}" name="invoice_mobile_{{$id}}" type="text" class="w-50" value="{{$warehouse->phone}}">
-            <br>
-            <br>
-        @endforeach
         <input type="submit" value="ذخیره">
     </form>
 @endsection

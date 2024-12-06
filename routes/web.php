@@ -149,6 +149,8 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
 
     Route::get('warehouse/transfer', [ProductController::class, 'transfer']);
     Route::post('warehouse/transfer', [ProductController::class, 'transferSave']);
+    Route::get('warehouse/manager', [ProductController::class, 'warehouseManager']);
+    Route::post('warehouse/manager', [ProductController::class, 'saveWarehouseManager']);
 
     ///REPORTS
     Route::get('report/add/{id}', [ReportController::class, 'newReport']);

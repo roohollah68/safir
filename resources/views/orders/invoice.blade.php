@@ -44,7 +44,7 @@
                 <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: {{$setting->invoice_province}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px 20px 0">
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">موبایل: {{$order->warehouse->phone}}</span>
+                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">موبایل: {{$order->warehouse->user->phone??''}}</span>
                 <span style="font-size: 35px; padding: 0;display: inline-block;width: 24%;">کد اقتصادی: {{$setting->invoice_e_code}}</span>
                 <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">کدپستی: {{$setting->invoice_zip_code}}</span>
                 <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شهر: {{$setting->invoice_city}}</span>

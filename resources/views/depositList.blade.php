@@ -30,9 +30,7 @@
             $counter = count($deposits);
         @endphp
         @foreach($deposits as $deposit)
-            @if(!isset($users[$deposit->user_id]))
-                @continue
-            @endif
+            @continue(!isset($users[$deposit->user_id]))
             <tr>
                 <td>{{$counter--}}</td>
                 @if($superAdmin)

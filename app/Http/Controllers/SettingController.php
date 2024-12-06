@@ -64,13 +64,7 @@ class SettingController extends Controller
                 'value' => $value
             ]);
         }
-        $warehouses = Warehouse::all()->keyBy('id');
-        foreach ($warehouses as $id => $warehouse){
-            $warehouse->update([
-                'phone'=> $req['invoice_mobile_'.$id],
-            ]);
-        }
-        return redirect(route('listOrders'));
+        return redirect('/invoiceData');
     }
 
     public function clearRoute()

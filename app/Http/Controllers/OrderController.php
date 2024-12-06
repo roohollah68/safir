@@ -26,15 +26,9 @@ class OrderController extends Controller
     public function showOrders()
     {
         $user = auth()->user();
-        if (auth()->user()->meta('showAllOrders')) {
-            $users = User::withTrashed()->get()->keyBy("id");
-            $orders = Order::withTrashed()->orderBy('id', 'desc')->with(['website', 'orderProducts', 'warehouse'])
-                ->limit($user->meta('NuRecords'))->get()->keyBy('id');
-        } else {
-            $users = array(auth()->user()->id => auth()->user());
-            $orders = auth()->user()->orders()->withTrashed()
-                ->orderBy('id', 'desc')->with(['orderProducts', 'warehouse'])->limit($user->meta('NuRecords'))->get()->keyBy('id');
-        }
+        $users = User::withTrashed()->get()->keyBy("id");
+        $orders = Helper::Order()->orderBy('id', 'desc')->with(['website', 'orderProducts', 'warehouse'])
+            ->limit($user->meta('NuRecords'))->get()->keyBy('id');
 
         foreach ($orders as $order) {
             $order->orders = $order->orders();
@@ -184,11 +178,7 @@ class OrderController extends Controller
 
     public function editOrder($id)
     {
-        if (auth()->user()->meta('showAllOrders')) {
-            $order = Order::with('customer.city')->with('user')->findOrFail($id);
-        } else {
-            $order = auth()->user()->orders()->with('customer.city')->with('user')->findOrFail($id);
-        }
+        $order = Helper::Order()->with('customer.city')->with('user')->findOrFail($id);
         $user = $order->user;
         if (($order->state && $order->user->safir()) || ($order->confirm && $order->user->admin()))
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
@@ -235,10 +225,7 @@ class OrderController extends Controller
     public function updateOrder($id, Request $request)
     {
         DB::beginTransaction();
-        if (auth()->user()->meta('showAllOrders'))
-            $order = Order::with('user')->with('orderProducts')->findOrFail($id);
-        else
-            $order = auth()->user()->orders()->with('orderProducts')->with('user')->findOrFail($id);
+        $order = Helper::Order()->with('user')->with('orderProducts')->findOrFail($id);
         $user = $order->user;
         request()->validate([
             'receipt' => 'mimes:jpeg,jpg,png,bmp|max:2048',
@@ -305,7 +292,7 @@ class OrderController extends Controller
     {
         Helper::access('changeOrderState');
         DB::beginTransaction();
-        $order = Order::findOrFail($id);
+        $order = Helper::Order()->findOrFail($id);
         $user = $order->user;
         $order->state = +$state;
 
@@ -387,7 +374,7 @@ class OrderController extends Controller
         $fonts = array();
         $orders = array();
         foreach ($idArray as $id) {
-            $order = Order::with('warehouse')->findOrFail($id);
+            $order = Helper::Order()->with('warehouse')->findOrFail($id);
             if ($order->state == 1) {
                 $order->update([
                     'state' => 2
@@ -419,10 +406,7 @@ class OrderController extends Controller
 
     public function invoice($id, Request $request)
     {
-        if (auth()->user()->meta('showAllOrders') || auth()->user()->meta('counter'))
-            $order = Order::findOrFail($id);
-        else
-            $order = auth()->user()->orders()->findOrFail($id);
+        $order = Helper::Order()->findOrFail($id);
         $order->desc .= '(انبار ' . $order->warehouse->name . ')';
         $total_no_dis = 0;
         $total_dis = 0;
@@ -474,7 +458,7 @@ class OrderController extends Controller
     public function cancelInvoice($id, Request $req)
     {
         DB::beginTransaction();
-        $order = Order::findOrFail($id);
+        $order = Helper::Order()->findOrFail($id);
         if (!$order->confirm)
             return $order;
         if ($order->state) {
@@ -501,11 +485,7 @@ class OrderController extends Controller
     public function deleteOrder($id, Request $request)
     {
         DB::beginTransaction();
-        if (auth()->user()->meta('showAllOrders'))
-            $order = Order::with('user')->findOrFail($id);
-        else
-            $order = auth()->user()->orders()->with('user')->findOrFail($id);
-
+        $order = Helper::Order()->with('user')->findOrFail($id);
         if ($order->state || ($order->confirm && $order->user->role !== 'user'))
             return 'سفارش نمی تواند حذف شود، چون پردازش شده است!';
 
@@ -616,26 +596,17 @@ class OrderController extends Controller
         $to = date($request->date2 . ' 23:59:59');
         $limit = $request->limit;
 
-        if (auth()->user()->meta('showAllOrders')) {
-            $orders = Order::withTrashed()->with('website')
-                ->whereBetween('created_at', [$from, $to])
-                ->limit($limit)
-                ->get()->keyBy('id');
-        } else {
-            $orders = auth()->user()->orders()->withTrashed()->with('website')
-                ->whereBetween('created_at', [$from, $to])
-                ->limit($limit)
-                ->get()->keyBy('id');
-        }
+        $orders = Helper::Order()->with(['website', 'orderProducts', 'warehouse'])
+            ->whereBetween('created_at', [$from, $to])
+            ->limit($limit)
+            ->get()->keyBy('id');
+
         return $orders;
     }
 
     public function viewOrder($id)
     {
-        if (auth()->user()->meta('showAllOrders'))
-            $order = Order::withTrashed()->findOrFail($id);
-        else
-            $order = auth()->user()->orders()->withTrashed()->findOrFail($id);
+        $order = Helper::Order()->findOrFail($id);
         $order = $this->addCityToAddress($order);
         return view('orders.view', ['order' => $order]);
     }
@@ -644,7 +615,7 @@ class OrderController extends Controller
     {
         Helper::access('changeOrderState');
         DB::beginTransaction();
-        $order = Order::findOrFail($id);
+        $order = Helper::Order()->findOrFail($id);
         if (!$order->deliveryMethod || $order->isCreatorAdmin())
             $order->deliveryMethod = '';
         if ($req->note)
@@ -658,10 +629,7 @@ class OrderController extends Controller
 
     public function paymentMethod($id, Request $req)
     {
-        if (auth()->user()->meta('showAllOrders'))
-            $order = Order::with('customer')->findOrFail($id);
-        else
-            $order = auth()->user()->orders()->with('customer')->findOrFail($id);
+        $order = Helper::Order()->with('customer')->findOrFail($id);
         request()->validate([
             'paymentMethod' => 'required',
             'cashPhoto' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
@@ -722,7 +690,7 @@ class OrderController extends Controller
 
     public function orderExcel($id)
     {
-        $order = Order::findOrFail($id);
+        $order = Helper::Order()->findOrFail($id);
         $customer = $order->customer;
         $customerMeta = $customer->customerMetas->first();
         $orderProducts = $order->orderProducts->keyBy('id');
@@ -731,7 +699,7 @@ class OrderController extends Controller
                 if (isset($orderProduct->product))
                     $orderProduct->original_price = $orderProduct->product->good->price;
                 else
-                    $orderProduct->original_price =0;
+                    $orderProduct->original_price = 0;
             } else
                 $orderProduct->original_price = +round($orderProduct->price * 100 / (100 - $orderProduct->discount));
             $orderProduct->add_value = $orderProduct->price * $orderProduct->number * 0.1;
@@ -746,7 +714,7 @@ class OrderController extends Controller
 
     public function saveExcelData($id, Request $req)
     {
-        $order = Order::findOrFail($id);
+        $order = Helper::Order()->findOrFail($id);
         if ($req->customer_code)
             CustomerMeta::updateOrCreate(
                 ['customer_id' => $order->customer_id],
@@ -770,7 +738,7 @@ class OrderController extends Controller
     public function changeWarehose($orderId, $warehouseId)
     {
         DB::beginTransaction();
-        $order = Order::findOrFail($orderId);
+        $order = Helper::Order()->findOrFail($orderId);
         $productOrders = $order->orderProducts;
         foreach ($productOrders as $productOrder) {
             $product = $productOrder->product;
