@@ -4,7 +4,6 @@ namespace App\Helper;
 
 use App\Models\Order;
 use App\Models\Setting;
-use App\Models\User;
 use App\Models\Warehouse;
 
 class Helper
@@ -14,13 +13,13 @@ class Helper
         return auth()->user()->meta($key);
     }
 
-    public static function access($key)
+    public static function access($key): void
     {
         if (!auth()->user()->meta($key))
             abort(401);
     }
 
-    public static function number_Fa_En($Number)  //تبدیل اعداد فارسی به انگلیسی
+    public static function number_Fa_En($Number): string  //تبدیل اعداد فارسی به انگلیسی
     {
         foreach (['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'] as $en => $fa) {
             $Number = str_replace($fa, '' . $en, $Number);
@@ -28,15 +27,15 @@ class Helper
         return $Number;
     }
 
-    public static function number_En_Fa($Number)
+    public static function number_En_Fa($Number): string
     {
         foreach (['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'] as $en => $fa) {
-            $Number = str_replace($en, '' . $fa, $Number);
+            $Number = str_replace($en, $fa, $Number);
         }
         return $Number;
     }
 
-    public static function settings()
+    public static function settings(): object
     {
         $sets = Setting::all();
         $res = [];
@@ -46,7 +45,7 @@ class Helper
         return (object)$res;
     }
 
-    public static function condition($state)
+    public static function condition($state): string
     {
         if ($state == 'waiting')
             return 'در انتظار بررسی';
@@ -56,18 +55,6 @@ class Helper
             return 'رد شده';
         else
             return 'نامشخص';
-    }
-
-    public static function orderAccess($order , $userId = null)
-    {
-        if(!$userId)
-            $userId = auth()->user()->id;
-        $user = User::findOrFail($userId);
-        $warehouses = Warehouse::where('user_id' , $userId)->get()->keyBy('id');
-        if($order->user_id == $userId || $user->meta('showAllOrders') ||
-            $user->meta('counter') || $warehouses[$order->warehouse_id])
-            return true;
-        return false;
     }
 
     public static function Order()

@@ -51,8 +51,6 @@ class TelegramController extends Controller
 
     public function createOrderMessage($order)
     {
-
-
         $total = number_format($order->total);
         $customerCost = number_format($order->customerCost);
         $time = verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime();
