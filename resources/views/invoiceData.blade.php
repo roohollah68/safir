@@ -45,6 +45,22 @@
         <input id="invoice_city" name="invoice_city" type="text" class="w-50" value="{{$setting->invoice_city}}">
         <br>
         <br>
+        <label for="invoice_bank1">شماره حساب 1:</label>
+        <textarea id="invoice_bank1" name="invoice_bank1" rows="5" class="w-50">{{$setting->invoice_bank1}}</textarea>
+        <br>
+        <br>
+        <label for="invoice_bank2">شماره حساب 2:</label>
+        <textarea id="invoice_bank2" name="invoice_bank2" rows="5" class="w-50">{{$setting->invoice_bank2}}</textarea>
+        <br>
+        <br>
+        <label for="invoice_note1">یادداشت 1(پیش فاکتور):</label>
+        <textarea id="invoice_note1" name="invoice_note1" rows="3" class="w-50">{{$setting->invoice_note1}}</textarea>
+        <br>
+        <br>
+        <label for="invoice_note2">یادداشت 2(همه):</label>
+        <textarea id="invoice_note2" name="invoice_note2" rows="3" class="w-50">{{$setting->invoice_note2}}</textarea>
+        <br>
+        <br>
         <input type="submit" value="ذخیره">
     </form>
 @endsection

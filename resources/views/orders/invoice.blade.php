@@ -131,18 +131,8 @@
                 </tr>
             </table>
             <div class="d-flex {{$lastPage}}" id="acount" style="padding: 20px 30px">
-                <span style="width: 49%">
-                    <p>حساب بانک سپه شرکت سلامت تدبیر اصیل مهر آسا</p>
-                    <p>شماره شبا: IR750150000003100006261636</p>
-                    <p>شماره حساب: 3100006261636</p>
-                    <p>شماره کارت: 5892108833365860</p>
-                </span>
-                <span style="width: 49%">
-                    <p>حساب بانک رفاه شرکت سلامت تدبیر اصیل مهرآسا</p>
-                    <p>شماره شبا: IR750130100000000355393499</p>
-                    <p>شماره حساب: 355393499</p>
-                    <p>شماره کارت: 5894637000235207</p>
-                </span>
+                <span style="width: 49%;white-space: pre-wrap;">{{$setting->invoice_bank1}}</span>
+                <span style="width: 49%;white-space: pre-wrap;">{{$setting->invoice_bank2}}</span>
             </div>
         </div>
         <div id="main" style="border: 3px solid; padding-top: 40px" class="{{$lastPage}}">
@@ -168,11 +158,9 @@
                     /
                 @endif
                 @unless($order->confirm)
-                    * اعتبار این پیش فاکتور برای ۴۸ ساعت است.
+                        <span style="white-space: pre-wrap;">{{$setting->invoice_note1}}</span>
                 @endunless
-                    <sapn style="font-weight: bold">
-                    * فقط پرداخت به شماره حساب های ذکر شده از طرف شرکت قابل قبول است و پرداخت به غیر مجاز نیست.
-                    </sapn>
+                    <sapn style="font-weight: bold;white-space: pre-wrap;">{{$setting->invoice_note2}}</sapn>
             </div>
         </div>
 
