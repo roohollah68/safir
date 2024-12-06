@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
     <title>@yield('title')</title>
-
+    <link rel="icon" href="/logo-300x300.webp"/>
     <script src="/js/jquery-3.7.1.js"></script>
 
     <script src="/js/jquery-ui.js"></script>
