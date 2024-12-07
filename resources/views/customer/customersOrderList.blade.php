@@ -92,9 +92,9 @@
                         <a class="btn btn-info fa fa-comment"
                            onclick="view_comment({{$order->id}})"
                            title="مشاهده کامنت ها"></a>
-{{--                        <a class="fa fa-file-invoice-dollar btn btn-secondary"--}}
-{{--                           onclick="invoice({{$order->id}})"--}}
-{{--                           title=" فاکتور"></a>--}}
+                        <a class="fa fa-file-invoice-dollar btn btn-secondary"
+                           onclick="invoice({{$order->id}})"
+                           title=" فاکتور"></a>
                         @if($order->receipt)
                             <a class="btn btn-info fa fa-image" href="/deposit/{{$order->receipt}}" target="_blank"></a>
                         @endif

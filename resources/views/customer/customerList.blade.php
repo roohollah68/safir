@@ -30,12 +30,12 @@
                 </div>
             </form>
         @endif
+        <a href="/customers" class="btn btn-info">همه</a>
+        <a href="?trust=1" class="btn btn-success">مطمئن</a>
+        <a href="?trust=0" class="btn btn-danger">نا مطمئن</a>
+        <br>
     @endif
     <a class="btn btn-info m-3 fa fa-user-plus" title="افزودن مشتری جدید" href="{{route('newCustomer')}}"></a>
-    <br>
-    <a href="/customers" class="btn btn-info">همه</a>
-    <a href="?trust=1" class="btn btn-success">مطمئن</a>
-    <a href="?trust=0" class="btn btn-danger">نا مطمئن</a>
     <br>
     <br>
     <div id="table-container">
