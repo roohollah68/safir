@@ -352,8 +352,9 @@
         $.post('/change_state/' + id + '/' + state, {
             _token: token,
         })
-            .done(state => {
-                orders[id].state = +state;
+            .done(res => {
+                orders[id].state = +res[0];
+                $.notify(res[1],'info');
                 $('#view_order_' + id).parent().html(operations(orders[id]));
                 $('#state_' + id).parent().html(createdTime(orders[id]));
                 $('#orderCondition_' + id).html(orderCondition(orders[id]));

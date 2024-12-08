@@ -29,11 +29,12 @@
                     </div>
                 </div>
             </form>
+            <a href="/customers" class="btn btn-info">همه</a>
+            <a href="?trust=1" class="btn btn-success">مطمئن</a>
+            <a href="?trust=0" class="btn btn-danger">نا مطمئن</a>
+            <br>
         @endif
-        <a href="/customers" class="btn btn-info">همه</a>
-        <a href="?trust=1" class="btn btn-success">مطمئن</a>
-        <a href="?trust=0" class="btn btn-danger">نا مطمئن</a>
-        <br>
+
     @endif
     <a class="btn btn-info m-3 fa fa-user-plus" title="افزودن مشتری جدید" href="{{route('newCustomer')}}"></a>
     <br>
@@ -87,14 +88,16 @@
                         @if(!$safir)
                             <a class="btn btn-info fa fa-file-invoice" title="تراکنش ها"
                                href="/customer/transaction/{{$customer->id}}"></a>
-                            @if($customer->trust)
-                                <span class="btn btn-success fa fa-check"
-                                      onclick="changeTrust({{$customer->id}} , this)" title="مورد اطمینان است."></span>
-                            @else
-                                <span class="btn btn-danger fa fa-x" onclick="changeTrust({{$customer->id}} , this)"
-                                      title="هنوز قابل اطمینان نیست."></span>
+                            @if(auth()->user()->meta('allCustomers'))
+                                @if($customer->trust)
+                                    <span class="btn btn-success fa fa-check"
+                                          onclick="changeTrust({{$customer->id}} , this)"
+                                          title="مورد اطمینان است."></span>
+                                @else
+                                    <span class="btn btn-danger fa fa-x" onclick="changeTrust({{$customer->id}} , this)"
+                                          title="هنوز قابل اطمینان نیست."></span>
+                                @endif
                             @endif
-
                         @endif
                     </td>
                 </tr>

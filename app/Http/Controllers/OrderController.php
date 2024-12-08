@@ -294,6 +294,9 @@ class OrderController extends Controller
         DB::beginTransaction();
         $order = Helper::Order()->findOrFail($id);
         $user = $order->user;
+        if(+$state == 1 && $order->payPercentApproved()<100 && ($order->paymentMethod == 'cash' || $order->paymentMethod == 'cheque')){
+            return [$order->state , 'ابتدا پرداخت فاکتور باید تایید شود.'];
+        }
         $order->state = +$state;
 
         if ($order->paymentMethod == 'onDelivery') {
@@ -365,7 +368,7 @@ class OrderController extends Controller
         $order->save();
         $user->save();
         DB::commit();
-        return +$order->state;
+        return [+$order->state , $text];
     }
 
     public function pdfs($ids)

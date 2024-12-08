@@ -124,7 +124,7 @@ class Order extends Model
     {
         $orderProducts = $this->orderProducts;
         $text = $this->orders;
-        foreach ($orderProducts as $orderProduct){
+        foreach ($orderProducts as $orderProduct) {
             $text .= ' ' . $orderProduct->name . ' ' . +$orderProduct->number . 'عدد' . '،';
         }
         return $text;
@@ -132,15 +132,30 @@ class Order extends Model
 
     public function payPercent()
     {
-        if($this->user->safir())
+        if ($this->user->safir())
             return 100;
         $payLinks = $this->paymentLinks;
         $Total = 0;
-        foreach ($payLinks as $payLink){
+        foreach ($payLinks as $payLink) {
             $Total += $payLink->amount;
         }
-        if($this->total == 0)
+        if ($this->total == 0)
             return 0;
-        return round($Total/$this->total*100);
+        return round($Total / $this->total * 100);
+    }
+
+    public function payPercentApproved()
+    {
+        if ($this->user->safir())
+            return 100;
+        $payLinks = $this->paymentLinks;
+        $Total = 0;
+        foreach ($payLinks as $payLink) {
+            if ($payLink->customerTransaction->verified == 'approved')
+                $Total += $payLink->amount;
+        }
+        if ($this->total == 0)
+            return 0;
+        return round($Total / $this->total * 100);
     }
 }
