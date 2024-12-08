@@ -15,8 +15,16 @@ class Helper
 
     public static function access($key): void
     {
-        if (!auth()->user()->meta($key))
+        if (is_string($key))
+            if (!auth()->user()->meta($key))
+                abort(401);
+        if(is_array($key)) {
+            foreach ($key as $k)
+                if (auth()->user()->meta($k))
+                    return;
             abort(401);
+        }
+
     }
 
     public static function number_Fa_En($Number): string  //تبدیل اعداد فارسی به انگلیسی
@@ -61,11 +69,11 @@ class Helper
     {
         $user = auth()->user();
         $orders = Order::withTrashed();
-        if(!$user->meta('showAllOrders') && !$user->meta('counter')){
+        if (!$user->meta('showAllOrders') && !$user->meta('counter')) {
             $orders = $orders->where(function ($query) {
                 $user = auth()->user();
-                $warehouses = Warehouse::where('user_id' , $user->id)->get()->keyBy('id')->keys();
-                $query->orWhere('user_id',$user->id)->orWhereIn('warehouse_id',$warehouses);
+                $warehouses = Warehouse::where('user_id', $user->id)->get()->keyBy('id')->keys();
+                $query->orWhere('user_id', $user->id)->orWhereIn('warehouse_id', $warehouses);
             });
         }
         return $orders;

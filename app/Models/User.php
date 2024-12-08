@@ -134,4 +134,9 @@ class User extends Authenticatable
         return $this->hasMany(CouponLink::class);
     }
 
+    public function withdrawals()
+    {
+        return $this->hasMany(Withdrawal::class);
+    }
+
 }

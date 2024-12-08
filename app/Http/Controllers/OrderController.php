@@ -294,6 +294,7 @@ class OrderController extends Controller
         DB::beginTransaction();
         $order = Helper::Order()->findOrFail($id);
         $user = $order->user;
+        // جلوگیری از ارسال سفارشات نقدی و چکی بدون تایید پرداخت
         if(+$state == 1 && $order->payPercentApproved()<100 && ($order->paymentMethod == 'cash' || $order->paymentMethod == 'cheque')){
             return [$order->state , 'ابتدا پرداخت فاکتور باید تایید شود.'];
         }

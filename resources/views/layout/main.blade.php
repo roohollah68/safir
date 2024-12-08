@@ -57,7 +57,7 @@
     <div class="loading">Loading&#8230;</div>
     <div class="content"><h3></h3></div>
 </div>
-
+<div id="invoice-wrapper"></div>
 
 </body>
 </html>

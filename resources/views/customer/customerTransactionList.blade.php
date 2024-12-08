@@ -131,9 +131,6 @@
         </div>
     </div>
 
-
-
-    <div id="invoice-wrapper"></div>
     <div id="transactionReportTXT">
         <div title="مشاهده سفارش" class="dialogs">
             <form method="post" id="report" action="">

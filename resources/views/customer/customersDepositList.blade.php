@@ -108,7 +108,6 @@
         @endforeach
         </tbody>
     </table>
-    <div id="invoice-wrapper"></div>
 @endsection
 
 

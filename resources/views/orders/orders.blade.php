@@ -76,7 +76,7 @@
 
     <table id="main-table" class="table table-striped">
     </table>
-    <div id="invoice-wrapper"></div>
+
     <div class="d-none" id="paymentMethodText">
         @include('orders.paymentMethods')
     </div>

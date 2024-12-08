@@ -65,6 +65,7 @@
                 </td>
                 <td>
                     <a class="btn btn-info fa fa-eye" onclick="view_order({{$id}})" title="مشاهده سفارش"></a>
+                    <a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice({{$id}})" title=" فاکتور"></a>
                     <a class="fa fa-comment btn btn-info" onclick="view_comment({{$id}})"></a>
                     <span class="btn btn-primary fa fa-chain" onclick="showOrderLink({{$id}})"></span>
                     @if(auth()->user()->meta('allCustomers'))

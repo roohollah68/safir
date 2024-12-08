@@ -15,6 +15,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TelegramController;
+use App\Http\Controllers\WithdrawalController;
 use App\Models\Product;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
@@ -157,6 +158,16 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::post('report/add/{id}', [ReportController::class, 'saveReport']);
     Route::get('report/list', [ReportController::class, 'list'])->name('reportList');
     Route::post('commentResponse/{id}', [ReportController::class, 'response']);
+
+    ///Withdrawal
+    Route::get('Withdrawal/add', [WithdrawalController::class, 'new'])->name('addWithdrawal');
+    Route::post('Withdrawal/add', [WithdrawalController::class, 'insert']);
+    Route::get('Withdrawal/delete/{id}', [WithdrawalController::class, 'delete']);
+    Route::get('Withdrawal/edit/{id}', [WithdrawalController::class, 'edit']);
+    Route::post('Withdrawal/edit/{id}', [WithdrawalController::class, 'update']);
+    Route::get('Withdrawal/list', [WithdrawalController::class, 'list'])->name('WithdrawalList');
+    Route::post('Withdrawal/confirm/{id}', [WithdrawalController::class, 'confirm']);
+    Route::post('Withdrawal/pay/{id}', [WithdrawalController::class, 'pay']);
 
     ///PROGRAMMER
     Route::get('/clear/route', [SettingController::class, 'clearRoute']);
