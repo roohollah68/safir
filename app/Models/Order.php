@@ -155,7 +155,7 @@ class Order extends Model
                 $Total += $payLink->amount;
         }
         if ($this->total == 0)
-            return 0;
+            return 100;
         return round($Total / $this->total * 100);
     }
 }
