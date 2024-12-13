@@ -23,8 +23,11 @@ class DepositController extends Controller
             $users = User::with('deposits')->get()->keyBy('id');
             return view('depositList', ['deposits' => $deposits, 'users' => $users]);
         } else {
-            $deposits = auth()->user()->deposits()->get();
-            return view('depositList', ['deposits' => $deposits]);
+            $user = auth()->user();
+            return view('depositList', [
+                'deposits' => $user->deposits,
+                'users' => [$user->id => $user],
+            ]);
         }
     }
 
