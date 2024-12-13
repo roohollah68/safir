@@ -7,7 +7,8 @@
 <span>تاریخ:</span> <b dir="ltr">{{verta()->formatDate()}}</b>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
 <span>آدرس:</span> <b>{{$customer->address}}</b><br>
 <span class="x-large">مانده کل:</span>
-<b class="x-large" dir="ltr">{{number_format($customer->balance)}} </b>
+{{--<b class="x-large" dir="ltr">{{number_format($customer->balance)}} </b>/--}}
+<b class="x-large" dir="ltr">{{number_format($customer->balance())}} </b>
 <span class="x-large"> ریال</span><br>
 <span>{{$timeDescription}}</span>
 <table class="customers">

@@ -19,7 +19,7 @@
                             <label for="user" class="input-group-text w-100">کاربر مرتبط:</label>
                         </div>
                         <select class="form-control" name="user" id="user">
-                            <option value="all" selected>همه</option>
+                            <option value="" selected>همه</option>
                             @foreach($users as $id=>$user)
                                 <option value="{{$id}}" @selected(isset($_GET['user']) &&  $id == $_GET['user'])>
                                     {{$user->name}}
@@ -72,7 +72,8 @@
 
                     @if(!$safir)
                         <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
-                                         class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
+{{--                                         class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>--}}
+                                         class="btn btn-outline-danger">{{number_format($customer->balance())}}</a></td>
                     @else
                         <td>{{$customer->address}}</td>
                         <td>{{$customer->zip_code}}</td>

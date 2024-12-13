@@ -74,4 +74,16 @@ class Customer extends Model
     {
         return $this->hasMany(CustomerMeta::class);
     }
+
+    public function balance()
+    {
+        $total = 0;
+        foreach ($this->transactions as $trans)
+            if ($trans->verified == 'approved')
+                $total += $trans->amount;
+        foreach ($this->orders as $order)
+            if ($order->confirm)
+                $total -= $order->total;
+        return $total;
+    }
 }

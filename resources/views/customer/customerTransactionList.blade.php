@@ -16,7 +16,8 @@
         <span>آدرس:</span> <b>{{$customer->address}}</b><br>
         <span>کد پستی:</span> <b>{{$customer->zip_code}}</b><br>
         <span class="h3">بدهکاری:</span>
-        <b dir="ltr" class="h3 text-danger">{{number_format($customer->balance)}}</b>
+{{--        <b dir="ltr" class="h3 text-danger">{{number_format($customer->balance)}}</b>--}}
+        <b dir="ltr" class="h3 text-danger">{{number_format($customer->balance())}}</b>
         <span class="h3">ریال</span><br>
         <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب"
            onclick="transactionReport({{$customer->id}})"></a>

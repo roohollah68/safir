@@ -22,16 +22,18 @@ class CustomerController extends Controller
 {
     public function customersList(Request $req)
     {
-        if (auth()->user()->meta('allCustomers')) {
-            if (!$req->user || $req->user == 'all')
-                $customers = Customer::with('user')->get()->keyBy("id");
-            else
-                $customers = Customer::where('user_id', $req->user)->with('user')->get();
-        } else
-            $customers = auth()->user()->customers->keyBy("id");
+        $user = auth()->user();
+        $customers = Customer::with(['user', 'orders', 'transactions']);
+        if ($user->meta('allCustomers')) {
+            if ($req->user)
+                $customers = $customers->where('user_id', $req->user);
+        }else
+                $customers = $customers->where('user_id', $user->id);
+        $customers = $customers->get()->keyBy("id");
         $total = 0;
         foreach ($customers as $customer) {
-            $total += $customer->balance;
+//            $total += $customer->balance;
+            $total += $customer->balance();
         }
         return view('customer.customerList', [
             'customers' => $customers,
@@ -42,10 +44,11 @@ class CustomerController extends Controller
 
     public function customersTransactionList($id)
     {
-        if (auth()->user()->meta('allCustomers'))
-            $customer = Customer::findOrFail($id);
-        else
-            $customer = auth()->user()->customers()->findOrFail($id);
+        $user = auth()->user();
+        $customer = Customer::with(['orders', 'transactions']);
+        if (!$user->meta('allCustomers'))
+            $customer = $customer->where('user_id', $user->id);
+        $customer = $customer->findOrFail($id);
         $transactions = $customer->transactions->keyBy('id');
         $orders = $customer->orders->keyBy('id')->where('confirm', true)->where('total', '>', 0);
 
@@ -313,7 +316,7 @@ class CustomerController extends Controller
 
     public function customerSOA($id, Request $request)
     {
-        $customer = Customer::find($id);
+        $customer = Customer::with(['orders', 'transactions'])->find($id);
         $orders = $customer->orders->where('total', '>', 0)->where('confirm', true);
         $transactions = $customer->transactions;
         $timeDescription = 'همه تراکنش ها';
