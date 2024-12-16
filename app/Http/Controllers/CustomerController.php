@@ -24,11 +24,11 @@ class CustomerController extends Controller
     {
         $user = auth()->user();
         $customers = Customer::with(['user', 'orders', 'transactions']);
-        if ($user->meta('allCustomers')) {
+        if ($user->meta('allCustomers') || $user->meta('editAllCustomers')) {
             if ($req->user)
                 $customers = $customers->where('user_id', $req->user);
-        }else
-                $customers = $customers->where('user_id', $user->id);
+        } else
+            $customers = $customers->where('user_id', $user->id);
         $customers = $customers->get()->keyBy("id");
         $total = 0;
         foreach ($customers as $customer) {
@@ -46,7 +46,7 @@ class CustomerController extends Controller
     {
         $user = auth()->user();
         $customer = Customer::with(['orders', 'transactions']);
-        if (!$user->meta('allCustomers'))
+        if (!$user->meta('allCustomers') && !$user->meta('editAllCustomers'))
             $customer = $customer->where('user_id', $user->id);
         $customer = $customer->findOrFail($id);
         $transactions = $customer->transactions->keyBy('id');
@@ -98,7 +98,7 @@ class CustomerController extends Controller
 
     public function showEditForm($id)
     {
-        if (auth()->user()->meta('allCustomers'))
+        if (auth()->user()->meta('editAllCustomers'))
             $customer = Customer::findOrFail($id);
         else
             $customer = auth()->user()->customers()->findOrFail($id);
@@ -123,7 +123,7 @@ class CustomerController extends Controller
         $request->phone = Helper::number_Fa_En($request->phone);
         $request->zip_code = Helper::number_Fa_En($request->zip_code);
 
-        if (auth()->user()->meta('allCustomers'))
+        if (auth()->user()->meta('editAllCustomers'))
             $customer = Customer::findOrFail($id);
         else
             $customer = auth()->user()->customers()->findOrFail($id);
@@ -141,7 +141,7 @@ class CustomerController extends Controller
 
     public function changeTrust($id)
     {
-        if (auth()->user()->meta('allCustomers'))
+        if (auth()->user()->meta('editAllCustomers'))
             $customer = Customer::findOrFail($id);
         else
             $customer = auth()->user()->customers()->findOrFail($id);
@@ -152,7 +152,7 @@ class CustomerController extends Controller
 
     public function newForm($id, $orderId = null)
     {
-        if (auth()->user()->meta('allCustomers'))
+        if (auth()->user()->meta('editAllCustomers'))
             $customer = Customer::findOrFail($id);
         else
             $customer = auth()->user()->customers()->findOrFail($id);
@@ -184,7 +184,10 @@ class CustomerController extends Controller
             $photo = $req->file("photo")->store("", 'deposit');
         }
 
-        $customer = Customer::findOrFail($req->id);
+        if (auth()->user()->meta('editAllCustomers'))
+            $customer = Customer::findOrFail($req->id);
+        else
+            $customer = auth()->user()->customers()->findOrFail($req->id);
 
         $newTransaction = $customer->transactions()->create([
             'amount' => $req->amount,
@@ -218,7 +221,10 @@ class CustomerController extends Controller
     public function deleteDeposit($id)
     {
         $transaction = CustomerTransaction::findOrFail($id);
-        $customer = $transaction->customer()->first();
+        if (auth()->user()->meta('editAllCustomers'))
+            $customer = Customer::findOrFail($transaction->customer_id);
+        else
+            $customer = auth()->user()->customers()->findOrFail($transaction->customer_id);
         if (!auth()->user()->meta('allCustomers'))
             if ($customer->user_id != auth()->user()->id)
                 abort(403);
@@ -228,7 +234,7 @@ class CustomerController extends Controller
 
     public function customersDepositList(Request $req)
     {
-        Helper::meta('counter');
+        Helper::access('counter');
         return view('customer.customersDepositList', [
             'transactions' => CustomerTransaction::with('customer.user')->limit(2000)->orderBy('id', 'desc')->get()->keyBy('id'),
             'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
@@ -238,7 +244,7 @@ class CustomerController extends Controller
 
     public function approveDeposit($id)
     {
-        Helper::meta('counter');
+        Helper::access('counter');
         $trans = CustomerTransaction::with('customer')->findOrFail($id);
         if ($trans->verified == 'approved')
             return;
@@ -253,7 +259,7 @@ class CustomerController extends Controller
     public function rejectDeposit($id, Request $req)
     {
         DB::beginTransaction();
-        Helper::meta('counter');
+        Helper::access('counter');
         $trans = CustomerTransaction::with('customer')->findOrFail($id);
         if ($trans->verified == 'rejected')
             return;
@@ -271,7 +277,7 @@ class CustomerController extends Controller
 
     public function customersOrderList(Request $req)
     {
-        Helper::meta('counter');
+        Helper::access('counter');
         return view('customer.customersOrderList', [
             'orders' => Order::where('confirm', true)->where('customer_id', '>', '0')
                 ->where('state', false)->with('user')->get()->keyBy('id'),
@@ -283,7 +289,7 @@ class CustomerController extends Controller
 
     public function approveOrder($id)
     {
-        Helper::meta('counter');
+        Helper::access('counter');
         DB::beginTransaction();
         $order = Order::findOrFail($id);
         if ($order->counter == 'approved')
@@ -298,7 +304,7 @@ class CustomerController extends Controller
 
     public function rejectOrder($id, Request $req)
     {
-        Helper::meta('counter');
+        Helper::access('counter');
         DB::beginTransaction();
         $order = Order::findOrFail($id);
         if ($order->counter == 'rejected' || $order->state)
@@ -310,13 +316,16 @@ class CustomerController extends Controller
         (new CommentController)->create($order, auth()->user(), 'عدم تایید حسابداری: ' . ($req->reason ?? ''));
         $order->save();
         DB::commit();
-
         (new OrderController())->cancelInvoice($id, $req);
     }
 
     public function customerSOA($id, Request $request)
     {
-        $customer = Customer::with(['orders', 'transactions'])->find($id);
+        $user = auth()->user();
+        if ($user->meta('allCustomers') || $user->meta('editAllCustomers'))
+            $customer = Customer::with(['orders', 'transactions'])->find($id);
+        else
+            $customer = $user->customers()->with(['orders', 'transactions'])->find($id);
         $orders = $customer->orders->where('total', '>', 0)->where('confirm', true);
         $transactions = $customer->transactions;
         $timeDescription = 'همه تراکنش ها';
@@ -394,7 +403,10 @@ class CustomerController extends Controller
 
     public function deletePayLink($id)
     {
+        $user = auth()->user();
         $payLink = PaymentLink::findOrfail($id);
+        if ($payLink->order->user->id != $user->id)
+            Helper::access('editAllCustomers');
         $payLink->delete();
     }
 
@@ -425,6 +437,7 @@ class CustomerController extends Controller
 
     public function paymentTracking(Request $req)
     {
+        Helper::access(['editAllCustomers' , 'allCustomers']);
         $orders = [];
         $Orders = Order::with('paymentLinks');
         if (isset($req->user) && $req->user != 'all')
@@ -448,7 +461,7 @@ class CustomerController extends Controller
 
     function postponedDay($id, $days)
     {
-        Helper::access('allCustomers');
+        Helper::access('editAllCustomers');
         $order = Order::findOrFail($id);
         $date = Carbon::now();
         $date->addDays(+$days);

@@ -27,7 +27,7 @@ class OrderController extends Controller
     {
         $user = auth()->user();
         $users = User::withTrashed()->get()->keyBy("id");
-        $orders = Helper::Order()->orderBy('id', 'desc')->with(['website', 'orderProducts', 'warehouse'])
+        $orders = Helper::Order(false)->orderBy('id', 'desc')->with(['website', 'orderProducts', 'warehouse'])
             ->limit($user->meta('NuRecords'))->get()->keyBy('id');
 
         foreach ($orders as $order) {
@@ -178,9 +178,9 @@ class OrderController extends Controller
 
     public function editOrder($id)
     {
-        $order = Helper::Order()->with('customer.city')->with('user')->findOrFail($id);
+        $order = Helper::Order(true)->with(['customer.city', 'user'])->findOrFail($id);
         $user = $order->user;
-        if (($order->state && $order->user->safir()) || ($order->confirm && $order->user->admin()))
+        if (($order->state && $user->safir()) || ($order->confirm && $user->admin()))
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
         if ($order->total < 0)
             return view('error')->with(['message' => 'فاکتور بازگشت به انبار قابل ویرایش نیست، لطفا حذف کنید و مجدد ثبت کنید.']);
@@ -225,8 +225,10 @@ class OrderController extends Controller
     public function updateOrder($id, Request $request)
     {
         DB::beginTransaction();
-        $order = Helper::Order()->with('user')->with('orderProducts')->findOrFail($id);
+        $order = Helper::Order(true)->with('user')->with('orderProducts')->findOrFail($id);
         $user = $order->user;
+        if (($order->state && $user->safir()) || ($order->confirm && $user->admin()))
+            return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
         request()->validate([
             'receipt' => 'mimes:jpeg,jpg,png,bmp|max:2048',
             'name' => 'required|string|min:3',
@@ -292,11 +294,11 @@ class OrderController extends Controller
     {
         Helper::access('changeOrderState');
         DB::beginTransaction();
-        $order = Helper::Order()->findOrFail($id);
+        $order = Helper::Order(true)->findOrFail($id);
         $user = $order->user;
         // جلوگیری از ارسال سفارشات نقدی و چکی بدون تایید پرداخت
-        if(+$state == 1 && $order->payPercentApproved()<100 && ($order->paymentMethod == 'cash' || $order->paymentMethod == 'cheque')){
-            return [$order->state , 'ابتدا پرداخت فاکتور باید تایید شود.'];
+        if (+$state == 1 && $order->payPercentApproved() < 100 && ($order->paymentMethod == 'cash' || $order->paymentMethod == 'cheque')) {
+            return [$order->state, 'ابتدا پرداخت فاکتور باید تایید شود.'];
         }
         $order->state = +$state;
 
@@ -369,7 +371,7 @@ class OrderController extends Controller
         $order->save();
         $user->save();
         DB::commit();
-        return [+$order->state , $text];
+        return [+$order->state, $text];
     }
 
     public function pdfs($ids)
@@ -378,7 +380,7 @@ class OrderController extends Controller
         $fonts = array();
         $orders = array();
         foreach ($idArray as $id) {
-            $order = Helper::Order()->with('warehouse')->findOrFail($id);
+            $order = Helper::Order(false)->with('warehouse')->findOrFail($id);
             if ($order->state == 1) {
                 $order->update([
                     'state' => 2
@@ -410,7 +412,7 @@ class OrderController extends Controller
 
     public function invoice($id, Request $request)
     {
-        $order = Helper::Order()->findOrFail($id);
+        $order = Helper::Order(false)->findOrFail($id);
         $order->desc .= '(انبار ' . $order->warehouse->name . ')';
         $total_no_dis = 0;
         $total_dis = 0;
@@ -462,7 +464,7 @@ class OrderController extends Controller
     public function cancelInvoice($id, Request $req)
     {
         DB::beginTransaction();
-        $order = Helper::Order()->findOrFail($id);
+        $order = Helper::Order(!Helper::meta('counter'))->findOrFail($id);
         if (!$order->confirm)
             return $order;
         if ($order->state) {
@@ -471,6 +473,7 @@ class OrderController extends Controller
         }
         $order->confirm = false;
         if ($order->counter == 'approved')
+
             (new CustomerController)->rejectOrder($id, $req);
         $order->customer->update([
             'balance' => $order->customer->balance + $order->total,
@@ -481,7 +484,6 @@ class OrderController extends Controller
         $order->paymentNote = null;
         (new CommentController)->create($order, auth()->user(), 'سفارش به حالت پیش فاکتور بازگشت ');
         $order->save();
-
         DB::commit();
         return $order;
     }
@@ -489,7 +491,7 @@ class OrderController extends Controller
     public function deleteOrder($id, Request $request)
     {
         DB::beginTransaction();
-        $order = Helper::Order()->with('user')->findOrFail($id);
+        $order = Helper::Order(true)->with('user')->findOrFail($id);
         if ($order->state || ($order->confirm && $order->user->role !== 'user'))
             return 'سفارش نمی تواند حذف شود، چون پردازش شده است!';
 
@@ -600,7 +602,7 @@ class OrderController extends Controller
         $to = date($request->date2 . ' 23:59:59');
         $limit = $request->limit;
 
-        $orders = Helper::Order()->with(['website', 'orderProducts', 'warehouse'])
+        $orders = Helper::Order(false)->with(['website', 'orderProducts', 'warehouse'])
             ->whereBetween('created_at', [$from, $to])
             ->limit($limit)
             ->get()->keyBy('id');
@@ -610,7 +612,7 @@ class OrderController extends Controller
 
     public function viewOrder($id)
     {
-        $order = Helper::Order()->findOrFail($id);
+        $order = Helper::Order(false)->findOrFail($id);
         $order = $this->addCityToAddress($order);
         return view('orders.view', ['order' => $order]);
     }
@@ -619,7 +621,7 @@ class OrderController extends Controller
     {
         Helper::access('changeOrderState');
         DB::beginTransaction();
-        $order = Helper::Order()->findOrFail($id);
+        $order = Helper::Order(true)->findOrFail($id);
         if (!$order->deliveryMethod || $order->isCreatorAdmin())
             $order->deliveryMethod = '';
         if ($req->note)
@@ -633,7 +635,7 @@ class OrderController extends Controller
 
     public function paymentMethod($id, Request $req)
     {
-        $order = Helper::Order()->with('customer')->findOrFail($id);
+        $order = Helper::Order(true)->with('customer')->findOrFail($id);
         request()->validate([
             'paymentMethod' => 'required',
             'cashPhoto' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
@@ -694,7 +696,7 @@ class OrderController extends Controller
 
     public function orderExcel($id)
     {
-        $order = Helper::Order()->findOrFail($id);
+        $order = Helper::Order(false)->findOrFail($id);
         $customer = $order->customer;
         $customerMeta = $customer->customerMetas->first();
         $orderProducts = $order->orderProducts->keyBy('id');
@@ -718,7 +720,7 @@ class OrderController extends Controller
 
     public function saveExcelData($id, Request $req)
     {
-        $order = Helper::Order()->findOrFail($id);
+        $order = Helper::Order(false)->findOrFail($id);
         if ($req->customer_code)
             CustomerMeta::updateOrCreate(
                 ['customer_id' => $order->customer_id],
@@ -742,7 +744,7 @@ class OrderController extends Controller
     public function changeWarehose($orderId, $warehouseId)
     {
         DB::beginTransaction();
-        $order = Helper::Order()->findOrFail($orderId);
+        $order = Helper::Order(true)->findOrFail($orderId);
         $productOrders = $order->orderProducts;
         foreach ($productOrders as $productOrder) {
             $product = $productOrder->product;

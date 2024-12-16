@@ -18,7 +18,7 @@ class Helper
         if (is_string($key))
             if (!auth()->user()->meta($key))
                 abort(401);
-        if(is_array($key)) {
+        if (is_array($key)) {
             foreach ($key as $k)
                 if (auth()->user()->meta($k))
                     return;
@@ -65,18 +65,18 @@ class Helper
             return 'نامشخص';
     }
 
-    public static function Order()
+    public static function Order($edit = false)
     {
         $user = auth()->user();
         $orders = Order::withTrashed();
-        if (!$user->meta('showAllOrders') && !$user->meta('counter')) {
-            $orders = $orders->where(function ($query) {
+        if ((!$edit && ($user->meta('showAllOrders') || $user->meta('counter'))) || $user->meta('editAllOrders'))
+            return $orders;
+        else
+            return $orders->where(function ($query) {
                 $user = auth()->user();
                 $warehouses = Warehouse::where('user_id', $user->id)->get()->keyBy('id')->keys();
                 $query->orWhere('user_id', $user->id)->orWhereIn('warehouse_id', $warehouses);
             });
-        }
-        return $orders;
     }
 }
 

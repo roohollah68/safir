@@ -11,7 +11,7 @@
             {{number_format($total)}}
         </span><span class="h5">ریال</span><br><br>
         <a class="btn btn-warning m-3" href="/customerPaymentTracking">پیگیری پرداختی مشتریان</a>
-        @if(auth()->user()->meta('allCustomers'))
+        @if(auth()->user()->meta('allCustomers') || auth()->user()->meta('editAllCustomers'))
             <form method="get" action="">
                 <div class="col-md-6">
                     <div class="form-group input-group required">
@@ -89,7 +89,7 @@
                         @if(!$safir)
                             <a class="btn btn-info fa fa-file-invoice" title="تراکنش ها"
                                href="/customer/transaction/{{$customer->id}}"></a>
-                            @if(auth()->user()->meta('allCustomers'))
+                            @if(auth()->user()->meta('allCustomers') || auth()->user()->meta('editAllCustomers'))
                                 @if($customer->trust)
                                     <span class="btn btn-success fa fa-check"
                                           onclick="changeTrust({{$customer->id}} , this)"

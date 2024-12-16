@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'city' => 't',
     'NuRecords' => '500', // number of orders to show
@@ -10,11 +9,13 @@ return [
         'addOrder' => 'ثبت سفارش',
         'refund' => 'ثبت سفارش بازگشت به انبار',
         'changeOrderState' =>'تغییر وضعیت سفارش به ارسال شده',
-        'showAllOrders' => 'مشاهده و ویرایش همه سفارشات',
+        'showAllOrders' => 'مشاهده همه سفارشات',
+        'editAllOrders' => 'ویرایش همه سفارشات',
         'changeDiscount' => 'تغییر تخفیف هنگام ثبت سفارش',
         'changePrice' => 'تغییر قیمت هنگام ثبت سفارش',
         'sellRawProduct' => 'فروش محصولات از دسته ماده اولیه',
-        'allCustomers' => 'مشاهده و ویرایش اطلاعات همه مشتربان',
+        'allCustomers' => 'مشاهده اطلاعات همه مشتربان',
+        'editAllCustomers' => 'ویرایش اطلاعات همه مشتربان',
         'counter' => 'حسابداری',
         'statistic' => 'مشاهده آمار',
         'warehouse' => 'انبار داری',
