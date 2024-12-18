@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
 use App\Models\Customer;
 use App\Models\CustomerTransaction;
 use App\Models\Order;
@@ -17,8 +18,7 @@ class StatisticController extends Controller
 {
     public function showStatistic(Request $request)
     {
-        if (!auth()->user()->meta('statistic'))
-            abort(401);
+        Helper::access('statistic');
         $users = User::with('customers')->get()->keyBy("id");
         foreach ($users as $id => $user) {
             $users[$id]->customer = $user->customers->keyby('name');
@@ -40,20 +40,19 @@ class StatisticController extends Controller
         }
         $request->from = Verta::parse($request->from)->toCarbon();
         $request->to = Verta::parse($request->to)->addDay()->addSeconds(-1)->toCarbon();
-//        dd([$request->from , $request->to]);
         $orders = Order::where([
             ['state', 10],
             ['created_at', '>', $request->from],
             ['created_at', '<', $request->to]
-        ]);
+        ])->where('total' , '>' , 0);
 
         if ($request->user != 'all') {
             $orders = $orders->where('user_id', $request->user);
             $customer = $users[$request->user]->customer;
             if(isset($customer[$request->customer]))
                 $orders = $orders->where('customer_id',$customer[$request->customer]->id);
-            else
-                $request->customer = 'همه';
+//            else
+//                $request->customer = 'همه';
         }
         $totalSale = 0;
         $totalProfit = 0;
@@ -61,9 +60,10 @@ class StatisticController extends Controller
         $productNumber = 0;
         if ($request->base == 'productBase') {
             $orders = $orders->with('orderProducts', 'website')->get();
-            $products = Product::whereHas('good', function (Builder $query) {
-                $query->where('category', 'final');
-            })->get()->keyBy('id');
+//            $products = Product::whereHas('good', function (Builder $query) {
+//                $query->where('category', 'final');
+//            })->get()->keyBy('id');
+            $products = Product::all()->keyBy('id');
             foreach ($products as $id => $product) {
                 $products[$id]->number = 0;
                 $products[$id]->total = 0;
