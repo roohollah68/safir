@@ -59,7 +59,7 @@
         </thead>
         <tbody>
         @foreach($orders as $order)
-
+            @continue(!isset($order->user))
             @if($order->confirm && (!$order->status || $order->status==4) &&
                     $order->user->admin() &&
                     ($selectedUser == 'all' || $order->customer->user->id == $selectedUser))
@@ -104,20 +104,20 @@
                                       onclick="rejectOrder({{$order->id}})"></span>
                             @endunless
                             @unless($order->counter == 'approved')
-                                    <span class="btn btn-success fa fa-check"
-                                          onclick="approveOrder({{$order->id}})"></span>
+                                <span class="btn btn-success fa fa-check"
+                                      onclick="approveOrder({{$order->id}})"></span>
                             @endunless
-{{--                                @if($order->counter == 'waiting')--}}
-{{--                                <span class="btn btn-success fa fa-check"--}}
-{{--                                      onclick="approveOrder({{$order->id}})"></span>--}}
-{{--                                <span class="btn btn-danger fa fa-x"--}}
-{{--                                      onclick="rejectOrder({{$order->id}})"></span>--}}
-{{--                            @elseif($order->counter == 'rejected')--}}
-{{--                                <span class="btn btn-success fa fa-check"--}}
-{{--                                      onclick="approveOrder({{$order->id}})"></span>--}}
-{{--                            @elseif($order->counter == 'approved')--}}
-{{--                                --}}
-{{--                            @endif--}}
+                            {{--                                @if($order->counter == 'waiting')--}}
+                            {{--                                <span class="btn btn-success fa fa-check"--}}
+                            {{--                                      onclick="approveOrder({{$order->id}})"></span>--}}
+                            {{--                                <span class="btn btn-danger fa fa-x"--}}
+                            {{--                                      onclick="rejectOrder({{$order->id}})"></span>--}}
+                            {{--                            @elseif($order->counter == 'rejected')--}}
+                            {{--                                <span class="btn btn-success fa fa-check"--}}
+                            {{--                                      onclick="approveOrder({{$order->id}})"></span>--}}
+                            {{--                            @elseif($order->counter == 'approved')--}}
+                            {{--                                --}}
+                            {{--                            @endif--}}
                             </span>
                     </td>
                 </tr>
