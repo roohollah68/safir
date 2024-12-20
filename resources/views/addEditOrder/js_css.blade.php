@@ -264,7 +264,8 @@
         $('#zip_code').val(customer.zip_code);
         $('#set-customer-discount').html(customer.discount + ' %').click(()=>{
             $('.discount-value').val(customer.discount).change();
-        })
+        });
+        $('#agreement').html(customer.agreement);
         let city = cities[customer.city_id];
         $('#city').val(city.name + ` (${city.province.name})`).change();
     }

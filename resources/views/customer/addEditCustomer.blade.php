@@ -140,6 +140,16 @@
                                class="form-control" name="discount" min="0" max="100" step="1">
                     </div>
                 </div>
+
+                <div class="col-md-6">
+                    <div class="form-group input-group">
+                        <div class="input-group-append" style="min-width: 160px">
+                            <label for="agreement" class="input-group-text w-100">توافق:</label>
+                        </div>
+                        <textarea id="agreement" class="form-control" name="agreement" rows="3"
+                        >{{old('agreement')?:$customer->agreement?:''}}</textarea>
+                    </div>
+                </div>
             @endunless
         </div>
 

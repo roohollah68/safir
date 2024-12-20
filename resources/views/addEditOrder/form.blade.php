@@ -11,10 +11,9 @@
 @endif
 <div id="hidden-input"></div>
 <input type="hidden" name="warehouseId" value="{{$warehouseId}}">
-
+<span id="agreement"></span>
 <div id="formElements" class="bg-white">
     <div class="row">
-
         <div class="col-md-6 mb-2">
             <div class="form-group input-group required">
                 <div class="input-group-append" style="min-width: 160px">

@@ -94,6 +94,7 @@ class CustomerController extends Controller
             'city_id' => $request->city_id,
             'user_id' => $request->user,
             'discount' => $request->discount,
+            'agreement' => $request->agreement,
         ]);
         return redirect()->route('CustomerList');
     }
@@ -137,6 +138,7 @@ class CustomerController extends Controller
             'city_id' => $request->city_id,
             'user_id' => $request->user,
             'discount' => $request->discount,
+            'agreement' => $request->agreement,
         ]);
         return redirect()->route('CustomerList');
     }

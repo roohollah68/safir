@@ -12,6 +12,7 @@
         <span>نام کاربر مرتبط:</span> <b>{{$customer->user->name}}</b><br>
         <span>شماره مشتری:</span> <b>{{$customer->id}}</b><br>
         <span>شماره تماس:</span> <b>{{$customer->phone}}</b><br>
+        <span>توافق:</span> <b>{{$customer->agreement}}</b><br>
         <span>شهر:</span> <b>{{$customer->city->name}}</b><br>
         <span>آدرس:</span> <b>{{$customer->address}}</b><br>
         <span>کد پستی:</span> <b>{{$customer->zip_code}}</b><br>
