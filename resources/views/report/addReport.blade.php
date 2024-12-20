@@ -9,7 +9,7 @@
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
     <form action="" method="post" enctype="multipart/form-data">
         @csrf
-        <h3> {{$warehouse2->name}}</h3>
+        <h3> {{$user->name}}</h3>
         <sapn>گزارش کار: </sapn><br>
         <textarea name="description" rows="10" style="width: 700px">{{$report->description}}</textarea>
         <br>

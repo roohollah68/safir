@@ -171,11 +171,6 @@
         refreshProducts()
     }
 
-    // function deliveryAction() {
-    //     deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
-    //     refreshProducts();
-    // }
-
     function refreshProducts() {
         let total = 0, Total = 0;
         let hasProduct = false;

@@ -154,8 +154,8 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::post('warehouse/manager', [ProductController::class, 'saveWarehouseManager']);
 
     ///REPORTS
-    Route::get('report/add/{id}', [ReportController::class, 'newReport']);
-    Route::post('report/add/{id}', [ReportController::class, 'saveReport']);
+    Route::get('report/add', [ReportController::class, 'newReport']);
+    Route::post('report/add', [ReportController::class, 'saveReport']);
     Route::get('report/list', [ReportController::class, 'list'])->name('reportList');
     Route::post('commentResponse/{id}', [ReportController::class, 'response']);
 

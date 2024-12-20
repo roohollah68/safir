@@ -70,7 +70,7 @@
                     <a class="nav-link active" href="{{route('transactions')}}">تراکنش ها</a>
                 </li>
             @endif
-            @if(auth()->user()->meta('workReport'))
+            @if(auth()->user()->meta('workReport') || auth()->user()->meta('addWorkReport'))
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('reportList')}}">گزارش کار</a>
                 </li>
