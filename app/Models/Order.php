@@ -93,7 +93,7 @@ class Order extends Model
 
     public function payMethod(): string
     {
-        if ($this->user()->first()->safir() || $this->paymentMethod != 'admin')
+        if ($this->user->safir() || $this->paymentMethod != 'admin')
             if (isset(config('payMethods')[$this->paymentMethod])) {
                 return config('payMethods')[$this->paymentMethod];
             } elseif ($this->paymentMethod) {

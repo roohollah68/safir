@@ -59,12 +59,9 @@
                     </div>
                 </li>
             @endif
-            @if(auth()->user()->meta('statistic'))
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{route('statistic')}}">آمار</a>
-                </li>
-            @endif
-
+            <li class="nav-item">
+                <a class="nav-link active" href="{{route('statistic')}}">آمار</a>
+            </li>
             @if($safir)
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('DepositList')}}">واریزی ها</a>
@@ -78,11 +75,11 @@
                     <a class="nav-link active" href="{{route('reportList')}}">گزارش کار</a>
                 </li>
             @endif
-{{--            @if(auth()->user()->meta('addWithdrawal') || auth()->user()->meta('confirmWithdrawal') || auth()->user()->meta('payWithdrawal'))--}}
-{{--                <li class="nav-item">--}}
-{{--                    <a class="nav-link active" href="{{route('WithdrawalList')}}">درخواست پرداخت</a>--}}
-{{--                </li>--}}
-{{--            @endif--}}
+            {{--            @if(auth()->user()->meta('addWithdrawal') || auth()->user()->meta('confirmWithdrawal') || auth()->user()->meta('payWithdrawal'))--}}
+            {{--                <li class="nav-item">--}}
+            {{--                    <a class="nav-link active" href="{{route('WithdrawalList')}}">درخواست پرداخت</a>--}}
+            {{--                </li>--}}
+            {{--            @endif--}}
             <li class="nav-item">
                 <a class="nav-link active" href="{{route('logout')}}">خروج</a>
             </li>

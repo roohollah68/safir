@@ -72,8 +72,8 @@
 
                     @if(!$safir)
                         <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
-{{--                                         class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>--}}
-                                         class="btn btn-outline-danger">{{number_format($customer->balance())}}</a></td>
+                                         class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
+{{--                                         class="btn btn-outline-danger">{{number_format($customer->balance())}}</a></td>--}}
                     @else
                         <td>{{$customer->address}}</td>
                         <td>{{$customer->zip_code}}</td>

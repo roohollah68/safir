@@ -29,11 +29,13 @@ class CustomerController extends Controller
                 $customers = $customers->where('user_id', $req->user);
         } else
             $customers = $customers->where('user_id', $user->id);
+        if(isset($req->trust))
+            $customers = $customers->where('trust' , +$req->trust);
         $customers = $customers->get()->keyBy("id");
         $total = 0;
         foreach ($customers as $customer) {
-//            $total += $customer->balance;
-            $total += $customer->balance();
+            $customer->balance = $customer->balance();
+            $total += $customer->balance;
         }
         return view('customer.customerList', [
             'customers' => $customers,

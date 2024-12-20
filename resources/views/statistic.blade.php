@@ -17,34 +17,44 @@
                 <input type="text" name="to" class="form-control" placeholder="تا تاریخ" id="date2-text" required>
             </div>
         </div>
-        <span>نوع فروشنده:</span>
-        <label for="safirOrders">سفیران</label>
-        <input type="checkbox" id="safirOrders" name="safirOrders"
-               class="checkboxradio" @checked(isset($request->safirOrders))>
-        <label for="siteOrders">سایت ها</label>
-        <input type="checkbox" id="siteOrders" name="siteOrders"
-               class="checkboxradio" @checked(isset($request->siteOrders))>
-        <label for="adminOrders">فروشگاه ها</label>
-        <input type="checkbox" id="adminOrders" name="adminOrders"
-               class="checkboxradio" @checked(isset($request->adminOrders))>
-        <br>
+        @if(auth()->user()->meta('statistic'))
+            <span>نوع فروشنده:</span>
+            <label for="safirOrders">سفیران</label>
+            <input type="checkbox" id="safirOrders" name="safirOrders"
+                   class="checkboxradio" @checked(isset($request->safirOrders))>
+            <label for="siteOrders">سایت ها</label>
+            <input type="checkbox" id="siteOrders" name="siteOrders"
+                   class="checkboxradio" @checked(isset($request->siteOrders))>
+            <label for="adminOrders">فروشگاه ها</label>
+            <input type="checkbox" id="adminOrders" name="adminOrders"
+                   class="checkboxradio" @checked(isset($request->adminOrders))>
+            <br>
+        @else
+            <input type="hidden" name="safirOrders" value="true">
+            <input type="hidden" name="siteOrders" value="true">
+            <input type="hidden" name="adminOrders" value="true">
+        @endif
         <div class="row">
-            <div class="col-md-4 my-3">
-                <div class="form-group d-flex">
-                    <label for="user" class="input-group-text">فروشنده:</label>
-                    <select class="form-control" name="user" id="user" onchange="customerList()">
-                        <option value="all" selected>همه</option>
-                        @foreach($users as $id=>$user)
-                            <option value="{{$id}}" @selected($request->user == $id)>{{$user->name}}</option>
-                        @endforeach
-                    </select>
+            @if(auth()->user()->meta('statistic'))
+                <div class="col-md-4 my-3">
+                    <div class="form-group d-flex">
+                        <label for="user" class="input-group-text">فروشنده:</label>
+                        <select class="form-control" name="user" id="user" onchange="customerList()">
+                            <option value="" selected>همه</option>
+                            @foreach($users as $id=>$user)
+                                <option value="{{$id}}" @selected($request->user == $id)>{{$user->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
-            </div>
-
+            @else
+                <input type="hidden" id="user" name="user" value="{{auth()->user()->id}}">
+            @endif
             <div class="col-md-4 my-3">
                 <div class="form-group d-flex">
                     <label for="customer" class="input-group-text">مشتری:</label>
-                    <input type="text" name="customer" value="{{$request->customer}}" id="customer" class="form-control" @readonly($request->user == 'all')>
+                    <input type="text" name="customer" value="{{$request->customer}}" id="customer"
+                           class="form-control" @readonly(!$request->user)>
                 </div>
             </div>
         </div>
@@ -52,9 +62,11 @@
         <label for="productBase">بر اساس محصول</label>
         <input type="radio" name="base" value="productBase" id="productBase"
                class="checkboxradio" @checked($request->base=='productBase')>
-        <label for="safirBase">بر اساس فروشنده</label>
-        <input type="radio" name="base" value="safirBase" id="safirBase"
-               class="checkboxradio" @checked($request->base=='safirBase')>
+        @if(auth()->user()->meta('statistic'))
+            <label for="safirBase">بر اساس فروشنده</label>
+            <input type="radio" name="base" value="safirBase" id="safirBase"
+                   class="checkboxradio" @checked($request->base=='safirBase')>
+        @endif
         <label for="customerBase">بر اساس مشتری</label>
         <input type="radio" name="base" value="customerBase" id="customerBase"
                class="checkboxradio" @checked($request->base=='customerBase')>
@@ -88,14 +100,15 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($products as $product)
+                @foreach($goods as $good)
                     <tr>
-                        <td><a href="/product/edit/{{$product->id}}">{{$product->name}}</a></td>
-                        <td>{{$product->number}}</td>
-                        <td>{{number_format($product->total)}}</td>
-                        <td>{{number_format(($product->number>0)?$product->total/$product->number:0)}}</td>
-                        <td>{{number_format($product->productPrice)}}</td>
-                        <td>{{number_format($product->profit)}}</td>
+                        {{--                        <td><a href="/product/edit/{{$product->id}}">{{$product->name}}</a></td>--}}
+                        <td>{{$good->name}}</td>
+                        <td>{{$good->number}}</td>
+                        <td>{{number_format($good->total)}}</td>
+                        <td>{{number_format(($good->number>0)?$good->total/$good->number:0)}}</td>
+                        <td>{{number_format($good->productPrice)}}</td>
+                        <td>{{number_format($good->profit)}}</td>
 
                     </tr>
                 @endforeach
@@ -232,13 +245,14 @@
                 selectedDate: new Date('{{$request->to}}'),
                 selectedDateToShow: new Date('{{$request->to}}'),
             });
+            customerList();
         });
 
-        function customerList(){
+        function customerList() {
             let customerId = $('#user').val()
-            if(customerId === 'all'){
+            if (!customerId) {
                 $("#customer").val('همه').prop('readonly', true);
-            }else{
+            } else {
                 $("#customer").prop('readonly', false).autocomplete({
                     source: Object.keys(users[customerId].customer),
                 });
