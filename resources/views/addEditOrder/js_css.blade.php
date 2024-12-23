@@ -260,7 +260,7 @@
         $('#set-customer-discount').html(customer.discount + ' %').click(()=>{
             $('.discount-value').val(customer.discount).change();
         });
-        $('#agreement').html(customer.agreement);
+        $('#agreement').html('<span>توافق: </span>' + (customer.agreement || ' '));
         let city = cities[customer.city_id];
         $('#city').val(city.name + ` (${city.province.name})`).change();
     }
