@@ -74,6 +74,8 @@ class StatisticController extends Controller
             foreach ($orders as $order) {
                 if ($order->website && !$request->siteOrders)
                     continue;
+                if(!isset($users[$order->user_id]))
+                    continue;
                 if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders)
                     continue;
                 if ($users[$order->user_id]->admin() && !$request->adminOrders)
