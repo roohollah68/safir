@@ -53,9 +53,9 @@
                             <option value="superAdmin">سوپر ادمین</option>
                             <option value="admin">فروشنده با فاکتور</option>
                             <option value="user">سفیر</option>
-                            <option value="warehouse">انبار دار</option>
-                            <option value="counter">حسابدار</option>
-                            <option value="account">صاحب حساب بانکی</option>
+{{--                            <option value="warehouse">انبار دار</option>--}}
+{{--                            <option value="counter">حسابدار</option>--}}
+{{--                            <option value="account">صاحب حساب بانکی</option>--}}
                         </select>
                     </div>
                 </div>
