@@ -79,10 +79,10 @@ class SettingController extends Controller
         $orders = Order::with('customer')->get()->keyBy('id');
         foreach ($orders as $id=>$order){
             if($order->customer && $order->customer->user_id != $order->user_id){
-//                echo $id . '<br>';
-                $order->update([
-                    'user_id' => $order->customer->user_id,
-                ]);
+                echo $id . '<br>';
+//                $order->update([
+//                    'user_id' => $order->customer->user_id,
+//                ]);
             }
         }
 
