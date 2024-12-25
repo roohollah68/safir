@@ -654,6 +654,8 @@ class OrderController extends Controller
             $photo = $req->file("cashPhoto");
         }
         if ($paymentMethod == 'cheque') {
+            if (!$req->file("chequePhoto"))
+                return ['error', 'باید عکس چک بانکی بارگذاری شود.'];
             $photo = $req->file("chequePhoto");
         }
         if ($paymentMethod == 'payInDate') {
