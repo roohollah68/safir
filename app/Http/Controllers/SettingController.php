@@ -75,16 +75,20 @@ class SettingController extends Controller
 
     public function command()
     {
-//        $customers = Customer::all()->keyBy('id');
-//        $oldcustomers = Oldcustomer::all()->keyBy('id');
-//        foreach ($customers as $id => $customer){
-//            if(isset($oldcustomers[$id])){
-//                if($oldcustomers[$id]->user_id != $customer->user_id){
-//                    echo '('.$id.')=>'.$customer->name.' => '.$oldcustomers[$id]->user->name.' => '.$customer->user->name.'<br>';
-//                }
-//            }
-//        }
         set_time_limit(0);
+        $orders = Order::with('customer')->get()->keyBy('id');
+        foreach ($orders as $id=>$order){
+            if($order->customer_id && !$order->customer){
+                $order->update([
+                    'customer_id' => 2830,
+                    'user_id' => 6,
+                    'confirm' => false,
+                    'state' => false,
+                    'counter' => 'waiting'
+                ]);
+            }
+        }
+
 
     }
 

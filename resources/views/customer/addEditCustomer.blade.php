@@ -109,7 +109,7 @@
                 </div>
             </div>
 
-            @if(auth()->user()->meta('allCustomers'))
+            @if(auth()->user()->meta('editAllCustomers'))
                 <div class="col-md-6">
                     <div class="form-group input-group required">
                         <div class="input-group-append" style="min-width: 160px">

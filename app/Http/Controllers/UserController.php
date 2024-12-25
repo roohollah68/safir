@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helper\Helper;
 use App\Models\Customer;
+use App\Models\Order;
 use App\Models\User;
 use App\Models\UserMeta;
 use App\Models\Warehouse;
@@ -45,7 +46,12 @@ class UserController extends Controller
     {
         Helper::access('usersEdit');
         User::where('id', $id)->delete();
-        Customer::where('user_id' , $id)->delete();
+        Customer::where('user_id' , $id)->update([
+            'user_id' => 6,
+        ]);
+        Order::where('user_id' , $id)->update([
+            'user_id' => 6,
+        ]);
         return redirect()->route('manageUsers');
 
     }

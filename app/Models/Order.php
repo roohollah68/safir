@@ -34,6 +34,7 @@ class Order extends Model
         'postponeDate',
         'paymentNote',
         'counter',
+        'user_id'
     ];
 
     public function user()

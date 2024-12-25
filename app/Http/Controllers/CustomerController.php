@@ -140,6 +140,9 @@ class CustomerController extends Controller
             'discount' => $request->discount,
             'agreement' => $request->agreement,
         ]);
+        $customer->orders()->update([
+            'user_id' => $request->user,
+        ]);
         return redirect()->route('CustomerList');
     }
 
