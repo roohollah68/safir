@@ -78,13 +78,10 @@ class SettingController extends Controller
         set_time_limit(0);
         $orders = Order::with('customer')->get()->keyBy('id');
         foreach ($orders as $id=>$order){
-            if($order->customer_id && !$order->customer){
+            if($order->customer && $order->customer->user_id != $order->user_id){
+//                echo $id . '<br>';
                 $order->update([
-                    'customer_id' => 2830,
-                    'user_id' => 6,
-                    'confirm' => false,
-                    'state' => false,
-                    'counter' => 'waiting'
+                    'user_id' => $order->customer->user_id,
                 ]);
             }
         }
