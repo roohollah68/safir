@@ -78,7 +78,8 @@
                     <td class="number"></td>
                     <td>{{(+$orderProduct->discount)/100*$orderProduct->original_price * (+$orderProduct->number)}}</td>
                     <td>
-                        <input type="checkbox" onclick="$(this).next().html(this.checked?{{$orderProduct->add_value}}:0);reDraw();">
+                        <input type="checkbox"
+                               onclick="$(this).next().html(this.checked?{{$orderProduct->add_value}}:0);reDraw();">
                         <span>0</span>
                     </td>
                 </tr>
@@ -92,28 +93,27 @@
 @section('files')
     <script>
         let table;
-        data =
-            $(function () {
-                draw()
-                $("#form").submit(function (e) {
-                    e.preventDefault();
-                    $.ajax({
-                        type: "POST",
-                        url: '/saveExcelData/' + {{$order->id}},
-                        data: new FormData(this),
-                        processData: false,
-                        contentType: false,
-                        headers: {
-                            "Accept": "application/json"
-                        }
-                    }).done(function (res) {
-                        $.notify(res, "success");
-                    }).fail(function () {
-                        $.notify('خطایی رخ داده است.', 'warn');
-                    });
+        $(function () {
+            draw()
+            $("#form").submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: '/saveExcelData/' + {{$order->id}},
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }).done(function (res) {
+                    $.notify(res, "success");
+                }).fail(function () {
+                    $.notify('خطایی رخ داده است.', 'warn');
                 });
-
             });
+
+        });
 
         function draw() {
             table = $('#orderExcel').DataTable({

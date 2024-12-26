@@ -76,32 +76,30 @@
     </form>
 @endsection
 
-
 @section('files')
     <script>
         let table;
-        data =
-            $(function () {
-                draw()
-                $("#form").submit(function (e) {
-                    e.preventDefault();
-                    $.ajax({
-                        type: "POST",
-                        url: '/saveExcelData/' + {{$order->id}},
-                        data: new FormData(this),
-                        processData: false,
-                        contentType: false,
-                        headers: {
-                            "Accept": "application/json"
-                        }
-                    }).done(function (res) {
-                        $.notify(res, "success");
-                    }).fail(function () {
-                        $.notify('خطایی رخ داده است.', 'warn');
-                    });
+        $(function () {
+            draw()
+            $("#form").submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: '/saveExcelData/' + {{$order->id}},
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                }).done(function (res) {
+                    $.notify(res, "success");
+                }).fail(function () {
+                    $.notify('خطایی رخ داده است.', 'warn');
                 });
-
             });
+
+        });
 
         function draw() {
             table = $('#orderExcel').DataTable({
@@ -127,24 +125,6 @@
                 }
             });
         }
-
-        function reDraw() {
-            table.destroy();
-            draw();
-        }
-
-        {{--function addedValue(checked) {--}}
-        {{--    if (checked) {--}}
-        {{--        @foreach($orderProducts as $id => $orderProduct)--}}
-        {{--        $('#added_value_{{$id}}').html({{$orderProduct->price * $orderProduct->number * 0.1}});--}}
-        {{--        @endforeach--}}
-        {{--    } else {--}}
-        {{--        @foreach($orderProducts as $id => $orderProduct)--}}
-        {{--        $('#added_value_{{$id}}').html(0);--}}
-        {{--        @endforeach--}}
-        {{--    }--}}
-        {{--    reDraw();--}}
-        {{--}--}}
 
     </script>
 
