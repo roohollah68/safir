@@ -8,7 +8,10 @@
     @csrf
     <br>
     <div class="w-100 m-2 p-2 bg-info rounded">
-        <span>نام مشتری:</span> <b>{{$customer->name}}</b><br>
+        <span>نام مشتری:</span> <b>{{$customer->name}}</b>
+        @if($customer->block)
+            <span class="btn btn-danger">مسدود</span>
+        @endif<br>
         <span>نام کاربر مرتبط:</span> <b>{{$customer->user->name}}</b><br>
         <span>شماره مشتری:</span> <b>{{$customer->id}}</b><br>
         <span>شماره تماس:</span> <b>{{$customer->phone}}</b><br>

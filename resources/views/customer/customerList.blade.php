@@ -67,13 +67,17 @@
                 @endisset
                 <tr>
                     <td>{{$customer->id}}</td>
-                    <td>{{$customer->name}}</td>
+                    <td>{{$customer->name}}
+                        @if($customer->block)
+                            <span class="btn btn-danger">مسدود</span>
+                        @endif
+                    </td>
                     <td>{{$customer->phone}}</td>
 
                     @if(!$safir)
                         <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
                                          class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
-{{--                                         class="btn btn-outline-danger">{{number_format($customer->balance())}}</a></td>--}}
+                        {{--                                         class="btn btn-outline-danger">{{number_format($customer->balance())}}</a></td>--}}
                     @else
                         <td>{{$customer->address}}</td>
                         <td>{{$customer->zip_code}}</td>
