@@ -41,6 +41,7 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
 
     ///ORDER
     Route::get('orders', [OrderController::class, 'showOrders'])->name('listOrders');
+    Route::get('order/{id}', [OrderController::class, 'showOrder']);
     Route::get('add_order', [OrderController::class, 'newOrder'])->name('newOrder');
     Route::post('add_order', [OrderController::class, 'insertOrder']);
     Route::get('edit_order/{id}', [OrderController::class, 'editOrder']);
