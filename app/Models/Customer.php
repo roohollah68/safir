@@ -19,6 +19,7 @@ class Customer extends Model
         'user_id',
         'discount',
         'trust',
+        'block',
         'agreement',
     ];
 

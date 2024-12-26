@@ -85,6 +85,8 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::get('/customer/edit/{id}', [CustomerController::class, 'showEditForm']);
     Route::post('/customer/edit/{id}', [CustomerController::class, 'updateCustomer']);
     Route::get('/changeTrust/{id}', [CustomerController::class, 'changeTrust']);
+    Route::get('/blockList', [CustomerController::class, 'blockList']);
+    Route::get('/changeBlock/{id}', [CustomerController::class, 'changeBlock']);
 
     ///CUSTOMER DEPOSIT
     Route::get('/customer/transaction/{id}', [CustomerController::class, 'customersTransactionList'])

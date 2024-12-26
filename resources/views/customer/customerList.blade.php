@@ -53,7 +53,7 @@
                     <th>آدرس</th>
                     <th>کد پستی</th>
                 @endif
-                @if($superAdmin)
+                @if(auth()->user()->meta('allCustomers') || auth()->user()->meta('editAllCustomers'))
                     <th>کاربر مرتبط</th>
                 @endif
                 <th>عملیات</th>
@@ -79,7 +79,7 @@
                         <td>{{$customer->zip_code}}</td>
                     @endif
 
-                    @if($superAdmin)
+                    @if(auth()->user()->meta('allCustomers') || auth()->user()->meta('editAllCustomers'))
                         <th>{{$customer->user->name}}</th>
                     @endif
 
@@ -118,11 +118,6 @@
                 order: [[3, "asc"]],
                 pageLength: 100,
             });
-            $('#brief-table table').DataTable({
-                order: [[2, "asc"]],
-                pageLength: 50,
-            });
-            $('#brief-table').hide();
         });
 
         function changeTrust(id, object) {

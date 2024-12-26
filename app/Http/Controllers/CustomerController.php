@@ -29,8 +29,8 @@ class CustomerController extends Controller
                 $customers = $customers->where('user_id', $req->user);
         } else
             $customers = $customers->where('user_id', $user->id);
-        if(isset($req->trust))
-            $customers = $customers->where('trust' , +$req->trust);
+        if (isset($req->trust))
+            $customers = $customers->where('trust', +$req->trust);
         $customers = $customers->get()->keyBy("id");
         $total = 0;
         foreach ($customers as $customer) {
@@ -444,7 +444,7 @@ class CustomerController extends Controller
 
     public function paymentTracking(Request $req)
     {
-        Helper::access(['editAllCustomers' , 'allCustomers']);
+        Helper::access(['editAllCustomers', 'allCustomers']);
         $orders = [];
         $Orders = Order::with('paymentLinks');
         if (isset($req->user) && $req->user != 'all')
@@ -466,7 +466,7 @@ class CustomerController extends Controller
         ]);
     }
 
-    function postponedDay($id, $days)
+    public function postponedDay($id, $days)
     {
         Helper::access('editAllCustomers');
         $order = Order::findOrFail($id);
@@ -476,4 +476,21 @@ class CustomerController extends Controller
         $order->save();
     }
 
+    public function blockList()
+    {
+        Helper::access('usersEdit');
+        $customers = Customer::with(['orders', 'transactions'])->get()->keyBy('id');
+        return view('customer.blockList', [
+            'customers' => $customers,
+        ]);
+    }
+
+    public function changeBlock($id)
+    {
+        Helper::access('usersEdit');
+        $customer = Customer::findOrFail($id);
+        $customer->block = !$customer->block;
+        $customer->save();
+        return $customer->block;
+    }
 }

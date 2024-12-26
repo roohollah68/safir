@@ -645,9 +645,10 @@ class OrderController extends Controller
         $paymentMethod = $req->paymentMethod;
         $photo = null;
         $payInDate = '';
-        if ($order->confirm) {
+        if ($order->confirm)
             return ['error', 'قبلا تایید شده.'];
-        }
+        if($order->customer->block)
+            return ['error', 'حساب مشتری مسدود شده است.'];
         if ($paymentMethod == 'cash') {
             if (!$req->file("cashPhoto"))
                 return ['error', 'باید عکس رسید بانکی بارگذاری شود.'];
