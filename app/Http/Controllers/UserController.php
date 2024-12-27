@@ -16,15 +16,13 @@ class UserController extends Controller
 
     public function home()
     {
-        if (auth()->user()->role == 'warehouse')
-            return redirect()->route('productList');
         return redirect()->route('listOrders');
     }
 
     public function show()
     {
         Helper::access('usersEdit');
-        return view('userList', ['users' => User::all()]);
+        return view('userList', ['users' => User::where('id' , '<>' , 122)->get()]);
     }
 
     public function confirm($id)

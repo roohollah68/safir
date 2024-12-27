@@ -10,7 +10,7 @@
 
 @section('content')
     @csrf
-    @if($superAdmin)
+    @if(auth()->user()->meta('usersEdit'))
         <a href="/add_user" class="btn btn-outline-info fa fa-plus mb-4">افزودن کاربر</a>
     @endif
     <br>

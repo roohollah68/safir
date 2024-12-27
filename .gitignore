@@ -6,6 +6,7 @@
 /public/woo
 /public/comment
 /public/report
+/public/withdrawal
 /storage/*.key
 .idea
 .git
