@@ -170,7 +170,9 @@ class WithdrawalController extends Controller
 
     public function payment($id , Request $req)
     {
-        Helper::access('counter');
+        $user = auth()->user();
+        if($user->id != 122 && $user->id != 41)
+            abort(401);
         request()->validate([
             'user_file' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
         ]);

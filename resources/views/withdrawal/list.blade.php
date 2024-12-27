@@ -158,7 +158,7 @@
         }
         @endif
 
-        @if(auth()->user()->meta('counter'))
+        @if(auth()->user()->id == 122 || auth()->user()->id == 41)
         function payment_form(id) {
             withdrawal = withdrawals[id]
             if (withdrawal.manager_confirm != 1)
