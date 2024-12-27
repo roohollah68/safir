@@ -51,6 +51,13 @@
             })
     }
 
+    function view_withdrawal(id) {
+        $.post('/viewWithdrawal/' + id, {_token: token})
+            .done(res => {
+                dialog = Dialog(res);
+            })
+    }
+
     function view_comment(id) {
         $.post('/viewComment/' + id, {_token: token})
             .done(res => {

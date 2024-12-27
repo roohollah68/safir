@@ -10,56 +10,183 @@
 
 @section('files')
 
+    <script>
+        let Current =
+            `@foreach(config('expense_type')['current'] as $data)
+            <option>{{$data}}</option>
+            @endforeach`
+        let Property =
+            `@foreach(config('expense_type')['property'] as $data)
+            <option>{{$data}}</option>
+            @endforeach`
+
+        $(() => {
+            $(".checkboxradio").checkboxradio();
+            let date_property = {
+                targetTextSelector: '[name="cheque_date"]',
+                targetDateSelector: '[name="cheque_date_hide"]',
+            }
+            @if(old('cheque_date')?:$withdrawal->cheque_date)
+                date_property.selectedDate = new Date('{{old('cheque_date_hide')?:$withdrawal->cheque_date}}');
+            @endif
+            const chequeDate = new mds.MdsPersianDateTimePicker(document.getElementById('cheque_date'), date_property);
+            @if((old('pay_method')?:$withdrawal->pay_method)=='cheque')
+            $('.cash').hide().prop('required', false);
+            @else
+            $('.cheque').hide().prop('required', false);
+            @endif
+
+            @if((old('expense_type')?:$withdrawal->expense_type)=='current')
+            $('#expense_desc').html(Current).val('{{old('expense_desc')?:$withdrawal->expense_desc}}').change()
+            @elseif((old('expense_type')?:$withdrawal->expense_type)=='property')
+            $('#expense_desc').html(Property).val('{{old('expense_desc')?:$withdrawal->expense_desc}}').change()
+            @endif
+        })
+    </script>
+    <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
+    <link rel="stylesheet" href="/date-time-picker/mds.bs.datetimepicker.style.css">
 @endsection
 
 @section('content')
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
     <form action="" method="post" enctype="multipart/form-data">
         @csrf
-        <div class="row">
-            <div class="col-md-6">
+        <div class="row my-4">
+            <div class="col-md-6 my-2">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
-                        <label for="amount" class="input-group-text w-100">میزان درخواست وجه:</label>
+                        <label for="amount" class="input-group-text w-100">مبلغ:</label>
                     </div>
-                    <input value="{{$withdrawal->amount}}" type="text" id="amount" class="form-control price-input"
-                           name="amount"
-                           required>
+                    <input value="{{old('amount')?:$withdrawal->amount}}" type="text" id="amount"
+                           class="form-control price-input" name="amount" required>
                     <div class="input-group-prepend" style="min-width: 120px">
                         <label for="amount" class="input-group-text w-100"> ریال</label>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-6 my-2">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
-                        <label for="description" class="input-group-text w-100">توضیحات:</label>
+                        <label for="description" class="input-group-text w-100">بابت:</label>
                     </div>
-                    <textarea name="description" id="description" class="form-control"
-                              rows="3" required>{{$withdrawal->description}}</textarea>
+                    <input type="text" class="form-control" name="expense"
+                           value="{{old('expense')?:$withdrawal->expense}}" required>
                 </div>
             </div>
 
-            <input type="hidden" id="oldFile1" name="oldFile1" value="{{$withdrawal->file1}}">
-            <div class="col-md-6 {{$withdrawal->file1?'hide':''}}" id="newFile">
-                <div class="form-group input-group ">
-                    <div class="input-group-append" style="width: 160px">
-                        <label for="file1" class="input-group-text w-100">ارسال فایل توضیحات:</label>
+            <div class="col-md-6 my-2">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label class="input-group-text ">روش پرداخت:</label>
                     </div>
-                    <input type="file" id="file1" name="file1">
+                    <label for="cash" class="">نقدی</label>
+                    <input type="radio" class="checkboxradio" name="pay_method" id="cash"
+                           value="cash" @checked((old('pay_method')?:$withdrawal->pay_method)!='cheque')
+                           onclick="$('.cash').show().prop('required',true);
+                           $('.cheque').hide().prop('required',false)">
+                    <label for="cheque" class="">چکی</label>
+                    <input type="radio" class="checkboxradio" name="pay_method" id="cheque"
+                           value="cheque" @checked((old('pay_method')?:$withdrawal->pay_method)=='cheque')
+                           onclick="$('.cash').hide().prop('required',false);
+                           $('.cheque').show().prop('required',true)">
                 </div>
-                <span>فرمت های مجاز: jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx  | حجم مجاز: 3mb</span>
+            </div>
+
+            <div class="col-md-6 my-2">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="account_name" class="input-group-text w-100">نام صاحب حساب:</label>
+                    </div>
+                    <input type="text" class="form-control" name="account_name"
+                           value="{{old('account_name')?:$withdrawal->account_name}}" required>
+                </div>
+            </div>
+
+            <div class="col-md-6 my-2 cash">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="account_number" class="input-group-text w-100">شماره شبا یا کارت:</label>
+                    </div>
+                    <input type="text" class="form-control cash" name="account_number"
+                           value="{{old('account_number')?:$withdrawal->account_number}}" required>
+                </div>
+            </div>
+
+            <div class="col-md-6 my-2 cheque">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="cheque_id" class="input-group-text w-100">کد ملی یا شناسه ملی:</label>
+                    </div>
+                    <input type="text" class="form-control cheque" name="cheque_id"
+                           value="{{old('cheque_id')?:$withdrawal->cheque_id}}" required>
+                </div>
+            </div>
+
+            <div class="col-md-6 my-2 cheque">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="cheque_date" class="input-group-text w-100">تاریخ چک:</label>
+                    </div>
+                    <input type="text" class="form-control cheque" name="cheque_date" id="cheque_date" required>
+                    <input type="hidden" name="cheque_date_hide">
+                </div>
+            </div>
+
+            <div class="col-md-6 my-2">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label class="input-group-text ">دسته هزینه:</label>
+                    </div>
+                    <input type="radio" name="expense_type" value="" class="hide">
+                    <label for="current" class="">هزینه</label>
+                    <input type="radio" class="checkboxradio" name="expense_type" id="current"
+                           value="current" @checked((old('expense_type')?:$withdrawal->expense_type)=='current')
+                           onclick="$('#expense_desc').html(Current).change()">
+                    <label for="property" class="">دارایی</label>
+                    <input type="radio" class="checkboxradio" name="expense_type" id="property"
+                           value="property" @checked((old('expense_type')?:$withdrawal->expense_type)=='property')
+                           onclick="$('#expense_desc').html(Property).change()">
+                </div>
+            </div>
+
+            <div class="col-md-6 my-2">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="expense_desc" class="input-group-text w-100">نوع هزینه:</label>
+                    </div>
+                    <select name="expense_desc" id="expense_desc"></select>
+                </div>
+            </div>
+
+            <div class="col-md-6 my-2">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="user_desc" class="input-group-text w-100">توضیحات:</label>
+                    </div>
+                    <textarea name="user_desc" id="user_desc" class="form-control"
+                              rows="3">{{old('user_desc')?:$withdrawal->user_desc}}</textarea>
+                </div>
             </div>
         </div>
+
+        <input type="hidden" id="old_user_file" name="old_user_file" value="{{$withdrawal->user_file}}">
+        <div class="col-md-6 {{$withdrawal->user_file?'hide':''}}" id="newFile">
+            <div class="form-group input-group ">
+                <div class="input-group-append" style="width: 160px">
+                    <label for="user_file" class="input-group-text w-100">ارسال فایل توضیحات:</label>
+                </div>
+                <input type="file" id="user_file" name="user_file">
+            </div>
+            <span>فرمت های مجاز: jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx  | حجم مجاز: 3mb</span>
+        </div>
         <br>
-        @if(isset($withdrawal->file1))
+        @if(isset($withdrawal->user_file))
             <div id="oldFile">
-            <a class="btn btn-info" href="/withdrawal/{{$withdrawal->file1}}" target="_blank">
-                مشاهده فایل
-            </a>
-            <i class="fa fa-trash-alt btn btn-danger" onclick="$('#oldFile1').val('');$('#oldFile').hide();$('#newFile').show();"
-               title="حذف"></i>
+                <a class="btn btn-info" href="/withdrawal/{{$withdrawal->user_file}}" target="_blank">مشاهده فایل</a>
+                <i class="fa fa-trash-alt btn btn-danger"
+                   onclick="$('#old_user_file').val('');$('#oldFile').hide();$('#newFile').show();"
+                   title="حذف"></i>
             </div>
         @endif
         <br>
@@ -72,6 +199,6 @@
         &nbsp;
         <a href="{{route('WithdrawalList')}}" class="btn btn-danger">بازگشت</a>
 
-        </form>
+    </form>
 
 @endsection

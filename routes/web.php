@@ -169,8 +169,10 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::get('Withdrawal/edit/{id}', [WithdrawalController::class, 'edit']);
     Route::post('Withdrawal/edit/{id}', [WithdrawalController::class, 'update']);
     Route::get('Withdrawal/list', [WithdrawalController::class, 'list'])->name('WithdrawalList');
-    Route::post('Withdrawal/confirm/{id}', [WithdrawalController::class, 'confirm']);
-    Route::post('Withdrawal/pay/{id}', [WithdrawalController::class, 'pay']);
+    Route::post('viewWithdrawal/{id}', [WithdrawalController::class, 'view']);
+    Route::post('/withdrawal/counterForm/{id}', [WithdrawalController::class, 'counter']);
+    Route::post('/withdrawal/managerForm/{id}', [WithdrawalController::class, 'manager']);
+    Route::post('/withdrawal/paymentForm/{id}', [WithdrawalController::class, 'payment']);
 
     ///PROGRAMMER
     Route::get('/clear/route', [SettingController::class, 'clearRoute']);
