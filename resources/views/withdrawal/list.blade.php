@@ -120,7 +120,7 @@
             }
         @endif
 
-        @if(auth()->user()->meta('usersEdit'))
+        @if(auth()->user()->id != 122)
         function manager_form(id) {
             withdrawal = withdrawals[id]
             if (withdrawal.payment_confirm == 1)

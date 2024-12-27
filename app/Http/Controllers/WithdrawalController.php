@@ -158,7 +158,9 @@ class WithdrawalController extends Controller
 
     public function manager($id , Request $req)
     {
-        Helper::access('usersEdit');
+        $user = auth()->user();
+        if($user->id != 122)
+            abort(401);
         $withdrawal = Withdrawal::findOrFail($id);
         $withdrawal->manager_confirm = $req->manager_confirm;
         $withdrawal->manager_desc = $req->manager_desc;
