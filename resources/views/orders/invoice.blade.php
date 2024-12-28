@@ -66,7 +66,7 @@
                 <span style="font-size: 40px; padding: 0;display: inline-block;width: 24%;">ثبت / کدملی:</span>
                 <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شناسه ملی: </span>
                 <span
-                        style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: {{$order->customer->city->province->name}}</span>
+                        style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: {{$order->customer?$order->customer->city->province->name:''}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px 20px 0">
                 <span
@@ -75,7 +75,7 @@
                 <span
                         style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">کدپستی: {{$order->zip_code}}</span>
                 <span
-                        style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شهر: {{$order->customer->city->name}}</span>
+                        style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شهر: {{$order->customer?$order->customer->city->name:''}}</span>
             </div>
             <p style="font-size: 45px; text-align: center;padding: 0; border:3px solid; border-radius: 30px; margin: 0 750px;background: #ddd;">
                 اطلاعات فاکتور</p>
