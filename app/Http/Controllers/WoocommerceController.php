@@ -79,7 +79,8 @@ class WoocommerceController extends Controller
             'deliveryMethod' => $request->shipping_lines[0]->method_title . ' _ ' . $deliveryTime,
             'counter' => 'approved',
             'confirm' => true,
-            'warehouse_id' => ($request->billing->city == 'تهران') ? 1 : 2,
+//            'warehouse_id' => ($request->billing->city == 'تهران') ? 1 : 2,
+            'warehouse_id' => 1,
         ];
         if ($web) {
             $web->update([
