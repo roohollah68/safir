@@ -122,6 +122,7 @@
                         <td>
                             <a class="btn btn-info fa fa-eye" onclick="view_order({{$id}})"
                                title="مشاهده فاکتور"></a>
+                            <i class="fa fa-comment btn btn-info" onclick="view_comment({{$id}})"></i>
                             <a class="fa fa-file-invoice-dollar btn btn-secondary"
                                onclick="invoice({{$id}})" title=" فاکتور"></a>
                             <span class="btn btn-primary fa fa-chain" onclick="showOrderLink({{$id}})"></span>
