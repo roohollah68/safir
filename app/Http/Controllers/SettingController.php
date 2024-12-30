@@ -76,17 +76,17 @@ class SettingController extends Controller
     public function command()
     {
         set_time_limit(0);
-        $orders = Order::with('customer')->get()->keyBy('id');
-        foreach ($orders as $id=>$order){
-            if($order->customer && $order->customer->user_id != $order->user_id){
-                echo $id . '<br>';
-//                $order->update([
-//                    'user_id' => $order->customer->user_id,
-//                ]);
-            }
+        $ids = [4004 , 4005 , 3968 , 3962 , 3952 , 3947 , 3941 , 3933 , 3914 ];
+        $ID = 4776;
+        foreach ($ids as $id){
+            Order::where('customer_id' , $id)->update([
+                'customer_id' => $ID,
+            ]);
+            CustomerTransaction::where('customer_id' , $id)->update([
+                'customer_id' => $ID,
+            ]);
+            Customer::find($id)->delete();
         }
-
-
     }
 
 }
