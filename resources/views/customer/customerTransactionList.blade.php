@@ -109,7 +109,7 @@
                                 <i class="btn btn-danger">رد شده</i>
                             @endif
                         </td>
-                        <td>{{number_format($order->total)}}</td>
+                        <td dir="ltr">{{number_format($order->total)}}</td>
                         <td>
                             @if($order->payPercent() == 0)
                                 <i class="btn btn-danger">0 %</i>

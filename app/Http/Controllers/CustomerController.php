@@ -52,7 +52,7 @@ class CustomerController extends Controller
             $customer = $customer->where('user_id', $user->id);
         $customer = $customer->findOrFail($id);
         $transactions = $customer->transactions->keyBy('id');
-        $orders = $customer->orders->keyBy('id')->where('confirm', true)->where('total', '>', 0);
+        $orders = $customer->orders->keyBy('id')->where('confirm', true)->where('total', '<>', 0);
 
         return view('customer.customerTransactionList', [
             'customer' => $customer,
@@ -333,7 +333,7 @@ class CustomerController extends Controller
             $customer = Customer::with(['orders', 'transactions'])->find($id);
         else
             $customer = $user->customers()->with(['orders', 'transactions'])->find($id);
-        $orders = $customer->orders->where('total', '>', 0)->where('confirm', true);
+        $orders = $customer->orders->where('total', '<>', 0)->where('confirm', true);
         $transactions = $customer->transactions;
         $timeDescription = 'همه تراکنش ها';
         if ($request->timeFilter == 'specifiedTime') {
