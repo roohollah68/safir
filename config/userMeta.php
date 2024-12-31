@@ -23,6 +23,7 @@ return [
         'addWorkReport' => 'ثبت گزارش کار',
         'workReport' => 'مشاهده گزارش کار همه',
         'withdrawal' => 'افزودن درخواست واریز',
+        'withdrawalPay' => 'ثبت رسید پرداخت درخواست واریز',
         'allWithdrawal' => 'مشاهده همه درخواستهای واریز',
     ],
 //    'usersEdit' => false,
