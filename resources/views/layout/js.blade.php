@@ -4,13 +4,13 @@
 
     function invoice(id) {
 
-        let printInvoice = (page) => {
-            $('#invoice-wrapper').html(page);
+        let printInvoice = (page, index) => {
+            $('#invoice-wrapper').html(page );
             setTimeout(() => {
                 domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
                     .then(function (dataUrl) {
                         let link = document.createElement('a');
-                        link.download = id + `_` + makeid(3) + '.jpg';
+                        link.download = id + `_` + index + `_` + makeid(3) + '.jpg';
                         link.href = dataUrl;
                         link.click();
                         $('#invoice-wrapper').html('');
@@ -26,14 +26,14 @@
         }).done(res => {
             $('#invoice-wrapper').html(res[0]);
             if ($('#invoice-content')[0].offsetHeight < 2900) {
-                printInvoice(res[0]);
+                printInvoice(res[0] , 1);
             } else {
                 $.post('/invoice/' + id, {
                     _token: token,
                 }).done(res => {
                     $.each(res, (index, page) => {
                         setTimeout(() => {
-                            printInvoice(page)
+                            printInvoice(page , index+1)
                         }, 200 * index);
                     })
 
