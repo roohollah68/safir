@@ -328,6 +328,7 @@ class CustomerController extends Controller
 
     public function customerSOA($id, Request $request)
     {
+        dd($request->all());
         $user = auth()->user();
         if ($user->meta('allCustomers') || $user->meta('editAllCustomers'))
             $customer = Customer::with(['orders', 'transactions'])->find($id);
