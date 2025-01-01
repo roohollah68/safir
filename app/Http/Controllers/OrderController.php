@@ -428,7 +428,7 @@ class OrderController extends Controller
         foreach ($order->orderProducts as $id => $orderProduct) {
             if ($orderProduct->discount != 100)
                 $orderProduct->price_no_dis = round((100 / (100 - $orderProduct->discount)) * $orderProduct->price);
-            else 
+            else
                 $orderProduct->price_no_dis = $orderProduct->product()->withTrashed()->first()->good->price;
             $orderProduct->sub_total_no_dis = $orderProduct->price_no_dis * $orderProduct->number;
             $total_no_dis = $total_no_dis + $orderProduct->sub_total_no_dis;
