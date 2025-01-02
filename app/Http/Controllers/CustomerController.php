@@ -340,15 +340,12 @@ class CustomerController extends Controller
             $timeDescription = 'از ' . $request->from . ' تا ' . $request->to;
             $request->from = Verta::parse($request->from)->toCarbon();
             $request->to = Verta::parse($request->to)->addDay()->addSeconds(-1)->toCarbon();
-            $transactions = $transactions->where([
-                ['created_at', '>', $request->from],
-                ['created_at', '<', $request->to]
-            ]);
-            $orders = $orders->where([
-                ['created_at', '>', $request->from],
-                ['created_at', '<', $request->to]
-            ]);
+            $transactions = $transactions->where('created_at', '>', $request->from)
+                ->where('created_at', '<', $request->to);
+            $orders = $orders->where('created_at', '>', $request->from)
+                ->where('created_at', '<', $request->to);
         }
+
         $pdf = PDF::loadView('customer.customerSOA', [
                 'customer' => $customer,
                 'transactions' => $transactions,

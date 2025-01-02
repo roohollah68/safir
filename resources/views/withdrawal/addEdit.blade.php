@@ -41,6 +41,10 @@
             @elseif((old('expense_type')?:$withdrawal->expense_type)=='property')
             $('#expense_desc').html(Property).val('{{old('expense_desc')?:$withdrawal->expense_desc}}').change()
             @endif
+
+            @if((old('official')?:$withdrawal->official)==1)
+            $('.VAT').show();
+            @endif
         })
     </script>
     <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
@@ -159,6 +163,34 @@
                 </div>
             </div>
 
+            <div class="col-md-6 my-2">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label class="input-group-text ">نوع فاکتور:</label>
+                    </div>
+                    <label for="official" class="">رسمی</label>
+                    <input type="radio" class="checkboxradio" name="official" id="official"
+                           value="1" @checked((old('official')?:$withdrawal->official)==1)
+                           onclick="$('.VAT').show()">
+                    <label for="unofficial" class="">غیر رسمی</label>
+                    <input type="radio" class="checkboxradio" name="official" id="unofficial"
+                           value="0" @checked((old('official')?:$withdrawal->official)!=1)
+                           onclick="$('.VAT').hide()">
+                </div>
+            </div>
+            <div class="col-md-6 my-2 VAT hide">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label class="input-group-text ">ارزش افزوده(10%):</label>
+                    </div>
+                    <label for="vat" class="">دارد</label>
+                    <input type="radio" class="checkboxradio" name="vat" id="vat"
+                           value="1" @checked((old('vat')?:$withdrawal->vat)==1)>
+                    <label for="no-vat" class="">ندارد</label>
+                    <input type="radio" class="checkboxradio" name="vat" id="no-vat"
+                           value="0" @checked((old('vat')?:$withdrawal->vat)!=1)>
+                </div>
+            </div>
             <div class="col-md-6 my-2">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">

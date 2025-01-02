@@ -18,6 +18,7 @@
     @endif
     <span>دسته هزینه:</span> <b>{{$withdrawal->expense_type=='current'?'هزینه':'دارایی'}}</b> <br>
     <span>نوع هزینه:</span> <b>{{$withdrawal->expense_desc}}</b> <br>
+    <span>نوع فاکتور:</span> <b>{{$withdrawal->official != 1?'غیر رسمی':('رسمی '.($withdrawal->vat == 1?'با ارزش افزوده':'بدون ارزش افزوده'))}}</b> <br>
     @if($withdrawal->deleted_at)
         <span>زمان حذف:</span><b>{{verta($withdrawal->deleted_at)->formatJalaliDate()}}</b><br>
     @endif

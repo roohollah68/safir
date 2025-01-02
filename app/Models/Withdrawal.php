@@ -24,6 +24,8 @@ class Withdrawal extends Model
         'expense_type',
         'expense_desc',
         'counter_confirm',
+        'official',
+        'vat',
         'counter_desc',
         'bank',
         'manager_confirm',
@@ -31,6 +33,8 @@ class Withdrawal extends Model
         'payment_confirm',
         'payment_desc',
         'payment_file',
+        'payment_file2',
+        'payment_file3',
     ];
 
     public function user()

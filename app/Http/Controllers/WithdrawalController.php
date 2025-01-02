@@ -40,6 +40,8 @@ class WithdrawalController extends Controller
             'cheque_id' => $req->cheque_id,
             'expense_type' => $req->expense_type,
             'expense_desc' => $req->expense_desc,
+            'official' => $req->official,
+            'vat' => $req->vat,
         ]);
         if ($req->file("user_file")) {
             $withdrawal->user_file = $req->file("user_file")->store("", 'withdrawal');
@@ -104,6 +106,8 @@ class WithdrawalController extends Controller
                 'cheque_id' => $req->cheque_id,
                 'expense_type' => $req->expense_type,
                 'expense_desc' => $req->expense_desc,
+                'official' => $req->official,
+                'vat' => $req->vat,
                 'counter_confirm' => 0,
                 'manager_confirm' => 0,
                 'payment_confirm' => 0,
@@ -137,10 +141,17 @@ class WithdrawalController extends Controller
         if($req->filter == 'paid'){
             $withdrawals = $withdrawals->where('payment_confirm' , 1);
         }
+        if($req->official == '0'){
+            $withdrawals = $withdrawals->where('official' , 0);
+        }
+        if($req->official == '1'){
+            $withdrawals = $withdrawals->where('official' , 1);
+        }
         return view('withdrawal.list', [
             'withdrawals' => $withdrawals->get()->keyBy('id'),
             'user' => $user,
             'filter' => $req->filter,
+            'official' => $req->official,
         ]);
     }
 
@@ -173,13 +184,19 @@ class WithdrawalController extends Controller
         $user = auth()->user();
         Helper::access('withdrawalPay');
         request()->validate([
-            'user_file' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
+            'payment_file' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
+            'payment_file2' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
+            'payment_file3' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
         ]);
         $withdrawal = Withdrawal::findOrFail($id);
         $withdrawal->payment_confirm = $req->payment_confirm;
         $withdrawal->payment_desc = $req->payment_desc;
         if($req->file('payment_file'))
             $withdrawal->payment_file = $req->file("payment_file")->store("", 'withdrawal');
+        if($req->file('payment_file2'))
+            $withdrawal->payment_file2 = $req->file("payment_file2")->store("", 'withdrawal');
+        if($req->file('payment_file3'))
+            $withdrawal->payment_file3 = $req->file("payment_file3")->store("", 'withdrawal');
         $withdrawal->save();
         return redirect(route('WithdrawalList'));
     }

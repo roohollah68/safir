@@ -8,11 +8,14 @@
     <a class="btn btn-info" href="{{route('addWithdrawal')}}">ثبت درخواست وجه جدید</a>
     <br>
     <br>
-    <a class="btn btn-{{$filter?'outline-':''}}primary" href="/Withdrawal/list">همه</a>
+    <a class="btn btn-{{(is_null($filter) && is_null($official))?'':'outline-'}}primary" href="/Withdrawal/list">همه</a>
     <a class="btn btn-{{$filter=='counter'?'':'outline-'}}primary" href="?filter=counter">منتظر تایید حسابدار</a>
     <a class="btn btn-{{$filter=='manager'?'':'outline-'}}primary" href="?filter=manager">منتظر تایید مدیر</a>
     <a class="btn btn-{{$filter=='payment'?'':'outline-'}}primary" href="?filter=payment">منتظر واریز</a>
     <a class="btn btn-{{$filter=='paid'?'':'outline-'}}primary" href="?filter=paid">پرداخت شده</a>
+    <br>
+    <a class="btn btn-{{$official=='1'?'':'outline-'}}primary" href="?official=1">رسمی</a>
+    <a class="btn btn-{{$official=='0'?'':'outline-'}}primary" href="?official=0">غیر رسمی</a>
     <br>
     <br>
     <table class="table table-striped" id="withdrawal-table">
@@ -23,6 +26,7 @@
             <th>کاربر</th>
             <th>مبلغ (ریال)</th>
             <th>بابت</th>
+            <th>صاحب حساب</th>
             <th>حسابدار</th>
             <th>مدیر</th>
             <th>واریز</th>
@@ -39,6 +43,7 @@
                 <td>{{$withdrawal->user->name}}</td>
                 <td>{{number_format($withdrawal->amount)}}</td>
                 <td>{{$withdrawal->expense}}</td>
+                <td>{{$withdrawal->account_name}}</td>
                 <td>{!! $withdrawal->counter_status() !!}</td>
                 <td>{!! $withdrawal->manager_status() !!}</td>
                 <td>{!! $withdrawal->payment_status() !!}</td>
@@ -185,12 +190,17 @@
             <textarea name="payment_desc" id="payment_desc" rows="3" class="w-100">${withdrawal.payment_desc || ''}</textarea>
 
 <br>
-<br>
-
 <label for="payment_file">رسید پرداخت:</label>
 <input type="file" name="payment_file" id="payment_file"><br>
 <a class="btn btn-info hide" id="payment_file_old" href="/withdrawal/${withdrawal.payment_file}" target="_blank">مشاهده فایل</a>
 <br>
+<label for="payment_file2">رسید پرداخت 2:</label>
+<input type="file" name="payment_file2" id="payment_file2"><br>
+<a class="btn btn-info hide" id="payment_file_old2" href="/withdrawal/${withdrawal.payment_file2}" target="_blank">مشاهده فایل2</a>
+<br>
+<label for="payment_file3">رسید پرداخت 3:</label>
+<input type="file" name="payment_file3" id="payment_file3"><br>
+<a class="btn btn-info hide" id="payment_file_old3" href="/withdrawal/${withdrawal.payment_file3}" target="_blank">مشاهده فایل3</a>
 <br>
 
 <input class="btn btn-success" type="submit" value="ذخیره">
@@ -201,6 +211,12 @@
             $(`input[value=${withdrawal.payment_confirm}]`).click();
             if(withdrawal.payment_file){
                 $('#payment_file_old').show();
+            }
+            if(withdrawal.payment_file2){
+                $('#payment_file_old2').show();
+            }
+            if(withdrawal.payment_file3){
+                $('#payment_file_old3').show();
             }
         }
         @endif
