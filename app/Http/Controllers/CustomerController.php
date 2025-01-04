@@ -244,7 +244,8 @@ class CustomerController extends Controller
         Helper::access('counter');
         return view('customer.customersDepositList', [
             'transactions' => CustomerTransaction::with('customer.user')->limit(2000)->orderBy('id', 'desc')->get()->keyBy('id'),
-            'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
+            'users' => User::where('role', '<>', 'user')->where('verified', true)->select('id', 'name')->get(),
+//            'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
             'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
         ]);
     }
@@ -288,7 +289,8 @@ class CustomerController extends Controller
         return view('customer.customersOrderList', [
             'orders' => Order::where('confirm', true)->where('customer_id', '>', '0')
                 ->where('state', false)->with('user')->get()->keyBy('id'),
-            'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
+            'users' => User::where('role', '<>', 'user')->where('verified', true)->select('id', 'name')->get(),
+//            'users' => User::where('verified', true)->select('id', 'name')->get(),
             'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
 
         ]);

@@ -61,7 +61,7 @@
         @foreach($orders as $order)
             @continue(!isset($order->user))
             @if($order->confirm && (!$order->status || $order->status==4) &&
-                    $order->user->admin() &&
+                    !$order->user->safir() &&
                     ($selectedUser == 'all' || $order->customer->user->id == $selectedUser))
 
                 <tr class="hide {{$order->counter}}" id="row-{{$order->id}}">
