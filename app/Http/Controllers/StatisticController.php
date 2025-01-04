@@ -29,6 +29,9 @@ class StatisticController extends Controller
         foreach ($users as $id => $user) {
             $users[$id]->customer = $user->customers->keyby('name');
         }
+        if (isset($request->city)) {
+            $request->base = 'customerBase';
+        }
         if (!isset($request->base)) {
             return view('statistic', [
                 'users' => $users,
@@ -62,6 +65,7 @@ class StatisticController extends Controller
         $totalProfit = 0;
         $orderNumber = 0;
         $productNumber = 0;
+
         if ($request->base == 'productBase') {
             $orders = $orders->with('orderProducts', 'website')->get();
             $goods = Good::withTrashed()->where('category', 'final')->get()->keyBy('id');
@@ -142,10 +146,12 @@ class StatisticController extends Controller
 
         }
         if ($request->base == 'customerBase') {
-            if ($statistic)
-                $customers = Customer::all()->keyBy('id');
-            else
-                $customers = $user->customers->keyBy('id');
+            $customers = Customer::query();
+            if (!$statistic)
+                $customers = $customers->where('user_id', $user->id);
+            if ($request->city)
+                $customers = $customers->where('city_id', $request->city);
+            $customers = $customers->get()->keyBy('id');
             foreach ($customers as $id => $customer) {
                 $customers[$id]->orderNumber = 0;
                 $customers[$id]->totalSale = 0;
@@ -158,7 +164,7 @@ class StatisticController extends Controller
                     continue;
                 if ($users[$order->user_id]->admin() && !$request->adminOrders)
                     continue;
-                if (!$order->customer)
+                if (!$order->customer || (isset($request->city) && $order->customer->city_id != $request->city))
                     continue;
                 $id = $order->customer_id;
                 $customers[$id]->orderNumber++;
@@ -243,19 +249,15 @@ class StatisticController extends Controller
         }
         if ($request->base == 'cityBase') {
             $cities = City::all()->keyBy('id');
-            if ($statistic)
-                $customers = Customer::all()->keyBy('id');
-            else
-                $customers = $user->customers->keyBy('id');
             foreach ($cities as $id => $city) {
                 $city->orderNumber = 0;
                 $city->totalSale = 0;
             }
             $orders = $orders->with('website', 'customer')->get();
             foreach ($orders as $order) {
-                if ($order->website )
+                if ($order->website && !$request->siteOrders)
                     continue;
-                if (!$order->website && $users[$order->user_id]->safir() )
+                if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders)
                     continue;
                 if ($users[$order->user_id]->admin() && !$request->adminOrders)
                     continue;
@@ -267,8 +269,6 @@ class StatisticController extends Controller
                 $orderNumber++;
                 $totalSale += $order->total;
             }
-            $request->siteOrders = null;
-            $request->safirOrders = null;
             return view('statistic', [
                 'totalSale' => $totalSale,
                 'request' => $request,

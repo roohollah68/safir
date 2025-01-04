@@ -81,170 +81,170 @@
                class="checkboxradio" @checked($request->base=='cityBase')>
         <br>
         <input class="btn btn-success m-3" type="submit" value="اعمال فیلتر">
+
+        @if(isset($totalSale))
+            @if($request->base=='productBase')
+                <br>
+                <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+                <h4>مجموع سود در این دوره : <span>{{number_format($totalProfit)}}</span> ریال </h4>
+                <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
+                <h4>تعداد محصولات فروخته شده : <span>{{$productNumber}}</span> عدد </h4>
+                <br>
+                <table class="table table-striped" id="statistic-table">
+                    <thead>
+                    <tr>
+                        <th>نام محصول</th>
+                        <th>تعداد فروش</th>
+                        <th>مبلغ کل(ریال)</th>
+                        <th>قیمت میانگین(ریال)</th>
+                        <th>قیمت تولید(ریال)</th>
+                        <th>سود(ریال)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($goods as $good)
+                        <tr>
+                            {{--                        <td><a href="/product/edit/{{$product->id}}">{{$product->name}}</a></td>--}}
+                            <td>{{$good->name}}</td>
+                            <td>{{$good->number}}</td>
+                            <td>{{number_format($good->total)}}</td>
+                            <td>{{number_format(($good->number>0)?$good->total/$good->number:0)}}</td>
+                            <td>{{number_format($good->productPrice)}}</td>
+                            <td>{{number_format($good->profit)}}</td>
+
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            @endif
+            @if($request->base=='safirBase')
+                <br>
+                <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+                <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
+                <br>
+                <table class="table table-striped" id="statistic-table">
+                    <thead>
+                    <tr>
+                        <th>نام فرروشنده</th>
+                        <th>تعداد فروش</th>
+                        <th>مبلغ کل(ریال)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($users as $user)
+                        <tr>
+                            <td>{{$user->name}}</td>
+                            <td>{{$user->orderNumber}}</td>
+                            <td>{{number_format($user->totalSale)}}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            @endif
+            @if($request->base=='customerBase')
+                <br>
+                <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+                <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
+                <br>
+
+                <table class="table table-striped" id="statistic-table">
+                    <thead>
+                    <tr>
+                        <th>نام مشتری</th>
+                        <th>تعداد فروش</th>
+                        <th>مبلغ کل(ریال)</th>
+                        <th>کاربر مرتبط</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($customers as $customer)
+                        <tr>
+                            <td><a href="/customer/transaction/{{$customer->id}}">{{$customer->name}}</a></td>
+                            <td>{{$customer->orderNumber}}</td>
+                            <td>{{number_format($customer->totalSale)}}</td>
+                            <td>{{$users[$customer->user_id]->name}}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            @endif
+            @if($request->base=='paymentBase')
+                <br>
+                <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+                <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
+                <br>
+                <table class="table table-striped" id="statistic-table">
+                    <thead>
+                    <tr>
+                        <th>شیوه پرداخت</th>
+                        <th>تعداد فروش</th>
+                        <th>مبلغ کل(ریال)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($paymentMethods as $index => $paymentMethod)
+                        <tr>
+                            <td>{{$index}}</td>
+                            <td>{{$paymentMethod->orderNumber}}</td>
+                            <td>{{number_format($paymentMethod->totalSale)}}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            @endif
+            @if($request->base=='depositBase')
+                <br>
+                <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+                <h4>تعداد واریزی ها در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
+                <br>
+                <table class="table table-striped" id="statistic-table">
+                    <thead>
+                    <tr>
+                        <th>مشتری</th>
+                        <th>کاربر مرتبط</th>
+                        <th>مبلغ کل(ریال)</th>
+                        <th>تعداد واریز</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($customers as $id => $customer)
+                        <tr>
+                            <td><a href="/customer/transaction/{{$customer->id}}">{{$customer->name}}</a></td>
+                            <td>{{$users[$customer->user_id]->name}}</td>
+                            <td>{{number_format($customer->total)}}</td>
+                            <td>{{$customer->number}}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            @endif
+            @if($request->base=='cityBase')
+                <br>
+                <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+                <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
+                <br>
+
+                <table class="table table-striped" id="statistic-table">
+                    <thead>
+                    <tr>
+                        <th>نام شهر</th>
+                        <th>تعداد فروش</th>
+                        <th>مبلغ کل(ریال)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($cities as $id => $city)
+                        <tr>
+                            <td><button class="btn btn-outline-primary" name="city" type="submit" value="{{$id}}">{{$city->name}}</button></td>
+                            <td>{{$city->orderNumber}}</td>
+                            <td>{{number_format($city->totalSale)}}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            @endif
+        @endif
     </form>
-
-    @if(isset($totalSale))
-        @if($request->base=='productBase')
-            <br>
-            <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
-            <h4>مجموع سود در این دوره : <span>{{number_format($totalProfit)}}</span> ریال </h4>
-            <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
-            <h4>تعداد محصولات فروخته شده : <span>{{$productNumber}}</span> عدد </h4>
-            <br>
-            <table class="table table-striped" id="statistic-table">
-                <thead>
-                <tr>
-                    <th>نام محصول</th>
-                    <th>تعداد فروش</th>
-                    <th>مبلغ کل(ریال)</th>
-                    <th>قیمت میانگین(ریال)</th>
-                    <th>قیمت تولید(ریال)</th>
-                    <th>سود(ریال)</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($goods as $good)
-                    <tr>
-                        {{--                        <td><a href="/product/edit/{{$product->id}}">{{$product->name}}</a></td>--}}
-                        <td>{{$good->name}}</td>
-                        <td>{{$good->number}}</td>
-                        <td>{{number_format($good->total)}}</td>
-                        <td>{{number_format(($good->number>0)?$good->total/$good->number:0)}}</td>
-                        <td>{{number_format($good->productPrice)}}</td>
-                        <td>{{number_format($good->profit)}}</td>
-
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-        @endif
-        @if($request->base=='safirBase')
-            <br>
-            <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
-            <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
-            <br>
-            <table class="table table-striped" id="statistic-table">
-                <thead>
-                <tr>
-                    <th>نام فرروشنده</th>
-                    <th>تعداد فروش</th>
-                    <th>مبلغ کل(ریال)</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($users as $user)
-                    <tr>
-                        <td>{{$user->name}}</td>
-                        <td>{{$user->orderNumber}}</td>
-                        <td>{{number_format($user->totalSale)}}</td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-        @endif
-        @if($request->base=='customerBase')
-            <br>
-            <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
-            <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
-            <br>
-
-            <table class="table table-striped" id="statistic-table">
-                <thead>
-                <tr>
-                    <th>نام مشتری</th>
-                    <th>تعداد فروش</th>
-                    <th>مبلغ کل(ریال)</th>
-                    <th>کاربر مرتبط</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($customers as $customer)
-                    <tr>
-                        <td><a href="/customer/transaction/{{$customer->id}}">{{$customer->name}}</a></td>
-                        <td>{{$customer->orderNumber}}</td>
-                        <td>{{number_format($customer->totalSale)}}</td>
-                        <td>{{$users[$customer->user_id]->name}}</td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-        @endif
-        @if($request->base=='paymentBase')
-            <br>
-            <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
-            <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
-            <br>
-            <table class="table table-striped" id="statistic-table">
-                <thead>
-                <tr>
-                    <th>شیوه پرداخت</th>
-                    <th>تعداد فروش</th>
-                    <th>مبلغ کل(ریال)</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($paymentMethods as $index => $paymentMethod)
-                    <tr>
-                        <td>{{$index}}</td>
-                        <td>{{$paymentMethod->orderNumber}}</td>
-                        <td>{{number_format($paymentMethod->totalSale)}}</td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-        @endif
-        @if($request->base=='depositBase')
-            <br>
-            <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
-            <h4>تعداد واریزی ها در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
-            <br>
-            <table class="table table-striped" id="statistic-table">
-                <thead>
-                <tr>
-                    <th>مشتری</th>
-                    <th>کاربر مرتبط</th>
-                    <th>مبلغ کل(ریال)</th>
-                    <th>تعداد واریز</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($customers as $id => $customer)
-                    <tr>
-                        <td><a href="/customer/transaction/{{$customer->id}}">{{$customer->name}}</a></td>
-                        <td>{{$users[$customer->user_id]->name}}</td>
-                        <td>{{number_format($customer->total)}}</td>
-                        <td>{{$customer->number}}</td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-        @endif
-        @if($request->base=='cityBase')
-            <br>
-            <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
-            <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
-            <br>
-
-            <table class="table table-striped" id="statistic-table">
-                <thead>
-                <tr>
-                    <th>نام شهر</th>
-                    <th>تعداد فروش</th>
-                    <th>مبلغ کل(ریال)</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($cities as $city)
-                    <tr>
-                        <td>{{$city->name}}</td>
-                        <td>{{$city->orderNumber}}</td>
-                        <td>{{number_format($city->totalSale)}}</td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-        @endif
-    @endif
 @endsection
 @section('files')
     <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
