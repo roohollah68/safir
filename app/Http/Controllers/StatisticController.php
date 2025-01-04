@@ -22,10 +22,11 @@ class StatisticController extends Controller
     {
         $user = auth()->user();
         $statistic = $user->meta('statistic');
-        if ($statistic)
-            $users = User::with('customers')->get()->keyBy("id");
-        else
-            $users = User::with('customers')->where('id', $user->id)->get()->keyBy("id");
+        $users = User::withTrashed()->with('customers');
+        if (!$statistic)
+            $users = $users->where('id', $user->id);
+        $users = $users->get()->keyBy("id");
+
         foreach ($users as $id => $user) {
             $users[$id]->customer = $user->customers->keyby('name');
         }
@@ -125,6 +126,8 @@ class StatisticController extends Controller
             }
             $orders = $orders->with('website')->get();
             foreach ($orders as $order) {
+//                if (!isset($users[$order->user_id]))
+//                    continue;
                 if ($order->website && !$request->siteOrders)
                     continue;
                 if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders)
