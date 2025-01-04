@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helper\Helper;
+use App\Models\City;
 use App\Models\Customer;
 use App\Models\CustomerTransaction;
 use App\Models\Good;
@@ -48,7 +49,7 @@ class StatisticController extends Controller
         $orders = Order::where([
             ['state', 10],
             ['created_at', '>', $request->from],
-            ['created_at', '<', $request->to]
+            ['created_at', '<', $request->to],
         ])->where('total', '>', 0);
 
         if ($request->user) {
@@ -74,7 +75,7 @@ class StatisticController extends Controller
             foreach ($orders as $order) {
                 if ($order->website && !$request->siteOrders)
                     continue;
-                if(!isset($users[$order->user_id]))
+                if (!isset($users[$order->user_id]))
                     continue;
                 if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders)
                     continue;
@@ -112,7 +113,8 @@ class StatisticController extends Controller
                 'productNumber' => $productNumber,
             ]);
 
-        } elseif ($request->base == 'safirBase') {
+        }
+        if ($request->base == 'safirBase') {
             foreach ($users as $id => $user) {
                 $users[$id]->orderNumber = 0;
                 $users[$id]->totalSale = 0;
@@ -138,7 +140,8 @@ class StatisticController extends Controller
                 'orderNumber' => $orderNumber,
             ]);
 
-        } elseif ($request->base == 'customerBase') {
+        }
+        if ($request->base == 'customerBase') {
             if ($statistic)
                 $customers = Customer::all()->keyBy('id');
             else
@@ -170,9 +173,10 @@ class StatisticController extends Controller
                 'customers' => $customers,
                 'orderNumber' => $orderNumber,
             ]);
-        } elseif ($request->base == 'paymentBase') {
+        }
+        if ($request->base == 'paymentBase') {
             $paymentMethods = [];
-            $orders = $orders->with(['website','user'])->get();
+            $orders = $orders->with(['website', 'user'])->get();
             foreach ($orders as $order) {
                 if ($order->website && !$request->siteOrders)
                     continue;
@@ -198,7 +202,8 @@ class StatisticController extends Controller
                 'paymentMethods' => $paymentMethods,
                 'orderNumber' => $orderNumber,
             ]);
-        } elseif ($request->base == 'depositBase') {
+        }
+        if ($request->base == 'depositBase') {
             $deposits = CustomerTransaction::where([
                 ['verified', 'approved'],
                 ['created_at', '>', $request->from],
@@ -234,6 +239,42 @@ class StatisticController extends Controller
                 'users' => $users,
                 'orderNumber' => $orderNumber,
                 'customers' => $customers,
+            ]);
+        }
+        if ($request->base == 'cityBase') {
+            $cities = City::all()->keyBy('id');
+            if ($statistic)
+                $customers = Customer::all()->keyBy('id');
+            else
+                $customers = $user->customers->keyBy('id');
+            foreach ($cities as $id => $city) {
+                $city->orderNumber = 0;
+                $city->totalSale = 0;
+            }
+            $orders = $orders->with('website', 'customer')->get();
+            foreach ($orders as $order) {
+                if ($order->website )
+                    continue;
+                if (!$order->website && $users[$order->user_id]->safir() )
+                    continue;
+                if ($users[$order->user_id]->admin() && !$request->adminOrders)
+                    continue;
+                if (!$order->customer)
+                    continue;
+                $id = $order->customer->city_id;
+                $cities[$id]->orderNumber++;
+                $cities[$id]->totalSale += $order->total;
+                $orderNumber++;
+                $totalSale += $order->total;
+            }
+            $request->siteOrders = null;
+            $request->safirOrders = null;
+            return view('statistic', [
+                'totalSale' => $totalSale,
+                'request' => $request,
+                'users' => $users,
+                'cities' => $cities,
+                'orderNumber' => $orderNumber,
             ]);
         }
     }

@@ -76,6 +76,9 @@
         <label for="depositBase">بر اساس ثبت واریزی</label>
         <input type="radio" name="base" value="depositBase" id="depositBase"
                class="checkboxradio" @checked($request->base=='depositBase')>
+        <label for="cityBase">بر اساس شهر</label>
+        <input type="radio" name="base" value="cityBase" id="cityBase"
+               class="checkboxradio" @checked($request->base=='cityBase')>
         <br>
         <input class="btn btn-success m-3" type="submit" value="اعمال فیلتر">
     </form>
@@ -211,6 +214,31 @@
                         <td>{{$users[$customer->user_id]->name}}</td>
                         <td>{{number_format($customer->total)}}</td>
                         <td>{{$customer->number}}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        @endif
+        @if($request->base=='cityBase')
+            <br>
+            <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
+            <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
+            <br>
+
+            <table class="table table-striped" id="statistic-table">
+                <thead>
+                <tr>
+                    <th>نام شهر</th>
+                    <th>تعداد فروش</th>
+                    <th>مبلغ کل(ریال)</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($cities as $city)
+                    <tr>
+                        <td>{{$city->name}}</td>
+                        <td>{{$city->orderNumber}}</td>
+                        <td>{{number_format($city->totalSale)}}</td>
                     </tr>
                 @endforeach
                 </tbody>
