@@ -255,13 +255,13 @@ class StatisticController extends Controller
             }
             $orders = $orders->with('website', 'customer')->get();
             foreach ($orders as $order) {
+                if (!$order->customer)
+                    continue;
                 if ($order->website && !$request->siteOrders)
                     continue;
                 if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders)
                     continue;
                 if ($users[$order->user_id]->admin() && !$request->adminOrders)
-                    continue;
-                if (!$order->customer)
                     continue;
                 $id = $order->customer->city_id;
                 $cities[$id]->orderNumber++;
