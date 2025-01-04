@@ -158,13 +158,13 @@ class StatisticController extends Controller
             }
             $orders = $orders->with('website', 'customer')->get();
             foreach ($orders as $order) {
+                if (!$order->customer || (isset($request->city) && $order->customer->city_id != $request->city))
+                    continue;
                 if ($order->website && !$request->siteOrders)
                     continue;
                 if (!$order->website && $users[$order->user_id]->safir() && !$request->safirOrders)
                     continue;
                 if ($users[$order->user_id]->admin() && !$request->adminOrders)
-                    continue;
-                if (!$order->customer || (isset($request->city) && $order->customer->city_id != $request->city))
                     continue;
                 $id = $order->customer_id;
                 $customers[$id]->orderNumber++;
