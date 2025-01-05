@@ -40,10 +40,11 @@
         @if(auth()->user()->meta('showAllOrders'))
             <br>
             <br>
-            <x-checkbox :id="'safirOrders'" :checked="true">سفیران</x-checkbox>
-            <x-checkbox :id="'siteOrders'" :checked="true">سایت ها</x-checkbox>
-            <x-checkbox :id="'adminOrders'" :checked="true">فروشگاه ها</x-checkbox>
+            <x-checkbox :id="'safirOrders'" checked>سفیران</x-checkbox>
+            <x-checkbox :id="'siteOrders'" checked>سایت ها</x-checkbox>
+            <x-checkbox :id="'adminOrders'" checked>فروشگاه ها</x-checkbox>
             <x-checkbox :id="'COD'">پرداخت در محل</x-checkbox>
+            <x-checkbox :id="'refund'">بازگشت به انبار</x-checkbox>
         @endif
         <br>
         <br>

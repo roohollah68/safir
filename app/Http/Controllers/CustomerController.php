@@ -50,7 +50,7 @@ class CustomerController extends Controller
     {
         $user = auth()->user();
         $customer = Customer::with(['orders', 'transactions']);
-        if (!$user->meta('allCustomers') && !$user->meta('editAllCustomers'))
+        if (!$user->meta(['allCustomers','editAllCustomers']))
             $customer = $customer->where('user_id', $user->id);
         $customer = $customer->findOrFail($id);
         $transactions = $customer->transactions->keyBy('id');
@@ -247,7 +247,6 @@ class CustomerController extends Controller
         return view('customer.customersDepositList', [
             'transactions' => CustomerTransaction::with('customer.user')->limit(2000)->orderBy('id', 'desc')->get()->keyBy('id'),
             'users' => User::where('role', '<>', 'user')->where('verified', true)->select('id', 'name')->get(),
-//            'users' => User::where('role', 'admin')->where('verified', true)->select('id', 'name')->get(),
             'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
         ]);
     }

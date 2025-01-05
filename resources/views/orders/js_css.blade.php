@@ -9,7 +9,7 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let showDeleted, printWait, confirmWait, counterWait, proccessWait, sent, COD, user = 'all',
+    let showDeleted, printWait, confirmWait, counterWait, proccessWait, sent, COD, refund, user = 'all',
         warehouseId = 'all';
     let changeOrdersPermit = !!'{{$user->meta('showAllOrders')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
@@ -65,6 +65,8 @@
             if (+warehouseId !== +order.warehouse_id && warehouseId !== 'all')
                 return;
             if (COD && order.paymentMethod !== 'cod' && order.paymentMethod !== 'پرداخت در محل' && order.paymentMethod !== 'onDelivery')
+                return;
+            if(refund && order.total >= 0)
                 return;
             let website = false;
             if (order.user_id === 30 || order.user_id === 32 || order.user_id === 33 || order.user_id === 75)
