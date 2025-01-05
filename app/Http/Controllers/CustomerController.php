@@ -331,11 +331,11 @@ class CustomerController extends Controller
     public function customerSOA($id, Request $request)
     {
         $user = auth()->user();
-        if ($user->meta('allCustomers') || $user->meta('editAllCustomers'))
+        if ($user->meta(['allCustomers' , 'editAllCustomers']))
             $customer = Customer::with(['orders', 'transactions'])->find($id);
         else
             $customer = $user->customers()->with(['orders', 'transactions'])->find($id);
-        $orders = $customer->orders->where('total', '<>', 0)->where('confirm', true);
+        $orders = $customer->orders->where('total', '>', 0)->where('confirm', true);
         $transactions = $customer->transactions;
         $timeDescription = 'همه تراکنش ها';
         if ($request->timeFilter == 'specifiedTime') {

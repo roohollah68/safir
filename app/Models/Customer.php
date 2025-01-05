@@ -84,7 +84,7 @@ class Customer extends Model
             if ($trans->verified == 'approved')
                 $total += $trans->amount;
         foreach ($this->orders as $order)
-            if ($order->confirm)
+            if ($order->confirm && $order->total > 0)
                 $total -= $order->total;
         return $total;
     }

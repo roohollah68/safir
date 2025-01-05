@@ -20,7 +20,7 @@
         <span>آدرس:</span> <b>{{$customer->address}}</b><br>
         <span>کد پستی:</span> <b>{{$customer->zip_code}}</b><br>
         <span class="h3">بدهکاری:</span>
-{{--        <b dir="ltr" class="h3 text-danger">{{number_format($customer->balance)}}</b>--}}
+        {{--        <b dir="ltr" class="h3 text-danger">{{number_format($customer->balance)}}</b>--}}
         <b dir="ltr" class="h3 text-danger">{{number_format($customer->balance())}}</b>
         <span class="h3">ریال</span><br>
         <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب"
@@ -111,7 +111,9 @@
                         </td>
                         <td dir="ltr">{{number_format($order->total)}}</td>
                         <td>
-                            @if($order->payPercent() == 0)
+                            @if($order->total < 0)
+                                <i class="btn btn-info">بازگشت به انبار</i>
+                            @elseif($order->payPercent() == 0)
                                 <i class="btn btn-danger">0 %</i>
                             @elseif($order->payPercent() == 100)
                                 <i class="btn btn-success">100 %</i>
@@ -125,9 +127,12 @@
                             <i class="fa fa-comment btn btn-info" onclick="view_comment({{$id}})"></i>
                             <a class="fa fa-file-invoice-dollar btn btn-secondary"
                                onclick="invoice({{$id}})" title=" فاکتور"></a>
-                            <span class="btn btn-primary fa fa-chain" onclick="showOrderLink({{$id}})"></span>
+                            @if($order->total > 0)
+                                <span class="btn btn-primary fa fa-chain" onclick="showOrderLink({{$id}})"></span>
+                            @endif
                             @if($order->payPercent() < 100)
-                                <a href="/customerDeposit/add/{{$customer->id}}/{{$order->id}}" class="btn btn-outline-warning">پرداخت فاکتور</a>
+                                <a href="/customerDeposit/add/{{$customer->id}}/{{$order->id}}"
+                                   class="btn btn-outline-warning">پرداخت فاکتور</a>
                             @endif
                         </td>
                     </tr>

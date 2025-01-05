@@ -308,8 +308,9 @@ class OrderController extends Controller
         if (+$state == 1 && $order->payPercentApproved() < 100 && ($order->paymentMethod == 'cash' || $order->paymentMethod == 'cheque')) {
             return [$order->state, 'ابتدا پرداخت فاکتور باید تایید شود.'];
         }
+        //if($order->state == 10 && $order->total < 0 )
+            //return [+$order->state, 'خطا'];
         $order->state = +$state;
-
         if ($order->paymentMethod == 'onDelivery') {
             if ($order->state == 1) {
                 $user->balance += $order->customerCost - $order->total;
@@ -336,7 +337,7 @@ class OrderController extends Controller
             $text = 'سفارش به انبار بازگشت';
             foreach ($order->productChange()->get() as $productChange) {
                 $productChange->update(['isDeleted' => true]);
-                $product = $productChange->product;
+                $product = $productChange->product()->withTrashed()->first();
                 if (!$product)
                     continue;
                 $product->update([
@@ -372,8 +373,17 @@ class OrderController extends Controller
                 }
             }
         }
-        if ($order->state == 10)
+        if ($order->state == 10) {
+            // ثبت واریزی بازگشت به انبار
+            if($order->total<0){
+                $order->customer->transactions()->create([
+                    'amount' => -$order->total,
+                    'verified' => 'waiting',
+                    'description' => 'بازگشت به انبار، سفارش: ' . $order->id,
+                ]);
+            }
             $text = 'سفارش ارسال شد';
+        }
         if ($text)
             (new CommentController)->create($order, auth()->user(), $text);
         $order->save();
@@ -481,7 +491,6 @@ class OrderController extends Controller
         }
         $order->confirm = false;
         if ($order->counter == 'approved')
-
             (new CustomerController)->rejectOrder($id, $req);
         $order->customer->update([
             'balance' => $order->customer->balance + $order->total,
@@ -630,6 +639,8 @@ class OrderController extends Controller
         Helper::access('changeOrderState');
         DB::beginTransaction();
         $order = Helper::Order(true)->findOrFail($id);
+        if($order->total < 0)
+            return $order;
         if (!$order->deliveryMethod || $order->isCreatorAdmin())
             $order->deliveryMethod = '';
         if ($req->note)
@@ -644,6 +655,19 @@ class OrderController extends Controller
     public function paymentMethod($id, Request $req)
     {
         $order = Helper::Order(true)->with('customer')->findOrFail($id);
+        if ($order->confirm)
+            return ['error', 'قبلا تایید شده.'];
+        if($order->customer->block)
+            return ['error', 'حساب مشتری مسدود شده است.'];
+        // بازگشت به انبار
+        if($order->total < 0) {
+            $order->update([
+                'confirm' => true,
+                'counter' => 'waiting',
+                'paymentNote' => 'بازگشت به انبار، سفارش: ' . $order->id,
+            ]);
+            return ['ok', $order];
+        }
         request()->validate([
             'paymentMethod' => 'required',
             'cashPhoto' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
@@ -653,10 +677,6 @@ class OrderController extends Controller
         $paymentMethod = $req->paymentMethod;
         $photo = null;
         $payInDate = '';
-        if ($order->confirm)
-            return ['error', 'قبلا تایید شده.'];
-        if($order->customer->block)
-            return ['error', 'حساب مشتری مسدود شده است.'];
         if ($paymentMethod == 'cash') {
             if (!$req->file("cashPhoto"))
                 return ['error', 'باید عکس رسید بانکی بارگذاری شود.'];
@@ -673,7 +693,7 @@ class OrderController extends Controller
             $payInDate = $req->payInDatePersian;
         }
         $order->update([
-            'confirm' => 1,
+            'confirm' => true,
             'paymentMethod' => $paymentMethod,
             'payInDate' => $req->payInDate,
             'paymentNote' => $req->note,

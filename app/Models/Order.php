@@ -135,13 +135,16 @@ class Order extends Model
     {
         if ($this->user->safir())
             return 100;
+        if ($this->total == 0)
+            return 0;
+        if ($this->total < 0)
+            return 100;
         $payLinks = $this->paymentLinks;
         $Total = 0;
         foreach ($payLinks as $payLink) {
             $Total += $payLink->amount;
         }
-        if ($this->total == 0)
-            return 0;
+
         return round($Total / $this->total * 100);
     }
 

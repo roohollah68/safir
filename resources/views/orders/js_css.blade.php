@@ -314,10 +314,25 @@
     @if($user->meta('changeOrderState'))
 
     function selectSendMethod(id) {
-        if (!orders[id].confirm) {
+        let order = orders[id];
+        if (!order.confirm) {
             alert('ابتدا فاکتور باید تایید شود!');
             return;
         }
+        if(order.total < 0){
+            $.post('/set_send_method/' + id,{
+                    _token: token
+                }
+            ).done(function (res) {
+                $.notify("با موفقیت ذخیره شد.", "success");
+                order = res;
+                change_state(id, 10)
+            }).fail(function () {
+                $.notify('خطایی رخ داده است.', 'warn');
+            });
+            return;
+        }
+
         dialog = Dialog(sendMethodText);
 
         $(".checkboxradio").checkboxradio();
@@ -336,7 +351,7 @@
             }).done(function (res) {
                 $.notify("با موفقیت ذخیره شد.", "success");
                 dialog.remove();
-                orders[id] = res;
+                order = res;
                 change_state(id, 10)
             }).fail(function () {
                 $.notify('خطایی رخ داده است.', 'warn');
@@ -354,7 +369,7 @@
         })
             .done(res => {
                 orders[id].state = +res[0];
-                $.notify(res[1],'info');
+                $.notify(res[1], 'info');
                 $('#view_order_' + id).parent().html(operations(orders[id]));
                 $('#state_' + id).parent().html(createdTime(orders[id]));
                 $('#orderCondition_' + id).html(orderCondition(orders[id]));
@@ -402,8 +417,28 @@
     @if($admin || $superAdmin)
 
     function selectPayment(id) {
-        if (orders[id].confirm)
+        let order = orders[id]
+        if (order.confirm)
             return
+        // بازگشت به انبار
+        if (order.total < 0) {
+            $.post('/orders/paymentMethod/' + id, {
+                _token: token
+            }).done(function (res) {
+                if (res[0] === "error")
+                    $.notify(res[1], 'warn');
+                else if (res[0] === "ok") {
+                    $.notify("با موفقیت ذخیره شد.", "success");
+                    order = res[1];
+                    $('#view_order_' + id).parent().html(operations(order));
+                    $('#state_' + id).parent().html(createdTime(order));
+                    $('#orderCondition_' + id).html(orderCondition(order));
+                }
+            }).fail(function () {
+                $.notify('خطایی رخ داده است.', 'warn');
+            });
+            return;
+        }
         dialog = Dialog(payMethodText);
 
         $(".checkboxradio").checkboxradio();
@@ -431,10 +466,10 @@
                 else if (res[0] === "ok") {
                     $.notify("با موفقیت ذخیره شد.", "success");
                     dialog.remove();
-                    orders[id] = res[1];
-                    $('#view_order_' + id).parent().html(operations(orders[id]));
-                    $('#state_' + id).parent().html(createdTime(orders[id]));
-                    $('#orderCondition_' + id).html(orderCondition(orders[id]));
+                    order = res[1];
+                    $('#view_order_' + id).parent().html(operations(order));
+                    $('#state_' + id).parent().html(createdTime(order));
+                    $('#orderCondition_' + id).html(orderCondition(order));
                 }
             }).fail(function () {
                 $.notify('خطایی رخ داده است.', 'warn');
