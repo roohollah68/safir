@@ -11,7 +11,7 @@
             {{number_format($total)}}
         </span><span class="h5">ریال</span><br><br>
         <a class="btn btn-warning m-3" href="/customerPaymentTracking">پیگیری پرداختی مشتریان</a>
-        @if(auth()->user()->meta('allCustomers') || auth()->user()->meta('editAllCustomers'))
+        @if($viewAllAuth)
             <form method="get" action="">
                 <div class="col-md-6">
                     <div class="form-group input-group required">
@@ -53,7 +53,7 @@
                     <th>آدرس</th>
                     <th>کد پستی</th>
                 @endif
-                @if(auth()->user()->meta('allCustomers') || auth()->user()->meta('editAllCustomers'))
+                @if($viewAllAuth)
                     <th>کاربر مرتبط</th>
                 @endif
                 <th>عملیات</th>
@@ -83,7 +83,7 @@
                         <td>{{$customer->zip_code}}</td>
                     @endif
 
-                    @if(auth()->user()->meta('allCustomers') || auth()->user()->meta('editAllCustomers'))
+                    @if($viewAllAuth)
                         <th>{{$customer->user->name}}</th>
                     @endif
 
@@ -93,7 +93,7 @@
                         @if(!$safir)
                             <a class="btn btn-info fa fa-file-invoice" title="تراکنش ها"
                                href="/customer/transaction/{{$customer->id}}"></a>
-                            @if(auth()->user()->meta('allCustomers') || auth()->user()->meta('editAllCustomers'))
+                            @if($viewAllAuth)
                                 @if($customer->trust)
                                     <span class="btn btn-success fa fa-check"
                                           onclick="changeTrust({{$customer->id}} , this)"

@@ -23,8 +23,9 @@ class CustomerController extends Controller
     public function customersList(Request $req)
     {
         $user = auth()->user();
+        $viewAllAuth = $user->meta(['allCustomers' , 'editAllCustomers']);
         $customers = Customer::with(['user', 'orders', 'transactions']);
-        if ($user->meta('allCustomers') || $user->meta('editAllCustomers')) {
+        if ($viewAllAuth) {
             if ($req->user)
                 $customers = $customers->where('user_id', $req->user);
         } else
@@ -41,6 +42,7 @@ class CustomerController extends Controller
             'customers' => $customers,
             'total' => $total,
             'users' => User::where('role', 'admin')->where('verified', true)->get()->keyBy('id'),
+            'viewAllAuth' => $viewAllAuth,
         ]);
     }
 
@@ -331,7 +333,7 @@ class CustomerController extends Controller
     public function customerSOA($id, Request $request)
     {
         $user = auth()->user();
-        if ($user->meta(['allCustomers' , 'editAllCustomers']))
+        if ($user->meta(['allCustomers', 'editAllCustomers']))
             $customer = Customer::with(['orders', 'transactions'])->find($id);
         else
             $customer = $user->customers()->with(['orders', 'transactions'])->find($id);
