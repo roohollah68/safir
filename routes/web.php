@@ -16,6 +16,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TelegramController;
 use App\Http\Controllers\WithdrawalController;
+use App\Livewire\Counter;
 use App\Models\Product;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
@@ -185,9 +186,6 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
 
 Route::post('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteOrder']);
 Route::get('/backup', [TelegramController::class, 'backUpDatabase']);
-
-
-
 
 
 require __DIR__ . '/auth.php';

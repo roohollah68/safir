@@ -14,7 +14,6 @@
         "hekmatinasser/verta": "^8.4",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
-        "livewire/livewire": "^3.5",
         "nunomaduro/collision": "^8.1"
     },
     "config": {
