@@ -7,6 +7,7 @@
     <span>کاربر ثبت کننده:</span> <b>{{$withdrawal->user->name}}</b> <br>
     <span>مبلغ درخواستی:</span> <b>{{number_format($withdrawal->amount)}}</b> <br>
     <span>بابت:</span> <b>{{$withdrawal->expense}}</b> <br>
+    <span>مکان درخواست:</span> <b>{{config('withdrawalLocation')[$withdrawal->location]}}</b> <br>
     <span>توضیحات کاربر:</span> <b>{{$withdrawal->user_desc}}</b> <br>
     <span>روش پرداخت:</span> <b>{{$withdrawal->pay_method=='cash'?'نقدی':'چکی'}}</b> <br>
     <span>صاحب حساب یا دریافت کنند چک:</span> <b>{{$withdrawal->account_name}}</b> <br>

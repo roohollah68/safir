@@ -42,6 +42,7 @@ class WithdrawalController extends Controller
             'expense_desc' => $req->expense_desc,
             'official' => $req->official,
             'vat' => $req->vat,
+            'location' => $req->location,
         ]);
         if ($req->file("user_file")) {
             $withdrawal->user_file = $req->file("user_file")->store("", 'withdrawal');
@@ -98,6 +99,7 @@ class WithdrawalController extends Controller
             $withdrawal->update([
                 'amount' => +str_replace(",", "", $req->amount),
                 'expense' => $req->expense,
+                'location' => $req->location,
                 'user_desc' => $req->user_desc,
                 'account_number' => $req->account_number,
                 'account_name' => $req->account_name,

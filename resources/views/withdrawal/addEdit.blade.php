@@ -56,6 +56,8 @@
     <form action="" method="post" enctype="multipart/form-data">
         @csrf
         <div class="row my-4">
+
+            {{--            مبلغ--}}
             <div class="col-md-6 my-2">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
@@ -69,6 +71,7 @@
                 </div>
             </div>
 
+            {{--            بابت--}}
             <div class="col-md-6 my-2">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
@@ -79,6 +82,23 @@
                 </div>
             </div>
 
+            {{--            نوع هزینه--}}
+            <div class="col-md-6 my-2">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="location" class="input-group-text w-100">مکان درخواست:</label>
+                    </div>
+                    <select name="location" id="location">
+                        @foreach(config('withdrawalLocation') as $id => $location)
+                            <option value="{{$id}}" @selected((old('location')?:$withdrawal->location) == $id)>
+                                {{$location}}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            {{--            روش پرداخت--}}
             <div class="col-md-6 my-2">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
@@ -97,6 +117,7 @@
                 </div>
             </div>
 
+            {{--            نام صاحب حساب--}}
             <div class="col-md-6 my-2">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
@@ -107,6 +128,7 @@
                 </div>
             </div>
 
+            {{--            شماره شبا یا کارت--}}
             <div class="col-md-6 my-2 cash">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
@@ -117,6 +139,7 @@
                 </div>
             </div>
 
+            {{--            کد ملی یا شناسه ملی--}}
             <div class="col-md-6 my-2 cheque">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
@@ -127,6 +150,7 @@
                 </div>
             </div>
 
+            {{--            تاریخ چک--}}
             <div class="col-md-6 my-2 cheque">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
@@ -137,6 +161,7 @@
                 </div>
             </div>
 
+            {{--            دسته هزینه--}}
             <div class="col-md-6 my-2">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
@@ -154,6 +179,7 @@
                 </div>
             </div>
 
+            {{--            نوع هزینه--}}
             <div class="col-md-6 my-2">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
@@ -163,6 +189,7 @@
                 </div>
             </div>
 
+            {{--            نوع فاکتور--}}
             <div class="col-md-6 my-2">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
@@ -178,6 +205,8 @@
                            onclick="$('.VAT').hide()">
                 </div>
             </div>
+
+            {{--            ارزش افزوده(10%)--}}
             <div class="col-md-6 my-2 VAT hide">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
@@ -191,6 +220,8 @@
                            value="0" @checked((old('vat')?:$withdrawal->vat)!=1)>
                 </div>
             </div>
+
+            {{--            توضیحات--}}
             <div class="col-md-6 my-2">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
@@ -202,6 +233,7 @@
             </div>
         </div>
 
+        {{--        ارسال فایل توضیحات--}}
         <input type="hidden" id="old_user_file" name="old_user_file" value="{{$withdrawal->user_file}}">
         <div class="col-md-6 {{$withdrawal->user_file?'hide':''}}" id="newFile">
             <div class="form-group input-group ">

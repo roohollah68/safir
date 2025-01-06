@@ -14,6 +14,7 @@ class Withdrawal extends Model
         'user_id',
         'amount',
         'expense',
+        'location',
         'user_desc',
         'user_file',
         'account_number',
