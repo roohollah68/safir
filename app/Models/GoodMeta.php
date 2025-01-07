@@ -12,6 +12,7 @@ class GoodMeta extends Model
         'warehouse_code',
         'stuff_code',
         'added_value',
+        'supplier_inf',
     ];
     public $timestamps = false;
 

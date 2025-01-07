@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helper\Helper;
 use App\Models\Good;
+use App\Models\GoodMeta;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductChange;
@@ -65,11 +66,17 @@ class ProductController extends Controller
             'price' => 'required',
         ]);
 
-        Good::create([
+        $good = Good::create([
             'name' => $req->name,
             'price' => $req->price,
             'productPrice' => $req->PPrice,
             'category' => $req->category,
+        ]);
+
+        GoodMeta::updateOrCreate([
+            'good_id' => $good->id,
+        ],[
+            'supplier_inf' => $req->supplier_inf,
         ]);
 
         return redirect()->route('productList');
@@ -110,6 +117,13 @@ class ProductController extends Controller
         $product->save();
         $good->save();
 
+
+        $goodmeta = GoodMeta::updateOrCreate([
+            'good_id' => $good->id,
+        ],[
+            'supplier_inf' => $req->supplier_inf,
+        ]);
+//        dd($goodmeta);
         if ($productChange->change != 0)
             $productChange->save();
         DB::commit();

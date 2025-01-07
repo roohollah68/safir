@@ -26,13 +26,18 @@ class Good extends Model
         return $this->hasMany(Product::class);
     }
 
-    public function goodMetas()
+    public function goodMeta()
     {
-        return $this->hasMany(GoodMeta::class);
+        return $this->hasone(GoodMeta::class);
     }
 
     public function couponLinks()
     {
         return $this->hasMany(CouponLink::class);
+    }
+
+    public function getSupplier_infAttribute()
+    {
+        return $this->goodMeta()->first()->supplier_inf;
     }
 }

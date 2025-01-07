@@ -15,7 +15,6 @@
         <h4 class="">تعداد موجود در انبار
             {{+$product->quantity}}
         </h4>
-
         <a class="btn btn-danger" href="{{route('productList')}}">بازگشت</a>
         <hr>
     @endif
@@ -60,22 +59,22 @@
                 </div>
             </div>
             @if($edit)
-            {{--مکان انبار--}}
-            <div class="col-md-6">
-                <div class="form-group input-group">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label for="warehouse" class="input-group-text w-100">مکان انبار:</label>
-                    </div>
-                    <select name="warehouse" id="warehouse" class="form-control" disabled>
-                        @foreach($warehouses as $warehouse)
-                            <option value="{{$warehouse->id}}"
+                {{--مکان انبار--}}
+                <div class="col-md-6">
+                    <div class="form-group input-group">
+                        <div class="input-group-append" style="min-width: 160px">
+                            <label for="warehouse" class="input-group-text w-100">مکان انبار:</label>
+                        </div>
+                        <select name="warehouse" id="warehouse" class="form-control" disabled>
+                            @foreach($warehouses as $warehouse)
+                                <option value="{{$warehouse->id}}"
                                     @selected($product->warehouse_id == $warehouse->id) >{{$warehouse->name}}</option>
-                        @endforeach
-                    </select>
+                            @endforeach
+                        </select>
 
+                    </div>
                 </div>
-            </div>
-            {{--اصلاح موجودی--}}
+                {{--اصلاح موجودی--}}
 
                 <div class="col-md-6 my-2">
                     <div class="form-group input-group">
@@ -104,27 +103,27 @@
                     </div>
                 </div>
 
-            <div class="col-md-6 my-2">
-                <div class="form-group input-group">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label for="alarm" class="input-group-text w-100">حد پایین:</label>
+                <div class="col-md-6 my-2">
+                    <div class="form-group input-group">
+                        <div class="input-group-append" style="min-width: 160px">
+                            <label for="alarm" class="input-group-text w-100">حد پایین:</label>
+                        </div>
+                        <input type="number" id="alarm" class="form-control" name="alarm"
+                               value="{{$product->alarm?:0}}"
+                               required>
+
                     </div>
-                    <input type="number" id="alarm" class="form-control" name="alarm"
-                           value="{{$product->alarm?:0}}"
-                           required>
 
-                </div>
+                    <div class="form-group input-group">
+                        <div class="input-group-append" style="min-width: 160px">
+                            <label for="high_alarm" class="input-group-text w-100">حد بالا:</label>
+                        </div>
+                        <input type="number" id="high_alarm" class="form-control" name="high_alarm"
+                               value="{{$product->high_alarm?:100}}"
+                               required>
 
-                <div class="form-group input-group">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label for="high_alarm" class="input-group-text w-100">حد بالا:</label>
                     </div>
-                    <input type="number" id="high_alarm" class="form-control" name="high_alarm"
-                           value="{{$product->high_alarm?:100}}"
-                           required>
-
                 </div>
-            </div>
             @endif
 
             {{--دسته بندی محصول--}}
@@ -139,18 +138,29 @@
 
                 </div>
             </div>
-            @if($edit)
-            {{--وضعیت موجودی--}}
-            <div class="col-md-6">
-                <div>
-                    <input type="radio" id="available" name="available" value="true" @checked($product->available)>
-                    <label for="available">موجود</label>
 
-                    <input type="radio" id="notavailable" name="available" value="false" @checked(!$product->available)>
-                    <label id="navailable" for="notavailable">نا موجود</label>
-
+            {{--اطلاعات فروشنده--}}
+            <div class="col-md-6 bg-light">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="supplier_inf">اطلاعات فروشنده:</label>
+                    </div>
+                    <textarea name="supplier_inf" class="form-control" id="supplier_inf">{{old('supplier_inf')?:$good->goodMeta->supplier_inf}}</textarea>
                 </div>
             </div>
+            @if($edit)
+                {{--وضعیت موجودی--}}
+                <div class="col-md-6">
+                    <div>
+                        <input type="radio" id="available" name="available" value="true" @checked($product->available)>
+                        <label for="available">موجود</label>
+
+                        <input type="radio" id="notavailable" name="available"
+                               value="false" @checked(!$product->available)>
+                        <label id="navailable" for="notavailable">نا موجود</label>
+
+                    </div>
+                </div>
             @endif
             {{--تصویر محصول--}}
             {{--
@@ -215,7 +225,8 @@
                                   onclick="deleteRecord({{$productChange->id}})"></span>
                         @endif
                         @if($productChange->order_id)
-                            <i id="view_order_{{$productChange->order_id}}" class="fa fa-eye btn btn-info" onclick="view_order({{$productChange->order_id}})"></i>
+                            <i id="view_order_{{$productChange->order_id}}" class="fa fa-eye btn btn-info"
+                               onclick="view_order({{$productChange->order_id}})"></i>
                         @endif
                     </td>
                 </tr>
