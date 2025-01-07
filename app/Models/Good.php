@@ -36,8 +36,11 @@ class Good extends Model
         return $this->hasMany(CouponLink::class);
     }
 
-    public function getSupplier_infAttribute()
+    public function Supplier_inf()
     {
-        return $this->goodMeta()->first()->supplier_inf;
+        if($this->goodMeta)
+            return $this->goodMeta->supplier_inf;
+        else
+            return null;
     }
 }

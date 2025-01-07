@@ -145,7 +145,7 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="supplier_inf">اطلاعات فروشنده:</label>
                     </div>
-                    <textarea name="supplier_inf" class="form-control" id="supplier_inf">{{old('supplier_inf')?:$good->goodMeta->supplier_inf}}</textarea>
+                    <textarea name="supplier_inf" class="form-control" id="supplier_inf">{{old('supplier_inf')?:$good->Supplier_inf()}}</textarea>
                 </div>
             </div>
             @if($edit)
