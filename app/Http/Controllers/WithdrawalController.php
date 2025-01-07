@@ -149,11 +149,15 @@ class WithdrawalController extends Controller
         if($req->official == '1'){
             $withdrawals = $withdrawals->where('official' , 1);
         }
+        if(isset($req->Location)){
+            $withdrawals = $withdrawals->where('location' , $req->Location);
+        }
         return view('withdrawal.list', [
             'withdrawals' => $withdrawals->get()->keyBy('id'),
             'user' => $user,
             'filter' => $req->filter,
             'official' => $req->official,
+            'Location' => $req->Location,
         ]);
     }
 

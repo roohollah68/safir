@@ -8,14 +8,28 @@
     <a class="btn btn-info" href="{{route('addWithdrawal')}}">ثبت درخواست وجه جدید</a>
     <br>
     <br>
-    <a class="btn btn-{{(is_null($filter) && is_null($official))?'':'outline-'}}primary" href="/Withdrawal/list">همه</a>
-    <a class="btn btn-{{$filter=='counter'?'':'outline-'}}primary" href="?filter=counter">منتظر تایید حسابدار</a>
-    <a class="btn btn-{{$filter=='manager'?'':'outline-'}}primary" href="?filter=manager">منتظر تایید مدیر</a>
-    <a class="btn btn-{{$filter=='payment'?'':'outline-'}}primary" href="?filter=payment">منتظر واریز</a>
-    <a class="btn btn-{{$filter=='paid'?'':'outline-'}}primary" href="?filter=paid">پرداخت شده</a>
+    @php
+    $F = is_null($filter)?'':'&filter='.$filter;
+    $O = is_null($official)?'':'&official='.$official;
+    $L = is_null($Location)?'':'&Location='.$Location;
+     @endphp
+    <div class="my-1">
+    <a class="btn btn-{{(is_null($filter) && is_null($official) && is_null($Location))?'':'outline-'}}primary" href="/Withdrawal/list">همه</a>
+    <a class="btn btn-{{$filter=='counter'?'':'outline-'}}primary" href="?filter=counter{{$O.$L}}">منتظر تایید حسابدار</a>
+    <a class="btn btn-{{$filter=='manager'?'':'outline-'}}primary" href="?filter=manager{{$O.$L}}">منتظر تایید مدیر</a>
+    <a class="btn btn-{{$filter=='payment'?'':'outline-'}}primary" href="?filter=payment{{$O.$L}}">منتظر واریز</a>
+    <a class="btn btn-{{$filter=='paid'?'':'outline-'}}primary" href="?filter=paid{{$O.$L}}">پرداخت شده</a>
+    </div>
     <br>
-    <a class="btn btn-{{$official=='1'?'':'outline-'}}primary" href="?official=1">رسمی</a>
-    <a class="btn btn-{{$official=='0'?'':'outline-'}}primary" href="?official=0">غیر رسمی</a>
+    <a class="btn btn-{{$official=='1'?'':'outline-'}}primary" href="?official=1{{$F.$L}}">رسمی</a>
+    <a class="btn btn-{{$official=='0'?'':'outline-'}}primary" href="?official=0{{$F.$L}}">غیر رسمی</a>
+    <span class="mx-4"></span>
+    @foreach(config('withdrawalLocation') as $id => $location)
+        @continue($id == 0)
+        <a class="btn btn-{{$Location==$id?'':'outline-'}}primary" href="?Location={{$id}}{{$F.$O}}">
+            {{$location}}
+        </a>
+    @endforeach
     <br>
     <br>
     <table class="table table-striped" id="withdrawal-table">

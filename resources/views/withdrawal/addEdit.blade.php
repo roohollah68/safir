@@ -82,7 +82,7 @@
                 </div>
             </div>
 
-            {{--            نوع هزینه--}}
+            {{--            مکان درخواست--}}
             <div class="col-md-6 my-2">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
