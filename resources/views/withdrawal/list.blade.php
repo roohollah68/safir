@@ -18,7 +18,8 @@
     <a class="btn btn-{{$filter=='counter'?'':'outline-'}}primary" href="?filter=counter{{$O.$L}}">منتظر تایید حسابدار</a>
     <a class="btn btn-{{$filter=='manager'?'':'outline-'}}primary" href="?filter=manager{{$O.$L}}">منتظر تایید مدیر</a>
     <a class="btn btn-{{$filter=='payment'?'':'outline-'}}primary" href="?filter=payment{{$O.$L}}">منتظر واریز</a>
-    <a class="btn btn-{{$filter=='paid'?'':'outline-'}}primary" href="?filter=paid{{$O.$L}}">پرداخت شده</a>
+    <a class="btn btn-{{$filter=='recipient'?'':'outline-'}}primary" href="?filter=recipient{{$O.$L}}">منتظر دریافت</a>
+    <a class="btn btn-{{$filter=='complete'?'':'outline-'}}primary" href="?filter=complete{{$O.$L}}">تکمیل شده</a>
     </div>
     <br>
     <a class="btn btn-{{$official=='1'?'':'outline-'}}primary" href="?official=1{{$F.$L}}">رسمی</a>
@@ -44,6 +45,7 @@
             <th>حسابدار</th>
             <th>مدیر</th>
             <th>واریز</th>
+            <th>دریافت</th>
             <th>عملیات</th>
         </tr>
         </thead>
@@ -61,6 +63,7 @@
                 <td>{!! $withdrawal->counter_status() !!}</td>
                 <td>{!! $withdrawal->manager_status() !!}</td>
                 <td>{!! $withdrawal->payment_status() !!}</td>
+                <td>{!! $withdrawal->recipient_status() !!}</td>
                 <td>
                     <span class="fa fa-eye btn btn-info" onclick="view_withdrawal({{$id}})"
                           title="مشاهده"></span>
@@ -142,7 +145,7 @@
         @if(auth()->user()->id == 122)
         function manager_form(id) {
             withdrawal = withdrawals[id]
-            if (withdrawal.payment_confirm == 1)
+            if (withdrawal.payment_confirm == 1 || withdrawal.counter_confirm != 1)
                 return;
             let dialog = Dialog(`
             <div title="بررسی مدیر" class="dialogs">
@@ -180,7 +183,7 @@
         @if(auth()->user()->meta('withdrawalPay'))
         function payment_form(id) {
             withdrawal = withdrawals[id]
-            if (withdrawal.manager_confirm != 1)
+            if (withdrawal.manager_confirm != 1 || withdrawal.recipient_confirm == 1)
                 return;
             let dialog = Dialog(`
             <div title="ثبت اطلاعات پرداخت" class="dialogs">
@@ -232,6 +235,44 @@
             if(withdrawal.payment_file3){
                 $('#payment_file_old3').show();
             }
+        }
+        @endif
+
+        @if(auth()->user()->meta('withdrawalRecipient'))
+        function recipient_form(id) {
+            withdrawal = withdrawals[id]
+            if (withdrawal.payment_confirm != 1)
+                return;
+            let dialog = Dialog(`
+            <div title="ثبت اطلاعات دریافت کالا یا خدمات" class="dialogs">
+<form method="post" action="/withdrawal/recipientForm/${id}" enctype="multipart/form-data">
+@csrf
+            <span>تغییر وضعیت:</span>
+
+            <label class="btn btn-success" for="approved">تائید</label>
+            <input type="radio" name="recipient_confirm" value="1" id="approved" class="checkboxradio">
+
+            <label class="btn btn-info" for="waiting">بررسی</label>
+            <input type="radio" name="recipient_confirm" value="0" id="waiting" class="checkboxradio">
+
+            <label class="btn btn-danger" for="reject">عدم تائید</label>
+            <input type="radio" name="recipient_confirm" value="-1" id="reject" class="checkboxradio">
+
+            <br>
+            <br>
+
+            <label for="recipient_desc">توضیحات</label><br>
+            <textarea name="recipient_desc" id="recipient_desc" rows="3" class="w-100">${withdrawal.recipient_desc || ''}</textarea>
+
+<br>
+<br>
+
+<input class="btn btn-success" type="submit" value="ذخیره" selected>
+</form>
+</div>
+            `);
+            $('.checkboxradio').checkboxradio();
+            $(`input[value=${withdrawal.recipient_confirm}]`).click();
         }
         @endif
 

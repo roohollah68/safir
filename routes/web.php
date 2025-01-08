@@ -174,6 +174,7 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
     Route::post('/withdrawal/counterForm/{id}', [WithdrawalController::class, 'counter']);
     Route::post('/withdrawal/managerForm/{id}', [WithdrawalController::class, 'manager']);
     Route::post('/withdrawal/paymentForm/{id}', [WithdrawalController::class, 'payment']);
+    Route::post('/withdrawal/recipientForm/{id}', [WithdrawalController::class, 'recipient']);
 
     ///PROGRAMMER
     Route::get('/clear/route', [SettingController::class, 'clearRoute']);

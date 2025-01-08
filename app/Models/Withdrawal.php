@@ -36,6 +36,8 @@ class Withdrawal extends Model
         'payment_file',
         'payment_file2',
         'payment_file3',
+        'recipient_desc',
+        'recipient_confirm',
     ];
 
     public function user()
@@ -79,6 +81,20 @@ class Withdrawal extends Model
         elseif ($this->payment_confirm == 0)
             return "<span class='btn btn-info' {$action}>در حال انجام</span>";
         elseif ($this->payment_confirm == 1)
+            return "<span class='btn btn-success' {$action}>تایید</span>";
+        return '<span class="btn btn-warning">خطا</span>';
+    }
+
+    public function recipient_status()
+    {
+        if($this->payment_confirm != 1)
+            return '';
+        $action = "onclick='recipient_form({$this->id})'";
+        if($this->recipient_confirm == -1)
+            return "<span class='btn btn-danger' {$action}>رد شده</span>";
+        elseif ($this->recipient_confirm == 0)
+            return "<span class='btn btn-info' {$action}>بررسی</span>";
+        elseif ($this->recipient_confirm == 1)
             return "<span class='btn btn-success' {$action}>تایید</span>";
         return '<span class="btn btn-warning">خطا</span>';
     }

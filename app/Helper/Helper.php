@@ -69,7 +69,7 @@ class Helper
     {
         $user = auth()->user();
         $orders = Order::withTrashed();
-        if ((!$edit && ($user->meta('showAllOrders') || $user->meta('counter'))) || $user->meta('editAllOrders'))
+        if ((!$edit && $user->meta(['showAllOrders','counter'])) || $user->meta('editAllOrders'))
             return $orders;
         else
             return $orders->where(function ($query) {

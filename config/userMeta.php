@@ -24,6 +24,7 @@ return [
         'workReport' => 'مشاهده گزارش کار همه',
         'withdrawal' => 'افزودن درخواست واریز',
         'withdrawalPay' => 'ثبت رسید پرداخت درخواست واریز',
+        'withdrawalRecipient' => 'ثبت دریافت کالا و خدمات بعد از واریز',
         'allWithdrawal' => 'مشاهده همه درخواستهای واریز',
     ],
 //    'usersEdit' => false,

@@ -140,8 +140,11 @@ class WithdrawalController extends Controller
         if($req->filter == 'payment'){
             $withdrawals = $withdrawals->where('payment_confirm' , '<>' , 1)->where('manager_confirm' , 1);
         }
-        if($req->filter == 'paid'){
-            $withdrawals = $withdrawals->where('payment_confirm' , 1);
+        if($req->filter == 'recipient'){
+            $withdrawals = $withdrawals->where('recipient_confirm' , '<>' , 1)->where('payment_confirm' , 1);
+        }
+        if($req->filter == 'complete'){
+            $withdrawals = $withdrawals->where('recipient_confirm' , 1);
         }
         if($req->official == '0'){
             $withdrawals = $withdrawals->where('official' , 0);
@@ -166,12 +169,12 @@ class WithdrawalController extends Controller
         Helper::access('counter');
         $withdrawal = Withdrawal::findOrFail($id);
         $withdrawal->counter_confirm = $req->counter_confirm;
+        $withdrawal->manager_confirm = 0;
         $withdrawal->counter_desc = $req->counter_desc;
         $withdrawal->bank = $req->bank;
         $withdrawal->save();
-        return redirect(route('WithdrawalList'));
+        return redirect()->back();
     }
-
 
     public function manager($id , Request $req)
     {
@@ -180,9 +183,10 @@ class WithdrawalController extends Controller
             abort(401);
         $withdrawal = Withdrawal::findOrFail($id);
         $withdrawal->manager_confirm = $req->manager_confirm;
+        $withdrawal->payment_confirm = 0;
         $withdrawal->manager_desc = $req->manager_desc;
         $withdrawal->save();
-        return redirect(route('WithdrawalList'));
+        return redirect()->back();
     }
 
     public function payment($id , Request $req)
@@ -196,6 +200,7 @@ class WithdrawalController extends Controller
         ]);
         $withdrawal = Withdrawal::findOrFail($id);
         $withdrawal->payment_confirm = $req->payment_confirm;
+        $withdrawal->recipient_confirm = 0;
         $withdrawal->payment_desc = $req->payment_desc;
         if($req->file('payment_file'))
             $withdrawal->payment_file = $req->file("payment_file")->store("", 'withdrawal');
@@ -204,9 +209,19 @@ class WithdrawalController extends Controller
         if($req->file('payment_file3'))
             $withdrawal->payment_file3 = $req->file("payment_file3")->store("", 'withdrawal');
         $withdrawal->save();
-        return redirect(route('WithdrawalList'));
+        return redirect()->back();
     }
 
+    public function recipient($id , Request $req)
+    {
+        $user = auth()->user();
+        Helper::access('withdrawalRecipient');
+        $withdrawal = Withdrawal::findOrFail($id);
+        $withdrawal->recipient_confirm = $req->recipient_confirm;
+        $withdrawal->recipient_desc = $req->recipient_desc;
+        $withdrawal->save();
+        return redirect()->back();
+    }
     public function view($id)
     {
         Helper::access(['withdrawal', 'allWithdrawal']);
