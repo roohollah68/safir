@@ -182,6 +182,8 @@ class WithdrawalController extends Controller
         if($user->id != 122)
             abort(401);
         $withdrawal = Withdrawal::findOrFail($id);
+        if($withdrawal->counter_confirm != 1)
+            return redirect()->back();
         $withdrawal->manager_confirm = $req->manager_confirm;
         $withdrawal->payment_confirm = 0;
         $withdrawal->manager_desc = $req->manager_desc;
@@ -199,6 +201,8 @@ class WithdrawalController extends Controller
             'payment_file3' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
         ]);
         $withdrawal = Withdrawal::findOrFail($id);
+        if($withdrawal->manager_confirm != 1)
+            return redirect()->back();
         $withdrawal->payment_confirm = $req->payment_confirm;
         $withdrawal->recipient_confirm = 0;
         $withdrawal->payment_desc = $req->payment_desc;
@@ -217,6 +221,8 @@ class WithdrawalController extends Controller
         $user = auth()->user();
         Helper::access('withdrawalRecipient');
         $withdrawal = Withdrawal::findOrFail($id);
+        if($withdrawal->payment_confirm != 1)
+            return redirect()->back();
         $withdrawal->recipient_confirm = $req->recipient_confirm;
         $withdrawal->recipient_desc = $req->recipient_desc;
         $withdrawal->save();
