@@ -6,6 +6,7 @@
 
 @section('content')
     <a class="btn btn-info" href="{{route('addWithdrawal')}}">ثبت درخواست وجه جدید</a>
+    <a class="btn btn-info" href="/Supplier/list">مشاهده لیست تامین کنندگان</a>
     <br>
     <br>
     @php
@@ -70,8 +71,8 @@
                     @if($withdrawal->manager_confirm != 1)
                         <a class="fa fa-edit btn btn-primary" href="/Withdrawal/edit/{{$id}}"
                            title="ویرایش"></a>
-                        <a class="fa fa-trash-alt btn btn-danger" href="/Withdrawal/delete/{{$id}}"
-                           title="حذف"></a>
+{{--                        <a class="fa fa-trash-alt btn btn-danger" href="/Withdrawal/delete/{{$id}}"--}}
+{{--                           title="حذف"></a>--}}
                     @endif
                 </td>
             </tr>

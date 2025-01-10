@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helper\Helper;
+use App\Models\Supplier;
 use App\Models\Withdrawal;
 use Illuminate\Http\Request;
 
@@ -12,40 +13,33 @@ class WithdrawalController extends Controller
     {
         Helper::access(['withdrawal', 'allWithdrawal']);
         return view('withdrawal.addEdit', [
+            'suppliers' => Supplier::all()->keyBy('name'),
             'withdrawal' => new Withdrawal(),
         ]);
     }
 
-    public function insert(Request $req)
+    public function insertOrUpdate(Request $req)
     {
         $user = auth()->user();
         Helper::access(['withdrawal', 'allWithdrawal']);
         request()->validate([
             'user_file' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
-            'amount' => 'required',
-            'expense' => 'required',
-            'account_name' => 'required',
-            'expense_type' => 'required',
             'expense_desc' => 'required',
+        ], [
+            'user_file.mimes' => 'فایل با این پسوند قابل قبول نیست!',
+            'user_file.max' => 'حجم فایل نباید از 3 mb بیشتر باشد!',
+            'expense_desc.required' => 'نوع هزینه باید مشخص شود!'
         ]);
-
-        $withdrawal = $user->withdrawals()->make([
-            'amount' => +str_replace(",", "", $req->amount),
-            'expense' => $req->expense,
-            'user_desc' => $req->user_desc,
-            'account_number' => $req->account_number,
-            'account_name' => $req->account_name,
-            'pay_method' => $req->pay_method,
-            'cheque_date' => $req->cheque_date_hide,
-            'cheque_id' => $req->cheque_id,
-            'expense_type' => $req->expense_type,
-            'expense_desc' => $req->expense_desc,
-            'official' => $req->official,
-            'vat' => $req->vat,
-            'location' => $req->location,
-        ]);
+        $req->merge(['amount' => +str_replace(",", "", $req->amount)]);
+        $withdrawal = $user->withdrawals()->where('manager_confirm', '<', 1)->updateOrCreate(['id' => $req->id], $req->merge([
+            'counter_confirm' => 0,
+            'manager_confirm' => 0,
+            'payment_confirm' => 0
+        ])->all());
         if ($req->file("user_file")) {
             $withdrawal->user_file = $req->file("user_file")->store("", 'withdrawal');
+        } elseif (!$req->old_user_file) {
+            $withdrawal->user_file = null;
         }
         $withdrawal->save();
         return redirect(route('WithdrawalList'));
@@ -55,15 +49,14 @@ class WithdrawalController extends Controller
     {
         Helper::access(['withdrawal', 'allWithdrawal']);
         $user = auth()->user();
-        if ($user->meta('allWithdrawal'))
-            $withdrawal = Withdrawal::findOrFail($id);
-        else
-            $withdrawal = $user->withdrawals()->findOrFail($id);
-        if ($withdrawal->manager_confirm != 1)
-            return view('withdrawal.addEdit', [
-                'withdrawal' => $withdrawal,
-            ]);
-        return redirect(route('WithdrawalList'));
+        $withdrawal = Withdrawal::where('manager_confirm', '<', 1);
+        if (!$user->meta('allWithdrawal'))
+            $withdrawal = $withdrawal->where('user_id', $user->id);
+        $withdrawal = $withdrawal->findOrNew($id);
+        return view('withdrawal.addEdit', [
+            'suppliers' => Supplier::all()->keyBy('name'),
+            'withdrawal' => $withdrawal,
+        ]);
     }
 
     public function delete($id)
@@ -74,53 +67,8 @@ class WithdrawalController extends Controller
             $withdrawal = Withdrawal::findOrFail($id);
         else
             $withdrawal = $user->withdrawals()->findOrFail($id);
-        if($withdrawal->manager_confirm != 1)
+        if ($withdrawal->manager_confirm != 1)
             $withdrawal->delete();
-        return redirect(route('WithdrawalList'));
-    }
-
-    public function update($id, Request $req)
-    {
-        Helper::access(['withdrawal', 'allWithdrawal']);
-        request()->validate([
-            'user_file' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
-            'amount' => 'required',
-            'expense' => 'required',
-            'account_name' => 'required',
-            'expense_type' => 'required',
-            'expense_desc' => 'required',
-        ]);
-        $user = auth()->user();
-        if ($user->meta('allWithdrawal'))
-            $withdrawal = Withdrawal::findOrFail($id);
-        else
-            $withdrawal = $user->withdrawals()->findOrFail($id);
-        if ($withdrawal->manager_confirm != 1){
-            $withdrawal->update([
-                'amount' => +str_replace(",", "", $req->amount),
-                'expense' => $req->expense,
-                'location' => $req->location,
-                'user_desc' => $req->user_desc,
-                'account_number' => $req->account_number,
-                'account_name' => $req->account_name,
-                'pay_method' => $req->pay_method,
-                'cheque_date' => $req->cheque_date_hide,
-                'cheque_id' => $req->cheque_id,
-                'expense_type' => $req->expense_type,
-                'expense_desc' => $req->expense_desc,
-                'official' => $req->official,
-                'vat' => $req->vat,
-                'counter_confirm' => 0,
-                'manager_confirm' => 0,
-                'payment_confirm' => 0,
-            ]);
-            if ($req->file("user_file")) {
-                $withdrawal->user_file = $req->file("user_file")->store("", 'withdrawal');
-            }elseif (!$req->old_user_file) {
-                $withdrawal->user_file = null;
-            }
-            $withdrawal->save();
-        }
         return redirect(route('WithdrawalList'));
     }
 
@@ -128,32 +76,32 @@ class WithdrawalController extends Controller
     {
         Helper::access(['withdrawal', 'allWithdrawal']);
         $user = auth()->user();
-        $withdrawals = Withdrawal::where('id' , '>' , 0);
+        $withdrawals = Withdrawal::where('id', '>', 0);
         if (!$user->meta('allWithdrawal'))
-            $withdrawals = $withdrawals->where('user_id' , $user->id);
-        if($req->filter == 'counter'){
-            $withdrawals = $withdrawals->where('counter_confirm' , '<>' , 1);
+            $withdrawals = $withdrawals->where('user_id', $user->id);
+        if ($req->filter == 'counter') {
+            $withdrawals = $withdrawals->where('counter_confirm', '<>', 1);
         }
-        if($req->filter == 'manager'){
-            $withdrawals = $withdrawals->where('manager_confirm' , '<>' , 1)->where('counter_confirm' , 1);
+        if ($req->filter == 'manager') {
+            $withdrawals = $withdrawals->where('manager_confirm', '<>', 1)->where('counter_confirm', 1);
         }
-        if($req->filter == 'payment'){
-            $withdrawals = $withdrawals->where('payment_confirm' , '<>' , 1)->where('manager_confirm' , 1);
+        if ($req->filter == 'payment') {
+            $withdrawals = $withdrawals->where('payment_confirm', '<>', 1)->where('manager_confirm', 1);
         }
-        if($req->filter == 'recipient'){
-            $withdrawals = $withdrawals->where('recipient_confirm' , '<>' , 1)->where('payment_confirm' , 1);
+        if ($req->filter == 'recipient') {
+            $withdrawals = $withdrawals->where('recipient_confirm', '<>', 1)->where('payment_confirm', 1);
         }
-        if($req->filter == 'complete'){
-            $withdrawals = $withdrawals->where('recipient_confirm' , 1);
+        if ($req->filter == 'complete') {
+            $withdrawals = $withdrawals->where('recipient_confirm', 1);
         }
-        if($req->official == '0'){
-            $withdrawals = $withdrawals->where('official' , 0);
+        if ($req->official == '0') {
+            $withdrawals = $withdrawals->where('official', 0);
         }
-        if($req->official == '1'){
-            $withdrawals = $withdrawals->where('official' , 1);
+        if ($req->official == '1') {
+            $withdrawals = $withdrawals->where('official', 1);
         }
-        if(isset($req->Location)){
-            $withdrawals = $withdrawals->where('location' , $req->Location);
+        if (isset($req->Location)) {
+            $withdrawals = $withdrawals->where('location', $req->Location);
         }
         return view('withdrawal.list', [
             'withdrawals' => $withdrawals->get()->keyBy('id'),
@@ -164,7 +112,7 @@ class WithdrawalController extends Controller
         ]);
     }
 
-    public function counter($id , Request $req)
+    public function counter($id, Request $req)
     {
         Helper::access('counter');
         $withdrawal = Withdrawal::findOrFail($id);
@@ -176,13 +124,13 @@ class WithdrawalController extends Controller
         return redirect()->back();
     }
 
-    public function manager($id , Request $req)
+    public function manager($id, Request $req)
     {
         $user = auth()->user();
-        if($user->id != 122)
+        if ($user->id != 122)
             abort(401);
         $withdrawal = Withdrawal::findOrFail($id);
-        if($withdrawal->counter_confirm != 1)
+        if ($withdrawal->counter_confirm != 1)
             return redirect()->back();
         $withdrawal->manager_confirm = $req->manager_confirm;
         $withdrawal->payment_confirm = 0;
@@ -191,7 +139,7 @@ class WithdrawalController extends Controller
         return redirect()->back();
     }
 
-    public function payment($id , Request $req)
+    public function payment($id, Request $req)
     {
         $user = auth()->user();
         Helper::access('withdrawalPay');
@@ -201,33 +149,34 @@ class WithdrawalController extends Controller
             'payment_file3' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
         ]);
         $withdrawal = Withdrawal::findOrFail($id);
-        if($withdrawal->manager_confirm != 1)
+        if ($withdrawal->manager_confirm != 1)
             return redirect()->back();
         $withdrawal->payment_confirm = $req->payment_confirm;
         $withdrawal->recipient_confirm = 0;
         $withdrawal->payment_desc = $req->payment_desc;
-        if($req->file('payment_file'))
+        if ($req->file('payment_file'))
             $withdrawal->payment_file = $req->file("payment_file")->store("", 'withdrawal');
-        if($req->file('payment_file2'))
+        if ($req->file('payment_file2'))
             $withdrawal->payment_file2 = $req->file("payment_file2")->store("", 'withdrawal');
-        if($req->file('payment_file3'))
+        if ($req->file('payment_file3'))
             $withdrawal->payment_file3 = $req->file("payment_file3")->store("", 'withdrawal');
         $withdrawal->save();
         return redirect()->back();
     }
 
-    public function recipient($id , Request $req)
+    public function recipient($id, Request $req)
     {
         $user = auth()->user();
         Helper::access('withdrawalRecipient');
         $withdrawal = Withdrawal::findOrFail($id);
-        if($withdrawal->payment_confirm != 1)
+        if ($withdrawal->payment_confirm != 1)
             return redirect()->back();
         $withdrawal->recipient_confirm = $req->recipient_confirm;
         $withdrawal->recipient_desc = $req->recipient_desc;
         $withdrawal->save();
         return redirect()->back();
     }
+
     public function view($id)
     {
         Helper::access(['withdrawal', 'allWithdrawal']);

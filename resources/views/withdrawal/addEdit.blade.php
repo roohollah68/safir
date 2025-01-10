@@ -19,7 +19,7 @@
             `@foreach(config('expense_type')['property'] as $data)
             <option>{{$data}}</option>
             @endforeach`
-
+        let suppliers = {!! json_encode($suppliers) !!}
         $(() => {
             $(".checkboxradio").checkboxradio();
             let date_property = {
@@ -45,6 +45,16 @@
             @if((old('official')?:$withdrawal->official)==1)
             $('.VAT').show();
             @endif
+
+
+            $("#account_name").autocomplete({
+                source: Object.keys(suppliers),
+                select: function (event, ui) {
+                    let supplier = suppliers[ui.item.value];
+                    $('#account_number').val(supplier.account);
+                    $('#cheque_id').val(supplier.code);
+                }
+            });
         })
     </script>
     <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
@@ -53,8 +63,9 @@
 
 @section('content')
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
-    <form action="" method="post" enctype="multipart/form-data">
+    <form action="/Withdrawal/add" method="post" enctype="multipart/form-data">
         @csrf
+        <input type="hidden" name="id" value="{{$withdrawal->id}}">
         <div class="row my-4">
 
             {{--            مبلغ--}}
@@ -66,7 +77,7 @@
                     <input value="{{old('amount')?:$withdrawal->amount}}" type="text" id="amount"
                            class="form-control price-input" name="amount" required>
                     <div class="input-group-prepend" style="min-width: 120px">
-                        <label for="amount" class="input-group-text w-100"> ریال</label>
+                        <label class="input-group-text w-100"> ریال</label>
                     </div>
                 </div>
             </div>
@@ -75,9 +86,9 @@
             <div class="col-md-6 my-2">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
-                        <label for="description" class="input-group-text w-100">بابت:</label>
+                        <label for="expense" class="input-group-text w-100">بابت:</label>
                     </div>
-                    <input type="text" class="form-control" name="expense"
+                    <input type="text" class="form-control" name="expense" id="expense"
                            value="{{old('expense')?:$withdrawal->expense}}" required>
                 </div>
             </div>
@@ -123,7 +134,7 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="account_name" class="input-group-text w-100">نام صاحب حساب:</label>
                     </div>
-                    <input type="text" class="form-control" name="account_name"
+                    <input type="text" class="form-control" name="account_name" id="account_name"
                            value="{{old('account_name')?:$withdrawal->account_name}}" required>
                 </div>
             </div>
@@ -134,7 +145,7 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="account_number" class="input-group-text w-100">شماره شبا یا کارت:</label>
                     </div>
-                    <input type="text" class="form-control cash" name="account_number"
+                    <input type="text" class="form-control cash" name="account_number" id="account_number"
                            value="{{old('account_number')?:$withdrawal->account_number}}" required>
                 </div>
             </div>
@@ -145,7 +156,7 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="cheque_id" class="input-group-text w-100">کد ملی یا شناسه ملی:</label>
                     </div>
-                    <input type="text" class="form-control cheque" name="cheque_id"
+                    <input type="text" class="form-control cheque" name="cheque_id" id="cheque_id"
                            value="{{old('cheque_id')?:$withdrawal->cheque_id}}" required>
                 </div>
             </div>

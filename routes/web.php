@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductChangeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StatisticController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
@@ -165,16 +166,22 @@ Route::group(['middleware' => ['auth', 'verify']], function () {
 
     ///Withdrawal
     Route::get('Withdrawal/add', [WithdrawalController::class, 'new'])->name('addWithdrawal');
-    Route::post('Withdrawal/add', [WithdrawalController::class, 'insert']);
-    Route::get('Withdrawal/delete/{id}', [WithdrawalController::class, 'delete']);
+    Route::post('Withdrawal/add', [WithdrawalController::class, 'insertOrUpdate']);
+//    Route::get('Withdrawal/delete/{id}', [WithdrawalController::class, 'delete']);
     Route::get('Withdrawal/edit/{id}', [WithdrawalController::class, 'edit']);
-    Route::post('Withdrawal/edit/{id}', [WithdrawalController::class, 'update']);
+//    Route::post('Withdrawal/edit/{id}', [WithdrawalController::class, 'update']);
     Route::get('Withdrawal/list', [WithdrawalController::class, 'list'])->name('WithdrawalList');
     Route::post('viewWithdrawal/{id}', [WithdrawalController::class, 'view']);
     Route::post('/withdrawal/counterForm/{id}', [WithdrawalController::class, 'counter']);
     Route::post('/withdrawal/managerForm/{id}', [WithdrawalController::class, 'manager']);
     Route::post('/withdrawal/paymentForm/{id}', [WithdrawalController::class, 'payment']);
     Route::post('/withdrawal/recipientForm/{id}', [WithdrawalController::class, 'recipient']);
+
+    ///SUPPLIERS
+    Route::get('Supplier/add', [SupplierController::class, 'new']);
+    Route::post('Supplier/add', [SupplierController::class, 'insertOrUpdate']);
+    Route::get('Supplier/edit/{id}', [SupplierController::class, 'edit']);
+    Route::get('Supplier/list', [SupplierController::class, 'list']);
 
     ///PROGRAMMER
     Route::get('/clear/route', [SettingController::class, 'clearRoute']);
