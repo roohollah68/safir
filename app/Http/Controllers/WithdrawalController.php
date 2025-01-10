@@ -6,6 +6,7 @@ use App\Helper\Helper;
 use App\Models\Supplier;
 use App\Models\Withdrawal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class WithdrawalController extends Controller
 {
@@ -20,6 +21,7 @@ class WithdrawalController extends Controller
 
     public function insertOrUpdate(Request $req)
     {
+        DB::beginTransaction();
         $user = auth()->user();
         Helper::access(['withdrawal', 'allWithdrawal']);
         request()->validate([
@@ -36,12 +38,17 @@ class WithdrawalController extends Controller
             'manager_confirm' => 0,
             'payment_confirm' => 0
         ])->all());
+        Supplier::updateOrCreate(['name' => $req->account_name],[
+           'account' => $req->account_number,
+           'code' => $req->cheque_id,
+        ]);
         if ($req->file("user_file")) {
             $withdrawal->user_file = $req->file("user_file")->store("", 'withdrawal');
         } elseif (!$req->old_user_file) {
             $withdrawal->user_file = null;
         }
         $withdrawal->save();
+        DB::commit();
         return redirect(route('WithdrawalList'));
     }
 
