@@ -5,33 +5,35 @@
 @endsection
 
 @section('content')
-    <a class="btn btn-info" href="{{route('addWithdrawal')}}">ثبت درخواست وجه جدید</a>
-    <a class="btn btn-info" href="/Supplier/list">مشاهده لیست تامین کنندگان</a>
+    <a class="btn btn-outline-success" href="{{route('addWithdrawal')}}"><i class="fa fa-plus"></i> ثبت درخواست وجه جدید</a>
+    <a class="btn btn-outline-info" href="/Supplier/list"><i class="fa fa-user"></i> مشاهده لیست تامین کنندگان</a>
     <br>
     <br>
     @php
-    $F = is_null($filter)?'':'&filter='.$filter;
-    $O = is_null($official)?'':'&official='.$official;
-    $L = is_null($Location)?'':'&Location='.$Location;
-     @endphp
-    <div class="my-1">
-    <a class="btn btn-{{(is_null($filter) && is_null($official) && is_null($Location))?'':'outline-'}}primary" href="/Withdrawal/list">همه</a>
+        $F = is_null($filter)?'':'&filter='.$filter;
+        $O = is_null($official)?'':'&official='.$official;
+        $L = is_null($Location)?'':'&Location='.$Location;
+    @endphp
+    <a class="btn btn-{{(is_null($filter) && is_null($official) && is_null($Location))?'':'outline-'}}primary"
+       href="/Withdrawal/list">همه</a>
+    <hr>
     <a class="btn btn-{{$filter=='counter'?'':'outline-'}}primary" href="?filter=counter{{$O.$L}}">منتظر تایید حسابدار</a>
     <a class="btn btn-{{$filter=='manager'?'':'outline-'}}primary" href="?filter=manager{{$O.$L}}">منتظر تایید مدیر</a>
     <a class="btn btn-{{$filter=='payment'?'':'outline-'}}primary" href="?filter=payment{{$O.$L}}">منتظر واریز</a>
     <a class="btn btn-{{$filter=='recipient'?'':'outline-'}}primary" href="?filter=recipient{{$O.$L}}">منتظر دریافت</a>
     <a class="btn btn-{{$filter=='complete'?'':'outline-'}}primary" href="?filter=complete{{$O.$L}}">تکمیل شده</a>
-    </div>
-    <br>
+    <hr>
     <a class="btn btn-{{$official=='1'?'':'outline-'}}primary" href="?official=1{{$F.$L}}">رسمی</a>
     <a class="btn btn-{{$official=='0'?'':'outline-'}}primary" href="?official=0{{$F.$L}}">غیر رسمی</a>
-    <span class="mx-4"></span>
+    <hr>
     @foreach(config('withdrawalLocation') as $id => $location)
         @continue($id == 0)
         <a class="btn btn-{{$Location==$id?'':'outline-'}}primary" href="?Location={{$id}}{{$F.$O}}">
             {{$location}}
         </a>
     @endforeach
+
+
     <br>
     <br>
     <table class="table table-striped" id="withdrawal-table">
@@ -71,8 +73,8 @@
                     @if($withdrawal->manager_confirm != 1)
                         <a class="fa fa-edit btn btn-primary" href="/Withdrawal/edit/{{$id}}"
                            title="ویرایش"></a>
-{{--                        <a class="fa fa-trash-alt btn btn-danger" href="/Withdrawal/delete/{{$id}}"--}}
-{{--                           title="حذف"></a>--}}
+                        {{--                        <a class="fa fa-trash-alt btn btn-danger" href="/Withdrawal/delete/{{$id}}"--}}
+                        {{--                           title="حذف"></a>--}}
                     @endif
                 </td>
             </tr>
@@ -85,7 +87,7 @@
 @section('files')
     <script>
         let token = '{{csrf_token()}}';
-        let withdrawals = {!!json_encode($withdrawals)!!}
+        let withdrawals = {!!json_encode($withdrawals)!!};
         $(function () {
             $('#withdrawal-table').DataTable({
                 pageLength: 100,
@@ -93,30 +95,30 @@
             });
         });
         @if(auth()->user()->meta('counter'))
-            function counter_form(id) {
-                withdrawal = withdrawals[id]
-                if (withdrawal.manager_confirm == 1)
-                    return;
-                let dialog = Dialog(`
+        function counter_form(id) {
+            withdrawal = withdrawals[id]
+            if (withdrawal.manager_confirm == 1)
+                return;
+            let dialog = Dialog(`
             <div title="بررسی حسابداری" class="dialogs">
 <form method="post" action="/withdrawal/counterForm/${id}">
 @csrf
-                <span>تغییر وضعیت:</span>
+            <span>تغییر وضعیت:</span>
 
-                <label class="btn btn-success" for="approved">تائید</label>
-                <input type="radio" name="counter_confirm" value="1" id="approved" class="checkboxradio">
+            <label class="btn btn-success" for="approved">تائید</label>
+            <input type="radio" name="counter_confirm" value="1" id="approved" class="checkboxradio">
 
-                <label class="btn btn-info" for="waiting">بررسی</label>
-                <input type="radio" name="counter_confirm" value="0" id="waiting" class="checkboxradio">
+            <label class="btn btn-info" for="waiting">بررسی</label>
+            <input type="radio" name="counter_confirm" value="0" id="waiting" class="checkboxradio">
 
-                <label class="btn btn-danger" for="reject">عدم تائید</label>
-                <input type="radio" name="counter_confirm" value="-1" id="reject" class="checkboxradio">
+            <label class="btn btn-danger" for="reject">عدم تائید</label>
+            <input type="radio" name="counter_confirm" value="-1" id="reject" class="checkboxradio">
 
-                <br>
-                <br>
+            <br>
+            <br>
 
-                <label for="counter_desc">توضیحات</label><br>
-                <textarea name="counter_desc" id="counter_desc" rows="3" class="w-100">${withdrawal.counter_desc || ''}</textarea>
+            <label for="counter_desc">توضیحات</label><br>
+            <textarea name="counter_desc" id="counter_desc" rows="3" class="w-100">${withdrawal.counter_desc || ''}</textarea>
 
 <br>
 <br>
@@ -137,10 +139,10 @@
 </form>
 </div>
             `);
-                $('.checkboxradio').checkboxradio();
-                $(`input[value=${withdrawal.counter_confirm}]`).click();
-                $('select[name=bank]').val(withdrawal.bank).change();
-            }
+            $('.checkboxradio').checkboxradio();
+            $(`input[value=${withdrawal.counter_confirm}]`).click();
+            $('select[name=bank]').val(withdrawal.bank).change();
+        }
         @endif
 
         @if(auth()->user()->id == 122)
@@ -227,13 +229,13 @@
             `);
             $('.checkboxradio').checkboxradio();
             $(`input[value=${withdrawal.payment_confirm}]`).click();
-            if(withdrawal.payment_file){
+            if (withdrawal.payment_file) {
                 $('#payment_file_old').show();
             }
-            if(withdrawal.payment_file2){
+            if (withdrawal.payment_file2) {
                 $('#payment_file_old2').show();
             }
-            if(withdrawal.payment_file3){
+            if (withdrawal.payment_file3) {
                 $('#payment_file_old3').show();
             }
         }

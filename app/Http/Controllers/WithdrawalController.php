@@ -38,10 +38,11 @@ class WithdrawalController extends Controller
             'manager_confirm' => 0,
             'payment_confirm' => 0
         ])->all());
-        Supplier::updateOrCreate(['name' => $req->account_name],[
+        $supplier = Supplier::updateOrCreate(['name' => $req->account_name],[
            'account' => $req->account_number,
            'code' => $req->cheque_id,
         ]);
+        $withdrawal->update(['supplier_id' => $supplier->id]);
         if ($req->file("user_file")) {
             $withdrawal->user_file = $req->file("user_file")->store("", 'withdrawal');
         } elseif (!$req->old_user_file) {

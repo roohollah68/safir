@@ -18,7 +18,9 @@ use App\Models\Product;
 use App\Models\Setting;
 //use App\Models\User;
 //use GuzzleHttp\Psr7\Query;
+use App\Models\Supplier;
 use App\Models\Warehouse;
+use App\Models\Withdrawal;
 use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
 //use Illuminate\Support\Carbon;
@@ -75,17 +77,19 @@ class SettingController extends Controller
 
     public function command()
     {
-        set_time_limit(0);
-        $ids = [4004 , 4005 , 3968 , 3962 , 3952 , 3947 , 3941 , 3933 , 3914 ];
-        $ID = 4776;
-        foreach ($ids as $id){
-            Order::where('customer_id' , $id)->update([
-                'customer_id' => $ID,
-            ]);
-            CustomerTransaction::where('customer_id' , $id)->update([
-                'customer_id' => $ID,
-            ]);
-            Customer::find($id)->delete();
+        $withdrawals = Withdrawal::all()->keyBy('id');
+        $suppliers = Supplier::all()->keyBy('name');
+        foreach ($withdrawals as $id => $withdrawal){
+            if(isset($suppliers[$withdrawal->account_name])){
+                $supplier = $suppliers[$withdrawal->account_name];
+            }else{
+                $supplier = Supplier::create([
+                    'name' => $withdrawal->account_name,
+                    'account' => $withdrawal->account_number,
+                    'code' => $withdrawal->cheque_id,
+                ]);
+            }
+            $withdrawal->update(['supplier_id' => $supplier->id]);
         }
     }
 

@@ -238,6 +238,7 @@
 
 @section('files')
     <script>
+        let token = '{!! csrf_token() !!}'
         $(function () {
             $('input[name="available"], input[name="category"]').checkboxradio();
             @if($edit)

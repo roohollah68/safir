@@ -12,6 +12,7 @@ class Withdrawal extends Model
     use SoftDeletes;
     protected $fillable = [
         'user_id',
+        'supplier_id',
         'amount',
         'expense',
         'location',
