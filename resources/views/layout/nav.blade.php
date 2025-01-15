@@ -33,7 +33,7 @@
             @endif
             @if(auth()->user()->meta('usersEdit'))
                 <li class="nav-item">
-                    <a class="nav-link active" href="{{route('manageUsers')}}">مدیریت کاربران</a>
+                    <a class="nav-link active" href="{{route('usersList')}}">مدیریت کاربران</a>
                 </li>
             @endif
             @if(auth()->user()->meta('manageSafir'))

@@ -56,24 +56,22 @@ class ProductController extends Controller
         ]);
     }
 
-    public function storeNew(Request $req)
+    public function storeNew($id = null, Request $req)
     {
         Helper::access('warehouse');
         DB::beginTransaction();
         $req->merge(['price' => str_replace(",", "", $req->price)]);
         $req->merge(['productPrice' => str_replace(",", "", $req->productPrice)]);
         request()->validate([
-            'name' => 'required|unique:goods|string|max:255|min:4',
+            'name' => ($id ? '' : 'unique:goods|') . 'required|string|max:255|min:4',
             'price' => 'required|integer',
             'productPrice' => 'integer',
-            'isic' => 'integer|min:7,max:7',
-            'tag' => 'integer|min:13,max:13',
         ]);
-        if($req->id){
+        if ($id) {
             $product = Product::with('good')->findOrFail($id);
             $productChange = new ProductChange();
-            $productChange->product_id = $product->id;
-            if ($req->addType == 'add') {
+            $productChange->product_id = $id;
+            if ($req->changeType == 'add') {
                 $productChange->change = +$req->add;
                 $product->quantity += $req->add;
                 $productChange->desc = 'اضافه کردن موجودی به اندازه ' . $req->add . ' عدد';
@@ -87,66 +85,23 @@ class ProductController extends Controller
             $product->high_alarm = $req->high_alarm;
             $product->available = ($req->available == 'true');
             $product->save();
-        }
-        $good = Good::create($req->all());
+            if ($productChange->change != 0)
+                $productChange->save();
+            $good = $product->good;
+            $good->update($req->all());
+        } else
+            $good = Good::create($req->all());
 
         GoodMeta::updateOrCreate([
             'good_id' => $good->id,
-        ],[
+        ], [
             'supplier_inf' => $req->supplier_inf,
         ]);
-        DB::commit();
-        return redirect()->route('productList');
-    }
-
-    public function editProduct(Request $req, $id)
-    {
-        Helper::access('warehouse');
-        DB::beginTransaction();
-        $req->price = str_replace(",", "", $req->price);
-        $req->PPrice = +str_replace(",", "", $req->PPrice);
-        request()->validate([
-            'photo' => 'mimes:jpeg,jpg,png,bmp|max:2048',
-            'name' => 'required|string|max:255|min:4',
-            'price' => 'required',
-        ]);
-        $product = Product::with('good')->findOrFail($id);
-        $good = $product->good;
-        $productChange = new ProductChange();
-        $productChange->product_id = $product->id;
-        $good->name = $req->name;
-        $good->price = $req->price;
-        $good->productPrice = $req->PPrice;
-        if ($req->addType == 'add') {
-            $productChange->change = +$req->add;
-            $product->quantity += $req->add;
-            $productChange->desc = 'اضافه کردن موجودی به اندازه ' . $req->add . ' عدد';
-        } else {
-            $productChange->change = +$req->value - (+$product->quantity);
-            $product->quantity = $req->value;
-            $productChange->desc = 'اصلاح موجودی به مقدار' . $req->value . ' عدد';
-        }
-        $productChange->quantity = $product->quantity;
-        $product->alarm = $req->alarm;
-        $product->high_alarm = $req->high_alarm;
-        $product->available = ($req->available == 'true');
-        $good->category = $req->category;
-        $product->save();
-        $good->save();
-
-
-        $goodmeta = GoodMeta::updateOrCreate([
-            'good_id' => $good->id,
-        ],[
-            'supplier_inf' => $req->supplier_inf,
-        ]);
-        if ($productChange->change != 0)
-            $productChange->save();
         DB::commit();
         if ($req->fast)
             return ['با موفقیت ذخیره شد.', $product];
         else
-            return redirect('/product/edit/' . $id);
+            return redirect()->route('productList');
     }
 
     public function deleteProduct($id)

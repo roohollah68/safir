@@ -23,13 +23,13 @@
         $(() => {
             $(".checkboxradio").checkboxradio();
             let date_property = {
-                targetTextSelector: '[name="cheque_date"]',
-                targetDateSelector: '[name="cheque_date_hide"]',
+                targetTextSelector: '[name="cheque_date_farsi"]',
+                targetDateSelector: '[name="cheque_date"]',
             }
             @if(old('cheque_date')?:$withdrawal->cheque_date)
-                date_property.selectedDate = new Date('{{old('cheque_date_hide')?:$withdrawal->cheque_date}}');
+                date_property.selectedDate = new Date('{{old('cheque_date')?:$withdrawal->cheque_date}}');
             @endif
-            const chequeDate = new mds.MdsPersianDateTimePicker(document.getElementById('cheque_date'), date_property);
+            const chequeDate = new mds.MdsPersianDateTimePicker(document.getElementById('cheque_date_farsi'), date_property);
             @if((old('pay_method')?:$withdrawal->pay_method)=='cheque')
             $('.cash').hide().prop('required', false);
             @else
@@ -165,10 +165,10 @@
             <div class="col-md-6 my-2 cheque">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
-                        <label for="cheque_date" class="input-group-text w-100">تاریخ چک:</label>
+                        <label for="cheque_date_farsi" class="input-group-text w-100">تاریخ چک:</label>
                     </div>
-                    <input type="text" class="form-control cheque" name="cheque_date" id="cheque_date" required>
-                    <input type="hidden" name="cheque_date_hide">
+                    <input type="text" class="form-control cheque" name="cheque_date_farsi" id="cheque_date_farsi" required>
+                    <input type="hidden" name="cheque_date">
                 </div>
             </div>
 

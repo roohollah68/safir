@@ -18,7 +18,7 @@
         <a class="btn btn-danger" href="{{route('productList')}}">بازگشت</a>
         <hr>
     @endif
-    <form action="" method="post" enctype="multipart/form-data">
+    <form action="/product/addOrEdit/{{$edit ? $product->id : ''}}" method="post" enctype="multipart/form-data">
         @csrf
         <div class="row">
             {{--نام محصول--}}
@@ -64,7 +64,7 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="isic" class="input-group-text w-100">اینتا کد:</label>
                     </div>
-                    <input type="text" id="isic" class="form-control" name="isic" required
+                    <input type="text" id="isic" class="form-control" name="isic"
                            value="{{old('isic')?:$good->isic}}"
                            onkeypress="return event.charCode >= 48 && event.charCode <= 57" pattern="^[0-9]*$">
                 </div>
@@ -76,7 +76,7 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="tag" class="input-group-text w-100">شناسه کالا:</label>
                     </div>
-                    <input type="text" id="tag" class="form-control" name="tag" required
+                    <input type="text" id="tag" class="form-control" name="tag"
                            value="{{old('tag')?:$good->tag}}"
                            onkeypress="return event.charCode >= 48 && event.charCode <= 57" pattern="^[0-9]*$">
                 </div>
@@ -122,6 +122,7 @@
             </div>
 
             @if($edit)
+                <input type="hidden" name="productId" value="{{$product->id}}">
                 {{--مکان انبار--}}
                 <div class="col-md-6">
                     <div class="form-group input-group">
@@ -142,7 +143,7 @@
                 <div class="col-md-6 my-2">
                     <div class="form-group input-group">
                         <div class="input-group-text">
-                            <input type="radio" name="addType" value="add"
+                            <input type="radio" name="changeType" value="add"
                                    aria-label="Radio button for following text input" checked
                                    onclick="$('#value').prop('disabled', true);$('#add').prop('disabled', false);">
                         </div>
@@ -153,7 +154,7 @@
                     </div>
                     <div class="form-group input-group">
                         <div class="input-group-text">
-                            <input type="radio" name="addType" value="value"
+                            <input type="radio" name="changeType" value="value"
                                    aria-label="Radio button for following text input"
                                    onclick="$('#add').prop('disabled', true);$('#value').prop('disabled', false);">
                         </div>

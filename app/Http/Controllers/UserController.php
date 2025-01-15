@@ -13,13 +13,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-
-    public function home()
-    {
-        return redirect()->route('listOrders');
-    }
-
-    public function show()
+    public function list()
     {
         Helper::access('usersEdit');
         return view('userList', ['users' => User::where('id' , '<>' , 122)->get()]);
@@ -29,14 +23,14 @@ class UserController extends Controller
     {
         Helper::access('usersEdit');
         User::find($id)->update(['verified' => true]);
-        return redirect()->route('manageUsers');
+        return redirect()->route('usersList');
     }
 
     public function suspend($id)
     {
         Helper::access('usersEdit');
         User::where('id', $id)->update(['verified' => false]);
-        return redirect()->route('manageUsers');
+        return redirect()->route('usersList');
 
     }
 
@@ -50,7 +44,7 @@ class UserController extends Controller
         Order::where('user_id' , $id)->update([
             'user_id' => 6,
         ]);
-        return redirect()->route('manageUsers');
+        return redirect()->route('usersList');
 
     }
 
@@ -155,7 +149,7 @@ class UserController extends Controller
                     ['value' => $request[$access]]
                 );
             }
-            return redirect()->route('manageUsers');
+            return redirect()->route('usersList');
         }
         return redirect()->route('listOrders');
     }

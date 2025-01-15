@@ -1,6 +1,7 @@
 <div title=" ویرایش سریع({{$product->id}})" class="dialogs ">
 
-    <form method="post" id="fastEditForm">
+    <form action="/product/addOrEdit/{{$product->id}}" method="post" id="fastEditForm">
+        <input type="hidden" name="supplier_inf" value="{{$product->good->Supplier_inf()}}">
         @csrf
         {{--نام محصول--}}
         <div class="col-md-12 mb-1">

@@ -100,7 +100,7 @@
 
         <input type="submit" class="btn btn-success" value="ذخیره">&nbsp;
         @if(auth()->user()->meta('usersEdit'))
-            <a href="{{route('manageUsers')}}" class="btn btn-danger">بازگشت</a>
+            <a href="{{route('usersList')}}" class="btn btn-danger">بازگشت</a>
         @else
             <a href="{{route('listOrders')}}" class="btn btn-danger">بازگشت</a>
         @endif

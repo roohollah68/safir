@@ -11,7 +11,7 @@
 @section('content')
     @csrf
     @if(auth()->user()->meta('usersEdit'))
-        <a href="/add_user" class="btn btn-outline-info fa fa-plus mb-4">افزودن کاربر</a>
+        <a href="/user/add" class="btn btn-outline-info fa fa-plus mb-4">افزودن کاربر</a>
     @endif
     <br>
     <h3>لیست کاربران تایید شده:</h3>
@@ -50,8 +50,8 @@
                     <td>{{$user->phone}}</td>
                     <td dir="ltr">{{number_format($user->balance)}}</td>
                     <td>
-                        <a class="btn btn-warning" href="/suspend_user/{{$user->id}}">تعلیق</a>
-                        <a class="btn btn-info" href="edit_user/{{$user->id}}">ویرایش</a>
+                        <a class="btn btn-warning" href="/user/suspend/{{$user->id}}">تعلیق</a>
+                        <a class="btn btn-info" href="/user/edit/{{$user->id}}">ویرایش</a>
                     </td>
                 </tr>
             @endif
@@ -77,8 +77,8 @@
                     <td>{{$user->username}}</td>
                     <td>{{$user->phone}}</td>
                     <td>
-                        <a class="btn btn-success" href="/confirm_user/{{$user->id}}">تایید</a>
-                        <a class="btn btn-danger" href="/delete_user/{{$user->id}}">حذف</a>
+                        <a class="btn btn-success" href="/user/confirm/{{$user->id}}">تایید</a>
+                        <a class="btn btn-danger" href="/user/delete/{{$user->id}}">حذف</a>
                     </td>
                 </tr>
             @endunless
