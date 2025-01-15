@@ -56,47 +56,43 @@ class ProductController extends Controller
         ]);
     }
 
-    public function storeNew($id = null, Request $req)
+    public function storeNew(Request $req, $id = null)
     {
         Helper::access('warehouse');
         DB::beginTransaction();
         $req->merge(['price' => str_replace(",", "", $req->price)]);
         $req->merge(['productPrice' => str_replace(",", "", $req->productPrice)]);
+        if ($id) {
+            $product = Product::findOrFail($id)->fill([
+                'alarm' => $req->alarm,
+                'high_alarm' => $req->high_alarm,
+                'available' => ($req->available == 'true'),
+            ]);
+            $productChange = $product->productChange()->make();
+            if (+$req->value == +$product->quantity)
+                $productChange->desc = 'اضافه کردن موجودی به اندازه ' . $req->add . ' عدد';
+            else
+                $productChange->desc = 'اصلاح موجودی به مقدار' . $req->value . ' عدد';
+            $change = (+$req->value + $req->add) - $product->quantity;
+            $product->quantity += $change;
+            $productChange->change = $change;
+            $productChange->quantity = $product->quantity;
+            $product->save();
+            if ($change != 0)
+                $productChange->save();
+            $good = $product->good;
+        }else
+            $good = new Good();
         request()->validate([
-            'name' => ($id ? '' : 'unique:goods|') . 'required|string|max:255|min:4',
+            'name' => 'required|string|max:255|min:4|unique:goods,name,'. $good->id,
             'price' => 'required|integer',
             'productPrice' => 'integer',
         ]);
-        if ($id) {
-            $product = Product::with('good')->findOrFail($id);
-            $productChange = new ProductChange();
-            $productChange->product_id = $id;
-            if ($req->changeType == 'add') {
-                $productChange->change = +$req->add;
-                $product->quantity += $req->add;
-                $productChange->desc = 'اضافه کردن موجودی به اندازه ' . $req->add . ' عدد';
-            } else {
-                $productChange->change = +$req->value - (+$product->quantity);
-                $product->quantity = $req->value;
-                $productChange->desc = 'اصلاح موجودی به مقدار' . $req->value . ' عدد';
-            }
-            $productChange->quantity = $product->quantity;
-            $product->alarm = $req->alarm;
-            $product->high_alarm = $req->high_alarm;
-            $product->available = ($req->available == 'true');
-            $product->save();
-            if ($productChange->change != 0)
-                $productChange->save();
-            $good = $product->good;
-            $good->update($req->all());
-        } else
-            $good = Good::create($req->all());
-
-        GoodMeta::updateOrCreate([
-            'good_id' => $good->id,
-        ], [
+        $good->fill($req->all())->save();
+        $good->goodMeta()->firstOrNew([
             'supplier_inf' => $req->supplier_inf,
         ]);
+
         DB::commit();
         if ($req->fast)
             return ['با موفقیت ذخیره شد.', $product];

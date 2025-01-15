@@ -1,6 +1,6 @@
 <div title=" ویرایش سریع({{$product->id}})" class="dialogs ">
 
-    <form action="/product/addOrEdit/{{$product->id}}" method="post" id="fastEditForm">
+    <form action="" method="post" id="fastEditForm">
         <input type="hidden" name="supplier_inf" value="{{$product->good->Supplier_inf()}}">
         @csrf
         {{--نام محصول--}}
@@ -32,12 +32,12 @@
         <div class="col-md-12 mb-1">
             <div class="form-group input-group">
                 <div class="input-group-append">
-                    <label for="PPrice-dialog" class="input-group-text w-100">قیمت تولید:</label>
+                    <label for="productPrice" class="input-group-text w-100">قیمت تولید:</label>
                 </div>
-                <input type="text" id="PPrice-dialog" class="form-control price-input" name="PPrice"
+                <input type="text" id="productPrice" class="form-control price-input" name="productPrice"
                        value="{{$product->productPrice}}">
                 <div class="input-group-append">
-                    <label for="PPrice" class="input-group-text">ریال</label>
+                    <label for="productPrice" class="input-group-text">ریال</label>
                 </div>
             </div>
         </div>

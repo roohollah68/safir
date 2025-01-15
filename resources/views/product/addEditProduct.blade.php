@@ -143,27 +143,25 @@
                 <div class="col-md-6 my-2">
                     <div class="form-group input-group">
                         <div class="input-group-text">
-                            <input type="radio" name="changeType" value="add"
-                                   aria-label="Radio button for following text input" checked
-                                   onclick="$('#value').prop('disabled', true);$('#add').prop('disabled', false);">
+                            <input type="radio" name="changeType" checked
+                                   onclick="$('#value').prop('readonly', true).val({{+$product->quantity}});$('#add').prop('readonly', false);">
                         </div>
                         <div class="input-group-append" style="min-width: 160px">
                             <label for="add" class="input-group-text w-100">افزودن به موجودی :</label>
                         </div>
-                        <input type="number" step="0.01" id="add" class="form-control" name="add" value="">
+                        <input type="number" step="0.01" id="add" class="form-control" name="add" value="0">
                     </div>
                     <div class="form-group input-group">
                         <div class="input-group-text">
-                            <input type="radio" name="changeType" value="value"
-                                   aria-label="Radio button for following text input"
-                                   onclick="$('#add').prop('disabled', true);$('#value').prop('disabled', false);">
+                            <input type="radio" name="changeType"
+                                   onclick="$('#add').prop('readonly', true).val(0);$('#value').prop('readonly', false);">
                         </div>
                         <div class="input-group-append" style="min-width: 160px">
                             <label for="value" class="input-group-text w-100">اصلاح موجودی :</label>
                         </div>
                         <input type="number" step="0.01" id="value" class="form-control" name="value"
                                value="{{+$product->quantity}}"
-                               disabled>
+                               readonly>
                     </div>
                 </div>
 

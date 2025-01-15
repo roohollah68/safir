@@ -338,7 +338,7 @@
                         e.preventDefault();
                         $.ajax({
                             type: "POST",
-                            url: '/product/edit/' + id,
+                            url: '/product/addOrEdit/' + id,
                             data: new FormData(this),
                             processData: false,
                             contentType: false,

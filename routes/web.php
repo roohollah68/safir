@@ -34,7 +34,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('/confirm/{id}', 'confirm');
         Route::get('/suspend/{id}', 'suspend');
         Route::get('/delete/{id}', 'delete');
-        Route::get('/add', 'addUser');
+        Route::get('/add', 'add');
         Route::post('/add', 'insertUser');
         Route::get('/edit/{id?}', 'edit')->name('editUser');
         Route::post('/edit/{id?}', 'update');

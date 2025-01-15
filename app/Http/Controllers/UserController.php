@@ -48,11 +48,11 @@ class UserController extends Controller
 
     }
 
-    public function addUser()
+    public function add()
     {
         Helper::access('usersEdit');
         $user = new User();
-        return view('editUser', [
+        return view('addEditUser', [
             'user' => $user,
             'edit' => false,
         ]);
@@ -60,48 +60,39 @@ class UserController extends Controller
 
     public function edit($id = null)
     {
-        $warehouses = Warehouse::all();
-        if (auth()->user()->meta('usersEdit') && $id)
-            return view('editUser', [
-                'user' => User::find($id),
-                'edit' => true,
-                'warehouses' => $warehouses,
-            ]);
-        else
-            return view('editUser', [
-                'user' => auth()->user(),
-                'edit' => true,
-                'warehouses' => $warehouses,
-            ]);
+        $user = auth()->user();
+        if ($user->meta('usersEdit'))
+            $user =User::find($id);
+        return view('addEditUser', [
+            'user' => $user,
+            'edit' => true,
+            'warehouses' => Warehouse::all(),
+        ]);
     }
 
-    public function insertUser(Request $request)
+    public function insertUser(Request $req)
     {
         Helper::access('usersEdit');
-        $request->validate([
+        $req->validate([
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|min:5',
+            'username' => 'required|unique:users|string|max:255|min:5',
             'phone' => 'required|string|max:11|min:11',
             'password' => 'required|string|min:8',
         ]);
-        $request->phone = Helper::number_Fa_En($request->phone);
+        $req->phone = Helper::number_Fa_En($req->phone);
 
-        User::create([
-            'name' => $request->name,
-            'phone' => $request->phone,
-            'username' => $request->username,
-            'role' => $request->role,
-            'password' => Hash::make($request->password),
+        User::create($req->merge([
+            'password' => Hash::make($req->password),
             'verified' => true,
-        ]);
-
+            ])->all());
         return redirect()->route('listOrders');
     }
 
     public function update(Request $request, $id = null)
     {
-        if (!auth()->user()->meta('usersEdit'))
-            $id = auth()->user()->id;
+        $user = auth()->user();
+        if (!$user->meta('usersEdit'))
+            $id = $user->id;
         $request->validate([
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|min:5',
