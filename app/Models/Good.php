@@ -8,17 +8,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Good extends Model
 {
-//    use HasFactory;
     use SoftDeletes;
-
     public $timestamps = false;
-
     protected $fillable =[
-        'name',
-        'price',
-        'photo',
-        'category',
-        'productPrice',
+        'name',  //نام کالا
+        'price',  //قیمت فروش
+        'photo', //تصویر محصول
+        'category', //دسته بندی محصول نهایی، مواد اولیه، ملزومات بسته بندی
+        'productPrice', //قیمت تولید
+        'isic', //اینتا کد
+        'vat', //ارزش افزوده دارد یا خیر
+        'tag', //شناسه کالا
     ];
 
     public function products()

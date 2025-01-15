@@ -48,15 +48,79 @@
             <div class="col-md-6">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
-                        <label for="PPrice" class="input-group-text w-100">قیمت تولید:</label>
+                        <label for="productPrice" class="input-group-text w-100">قیمت تولید:</label>
                     </div>
-                    <input type="text" id="PPrice" class="form-control price-input" name="PPrice"
-                           value="{{old('PPrice')?:$good->productPrice}}">
+                    <input type="text" id="productPrice" class="form-control price-input" name="productPrice"
+                           value="{{old('productPrice')?:$good->productPrice}}">
                     <div class="input-group-append" style="min-width: 120px">
-                        <label for="PPrice" class="input-group-text w-100">ریال</label>
+                        <label for="productPrice" class="input-group-text w-100">ریال</label>
                     </div>
                 </div>
             </div>
+
+            {{--اینتا کد--}}
+            <div class="col-md-6">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="isic" class="input-group-text w-100">اینتا کد:</label>
+                    </div>
+                    <input type="text" id="isic" class="form-control" name="isic" required
+                           value="{{old('isic')?:$good->isic}}"
+                           onkeypress="return event.charCode >= 48 && event.charCode <= 57" pattern="^[0-9]*$">
+                </div>
+            </div>
+
+            {{--شناسه کالا--}}
+            <div class="col-md-6">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="tag" class="input-group-text w-100">شناسه کالا:</label>
+                    </div>
+                    <input type="text" id="tag" class="form-control" name="tag" required
+                           value="{{old('tag')?:$good->tag}}"
+                           onkeypress="return event.charCode >= 48 && event.charCode <= 57" pattern="^[0-9]*$">
+                </div>
+            </div>
+
+            {{-- ارزش افزوده(10%)--}}
+            <div class="col-md-6 my-2 VAT">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label class="input-group-text ">ارزش افزوده(10%):</label>
+                    </div>
+                    <label for="vat" class="">دارد</label>
+                    <input type="radio" class="checkboxradio" name="vat" id="vat"
+                           value="1" @checked((old('vat')?:$good->vat)==1)>
+                    <label for="no-vat" class="">ندارد</label>
+                    <input type="radio" class="checkboxradio" name="vat" id="no-vat"
+                           value="0" @checked((old('vat')?:$good->vat)!=1)>
+                </div>
+            </div>
+
+            {{--دسته بندی محصول--}}
+            <div class="col-md-6 bg-light">
+                <div class="form-group input-group">
+                    <input type="radio" name="category" id="final" value="final" @checked($good->category == 'final')>
+                    <label for="final">محصول نهایی</label>
+                    <input type="radio" name="category" id="raw" value="raw" @checked($good->category == 'raw')>
+                    <label for="raw">مواد اولیه</label>
+                    <input type="radio" name="category" id="pack" value="pack" @checked($good->category == 'pack')>
+                    <label for="pack">ملزومات بسته بندی</label>
+
+                </div>
+            </div>
+
+            {{--اطلاعات تامین کننده--}}
+            <div class="col-md-6 bg-light">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="supplier_inf">اطلاعات تامین کننده:</label>
+                    </div>
+                    <textarea name="supplier_inf" class="form-control"
+                              id="supplier_inf">{{old('supplier_inf')?:$good->Supplier_inf()}}</textarea>
+                </div>
+            </div>
+
             @if($edit)
                 {{--مکان انبار--}}
                 <div class="col-md-6">
@@ -65,16 +129,16 @@
                             <label for="warehouse" class="input-group-text w-100">مکان انبار:</label>
                         </div>
                         <select name="warehouse" id="warehouse" class="form-control" disabled>
-                            @foreach($warehouses as $warehouse)
-                                <option value="{{$warehouse->id}}"
-                                    @selected($product->warehouse_id == $warehouse->id) >{{$warehouse->name}}</option>
+                            @foreach($warehouses as $id => $warehouse)
+                                <option
+                                    value="{{$id}}" @selected($product->warehouse_id == $id)>{{$warehouse->name}}</option>
                             @endforeach
                         </select>
 
                     </div>
                 </div>
-                {{--اصلاح موجودی--}}
 
+                {{--اصلاح موجودی--}}
                 <div class="col-md-6 my-2">
                     <div class="form-group input-group">
                         <div class="input-group-text">
@@ -123,31 +187,7 @@
 
                     </div>
                 </div>
-            @endif
 
-            {{--دسته بندی محصول--}}
-            <div class="col-md-6 bg-light">
-                <div class="form-group input-group">
-                    <input type="radio" name="category" id="final" value="final" @checked($good->category == 'final')>
-                    <label for="final">محصول نهایی</label>
-                    <input type="radio" name="category" id="raw" value="raw" @checked($good->category == 'raw')>
-                    <label for="raw">مواد اولیه</label>
-                    <input type="radio" name="category" id="pack" value="pack" @checked($good->category == 'pack')>
-                    <label for="pack">ملزومات بسته بندی</label>
-
-                </div>
-            </div>
-
-            {{--اطلاعات تامین کننده--}}
-            <div class="col-md-6 bg-light">
-                <div class="form-group input-group">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label for="supplier_inf">اطلاعات تامین کننده:</label>
-                    </div>
-                    <textarea name="supplier_inf" class="form-control" id="supplier_inf">{{old('supplier_inf')?:$good->Supplier_inf()}}</textarea>
-                </div>
-            </div>
-            @if($edit)
                 {{--وضعیت موجودی--}}
                 <div class="col-md-6">
                     <div>
@@ -196,8 +236,8 @@
         @endif
         &nbsp;
         <a href="{{route('productList')}}" class="btn btn-danger">بازگشت</a>
-
     </form>
+
     @if($edit)
         <hr>
         <span class="btn btn-warning m-2" onclick="$('.deleted').toggle()"><span class="deleted fa fa-check"></span>نمایش حذف شده ها</span>
@@ -239,12 +279,9 @@
     <script>
         let token = '{!! csrf_token() !!}'
         $(function () {
+            $('.checkboxradio').checkboxradio();
             $('input[name="available"], input[name="category"]').checkboxradio();
             @if($edit)
-            {{--if (!({{$product->available}}))--}}
-            {{--    $('#notavailable').click();--}}
-            {{--if (!!'{{$good->category}}')--}}
-            {{--    $('#{{$good->category}}').click();--}}
             $('#table1').DataTable({
                 order: [[0, "desc"]],
                 pageLength: 100,

@@ -52,33 +52,50 @@ class ProductController extends Controller
             'product' => $product,
             'good' => $product->good,
             'edit' => true,
-            'warehouses' => Warehouse::all(),
+            'warehouses' => Warehouse::all()->keyBy('id'),
         ]);
     }
 
     public function storeNew(Request $req)
     {
         Helper::access('warehouse');
-        $req->price = +str_replace(",", "", $req->price);
-        $req->PPrice = +str_replace(",", "", $req->PPrice);
+        DB::beginTransaction();
+        $req->merge(['price' => str_replace(",", "", $req->price)]);
+        $req->merge(['productPrice' => str_replace(",", "", $req->productPrice)]);
         request()->validate([
             'name' => 'required|unique:goods|string|max:255|min:4',
-            'price' => 'required',
+            'price' => 'required|integer',
+            'productPrice' => 'integer',
+            'isic' => 'integer|min:7,max:7',
+            'tag' => 'integer|min:13,max:13',
         ]);
-
-        $good = Good::create([
-            'name' => $req->name,
-            'price' => $req->price,
-            'productPrice' => $req->PPrice,
-            'category' => $req->category,
-        ]);
+        if($req->id){
+            $product = Product::with('good')->findOrFail($id);
+            $productChange = new ProductChange();
+            $productChange->product_id = $product->id;
+            if ($req->addType == 'add') {
+                $productChange->change = +$req->add;
+                $product->quantity += $req->add;
+                $productChange->desc = 'اضافه کردن موجودی به اندازه ' . $req->add . ' عدد';
+            } else {
+                $productChange->change = +$req->value - (+$product->quantity);
+                $product->quantity = $req->value;
+                $productChange->desc = 'اصلاح موجودی به مقدار' . $req->value . ' عدد';
+            }
+            $productChange->quantity = $product->quantity;
+            $product->alarm = $req->alarm;
+            $product->high_alarm = $req->high_alarm;
+            $product->available = ($req->available == 'true');
+            $product->save();
+        }
+        $good = Good::create($req->all());
 
         GoodMeta::updateOrCreate([
             'good_id' => $good->id,
         ],[
             'supplier_inf' => $req->supplier_inf,
         ]);
-
+        DB::commit();
         return redirect()->route('productList');
     }
 
@@ -123,7 +140,6 @@ class ProductController extends Controller
         ],[
             'supplier_inf' => $req->supplier_inf,
         ]);
-//        dd($goodmeta);
         if ($productChange->change != 0)
             $productChange->save();
         DB::commit();
