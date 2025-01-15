@@ -157,6 +157,8 @@
                     توضیحات: {{$order->desc}}
                     /
                 @endif
+                     (انبار {{$order->warehouse->name}})
+                    /
                 @unless($order->confirm)
                         <span style="white-space: pre-wrap;">{{$setting->invoice_note1}}</span>
                 @endunless
