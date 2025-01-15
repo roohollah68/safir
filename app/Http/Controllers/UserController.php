@@ -74,7 +74,7 @@ class UserController extends Controller
     {
         Helper::access('usersEdit');
         $req->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:users',
             'username' => 'required|unique:users|string|max:255|min:5',
             'phone' => 'required|string|max:11|min:11',
             'password' => 'required|string|min:8',
@@ -94,8 +94,8 @@ class UserController extends Controller
         if (!$user->meta('usersEdit'))
             $id = $user->id;
         $request->validate([
-            'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|min:5',
+            'name' => 'required|string|max:255|unique:users,name,'.$id,
+            'username' => 'required|string|max:255|min:5|unique:users,username,'.$id,
             'phone' => 'required|string|max:11|min:11',
             'NuRecords' => 'integer|min:1|max:3000'
         ]);
