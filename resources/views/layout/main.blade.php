@@ -58,6 +58,9 @@
     <div class="content"><h3></h3></div>
 </div>
 <div id="invoice-wrapper"></div>
+<div id="invoice-wrapper1"></div>
+<div id="invoice-wrapper2"></div>
+<div id="invoice-wrapper3"></div>
 
 </body>
 </html>

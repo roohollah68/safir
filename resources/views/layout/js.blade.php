@@ -1,22 +1,17 @@
 <script>
 
-    @if($admin || $superAdmin || $print)
-
     function invoice(id) {
 
         let printInvoice = (page, index) => {
-            $('#invoice-wrapper').html(page );
-            setTimeout(() => {
-                domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
-                    .then(function (dataUrl) {
-                        let link = document.createElement('a');
-                        link.download = id + `_` + index + `_` + makeid(3) + '.jpg';
-                        link.href = dataUrl;
-                        link.click();
-                        $('#invoice-wrapper').html('');
-                    })
-            }, 100)
-
+            $('#invoice-wrapper' + index).html(page);
+            domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
+                .then(function (dataUrl) {
+                    let link = document.createElement('a');
+                    link.download = id + `_` + index + `_` + makeid(3) + '.jpg';
+                    link.href = dataUrl;
+                    link.click();
+                    $('#invoice-wrapper' + index).html('');
+                })
         }
 
         $.post('/invoice/' + id, {
@@ -24,25 +19,20 @@
             totalPages: 1,
             pageContent: 'all',
         }).done(res => {
-            $('#invoice-wrapper').html(res[0]);
+            $('#invoice-wrapper1').html(res[0]);
             if ($('#invoice-content')[0].offsetHeight < 2900) {
-                printInvoice(res[0] , 1);
+                printInvoice(res[0], 1);
             } else {
                 $.post('/invoice/' + id, {
                     _token: token,
                 }).done(res => {
                     $.each(res, (index, page) => {
-                        setTimeout(() => {
-                            printInvoice(page , index+1)
-                        }, 200 * index);
+                        printInvoice(page, index + 1)
                     })
-
                 })
             }
         })
     }
-
-    @endif
 
     function view_order(id) {
         $.post('/viewOrder/' + id, {_token: token})

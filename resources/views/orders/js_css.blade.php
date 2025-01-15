@@ -381,7 +381,7 @@
 
     @endif
 
-    @if($user->meta('showAllOrders') || $user->meta('editAllOrders') || $user->meta('changeOrderState'))
+    @if($user->meta(['showAllOrders','editAllOrders','changeOrderState']))
 
     function generatePDF(Ids) {
 
