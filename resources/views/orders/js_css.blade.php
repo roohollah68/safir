@@ -253,7 +253,7 @@
         let confirmInvoice = `<a class="fa fa-check btn btn-success" onclick="selectPayment(${id})" title=" تایید فاکتور"></a> `;
         let invoice = `<a class="fa fa-file-invoice-dollar btn btn-info text-success" onclick="invoice(${id})" title=" فاکتور"></a> `;
         let preInvoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title="پیش فاکتور"></a> `;
-        let excel = `<a class="fa fa-file-excel btn btn-outline-info" href="/orderExcel/${id}" title="خروجی اکسل"></a> `;
+        // let excel = `<a class="fa fa-file-excel btn btn-outline-info" href="/orderExcel/${id}" title="خروجی اکسل"></a> `;
 
         if (!order.state && (!order.confirm || creatorRole === 'user'))
             res += deleteOrder;
@@ -263,8 +263,8 @@
         if (changeOrdersPermit && order.state)
             res += generatePDF
 
-        if (order.customer_id)
-            res += excel
+        // if (order.customer_id)
+        //     res += excel
 
         if (creatorRole !== 'user' && order.state < 10) {
             if (order.confirm)

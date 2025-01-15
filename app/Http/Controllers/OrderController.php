@@ -725,52 +725,52 @@ class OrderController extends Controller
         return ['ok', $order];
     }
 
-    public function orderExcel($id)
-    {
-        $order = Helper::Order(false)->findOrFail($id);
-        $customer = $order->customer;
-        $customerMeta = $customer->customerMetas->first();
-        $orderProducts = $order->orderProducts->keyBy('id');
-        foreach ($orderProducts as $orderProduct) {
-            if ($orderProduct->discount == 100) {
-                if (isset($orderProduct->product))
-                    $orderProduct->original_price = $orderProduct->product->good->price;
-                else
-                    $orderProduct->original_price = 0;
-            } else
-                $orderProduct->original_price = +round($orderProduct->price * 100 / (100 - $orderProduct->discount));
-            $orderProduct->add_value = $orderProduct->price * $orderProduct->number * 0.1;
-        }
-        return view('orders.orderExcel', [
-            'order' => $order,
-            'customer' => $customer,
-            'customerMeta' => $customerMeta,
-            'orderProducts' => $orderProducts,
-        ]);
-    }
-
-    public function saveExcelData($id, Request $req)
-    {
-        $order = Helper::Order(false)->findOrFail($id);
-        if ($req->customer_code)
-            CustomerMeta::updateOrCreate(
-                ['customer_id' => $order->customer_id],
-                [
-                    'customer_code' => $req->customer_code
-                ]
-            );
-        foreach ($order->orderProducts as $orderProduct) {
-            GoodMeta::updateOrCreate(
-                ['good_id' => $orderProduct->product->good_id],
-                [
-                    'warehouse_code' => $req->{'warehouse_code_' . $orderProduct->id},
-                    'stuff_code' => $req->{'stuff_code_' . $orderProduct->id},
-//                    'added_value' => $req->{'added_value_' . $orderProduct->id},
-                ]
-            );
-        }
-        return 'با موفقیت ذخیره شد.';
-    }
+//    public function orderExcel($id)
+//    {
+//        $order = Helper::Order(false)->findOrFail($id);
+//        $customer = $order->customer;
+//        $customerMeta = $customer->customerMetas->first();
+//        $orderProducts = $order->orderProducts->keyBy('id');
+//        foreach ($orderProducts as $orderProduct) {
+//            if ($orderProduct->discount == 100) {
+//                if (isset($orderProduct->product))
+//                    $orderProduct->original_price = $orderProduct->product->good->price;
+//                else
+//                    $orderProduct->original_price = 0;
+//            } else
+//                $orderProduct->original_price = +round($orderProduct->price * 100 / (100 - $orderProduct->discount));
+//            $orderProduct->add_value = $orderProduct->price * $orderProduct->number * 0.1;
+//        }
+//        return view('orders.orderExcel', [
+//            'order' => $order,
+//            'customer' => $customer,
+//            'customerMeta' => $customerMeta,
+//            'orderProducts' => $orderProducts,
+//        ]);
+//    }
+//
+//    public function saveExcelData($id, Request $req)
+//    {
+//        $order = Helper::Order(false)->findOrFail($id);
+//        if ($req->customer_code)
+//            CustomerMeta::updateOrCreate(
+//                ['customer_id' => $order->customer_id],
+//                [
+//                    'customer_code' => $req->customer_code
+//                ]
+//            );
+//        foreach ($order->orderProducts as $orderProduct) {
+//            GoodMeta::updateOrCreate(
+//                ['good_id' => $orderProduct->product->good_id],
+//                [
+//                    'warehouse_code' => $req->{'warehouse_code_' . $orderProduct->id},
+//                    'stuff_code' => $req->{'stuff_code_' . $orderProduct->id},
+////                    'added_value' => $req->{'added_value_' . $orderProduct->id},
+//                ]
+//            );
+//        }
+//        return 'با موفقیت ذخیره شد.';
+//    }
 
     public function changeWarehose($orderId, $warehouseId)
     {

@@ -51,8 +51,8 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('changeWarehouse/{orderId}/{warehouseId}', 'changeWarehose');
         Route::post('/viewOrder/{id}', 'viewOrder');
         Route::post('/invoice/{id}', 'invoice');
-        Route::get('/orderExcel/{id}', 'orderExcel');
-        Route::post('/saveExcelData/{id}', 'saveExcelData');
+//        Route::get('/orderExcel/{id}', 'orderExcel');
+//        Route::post('/saveExcelData/{id}', 'saveExcelData');
         Route::post('/orders/dateFilter', 'dateFilter');
         Route::get('/pdfs/{ids}', 'pdfs');
         Route::post('/orders/paymentMethod/{id}', 'paymentMethod');
