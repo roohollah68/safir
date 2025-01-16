@@ -93,6 +93,8 @@ class WithdrawalController extends Controller
             $withdrawals = $withdrawals->where('manager_confirm', '<>', 1)->where('counter_confirm', 1);
         if ($req->filter == 'payment')
             $withdrawals = $withdrawals->where('payment_confirm', '<>', 1)->where('manager_confirm', 1);
+        if ($req->filter == 'paid')
+            $withdrawals = $withdrawals->where('payment_confirm', 1);
         if ($req->filter == 'recipient')
             $withdrawals = $withdrawals->where('recipient_confirm', '<>', 1)->where('payment_confirm', 1);
         if ($req->filter == 'complete')

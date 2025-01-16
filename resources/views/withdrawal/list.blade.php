@@ -23,6 +23,7 @@
         حسابدار</a>
     <a class="btn btn-{{$filter=='manager'?'':'outline-'}}primary" href="?{{$get}}filter=manager">منتظر تایید مدیر</a>
     <a class="btn btn-{{$filter=='payment'?'':'outline-'}}primary" href="?{{$get}}filter=payment">منتظر واریز</a>
+    <a class="btn btn-{{$filter=='paid'?'':'outline-'}}primary" href="?{{$get}}filter=paid">واریز شده</a>
     <a class="btn btn-{{$filter=='recipient'?'':'outline-'}}primary" href="?{{$get}}filter=recipient">منتظر دریافت</a>
     <a class="btn btn-{{$filter=='complete'?'':'outline-'}}primary" href="?{{$get}}filter=complete">تکمیل شده</a>
     <span class="mx-3"></span>
@@ -46,7 +47,10 @@
         <option value="{{$id}}" @selected($id == $Supplier)>{{$supplier->name}}</option>
     @endforeach
     </select>
-
+    <hr>
+    <span>تعداد: </span><b>{{$withdrawals->count()}}</b>
+    <span class="mx-3"></span>
+    <span>مجموع: </span><b>{{number_format($withdrawals->sum('amount'))}}</b><span>ریال</span>
     <br>
     <br>
     <table class="table table-striped" id="withdrawal-table">
@@ -75,7 +79,7 @@
                 <td>{{$withdrawal->user->name}}</td>
                 <td>{{number_format($withdrawal->amount)}}</td>
                 <td>{{$withdrawal->expense}}</td>
-                <td><a href="?{{$get}}Supplier={{$withdrawal->supplier_id}}">{{$withdrawal->account_name}}</a></td>
+                <td><a href="?Supplier={{$withdrawal->supplier_id}}">{{$withdrawal->account_name}}</a></td>
                 <td>{!! $withdrawal->counter_status() !!}</td>
                 <td>{!! $withdrawal->manager_status() !!}</td>
                 <td>{!! $withdrawal->payment_status() !!}</td>
