@@ -7,6 +7,7 @@
 @section('content')
     <a class="btn btn-outline-success" href="{{route('addWithdrawal')}}"><i class="fa fa-plus"></i> ثبت درخواست وجه جدید</a>
     <a class="btn btn-outline-info" href="/Supplier/list"><i class="fa fa-user"></i> مشاهده لیست تامین کنندگان</a>
+    <a class="btn btn-outline-primary" href="/Withdrawal/tankhah/add"><i class="fa fa-plus"></i>ثبت فاکتور تنخواه</a>
     <i class="mx-3"></i>
     <i>از تاریخ: </i><input type="text" value="" style="width: 120px" id="from_date">
     <i class="mx-3"></i>
@@ -21,6 +22,7 @@
     <a class="btn btn-{{$filter=='paid'?'':'outline-'}}primary" href="?{{$get}}filter=paid">واریز شده</a>
     <a class="btn btn-{{$filter=='recipient'?'':'outline-'}}primary" href="?{{$get}}filter=recipient">منتظر دریافت</a>
     <a class="btn btn-{{$filter=='complete'?'':'outline-'}}primary" href="?{{$get}}filter=complete">تکمیل شده</a>
+    <a class="btn btn-{{$filter=='tankhah'?'':'outline-'}}primary" href="?{{$get}}filter=tankhah">تنخواه</a>
     <i class="mx-3"></i>
     <a class="btn btn-{{$payMethod=='cash'?'':'outline-'}}warning" href="?{{$get}}payMethod=cash">نقدی</a>
     <a class="btn btn-{{$payMethod=='cheque'?'':'outline-'}}warning" href="?{{$get}}payMethod=cheque">چکی</a>
@@ -73,7 +75,7 @@
                 <td>{{verta($withdrawal->created_at)->formatJalaliDate()}}</td>
                 <td>{{$withdrawal->user->name}}</td>
                 <td>{{number_format($withdrawal->amount)}}</td>
-                <td>{{$withdrawal->expense}}</td>
+                <td>{{$withdrawal->expense}}{{$withdrawal->tankhah?' (تنخواه) ':''}}</td>
                 <td><a href="?Supplier={{$withdrawal->supplier_id}}">{{$withdrawal->account_name}}</a></td>
                 <td>{!! $withdrawal->counter_status() !!}</td>
                 <td>{!! $withdrawal->manager_status() !!}</td>
@@ -83,10 +85,10 @@
                     <span class="fa fa-eye btn btn-info" onclick="view_withdrawal({{$id}})"
                           title="مشاهده"></span>
                     @if($withdrawal->manager_confirm != 1)
-                        <a class="fa fa-edit btn btn-primary" href="/Withdrawal/edit/{{$id}}"
-                           title="ویرایش"></a>
-                        {{--                        <a class="fa fa-trash-alt btn btn-danger" href="/Withdrawal/delete/{{$id}}"--}}
-                        {{--                           title="حذف"></a>--}}
+                        <a class="fa fa-edit btn btn-primary" href="/Withdrawal/edit/{{$id}}" title="ویرایش"></a>
+                    @endif
+                    @if( $withdrawal->tankhah)
+                        <a class="fa fa-edit btn btn-primary" href="/Withdrawal/tankhah/edit/{{$id}}" title="ویرایش"></a>
                     @endif
                 </td>
             </tr>

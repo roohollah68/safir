@@ -9,6 +9,7 @@ use App\Models\Withdrawal;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Mpdf\Tag\B;
 
 class WithdrawalController extends Controller
 {
@@ -101,6 +102,8 @@ class WithdrawalController extends Controller
             $withdrawals = $withdrawals->where('recipient_confirm', '<>', 1)->where('payment_confirm', 1);
         if ($req->filter == 'complete')
             $withdrawals = $withdrawals->where('recipient_confirm', 1);
+        if ($req->filter == 'tankhah')
+            $withdrawals = $withdrawals->where('tankhah', 1);
         if (isset($req->official))
             $withdrawals = $withdrawals->where('official', $req->official);
         if (isset($req->Location))
@@ -188,7 +191,7 @@ class WithdrawalController extends Controller
         $withdrawal = Withdrawal::findOrFail($id);
         if ($withdrawal->payment_confirm != 1)
             return redirect()->back();
-        $withdrawal->recipient_confirm = $req->recipient_confirm;
+        $withdrawal->recipient_confirm = ($req->recipient_confirm || $withdrawal->tankhah);
         $withdrawal->recipient_desc = $req->recipient_desc;
         if ($req->file('recipient_file'))
             $withdrawal->recipient_file = $req->file("recipient_file")->store("", 'withdrawal');
@@ -207,5 +210,66 @@ class WithdrawalController extends Controller
         return view('withdrawal.view', [
             'withdrawal' => $withdrawal,
         ]);
+    }
+
+    public function addTankhah()
+    {
+        Helper::access(['withdrawal', 'allWithdrawal']);
+        return view('withdrawal.addEditTankhah', [
+            'suppliers' => Supplier::all()->keyBy('name'),
+            'withdrawal' => new Withdrawal(),
+            'banks' => Bank::all()->keyBy('id'),
+        ]);
+    }
+
+    public function editTankhah($id)
+    {
+        Helper::access(['withdrawal', 'allWithdrawal']);
+        $user = auth()->user();
+        $withdrawal = Withdrawal::where('tankhah', 1);
+        if (!$user->meta('allWithdrawal'))
+            $withdrawal = $withdrawal->where('user_id', $user->id);
+        $withdrawal = $withdrawal->findOrNew($id);
+        return view('withdrawal.addEditTankhah', [
+            'suppliers' => Supplier::all()->keyBy('name'),
+            'withdrawal' => $withdrawal,
+            'banks' => Bank::all()->keyBy('id'),
+        ]);
+    }
+
+    public function addEditTankhah(Request $req , $id = null)
+    {
+        DB::beginTransaction();
+        $user = auth()->user();
+        Helper::access(['withdrawal', 'allWithdrawal']);
+        request()->validate([
+            'user_file' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
+            'expense_desc' => 'required',
+        ], [
+            'user_file.mimes' => 'فایل با این پسوند قابل قبول نیست!',
+            'user_file.max' => 'حجم فایل نباید از 3 mb بیشتر باشد!',
+            'expense_desc.required' => 'نوع هزینه باید مشخص شود!'
+        ]);
+        $req->merge(['amount' => +str_replace(",", "", $req->amount)]);
+        $withdrawal = $user->withdrawals()->updateOrCreate(['id' => $req->id], $req->merge([
+            'tankhah' => 1,
+            'counter_confirm' => 1,
+            'manager_confirm' => 1,
+            'payment_confirm' => 1,
+            'recipient_confirm' => 1,
+        ])->all());
+        $supplier = Supplier::updateOrCreate(['name' => $req->account_name],[
+            'account' => $req->account_number,
+            'code' => $req->cheque_id,
+        ]);
+        $withdrawal->update(['supplier_id' => $supplier->id]);
+        if ($req->file("user_file")) {
+            $withdrawal->user_file = $req->file("user_file")->store("", 'withdrawal');
+        } elseif (!$req->old_user_file) {
+            $withdrawal->user_file = null;
+        }
+        $withdrawal->save();
+        DB::commit();
+        return redirect(route('WithdrawalList'));
     }
 }

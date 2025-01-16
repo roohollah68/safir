@@ -254,7 +254,13 @@
             @foreach($product->productChange()->get()->keyBy('id') as $productChange)
                 <tr class="{{$productChange->isDeleted?'deleted':''}}">
                     <td dir="ltr">{{verta($productChange->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
-                    <td>{{$productChange->desc}}</td>
+                    <td>
+                        @if($productChange->order_id)
+                            خرید مشتری {{$productChange->order->name}}
+                        @else
+                            {{$productChange->desc}}
+                        @endif
+                    </td>
                     <td dir="ltr">{{+$productChange->change}}</td>
                     <td dir="ltr">{{+$productChange->quantity}}</td>
                     <td>

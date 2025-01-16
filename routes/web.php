@@ -194,6 +194,10 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/managerForm/{id}', 'manager');
         Route::post('/paymentForm/{id}', 'payment');
         Route::post('/recipientForm/{id}', 'recipient');
+        Route::get('/tankhah/add', 'addTankhah');
+        Route::get('/tankhah/edit/{id}', 'editTankhah');
+        Route::post('/tankhah/add/{id?}', 'addEditTankhah');
+
     });
 
     Route::controller(SupplierController::class)->prefix('Supplier')->group(function () {
