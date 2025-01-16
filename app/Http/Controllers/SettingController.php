@@ -77,20 +77,16 @@ class SettingController extends Controller
 
     public function command()
     {
-        $withdrawals = Withdrawal::all()->keyBy('id');
-        $suppliers = Supplier::all()->keyBy('name');
-        foreach ($withdrawals as $id => $withdrawal){
-            if(isset($suppliers[$withdrawal->account_name])){
-                $supplier = $suppliers[$withdrawal->account_name];
-            }else{
-                $supplier = Supplier::create([
-                    'name' => $withdrawal->account_name,
-                    'account' => $withdrawal->account_number,
-                    'code' => $withdrawal->cheque_id,
-                ]);
-            }
-            $withdrawal->update(['supplier_id' => $supplier->id]);
+        $customer = Customer::with(['orders.orderProducts' , 'transactions'])->find(2992);
+        foreach ($customer->orders as $order){
+            foreach ($order->orderProducts as $orderProduct)
+                $orderProduct->delete();
+            $order->delete();
         }
+        foreach ($customer->transactions as $transaction){
+            $transaction->delete();
+        }
+        $customer->delete();
     }
 
 }
