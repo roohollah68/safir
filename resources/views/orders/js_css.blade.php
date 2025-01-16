@@ -45,9 +45,6 @@
         }
 
         $.each(orders, (id, order) => {
-            if(id == 28004){
-                console.log(order);
-            }
             if (user !== 'all' && +user !== order.user_id)
                 return
             if (showDeleted ^ !!order.deleted_at)
