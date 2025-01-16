@@ -23,7 +23,6 @@
         sendMethodText = $('#sendMethodText').html();
         $('#sendMethodText').html('');
         $(".checkboxradio").checkboxradio();
-        $('#warehouse-' + warehouseId).click();
         prepare_data();
 
         const dtp1Instance2 = new mds.MdsPersianDateTimePicker(document.getElementById('date1'), {
@@ -43,7 +42,7 @@
         let select = (id) => {
             return `<input type="checkbox" class="orders_checkbox" onclick="ids.includes(${id})?removeFromIds(${id}):ids.push(${id})">`;
         }
-
+console.log('hi');
         $.each(orders, (id, order) => {
             if (user !== 'all' && +user !== order.user_id)
                 return

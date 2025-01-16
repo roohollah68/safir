@@ -46,7 +46,7 @@
         @endif
         <br>
         <br>
-        <x-radio :id="'warehouse-all'"  onclick="warehouseId = 'all';prepare_data()" name="warehouse">همه</x-radio>
+        <x-radio :id="'warehouse-all'"  onclick="warehouseId = 'all';prepare_data()" name="warehouse" checked>همه</x-radio>
         @foreach($warehouses as $warehouse)
             <x-radio :id="'warehouse-'.$warehouse->id"  onclick="warehouseId = {{$warehouse->id}};prepare_data()" name="warehouse">{{$warehouse->name}}</x-radio>
         @endforeach
@@ -60,7 +60,7 @@
                 <label for="user" class="input-group-text">سفیر:</label>
 
                 <select class="form-control" id="user"
-                        onchange="user = $('#user option:selected').val() || 'all';prepare_data()">
+                        onchange="user = this.value;prepare_data()">
                     <option value="all" selected>همه</option>
                     @foreach($users as $id=>$user)
                         <option value="{{$id}}">{{$user->name}}</option>
