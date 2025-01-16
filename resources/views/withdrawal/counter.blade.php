@@ -21,15 +21,13 @@
         <br>
         <br>
 
-        <label for="bank">انتخاب بانک</label>
-        <select id="bank" name="bank" class="form-control w-50">
-            <option>سپه</option>
-            <option>ملت</option>
-            <option>رفاه</option>
-            <option>کشاورزی</option>
-            <option>پارسیان</option>
+        <label for="bank_id">انتخاب بانک</label>
+        <select id="bank_id" name="bank_id" class="form-control w-50" required>
+            <option value="">لطفا انتخاب کنید</option>
+            @foreach($banks as $id => $bank)
+                <option value="{{$id}}">{{$bank->name}}</option>
+            @endforeach
         </select>
-
         <br>
         <br>
 

@@ -125,17 +125,14 @@
                     window.location.replace("?{!! $get !!}to=" + date2.getText())
                 }
             });
-
         });
-
-
 
         @if($User->meta('counter'))
         function counter_form(id) {
             withdrawal = withdrawals[id]
             if (withdrawal.manager_confirm == 1)
                 return;
-            let dialog = Dialog(`@include('withdrawal.counter')`);
+            Dialog(`@include('withdrawal.counter')`);
             $('.checkboxradio').checkboxradio();
             $(`input[value=${withdrawal.counter_confirm}]`).click();
             $('select[name=bank]').val(withdrawal.bank).change();
@@ -147,7 +144,7 @@
             withdrawal = withdrawals[id]
             if (withdrawal.payment_confirm == 1 || withdrawal.counter_confirm != 1)
                 return;
-            let dialog = Dialog(`@include('withdrawal.manager')`);
+            Dialog(`@include('withdrawal.manager')`);
             $('.checkboxradio').checkboxradio();
             $(`input[value=${withdrawal.manager_confirm}]`).click();
         }
@@ -158,7 +155,7 @@
             withdrawal = withdrawals[id]
             if (withdrawal.manager_confirm != 1 || withdrawal.recipient_confirm == 1)
                 return;
-            let dialog = Dialog(`@include('withdrawal.payment')`);
+            Dialog(`@include('withdrawal.payment')`);
             $('.checkboxradio').checkboxradio();
             $(`input[value=${withdrawal.payment_confirm}]`).click();
             if (withdrawal.payment_file) {
@@ -178,7 +175,7 @@
             withdrawal = withdrawals[id]
             if (withdrawal.payment_confirm != 1)
                 return;
-            let dialog = Dialog(`@include('withdrawal.recipient')`);
+            Dialog(`@include('withdrawal.recipient')`);
             $('.checkboxradio').checkboxradio();
             $(`input[value=${withdrawal.recipient_confirm}]`).click();
             if (withdrawal.recipient_file) {

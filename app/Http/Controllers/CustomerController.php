@@ -148,6 +148,20 @@ class CustomerController extends Controller
         return redirect()->route('CustomerList');
     }
 
+    public function deleteCustomer($id)
+    {
+        $customer = Customer::with(['orders.orderProducts' , 'transactions'])->find($id);
+        foreach ($customer->orders as $order){
+            foreach ($order->orderProducts as $orderProduct)
+                $orderProduct->delete();
+            $order->delete();
+        }
+        foreach ($customer->transactions as $transaction){
+            $transaction->delete();
+        }
+        $customer->delete();
+    }
+
     public function changeTrust($id)
     {
         if (auth()->user()->meta('editAllCustomers'))

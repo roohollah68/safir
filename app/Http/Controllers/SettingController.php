@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 //use App\Models\CustomerTransaction;
 //use App\Models\Good;
 use App\Helper\Helper;
+use App\Models\Bank;
 use App\Models\CouponLink;
 use App\Models\Customer;
 use App\Models\CustomerTransaction;
@@ -77,16 +78,12 @@ class SettingController extends Controller
 
     public function command()
     {
-        $customer = Customer::with(['orders.orderProducts' , 'transactions'])->find(2992);
-        foreach ($customer->orders as $order){
-            foreach ($order->orderProducts as $orderProduct)
-                $orderProduct->delete();
-            $order->delete();
+        $banks = Bank::all()->keyBy('name');
+        $withdrawals = Withdrawal::all()->keyBy('id');
+        foreach ($withdrawals as $id => $withdrawal){
+            if(!$withdrawal->bank_id && $withdrawal->bank)
+                $withdrawal->update(['bank_id' => $banks[$withdrawal->bank]->id]);
         }
-        foreach ($customer->transactions as $transaction){
-            $transaction->delete();
-        }
-        $customer->delete();
     }
 
 }

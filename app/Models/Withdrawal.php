@@ -11,43 +11,18 @@ class Withdrawal extends Model
     use HasFactory;
     use SoftDeletes;
     protected $guarded = [
-        'id'
+        'id',
+        'user_id'
     ];
-//    protected $fillable = [
-//        'user_id',
-//        'supplier_id',
-//        'amount',
-//        'expense',
-//        'location',
-//        'user_desc',
-//        'user_file',
-//        'account_number',
-//        'account_name',
-//        'pay_method',
-//        'cheque_date',
-//        'cheque_id',
-//        'expense_type',
-//        'expense_desc',
-//        'counter_confirm',
-//        'official',
-//        'vat',
-//        'counter_desc',
-//        'bank',
-//        'manager_confirm',
-//        'manager_desc',
-//        'payment_confirm',
-//        'payment_desc',
-//        'payment_file',
-//        'payment_file2',
-//        'payment_file3',
-//        'recipient_desc',
-//        'recipient_confirm',
-//        'recipient_file',
-//    ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class);
     }
 
     public function counter_status()

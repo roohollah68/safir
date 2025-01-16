@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helper\Helper;
+use App\Models\Bank;
 use App\Models\Supplier;
 use App\Models\Withdrawal;
 use Carbon\Carbon;
@@ -115,6 +116,7 @@ class WithdrawalController extends Controller
         return view('withdrawal.list', [
             'withdrawals' => $withdrawals->with('user')->get()->keyBy('id'),
             'suppliers' => Supplier::all()->keyBy('id')->sortBy('name'),
+            'banks' => Bank::where('enable' , true)->get()->keyBy('id'),
             'get' => http_build_query($_GET).'&',
             'filter' => $req->filter,
             'official' => $req->official,
@@ -133,7 +135,7 @@ class WithdrawalController extends Controller
         $withdrawal->counter_confirm = $req->counter_confirm;
         $withdrawal->manager_confirm = 0;
         $withdrawal->counter_desc = $req->counter_desc;
-        $withdrawal->bank = $req->bank;
+        $withdrawal->bank_id = $req->bank_id;
         $withdrawal->save();
         return redirect()->back();
     }
@@ -198,10 +200,10 @@ class WithdrawalController extends Controller
     {
         Helper::access(['withdrawal', 'allWithdrawal']);
         $user = auth()->user();
-        if ($user->meta('allWithdrawal'))
-            $withdrawal = Withdrawal::findOrFail($id);
-        else
-            $withdrawal = $user->withdrawals()->findOrFail($id);
+        $withdrawal = Withdrawal::with('bank');
+        if (!$user->meta('allWithdrawal'))
+            $withdrawal = $withdrawal->where('user_id' , $user->id);
+            $withdrawal = $withdrawal->findOrFail($id);
         return view('withdrawal.view', [
             'withdrawal' => $withdrawal,
         ]);

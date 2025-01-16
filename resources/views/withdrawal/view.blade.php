@@ -19,20 +19,48 @@
     @endif
     <span>دسته هزینه:</span> <b>{{$withdrawal->expense_type=='current'?'هزینه':'دارایی'}}</b> <br>
     <span>نوع هزینه:</span> <b>{{$withdrawal->expense_desc}}</b> <br>
-    <span>نوع فاکتور:</span> <b>{{$withdrawal->official != 1?'غیر رسمی':('رسمی '.($withdrawal->vat == 1?'با ارزش افزوده':'بدون ارزش افزوده'))}}</b> <br>
+    <span>نوع فاکتور:</span>
+    <b>{{$withdrawal->official != 1?'غیر رسمی':('رسمی '.($withdrawal->vat == 1?'با ارزش افزوده':'بدون ارزش افزوده'))}}</b>
+    <br>
     @if($withdrawal->deleted_at)
         <span>زمان حذف:</span><b>{{verta($withdrawal->deleted_at)->formatJalaliDate()}}</b><br>
     @endif
     <span>تایید حسابداری:</span> <b>{!! $withdrawal->counter_status() !!}</b> <br>
     <span>توضیحات حسابداری:</span> <b>{{$withdrawal->counter_desc}}</b> <br>
-    <span>بانک پرداخت کننده:</span> <b>{{$withdrawal->bank}}</b> <br>
-    <span>تایید مدیر:</span> <b>{!! $withdrawal->manager_status() !!}</b> <br>
-    <span>توضیحات مدیر:</span> <b>{{$withdrawal->manager_desc}}</b> <br>
-    <span>تایید پرداخت:</span> <b>{!! $withdrawal->payment_status() !!}</b> <br>
-    <span>توضیحات پرداخت:</span> <b>{{$withdrawal->payment_desc}}</b> <br>
-    @if($withdrawal->payment_file)
-        <span>رسید پرداخت:</span> <b><a href="/withdrawal/{{$withdrawal->payment_file}}" target="_blank">مشاهده فایل</a></b>
-        <br>
+    <span>بانک پرداخت کننده:</span> <b>{{(isset($withdrawal->bank))?$withdrawal->bank->name:'نامشخص'}}</b>
+    <hr>
+    @if($withdrawal->counter_confirm != 0)
+        <span>تایید مدیر:</span> <b>{!! $withdrawal->manager_status() !!}</b> <br>
+        <span>توضیحات مدیر:</span> <b>{{$withdrawal->manager_desc}}</b>
+        <hr>
     @endif
-
+    @if($withdrawal->counter_confirm != 0 && $withdrawal->manager_confirm != 0)
+        <span>تایید پرداخت:</span> <b>{!! $withdrawal->payment_status() !!}</b> <br>
+        <span>توضیحات پرداخت:</span> <b>{{$withdrawal->payment_desc}}</b> <br>
+        @if($withdrawal->payment_file)
+            <span>رسید پرداخت:</span> <b><a href="/withdrawal/{{$withdrawal->payment_file}}" target="_blank">مشاهده
+                    فایل</a></b>
+            <br>
+        @endif
+        @if($withdrawal->payment_file2)
+            <span>رسید پرداخت2:</span> <b><a href="/withdrawal/{{$withdrawal->payment_file2}}" target="_blank">مشاهده
+                    فایل</a></b>
+            <br>
+        @endif
+        @if($withdrawal->payment_file3)
+            <span>رسید پرداخت3:</span> <b><a href="/withdrawal/{{$withdrawal->payment_file3}}" target="_blank">مشاهده
+                    فایل</a></b>
+            <br>
+        @endif
+        <hr>
+    @endif
+    @if($withdrawal->counter_confirm != 0 && $withdrawal->manager_confirm != 0 && $withdrawal->payment_confirm != 0)
+        <span>تایید دریافت کالا یا خدمات:</span> <b>{!! $withdrawal->recipient_status() !!}</b> <br>
+        <span>توضیحات دریافت:</span> <b>{{$withdrawal->recipient_desc}}</b> <br>
+        @if($withdrawal->recipient_file)
+            <span>رسید دریافت:</span> <b><a href="/withdrawal/{{$withdrawal->recipient_file}}" target="_blank">مشاهده
+                    فایل</a></b>
+            <br>
+        @endif
+    @endif
 </div>
