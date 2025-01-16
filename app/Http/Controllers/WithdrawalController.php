@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helper\Helper;
 use App\Models\Supplier;
 use App\Models\Withdrawal;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -107,15 +108,21 @@ class WithdrawalController extends Controller
             $withdrawals = $withdrawals->where('supplier_id', $req->Supplier);
         if(isset($req->payMethod))
             $withdrawals = $withdrawals->where('pay_method', $req->payMethod);
+        if(isset($req->from))
+            $withdrawals = $withdrawals->whereDate('created_at','>', $req->from);
+        if(isset($req->to))
+            $withdrawals = $withdrawals->whereDate('created_at','<', $req->to);
         return view('withdrawal.list', [
-            'withdrawals' => $withdrawals->get()->keyBy('id'),
+            'withdrawals' => $withdrawals->with('user')->get()->keyBy('id'),
             'suppliers' => Supplier::all()->keyBy('id')->sortBy('name'),
-            'user' => $user,
+            'get' => http_build_query($_GET).'&',
             'filter' => $req->filter,
             'official' => $req->official,
             'Location' => $req->Location,
             'Supplier' => $req->Supplier,
             'payMethod' => $req->payMethod,
+            'from' => $req->from,
+            'to' => $req->to,
         ]);
     }
 

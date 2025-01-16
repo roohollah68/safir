@@ -174,10 +174,7 @@
     </div>
 @endsection
 
-
 @section('files')
-    <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
-    <link rel="stylesheet" href="/date-time-picker/mds.bs.datetimepicker.style.css">
     <script>
         let token = '{{csrf_token()}}';
         let transactionReportTXT;
