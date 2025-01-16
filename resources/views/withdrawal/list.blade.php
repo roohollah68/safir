@@ -10,29 +10,42 @@
     <br>
     <br>
     @php
-        $F = is_null($filter)?'':'&filter='.$filter;
-        $O = is_null($official)?'':'&official='.$official;
-        $L = is_null($Location)?'':'&Location='.$Location;
+        $get = '';
+            $get .= is_null($filter)?'':'filter='.$filter.'&';
+            $get .= is_null($official)?'':'official='.$official.'&';
+            $get .= is_null($Location)?'':'Location='.$Location.'&';
+            $get .= is_null($Supplier)?'':'Supplier='.$Supplier.'&';
+            $get .= is_null($payMethod)?'':'payMethod='.$payMethod.'&';
     @endphp
-    <a class="btn btn-{{(is_null($filter) && is_null($official) && is_null($Location))?'':'outline-'}}primary"
-       href="/Withdrawal/list">همه</a>
+    <a class="btn btn-{{$get?'outline-':''}}success" href="/Withdrawal/list">همه</a>
+    <span class="mx-3"></span>
+    <a class="btn btn-{{$filter=='counter'?'':'outline-'}}primary" href="?{{$get}}filter=counter">منتظر تایید
+        حسابدار</a>
+    <a class="btn btn-{{$filter=='manager'?'':'outline-'}}primary" href="?{{$get}}filter=manager">منتظر تایید مدیر</a>
+    <a class="btn btn-{{$filter=='payment'?'':'outline-'}}primary" href="?{{$get}}filter=payment">منتظر واریز</a>
+    <a class="btn btn-{{$filter=='recipient'?'':'outline-'}}primary" href="?{{$get}}filter=recipient">منتظر دریافت</a>
+    <a class="btn btn-{{$filter=='complete'?'':'outline-'}}primary" href="?{{$get}}filter=complete">تکمیل شده</a>
+    <span class="mx-3"></span>
+    <a class="btn btn-{{$payMethod=='cash'?'':'outline-'}}warning" href="?{{$get}}payMethod=cash">نقدی</a>
+    <a class="btn btn-{{$payMethod=='cheque'?'':'outline-'}}warning" href="?{{$get}}payMethod=cheque">چکی</a>
     <hr>
-    <a class="btn btn-{{$filter=='counter'?'':'outline-'}}primary" href="?filter=counter{{$O.$L}}">منتظر تایید حسابدار</a>
-    <a class="btn btn-{{$filter=='manager'?'':'outline-'}}primary" href="?filter=manager{{$O.$L}}">منتظر تایید مدیر</a>
-    <a class="btn btn-{{$filter=='payment'?'':'outline-'}}primary" href="?filter=payment{{$O.$L}}">منتظر واریز</a>
-    <a class="btn btn-{{$filter=='recipient'?'':'outline-'}}primary" href="?filter=recipient{{$O.$L}}">منتظر دریافت</a>
-    <a class="btn btn-{{$filter=='complete'?'':'outline-'}}primary" href="?filter=complete{{$O.$L}}">تکمیل شده</a>
-    <hr>
-    <a class="btn btn-{{$official=='1'?'':'outline-'}}primary" href="?official=1{{$F.$L}}">رسمی</a>
-    <a class="btn btn-{{$official=='0'?'':'outline-'}}primary" href="?official=0{{$F.$L}}">غیر رسمی</a>
-    <hr>
+    <a class="btn btn-{{$official=='1'?'':'outline-'}}info" href="?{{$get}}official=1">رسمی</a>
+    <a class="btn btn-{{$official=='0'?'':'outline-'}}info" href="?{{$get}}official=0">غیر رسمی</a>
+    <span class="mx-3"></span>
     @foreach(config('withdrawalLocation') as $id => $location)
         @continue($id == 0)
-        <a class="btn btn-{{$Location==$id?'':'outline-'}}primary" href="?Location={{$id}}{{$F.$O}}">
+        <a class="btn btn-{{$Location==$id?'':'outline-'}}secondary" href="?{{$get}}Location={{$id}}">
             {{$location}}
         </a>
     @endforeach
-
+    <span class="mx-3"></span>
+    <label for="supplier">تامین کننده</label>
+    <select id="supplier" onchange="window.location.replace('?{{$get}}Supplier='+this.value)">
+        <option value="">همه</option>
+    @foreach($suppliers as $id => $supplier)
+        <option value="{{$id}}" @selected($id == $Supplier)>{{$supplier->name}}</option>
+    @endforeach
+    </select>
 
     <br>
     <br>

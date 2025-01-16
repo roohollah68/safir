@@ -87,36 +87,33 @@ class WithdrawalController extends Controller
         $withdrawals = Withdrawal::where('id', '>', 0);
         if (!$user->meta('allWithdrawal'))
             $withdrawals = $withdrawals->where('user_id', $user->id);
-        if ($req->filter == 'counter') {
+        if ($req->filter == 'counter')
             $withdrawals = $withdrawals->where('counter_confirm', '<>', 1);
-        }
-        if ($req->filter == 'manager') {
+        if ($req->filter == 'manager')
             $withdrawals = $withdrawals->where('manager_confirm', '<>', 1)->where('counter_confirm', 1);
-        }
-        if ($req->filter == 'payment') {
+        if ($req->filter == 'payment')
             $withdrawals = $withdrawals->where('payment_confirm', '<>', 1)->where('manager_confirm', 1);
-        }
-        if ($req->filter == 'recipient') {
+        if ($req->filter == 'recipient')
             $withdrawals = $withdrawals->where('recipient_confirm', '<>', 1)->where('payment_confirm', 1);
-        }
-        if ($req->filter == 'complete') {
+        if ($req->filter == 'complete')
             $withdrawals = $withdrawals->where('recipient_confirm', 1);
-        }
-        if ($req->official == '0') {
-            $withdrawals = $withdrawals->where('official', 0);
-        }
-        if ($req->official == '1') {
-            $withdrawals = $withdrawals->where('official', 1);
-        }
-        if (isset($req->Location)) {
+        if (isset($req->official))
+            $withdrawals = $withdrawals->where('official', $req->official);
+        if (isset($req->Location))
             $withdrawals = $withdrawals->where('location', $req->Location);
-        }
+        if(isset($req->Supplier))
+            $withdrawals = $withdrawals->where('supplier_id', $req->Supplier);
+        if(isset($req->payMethod))
+            $withdrawals = $withdrawals->where('pay_method', $req->payMethod);
         return view('withdrawal.list', [
             'withdrawals' => $withdrawals->get()->keyBy('id'),
+            'suppliers' => Supplier::all()->keyBy('id')->sortBy('name'),
             'user' => $user,
             'filter' => $req->filter,
             'official' => $req->official,
             'Location' => $req->Location,
+            'Supplier' => $req->Supplier,
+            'payMethod' => $req->payMethod,
         ]);
     }
 

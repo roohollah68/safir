@@ -14,7 +14,7 @@
             <th>شماره</th>
             <th>نام</th>
             <th>تعداد واریز</th>
-            <th>مجموع دریافتی این دوره</th>
+            <th>مجموع دریافتی(ریال)</th>
             <th>عملیات</th>
         </tr>
         </thead>
@@ -24,9 +24,9 @@
 
             <tr>
                 <td>{{$id}}</td>
-                <td>{{$supplier->name}}</td>
+                <td><a href="{{route('WithdrawalList')}}?Supplier={{$id}}">{{$supplier->name}}</a></td>
                 <td>{{$supplier->withdrawals->where('payment_confirm', 1)->count()}}</td>
-                <td></td>
+                <td>{{number_format($supplier->withdrawals->where('payment_confirm', 1)->sum('amount'))}}</td>
                 <td>
                     <a class="fa fa-edit btn btn-primary" href="/Supplier/edit/{{$id}}"
                        title="ویرایش"></a>
@@ -47,7 +47,7 @@
         $(function () {
             $('#supplier-table').DataTable({
                 pageLength: 100,
-                order: [[0, "desc"]],
+                order: [[2, "desc"]],
             });
         });
         function view_supplier(id){
