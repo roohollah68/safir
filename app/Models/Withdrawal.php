@@ -39,6 +39,7 @@ class Withdrawal extends Model
         'payment_file3',
         'recipient_desc',
         'recipient_confirm',
+        'recipient_file',
     ];
 
     public function user()

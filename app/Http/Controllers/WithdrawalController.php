@@ -149,7 +149,6 @@ class WithdrawalController extends Controller
 
     public function payment($id, Request $req)
     {
-        $user = auth()->user();
         Helper::access('withdrawalPay');
         request()->validate([
             'payment_file' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
@@ -174,13 +173,17 @@ class WithdrawalController extends Controller
 
     public function recipient($id, Request $req)
     {
-        $user = auth()->user();
         Helper::access('withdrawalRecipient');
+        request()->validate([
+            'recipient_file' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
+        ]);
         $withdrawal = Withdrawal::findOrFail($id);
         if ($withdrawal->payment_confirm != 1)
             return redirect()->back();
         $withdrawal->recipient_confirm = $req->recipient_confirm;
         $withdrawal->recipient_desc = $req->recipient_desc;
+        if ($req->file('recipient_file'))
+            $withdrawal->recipient_file = $req->file("recipient_file")->store("", 'withdrawal');
         $withdrawal->save();
         return redirect()->back();
     }

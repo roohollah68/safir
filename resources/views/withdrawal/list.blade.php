@@ -99,46 +99,7 @@
             withdrawal = withdrawals[id]
             if (withdrawal.manager_confirm == 1)
                 return;
-            let dialog = Dialog(`
-            <div title="بررسی حسابداری" class="dialogs">
-<form method="post" action="/withdrawal/counterForm/${id}">
-@csrf
-            <span>تغییر وضعیت:</span>
-
-            <label class="btn btn-success" for="approved">تائید</label>
-            <input type="radio" name="counter_confirm" value="1" id="approved" class="checkboxradio">
-
-            <label class="btn btn-info" for="waiting">بررسی</label>
-            <input type="radio" name="counter_confirm" value="0" id="waiting" class="checkboxradio">
-
-            <label class="btn btn-danger" for="reject">عدم تائید</label>
-            <input type="radio" name="counter_confirm" value="-1" id="reject" class="checkboxradio">
-
-            <br>
-            <br>
-
-            <label for="counter_desc">توضیحات</label><br>
-            <textarea name="counter_desc" id="counter_desc" rows="3" class="w-100">${withdrawal.counter_desc || ''}</textarea>
-
-<br>
-<br>
-
-<label for="bank">انتخاب بانک</label>
-<select id="bank" name="bank" class="form-control w-50">
-<option>سپه</option>
-<option>ملت</option>
-<option>رفاه</option>
-<option>کشاورزی</option>
-<option>پارسیان</option>
-</select>
-
-<br>
-<br>
-
-<input class="btn btn-success" type="submit" value="ذخیره">
-</form>
-</div>
-            `);
+            let dialog = Dialog(`@include('withdrawal.counter')`);
             $('.checkboxradio').checkboxradio();
             $(`input[value=${withdrawal.counter_confirm}]`).click();
             $('select[name=bank]').val(withdrawal.bank).change();
@@ -150,34 +111,7 @@
             withdrawal = withdrawals[id]
             if (withdrawal.payment_confirm == 1 || withdrawal.counter_confirm != 1)
                 return;
-            let dialog = Dialog(`
-            <div title="بررسی مدیر" class="dialogs">
-<form method="post" action="/withdrawal/managerForm/${id}">
-@csrf
-            <span>تغییر وضعیت:</span>
-
-            <label class="btn btn-success" for="approved">تائید</label>
-            <input type="radio" name="manager_confirm" value="1" id="approved" class="checkboxradio">
-
-            <label class="btn btn-info" for="waiting">بررسی</label>
-            <input type="radio" name="manager_confirm" value="0" id="waiting" class="checkboxradio">
-
-            <label class="btn btn-danger" for="reject">عدم تائید</label>
-            <input type="radio" name="manager_confirm" value="-1" id="reject" class="checkboxradio">
-
-            <br>
-            <br>
-
-            <label for="manager_desc">توضیحات</label><br>
-            <textarea name="manager_desc" id="manager_desc" rows="3" class="w-100">${withdrawal.manager_desc || ''}</textarea>
-
-<br>
-<br>
-
-<input class="btn btn-success" type="submit" value="ذخیره">
-</form>
-</div>
-            `);
+            let dialog = Dialog(`@include('withdrawal.manager')`);
             $('.checkboxradio').checkboxradio();
             $(`input[value=${withdrawal.manager_confirm}]`).click();
         }
@@ -188,45 +122,7 @@
             withdrawal = withdrawals[id]
             if (withdrawal.manager_confirm != 1 || withdrawal.recipient_confirm == 1)
                 return;
-            let dialog = Dialog(`
-            <div title="ثبت اطلاعات پرداخت" class="dialogs">
-<form method="post" action="/withdrawal/paymentForm/${id}" enctype="multipart/form-data">
-@csrf
-            <span>تغییر وضعیت:</span>
-
-            <label class="btn btn-success" for="approved">تائید</label>
-            <input type="radio" name="payment_confirm" value="1" id="approved" class="checkboxradio">
-
-            <label class="btn btn-info" for="waiting">بررسی</label>
-            <input type="radio" name="payment_confirm" value="0" id="waiting" class="checkboxradio">
-
-            <label class="btn btn-danger" for="reject">عدم تائید</label>
-            <input type="radio" name="payment_confirm" value="-1" id="reject" class="checkboxradio">
-
-            <br>
-            <br>
-
-            <label for="payment_desc">توضیحات</label><br>
-            <textarea name="payment_desc" id="payment_desc" rows="3" class="w-100">${withdrawal.payment_desc || ''}</textarea>
-
-<br>
-<label for="payment_file">رسید پرداخت:</label>
-<input type="file" name="payment_file" id="payment_file"><br>
-<a class="btn btn-info hide" id="payment_file_old" href="/withdrawal/${withdrawal.payment_file}" target="_blank">مشاهده فایل</a>
-<br>
-<label for="payment_file2">رسید پرداخت 2:</label>
-<input type="file" name="payment_file2" id="payment_file2"><br>
-<a class="btn btn-info hide" id="payment_file_old2" href="/withdrawal/${withdrawal.payment_file2}" target="_blank">مشاهده فایل2</a>
-<br>
-<label for="payment_file3">رسید پرداخت 3:</label>
-<input type="file" name="payment_file3" id="payment_file3"><br>
-<a class="btn btn-info hide" id="payment_file_old3" href="/withdrawal/${withdrawal.payment_file3}" target="_blank">مشاهده فایل3</a>
-<br>
-
-<input class="btn btn-success" type="submit" value="ذخیره">
-</form>
-</div>
-            `);
+            let dialog = Dialog(`@include('withdrawal.payment')`);
             $('.checkboxradio').checkboxradio();
             $(`input[value=${withdrawal.payment_confirm}]`).click();
             if (withdrawal.payment_file) {
@@ -246,36 +142,12 @@
             withdrawal = withdrawals[id]
             if (withdrawal.payment_confirm != 1)
                 return;
-            let dialog = Dialog(`
-            <div title="ثبت اطلاعات دریافت کالا یا خدمات" class="dialogs">
-<form method="post" action="/withdrawal/recipientForm/${id}" enctype="multipart/form-data">
-@csrf
-            <span>تغییر وضعیت:</span>
-
-            <label class="btn btn-success" for="approved">تائید</label>
-            <input type="radio" name="recipient_confirm" value="1" id="approved" class="checkboxradio">
-
-            <label class="btn btn-info" for="waiting">بررسی</label>
-            <input type="radio" name="recipient_confirm" value="0" id="waiting" class="checkboxradio">
-
-            <label class="btn btn-danger" for="reject">عدم تائید</label>
-            <input type="radio" name="recipient_confirm" value="-1" id="reject" class="checkboxradio">
-
-            <br>
-            <br>
-
-            <label for="recipient_desc">توضیحات</label><br>
-            <textarea name="recipient_desc" id="recipient_desc" rows="3" class="w-100">${withdrawal.recipient_desc || ''}</textarea>
-
-<br>
-<br>
-
-<input class="btn btn-success" type="submit" value="ذخیره" selected>
-</form>
-</div>
-            `);
+            let dialog = Dialog(`@include('withdrawal.recipient')`);
             $('.checkboxradio').checkboxradio();
             $(`input[value=${withdrawal.recipient_confirm}]`).click();
+            if (withdrawal.recipient_file) {
+                $('#recipient_file_old').show();
+            }
         }
         @endif
 
