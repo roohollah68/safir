@@ -123,14 +123,14 @@ class User extends Authenticatable
     public function meta($name)
     {
         if (is_string($name)) {
-            $Meta = $this->userMetas()->where('name', $name)->first();
+            $Meta = $this->userMetas->where('name', $name)->first();
             if ($Meta)
                 return $Meta->value;
             else
                 return config('userMeta.' . $name);
         } elseif (is_array($name)) {
             foreach ($name as $key){
-                $Meta = $this->userMetas()->where('name', $key)->first();
+                $Meta = $this->userMetas->where('name', $key)->first();
                 if ($Meta)
                     if($Meta->value)
                         return true;

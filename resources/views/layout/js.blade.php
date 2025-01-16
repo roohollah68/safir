@@ -4,7 +4,7 @@
 
         let printInvoice = (page, index) => {
             $('#invoice-wrapper' + index).html(page);
-            domtoimage.toJpeg($('#invoice')[0], {width: 2100, height: 2970})
+            domtoimage.toJpeg($('#invoice'+index)[0], {width: 2100, height: 2970})
                 .then(function (dataUrl) {
                     let link = document.createElement('a');
                     link.download = id + `_` + index + `_` + makeid(3) + '.jpg';

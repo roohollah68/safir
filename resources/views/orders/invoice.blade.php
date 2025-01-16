@@ -1,4 +1,4 @@
-<div id="invoice" style="width: 2100px;height: 2970px; padding: 70px;" class="bg-white">
+<div id="invoice{{$page}}" style="width: 2100px;height: 2970px; padding: 70px;" class="bg-white">
     <div id="invoice-content" class="">
         <div class="d-flex" style="border: 3px solid;border-bottom:0;height: 310px;z-index: 5;position: relative;">
             <span style="width: 25%">
@@ -169,34 +169,34 @@
 
         <style>
 
-            #invoice .table2 td {
+            #invoice-content .table2 td {
                 border-bottom: 1px solid #000000 !important;
                 border-left: 1px solid #000000 !important;
             }
 
-            #invoice .table2 th {
+            #invoice-content .table2 th {
                 background: #eee;
             }
 
-            #invoice .table2 th {
+            #invoice-content .table2 th {
                 border: 1px solid #000000 !important;
             }
 
-            #invoice .table2 th {
+            #invoice-content .table2 th {
                 text-align: center !important;
             }
 
-            #invoice th, #invoice .normal {
+            #invoice-content th, #invoice-content .normal {
                 font-size: 35px;
             }
 
-            #invoice td, #invoice .smaller {
+            #invoice-content td, #invoice-content .smaller {
                 font-size: 40px;
                 text-align: center !important;
                 font-weight: bold;
             }
 
-            #invoice {
+            #invoice-content {
                 font-family: IranSans;
             }
 

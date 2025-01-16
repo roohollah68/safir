@@ -13,6 +13,7 @@
         <tr>
             <th>شماره</th>
             <th>نام</th>
+            <th>تعداد واریز</th>
             <th>مجموع دریافتی این دوره</th>
             <th>عملیات</th>
         </tr>
@@ -24,6 +25,7 @@
             <tr>
                 <td>{{$id}}</td>
                 <td>{{$supplier->name}}</td>
+                <td>{{$supplier->withdrawals->where('payment_confirm', 1)->count()}}</td>
                 <td></td>
                 <td>
                     <a class="fa fa-edit btn btn-primary" href="/Supplier/edit/{{$id}}"

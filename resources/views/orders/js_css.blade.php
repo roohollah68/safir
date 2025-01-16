@@ -2,7 +2,6 @@
 
     let token = "{{ csrf_token() }}";
     let superAdmin = !!"{{$superAdmin ? 'true' : ''}}";
-    let print = {{$print ? 'true' : 'false'}};
     let admin = {{$admin ? 'true' : 'false'}};
     let safir = {{$safir ? 'true' : 'false'}};
     let table;

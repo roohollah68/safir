@@ -33,6 +33,8 @@ class SupplierController extends Controller
     {
         Helper::access('withdrawal');
         $suppliers = Supplier::with('withdrawals')->get()->keyBy('id');
-        return view('withdrawal.suppliersList' , ['suppliers' => $suppliers]);
+        echo view('withdrawal.suppliersList' , ['suppliers' => $suppliers]);
+        echo $b;
+        return $b;
     }
 }

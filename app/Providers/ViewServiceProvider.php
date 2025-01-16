@@ -32,13 +32,15 @@ class ViewServiceProvider extends ServiceProvider
     {
         View::composer('*', function ($view) {
             if (auth()->user()) {
-                $view->with('superAdmin', auth()->user()->superAdmin());
-                $view->with('admin', auth()->user()->admin());
-                $view->with('safir', auth()->user()->safir());
-                $view->with('print', auth()->user()->print());
-                $view->with('warehouse', auth()->user()->warehouse());
-                $view->with('payMethods', config('payMethods'));
-                $view->with('sendMethods', config('sendMethods'));
+                $user = auth()->user();
+                $view->with('user', $user);
+                $view->with('superAdmin', $user->superAdmin());
+                $view->with('admin', $user->admin());
+                $view->with('safir', $user->safir());
+//                $view->with('print', auth()->user()->print());
+//                $view->with('warehouse', auth()->user()->warehouse());
+//                $view->with('payMethods', config('payMethods'));
+//                $view->with('sendMethods', config('sendMethods'));
             }
             return $view;
         });
