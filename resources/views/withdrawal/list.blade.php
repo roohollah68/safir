@@ -75,7 +75,7 @@
                 <td>{{$withdrawal->user->name}}</td>
                 <td>{{number_format($withdrawal->amount)}}</td>
                 <td>{{$withdrawal->expense}}</td>
-                <td>{{$withdrawal->account_name}}</td>
+                <td><a href="?{{$get}}Supplier={{$withdrawal->supplier_id}}">{{$withdrawal->account_name}}</a></td>
                 <td>{!! $withdrawal->counter_status() !!}</td>
                 <td>{!! $withdrawal->manager_status() !!}</td>
                 <td>{!! $withdrawal->payment_status() !!}</td>
