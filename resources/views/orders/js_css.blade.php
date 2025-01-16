@@ -45,6 +45,9 @@
         }
 
         $.each(orders, (id, order) => {
+            if(id == 28004){
+                console.log(order);
+            }
             if (user !== 'all' && +user !== order.user_id)
                 return
             if (showDeleted ^ !!order.deleted_at)
@@ -58,8 +61,6 @@
             if (printWait && (!order.confirm || order.state || order.counter !== 'approved'))
                 return
             if (proccessWait && (order.state > 4 || order.state < 1))
-                return
-            if (print && !order.confirm)
                 return
             if (+warehouseId !== +order.warehouse_id && warehouseId !== 'all')
                 return;
