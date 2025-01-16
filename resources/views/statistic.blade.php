@@ -17,7 +17,7 @@
                 <input type="text" name="to" class="form-control" placeholder="تا تاریخ" id="date2-text" required>
             </div>
         </div>
-        @if(auth()->user()->meta('statistic'))
+        @if($User->meta('statistic'))
             <span>نوع فروشنده:</span>
             <label for="safirOrders">سفیران</label>
             <input type="checkbox" id="safirOrders" name="safirOrders"
@@ -35,7 +35,7 @@
             <input type="hidden" name="adminOrders" value="true">
         @endif
         <div class="row">
-            @if(auth()->user()->meta('statistic'))
+            @if($User->meta('statistic'))
                 <div class="col-md-4 my-3">
                     <div class="form-group d-flex">
                         <label for="user" class="input-group-text">فروشنده:</label>
@@ -49,7 +49,7 @@
                     </div>
                 </div>
             @else
-                <input type="hidden" id="user" name="user" value="{{auth()->user()->id}}">
+                <input type="hidden" id="user" name="user" value="{{$User->id}}">
             @endif
             <div class="col-md-4 my-3">
                 <div class="form-group d-flex">
@@ -63,7 +63,7 @@
         <label for="productBase">بر اساس محصول</label>
         <input type="radio" name="base" value="productBase" id="productBase"
                class="checkboxradio" @checked($request->base=='productBase')>
-        @if(auth()->user()->meta('statistic'))
+        @if($User->meta('statistic'))
             <label for="safirBase">بر اساس فروشنده</label>
             <input type="radio" name="base" value="safirBase" id="safirBase"
                    class="checkboxradio" @checked($request->base=='safirBase')>

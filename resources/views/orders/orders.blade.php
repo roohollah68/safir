@@ -35,7 +35,7 @@
         <x-checkbox :id="'proccessWait'"> در حال پردازش</x-checkbox>
         <x-checkbox :id="'sent'">ارسال شده</x-checkbox>
 
-        @if(auth()->user()->meta('showAllOrders'))
+        @if($User->meta('showAllOrders'))
             <br>
             <br>
             <x-checkbox :id="'safirOrders'" checked>سفیران</x-checkbox>
@@ -53,7 +53,7 @@
 
     @endif
     <br>
-    @if(auth()->user()->meta('showAllOrders'))
+    @if($User->meta('showAllOrders'))
         <div class="my-3">
             <div class="form-group col-md-4 d-flex">
 

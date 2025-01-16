@@ -29,11 +29,9 @@ class OrderController extends Controller
         $users = User::withTrashed()->get()->keyBy("id");
         $orders = Helper::Order(false)->orderBy('id', 'desc')->with(['website', 'orderProducts', 'warehouse'])
             ->limit($user->meta('NuRecords'))->get()->keyBy('id');
-
         foreach ($orders as $order) {
             $order->orders = $order->orders();
         }
-
         return view('orders.orders', [
             'users' => $users,
             'orders' => $orders,

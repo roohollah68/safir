@@ -130,7 +130,7 @@
 
 
 
-        @if($user->meta('counter'))
+        @if($User->meta('counter'))
         function counter_form(id) {
             withdrawal = withdrawals[id]
             if (withdrawal.manager_confirm == 1)
@@ -142,7 +142,7 @@
         }
         @endif
 
-        @if($user->id == 122)
+        @if($User->id == 122)
         function manager_form(id) {
             withdrawal = withdrawals[id]
             if (withdrawal.payment_confirm == 1 || withdrawal.counter_confirm != 1)
@@ -153,7 +153,7 @@
         }
         @endif
 
-        @if($user->meta('withdrawalPay'))
+        @if($User->meta('withdrawalPay'))
         function payment_form(id) {
             withdrawal = withdrawals[id]
             if (withdrawal.manager_confirm != 1 || withdrawal.recipient_confirm == 1)
@@ -173,7 +173,7 @@
         }
         @endif
 
-        @if($user->meta('withdrawalRecipient'))
+        @if($User->meta('withdrawalRecipient'))
         function recipient_form(id) {
             withdrawal = withdrawals[id]
             if (withdrawal.payment_confirm != 1)

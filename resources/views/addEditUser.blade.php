@@ -42,7 +42,7 @@
                 رمز عبور:
             </x-col-md-6>
 
-            @if(auth()->user()->meta('usersEdit'))
+            @if($User->meta('usersEdit'))
 
                 <div class="col-md-6 mb-2">
                     <div class="form-group input-group">
@@ -81,7 +81,7 @@
                         </select>
                     </div>
                 </div>
-                @if(auth()->user()->meta('usersEdit'))
+                @if($User->meta('usersEdit'))
                     <a href="/invoiceData" class="btn btn-secondary" style="width: 200px">ویرایش اطلاعات فاکتور</a>
                     <h4>دسترسی ها</h4>
                     <hr>
@@ -99,7 +99,7 @@
 
 
         <input type="submit" class="btn btn-success" value="ذخیره">&nbsp;
-        @if(auth()->user()->meta('usersEdit'))
+        @if($User->meta('usersEdit'))
             <a href="{{route('usersList')}}" class="btn btn-danger">بازگشت</a>
         @else
             <a href="{{route('listOrders')}}" class="btn btn-danger">بازگشت</a>

@@ -1,10 +1,10 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary p-2" id="navbar">
-    <a class="navbar-brand" href="{{route('editUser')}}/{{$user->id}}"> {{$user->name}} خوش آمدید
+    <a class="navbar-brand" href="{{route('editUser')}}/{{$User->id}}"> {{$User->name}} خوش آمدید
         <span
             class="fa fa-gear"></span></a>
     @if($safir)
         <a class="navbar-brand" href="{{route('DepositList')}}">| اعتبار <span
-                dir="ltr">{{number_format($user->balance)}}</span> ریال</a>
+                dir="ltr">{{number_format($User->balance)}}</span> ریال</a>
     @endif
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -13,7 +13,7 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            @if($user->meta('addOrder'))
+            @if($User->meta('addOrder'))
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('newOrder')}}">ایجاد سفارش</a>
                 </li>
@@ -26,17 +26,17 @@
                     <a class="nav-link active" href="{{route('CustomerList')}}">مشتریان</a>
                 </li>
             @endif
-            @if($user->meta('warehouse'))
+            @if($User->meta('warehouse'))
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('productList')}}">محصولات</a>
                 </li>
             @endif
-            @if($user->meta('usersEdit'))
+            @if($User->meta('usersEdit'))
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('usersList')}}">مدیریت کاربران</a>
                 </li>
             @endif
-            @if($user->meta('manageSafir'))
+            @if($User->meta('manageSafir'))
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
                        data-bs-toggle="dropdown"
@@ -48,7 +48,7 @@
                     </div>
                 </li>
             @endif
-            @if($user->meta('counter'))
+            @if($User->meta('counter'))
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
                        data-bs-toggle="dropdown"
@@ -70,12 +70,12 @@
                     <a class="nav-link active" href="{{route('transactions')}}">تراکنش ها</a>
                 </li>
             @endif
-            @if($user->meta(['workReport' , 'addWorkReport']))
+            @if($User->meta(['workReport' , 'addWorkReport']))
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('reportList')}}">گزارش کار</a>
                 </li>
             @endif
-            @if($user->meta(['withdrawal' , 'allWithdrawal']))
+            @if($User->meta(['withdrawal' , 'allWithdrawal']))
                 <li class="nav-item">
                     <a class="nav-link active" href="{{route('WithdrawalList')}}">درخواست پرداخت</a>
                 </li>
