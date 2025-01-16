@@ -68,11 +68,11 @@
             <h4>نحوه پرداخت</h4>
             @if(!$edit)
                 <x-radio :id="'credit'" :name="'paymentMethod'" value="credit" onclick="paymentAction()" checked>
-                    {{$payMethods['credit']}}</x-radio>
+                    {{config('payMethods')['credit']}}</x-radio>
                 <x-radio :id="'receipt'" :name="'paymentMethod'" value="receipt" onclick="paymentAction()">
-                    {{$payMethods['receipt']}}</x-radio>
+                    {{config('payMethods')['receipt']}}</x-radio>
                 <x-radio :id="'onDelivery'" :name="'paymentMethod'" value="onDelivery" onclick="paymentAction()">
-                    {{$payMethods['onDelivery']}}</x-radio><br>
+                    {{config('payMethods')['onDelivery']}}</x-radio><br>
                 <label for='receiptPhoto' class="btn btn-info m-2 hide receiptPhoto">بارگذاری تصویر رسید بانکی <i
                         class="fa fa-image"></i></label>
                 <input type="file" id="receiptPhoto" class="hide" name="receipt">
@@ -81,7 +81,7 @@
                        name="customerDiscount" value="{{old('customerDiscount')}}" onchange="refreshProducts()"><br>
 
             @else
-                <div id="edit-payment-method"><p>{{$payMethods[$order->paymentMethod]}}</p>
+                <div id="edit-payment-method"><p>{{$order->payMethod()}}</p>
                     @if($order->receipt)
                         <a href="/receipt/{{$order->receipt}}" target="_blank">
                             <img style="max-width: 200px; max-height: 200px" alt="😔" src="/receipt/{{$order->receipt}}">
@@ -96,27 +96,27 @@
         <div class="p-3 m-2 border">
             <h4>شیوه ارسال</h4>
             @if(!$edit)
-                <label for="peyk" onclick="deliveryMethod=`peyk`;refreshProducts()">{{$sendMethods['peyk']}}
+                <label for="peyk" onclick="deliveryMethod=`peyk`;refreshProducts()">{{config('sendMethods')['peyk']}}
                     ({{number_format($settings->peykCost)}} ریال)</label>
                 <input value="peykCost" onclick="deliveryMethod=`peyk`;refreshProducts()" type="radio"
                        name="deliveryMethod"
                        id="peyk" class="checkboxradio" checked>
 
-                <label for="post" onclick="deliveryMethod=`post`;refreshProducts()">{{$sendMethods['post']}}
+                <label for="post" onclick="deliveryMethod=`post`;refreshProducts()">{{config('sendMethods')['post']}}
                     ({{number_format($settings->postCost)}} ریال)</label>
                 <input value="postCost" onclick="deliveryMethod=`post`;refreshProducts()" type="radio"
                        name="deliveryMethod"
                        id="post" class="checkboxradio">
 
                 <label for="peykeShahri"
-                       onclick="deliveryMethod=`peykeShahri`;refreshProducts()">{{$sendMethods['peykeShahri']}}
+                       onclick="deliveryMethod=`peykeShahri`;refreshProducts()">{{config('sendMethods')['peykeShahri']}}
                     ({{number_format($settings->peykeShahri)}} ریال)</label>
                 <input value="peykeShahri" onclick="deliveryMethod=`peykeShahri`;refreshProducts()" type="radio"
                        name="deliveryMethod"
                        id="peykeShahri" class="checkboxradio">
 
                 <label for="paskerayeh"
-                       onclick="deliveryMethod=`paskerayeh`;refreshProducts()">{{$sendMethods['paskerayeh']}} (هزینه
+                       onclick="deliveryMethod=`paskerayeh`;refreshProducts()">{{config('sendMethods')['paskerayeh']}} (هزینه
                     ارسال به عهده مشتری)</label>
                 <input value="paskerayeh" onclick="deliveryMethod=`paskerayeh`;refreshProducts()" type="radio"
                        name="deliveryMethod"
@@ -124,7 +124,7 @@
                 <br>
 
             @else
-                <p>{{$sendMethods[$order->deliveryMethod]??$order->deliveryMethod}}</p>
+                <p>{{$order->sendMethod()}}</p>
             @endif
         </div>
 
