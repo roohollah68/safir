@@ -109,9 +109,9 @@ class WithdrawalController extends Controller
         if(isset($req->payMethod))
             $withdrawals = $withdrawals->where('pay_method', $req->payMethod);
         if(isset($req->from))
-            $withdrawals = $withdrawals->whereDate('created_at','>', $req->from);
+            $withdrawals = $withdrawals->whereDate('created_at','>=', $req->from);
         if(isset($req->to))
-            $withdrawals = $withdrawals->whereDate('created_at','<', $req->to);
+            $withdrawals = $withdrawals->whereDate('created_at','<=', $req->to);
         return view('withdrawal.list', [
             'withdrawals' => $withdrawals->with('user')->get()->keyBy('id'),
             'suppliers' => Supplier::all()->keyBy('id')->sortBy('name'),
