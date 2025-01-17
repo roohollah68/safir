@@ -78,12 +78,10 @@ class SettingController extends Controller
 
     public function command()
     {
-        $banks = Bank::all()->keyBy('name');
-        $withdrawals = Withdrawal::all()->keyBy('id');
-        foreach ($withdrawals as $id => $withdrawal){
-            if(!$withdrawal->bank_id && $withdrawal->bank)
-                $withdrawal->update(['bank_id' => $banks[$withdrawal->bank]->id]);
-        }
+        Order::where('customer_id', 3019)->update(['customer_id'=>1660]);
+        Order::where('customer_id', 3020)->update(['customer_id'=>1660]);
+        CustomerTransaction::where('customer_id', 3019)->update(['customer_id'=>1660]);
+        CustomerTransaction::where('customer_id', 3020)->update(['customer_id'=>1660]);
     }
 
 }
