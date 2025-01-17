@@ -39,7 +39,7 @@ class Order extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 
     public function customer()
@@ -133,11 +133,11 @@ class Order extends Model
 
     public function payPercent()
     {
-        if ($this->user->safir())
-            return 100;
         if ($this->total == 0)
             return 0;
         if ($this->total < 0)
+            return 100;
+        if ($this->user->safir())
             return 100;
         $payLinks = $this->paymentLinks;
         $Total = 0;
@@ -146,6 +146,19 @@ class Order extends Model
         }
 
         return round($Total / $this->total * 100);
+    }
+
+    public function unpaid()
+    {
+        if ($this->total <= 0 || $this->user->safir())
+            return 0;
+
+        $payLinks = $this->paymentLinks;
+        $Total = 0;
+        foreach ($payLinks as $payLink) {
+            $Total += $payLink->amount;
+        }
+        return round($this->total - $Total);
     }
 
     public function payPercentApproved()

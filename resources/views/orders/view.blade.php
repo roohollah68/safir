@@ -1,7 +1,8 @@
 <div title="مشاهده سفارش" class="dialogs">
     @if($order->receipt)
-        <a href="receipt/{{$order->receipt}}" target="_blank"><img style="width: 300px"
-                                                                   src="receipt/{{$order->receipt}}"></a>
+        <a href="receipt/{{$order->receipt}}" target="_blank">
+            <img style="width: 300px"src="receipt/{{$order->receipt}}">
+        </a>
     @endif
     <br>
     <span>شماره سفارش:</span> <b>{{$order->id}}</b> <br>

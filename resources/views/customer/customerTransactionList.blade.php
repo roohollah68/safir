@@ -20,7 +20,6 @@
         <span>آدرس:</span> <b>{{$customer->address}}</b><br>
         <span>کد پستی:</span> <b>{{$customer->zip_code}}</b><br>
         <span class="h3">بدهکاری:</span>
-        {{--        <b dir="ltr" class="h3 text-danger">{{number_format($customer->balance)}}</b>--}}
         <b dir="ltr" class="h3 text-danger">{{number_format($customer->balance())}}</b>
         <span class="h3">ریال</span><br>
         <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب"
@@ -51,31 +50,22 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($transactions as $id => $tran)
+                @foreach($deposits as $id => $deposit)
                     <tr>
-                        <td>{{$tran->id}}</td>
-                        <td>{{verta($tran->created_at)->timezone('Asia/tehran')->format('Y/m/d')}}</td>
-                        <td>{{$tran->description}}</td>
-                        <td>
-                            @if($tran->verified == 'waiting')
-                                <i class="btn btn-info">در انتظار بررسی</i>
-                            @elseif($tran->verified == 'approved')
-                                <i class="btn btn-success">تایید شده</i>
-                            @elseif($tran->verified == 'rejected')
-                                <i class="btn btn-danger">رد شده</i>
-                            @endif
+                        <td>{{$deposit->id}}</td>
+                        <td>{{verta($deposit->created_at)->timezone('Asia/tehran')->format('Y/m/d')}}</td>
+                        <td>{{$deposit->description}}</td>
+                        <td>{!! $deposit->verified() !!}
                         </td>
-                        <td dir="ltr">{{number_format($tran->amount)}}</td>
+                        <td dir="ltr">{{number_format($deposit->amount)}}</td>
                         <td>
-                            @if( $tran->verified != 'rejected')
+                            <i class="btn btn-info fa fa-eye" onclick="view_deposit({{$id}})"></i>
+                            @if( $deposit->verified != 'rejected')
                                 <span class="btn btn-primary fa fa-chain" onclick="showDepositLink({{$id}})"></span>
                             @endif
-                            @if( $tran->verified != 'approved')
+                            @if( $deposit->verified != 'approved')
                                 <a class="btn btn-danger fa fa-trash" onclick="deleteDeposit({{$id}})"></a>
-                            @endif
-                            @if($tran->photo)
-                                <a class="btn btn-info fa fa-image" href="/deposit/{{$tran->photo}}"
-                                   target="_blank"></a>
+                                <a class="btn btn-warning fa fa-edit" href="/customerDeposit/edit/{{$customer->id}}/{{$id}}"></a>
                             @endif
                         </td>
                     </tr>
@@ -176,10 +166,8 @@
 
 @section('files')
     <script>
-        let token = '{{csrf_token()}}';
         let transactionReportTXT;
         $(function () {
-            token = $('input[name=_token]').val();
             transactionReportTXT = $('#transactionReportTXT').html();
             $('#transactionReportTXT').html('');
             $('#tabs').tabs();

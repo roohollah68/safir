@@ -1,22 +1,15 @@
 <div title="نحوه پرداخت" class="dialogs">
     <form method="post" id="paymentForm" action="" enctype="multipart/form-data">
         @csrf
-        <input type="radio" id="cash" value="cash" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('.cashPhoto').show()">
-        <label for='cash' class="btn btn-success my-1">پرداخت نقدی</label>
-        <label for='cashPhoto' class="btn btn-info m-2 hide cashPhoto" >بارگذاری رسید بانکی  <i class="fa fa-image"></i></label>
-        <input type="file" class="hide" name="cashPhoto" id="cashPhoto">
+        <a class="btn btn-info" onclick="dialog.remove();" target="_blank" href="/customerDeposit/add/{{$order->customer_id}}/{{$order->id}}">پرداخت نقدی یا چکی</a>
         <br>
-        <input type="radio" id="cheque" value="cheque" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('.chequePhoto').show()">
-        <label for='cheque' class="btn btn-info my-1">پرداخت چکی</label>
-        <label for='chequePhoto' class="btn btn-info m-2 hide chequePhoto">بارگذاری تصویر چک  <i class="fa fa-image"></i></label>
-        <input type="file" class="hide" name="chequePhoto" id="chequePhoto">
         <br>
-        <input type="radio" id="cod" value="cod" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();">
+        <input type="radio" id="cod" value="cod" name="paymentMethod" class="checkboxradio" >
         <label for='cod' class="btn btn-primary my-1">پرداخت در محل</label>
         <br>
-        <input type="radio" id="payInDate" value="payInDate" name="paymentMethod" class="checkboxradio" onchange="$('.hide').hide();$('#dateOfPayment').show()">
+        <input type="radio" id="payInDate" value="payInDate" name="paymentMethod" class="checkboxradio" >
         <label for="payInDate" class="btn btn-danger my-1">پرداخت در تاریخ</label>
-        <input type="text" name="payInDatePersian" id="dateOfPayment" class="form-control hide" placeholder="تاریخ پرداخت" >
+        <input type="text" name="payInDatePersian" id="dateOfPayment" class="form-control" placeholder="تاریخ پرداخت" >
         <input type="hidden" name="payInDate">
 
         <br><label for="send-note">یادداشت:</label>

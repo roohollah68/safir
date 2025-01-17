@@ -4,7 +4,7 @@
 
         let printInvoice = (page, index) => {
             $('#invoice-wrapper' + index).html(page);
-            domtoimage.toJpeg($('#invoice'+index)[0], {width: 2100, height: 2970})
+            domtoimage.toJpeg($('#invoice' + index)[0], {width: 2100, height: 2970})
                 .then(function (dataUrl) {
                     let link = document.createElement('a');
                     link.download = id + `_` + index + `_` + makeid(3) + '.jpg';
@@ -50,6 +50,13 @@
 
     function view_comment(id) {
         $.post('/viewComment/' + id, {_token: token})
+            .done(res => {
+                dialog = Dialog(res);
+            })
+    }
+
+    function view_deposit(id) {
+        $.post('/customerDeposit/view/' + id, {_token: token})
             .done(res => {
                 dialog = Dialog(res);
             })
@@ -177,4 +184,31 @@
         }
         return result;
     }
+
+    let language = {
+        "decimal": "",
+        "emptyTable": "هیچ سفارشی موجود نیست",
+        "info": "نمایش _START_ تا _END_ از _TOTAL_ مورد",
+        "infoEmpty": "نمایش  0 تا 0 از 0 مورد",
+        "infoFiltered": "(فیلتر شده از مجموع _MAX_ داده)",
+        "infoPostFix": "",
+        "thousands": ",",
+        "lengthMenu": "نمایش _MENU_ مورد",
+        "loadingRecords": "در حال بارگذاری...",
+        "processing": "در حال پردازش...",
+        "search": "جستجو:",
+        "zeroRecords": "هیچ مورد منطبقی یافت نشد",
+        "paginate": {
+            "first": "اولین",
+            "last": "آخرین",
+            "next": "بعدی",
+            "previous": "قبلی"
+        },
+        aria: {
+            "sortAscending": ": activate to sort column ascending",
+            "sortDescending": ": activate to sort column descending"
+        }
+    }
+
+    let token = "{{ csrf_token() }}";
 </script>

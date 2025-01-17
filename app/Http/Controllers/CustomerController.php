@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\BaleAPIv2;
 use App\Helper\Helper;
+use App\Models\Bank;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\CustomerTransaction;
@@ -23,7 +24,7 @@ class CustomerController extends Controller
     public function customersList(Request $req)
     {
         $user = auth()->user();
-        $viewAllAuth = $user->meta(['allCustomers' , 'editAllCustomers']);
+        $viewAllAuth = $user->meta(['allCustomers', 'editAllCustomers']);
         $customers = Customer::with(['user', 'orders', 'transactions']);
         if ($viewAllAuth) {
             if ($req->user)
@@ -50,15 +51,15 @@ class CustomerController extends Controller
     {
         $user = auth()->user();
         $customer = Customer::with(['orders', 'transactions']);
-        if (!$user->meta(['allCustomers','editAllCustomers']))
+        if (!$user->meta(['allCustomers', 'editAllCustomers']))
             $customer = $customer->where('user_id', $user->id);
         $customer = $customer->findOrFail($id);
-        $transactions = $customer->transactions->keyBy('id');
+        $deposits = $customer->transactions->keyBy('id');
         $orders = $customer->orders->keyBy('id')->where('confirm', true)->where('total', '<>', 0);
 
         return view('customer.customerTransactionList', [
             'customer' => $customer,
-            'transactions' => $transactions,
+            'deposits' => $deposits,
             'orders' => $orders
         ]);
 
@@ -150,13 +151,13 @@ class CustomerController extends Controller
 
     public function deleteCustomer($id)
     {
-        $customer = Customer::with(['orders.orderProducts' , 'transactions'])->find($id);
-        foreach ($customer->orders as $order){
+        $customer = Customer::with(['orders.orderProducts', 'transactions'])->find($id);
+        foreach ($customer->orders as $order) {
             foreach ($order->orderProducts as $orderProduct)
                 $orderProduct->delete();
             $order->delete();
         }
-        foreach ($customer->transactions as $transaction){
+        foreach ($customer->transactions as $transaction) {
             $transaction->delete();
         }
         $customer->delete();
@@ -173,72 +174,108 @@ class CustomerController extends Controller
         return $customer->trust;
     }
 
-    public function newForm($id, $orderId = null)
+    public function newForm($customerId, $orderId = null)
     {
         if (auth()->user()->meta('editAllCustomers'))
-            $customer = Customer::findOrFail($id);
+            $customer = Customer::findOrFail($customerId);
         else
-            $customer = auth()->user()->customers()->findOrFail($id);
+            $customer = auth()->user()->customers()->findOrFail($customerId);
+
         if ($orderId)
             $order = Order::findOrFail($orderId);
         else
-            $order = null;
+            $order = new Order();
+
         return view('customer.addEditCustomerDeposit', [
             'customer' => $customer,
-            'deposit' => false,
+            'deposit' => new CustomerTransaction(),
             'order' => $order,
+            'banks' => Bank::where('enable', true)->get()->keyBy('id'),
         ]);
     }
 
-    public function storeNew(Request $req)
+    public function editForm($customerId, $depositId)
     {
-        $req->amount = +str_replace(",", "", $req->amount);
+        if (auth()->user()->meta('editAllCustomers'))
+            $customer = Customer::findOrFail($customerId);
+        else
+            $customer = auth()->user()->customers()->findOrFail($customerId);
+
+        return view('customer.addEditCustomerDeposit', [
+            'customer' => $customer,
+            'deposit' => $customer->transactions()->find($depositId),
+            'order' => new Order(),
+            'banks' => Bank::where('enable', true)->get()->keyBy('id'),
+        ]);
+    }
+
+    public function store(Request $req, $customerId, $orderId = null, $depositId = null)
+    {
+        DB::beginTransaction();
+        $user = auth()->user();
         request()->validate([
-            'photo' => 'required|mimes:jpeg,jpg,png,bmp|max:2048',
+            'photo' => 'required_without:old_Photo|mimes:jpeg,jpg,png,bmp|max:2048',
+            'old_Photo' => 'required_without:photo',
             'amount' => 'required',
         ], [
-            'photo.required' => 'ارائه رسید بانکی الزامی است!'
+            'photo.required_without' => 'ارائه رسید بانکی الزامی است!',
+            'old_Photo.required_without' => '',
+            'photo.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
         ]);
 
-        DB::beginTransaction();
+        if ($user->meta('editAllCustomers'))
+            $customer = Customer::findOrFail($customerId);
+        else
+            $customer = auth()->user()->customers()->findOrFail($customerId);
 
-        $photo = '';
+        $photo = $req->old_Photo;
         if ($req->file("photo")) {
             $photo = $req->file("photo")->store("", 'deposit');
         }
 
-        if (auth()->user()->meta('editAllCustomers'))
-            $customer = Customer::findOrFail($req->id);
-        else
-            $customer = auth()->user()->customers()->findOrFail($req->id);
-
-        $newTransaction = $customer->transactions()->create([
-            'amount' => $req->amount,
-            'description' => $req->desc,
+        $transaction = $customer->transactions()->findOrNew($depositId)->fill([
+            'bank_id' => $req->bank_id,
+            'pay_method' => $req->pay_method,
+            'cheque_date' => $req->cheque_date,
+            'cheque_name' => $req->cheque_name,
+            'cheque_code' => $req->cheque_code,
+            'description' => $req->description,
+            'amount' => +str_replace(",", "", $req->amount),
             'photo' => $photo,
-            'verified' => 'waiting',
         ]);
-        if ($req->order)
-            $newTransaction->paymentLinks()->create([
-                'order_id' => $req->order,
-                'amount' => $req->amount,
+        $transaction->save();
+        if (+$orderId) {
+            $transaction->paymentLinks()->create([
+                'order_id' => $orderId,
+                'amount' => $transaction->amount,
             ]);
-
-        $req->amount = number_format($req->amount);
-        $userName = auth()->user()->name;
+            if (!$customer->block)
+                Order::findOrFail($orderId)->update([
+                    'confirm' => true,
+                    'paymentMethod' => $req->pay_method == 'cash' ? 1 : 2,
+                ]);
+        } else {
+            $transaction->paymentLinks()->delete();
+        }
         $message = "*ثبت سند واریزی مشتری*
 نام: {$customer->name}
 مبلغ: {$req->amount} ریال
-توسط: {$userName}
-توضیحات: {$newTransaction->description}
+توسط: {$user->name}
+توضیحات: {$transaction->description}
         ";
 
         $array = array("caption" => $message, "photo" => env('APP_URL') . "deposit/{$photo}");
-        $this->sendPhotoToBale($array, '4538199149');
+        $this->sendPhotoToBale($array, env('Deposit'));
 
         DB::commit();
 
-        return redirect('/customer/transaction/' . $req->id);
+        return redirect(route('customersTransactionList', ['id' => $customerId]));
+    }
+
+    public function viewDeposit($id)
+    {
+        $deposit = CustomerTransaction::findOrFail($id);
+        return view('customer.view', ['deposit' => $deposit]);
     }
 
     public function deleteDeposit($id)
@@ -258,10 +295,20 @@ class CustomerController extends Controller
     public function customersDepositList(Request $req)
     {
         Helper::access('counter');
+        $req->verified = $req->verified ?: 'waiting';
+        $transactions = CustomerTransaction::limit(2000)->whereHas('customer.user', function ($query) {
+            if (isset($_GET['user_id']) && $_GET['user_id'])
+                $query->where('id', $_GET['user_id']);
+            else
+                $query;
+        })->where('verified', $req->verified)->with(['customer.user']);
+
         return view('customer.customersDepositList', [
-            'transactions' => CustomerTransaction::with('customer.user')->limit(2000)->orderBy('id', 'desc')->get()->keyBy('id'),
-            'users' => User::where('role', '<>', 'user')->where('verified', true)->select('id', 'name')->get(),
-            'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
+            'transactions' => $transactions->get()->keyBy('id'),
+            'users' => User::where('role', '<>', 'user')->where('verified', true)->get()->keyBy('id'),
+            'verified' => $req->verified,
+            'user_id' => $req->user_id,
+            'get' => http_build_query($_GET) . '&',
         ]);
     }
 
@@ -270,13 +317,14 @@ class CustomerController extends Controller
         Helper::access('counter');
         $trans = CustomerTransaction::with('customer')->findOrFail($id);
         if ($trans->verified == 'approved')
-            return;
+            return $trans->verified;
         $trans->customer->update([
             'balance' => $trans->customer->balance + $trans->amount,
         ]);
         $trans->update([
             'verified' => 'approved',
         ]);
+        return $trans->verified;
     }
 
     public function rejectDeposit($id, Request $req)
@@ -285,7 +333,7 @@ class CustomerController extends Controller
         Helper::access('counter');
         $trans = CustomerTransaction::with('customer')->findOrFail($id);
         if ($trans->verified == 'rejected')
-            return;
+            return $trans->verified;
         if ($trans->verified == 'approved')
             $trans->customer->update([
                 'balance' => $trans->customer->balance - $trans->amount,
@@ -296,6 +344,7 @@ class CustomerController extends Controller
         ]);
         $trans->paymentLinks()->delete();
         DB::commit();
+        return $trans->verified;
     }
 
     public function customersOrderList(Request $req)

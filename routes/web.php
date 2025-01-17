@@ -18,6 +18,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TelegramController;
 use App\Http\Controllers\WithdrawalController;
 use App\Livewire\Counter;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
@@ -50,6 +51,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('delete_order/{id}', 'deleteOrder');
         Route::get('changeWarehouse/{orderId}/{warehouseId}', 'changeWarehose');
         Route::post('/viewOrder/{id}', 'viewOrder');
+        Route::post('/viewPaymentMethods/{id}', 'viewPaymentMethods');
         Route::post('/invoice/{id}', 'invoice');
 //        Route::get('/orderExcel/{id}', 'orderExcel');
 //        Route::post('/saveExcelData/{id}', 'saveExcelData');
@@ -108,10 +110,11 @@ Route::middleware(['auth', 'verify'])->group(function () {
             ->name('customersTransactionList');
         Route::get('/customer/SOA/{id}', 'customerSOA');
         Route::post('/customer/SOA/{id}', 'customerSOA');
-        Route::get('/customerDeposit/add/{id}', 'newForm');
-        Route::get('/customerDeposit/add/{customerId}/{orderId}', 'newForm');
-        Route::post('/customerDeposit/add/{id}', 'storeNew');
+        Route::get('/customerDeposit/add/{customerId}/{orderId?}', 'newForm');
+        Route::get('/customerDeposit/edit/{customerId}/{depositId}', 'editForm');
+        Route::post('/customerDeposit/add/{customerId}/{orderId?}/{depositId?}', 'store');
         Route::post('/customerDeposit/delete/{id}', 'deleteDeposit');
+        Route::post('/customerDeposit/view/{id}', 'viewDeposit');
         Route::get('/customerPaymentTracking', 'paymentTracking');
         Route::get('/postponedDay/{id}/{days}', 'postponedDay');
 

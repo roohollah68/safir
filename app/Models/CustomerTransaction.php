@@ -9,19 +9,8 @@ class CustomerTransaction extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'customer_id',
-        'order_id',
-        'amount',
-        'balance',
-        'type',
-        'description',
-        'photo',
-        'deleted',
-        'paymentLink',
-        'verified',
-        'date',
-        'paymentMethod',
+    protected $guarded = [
+        'id',
     ];
 
     public function customer()
@@ -47,6 +36,21 @@ class CustomerTransaction extends Model
             $Total += $payLink->amount;
         }
         return $Total;
+    }
+
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class);
+    }
+
+    public function verified()
+    {
+        if ($this->verified == 'waiting')
+            return '<i class="btn btn-info">در انتظار بررسی</i>';
+        if ($this->verified == 'approved')
+            return '<i class="btn btn-success">تایید شده</i>';
+        if ($this->verified == 'rejected')
+            return '<i class="btn btn-danger">رد شده</i>';
     }
 
 }

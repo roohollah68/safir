@@ -1,6 +1,6 @@
 <script>
 
-    let token = "{{ csrf_token() }}";
+
     let superAdmin = !!"{{$superAdmin ? 'true' : ''}}";
     let admin = {{$admin ? 'true' : 'false'}};
     let safir = {{$safir ? 'true' : 'false'}};
@@ -42,7 +42,6 @@
         let select = (id) => {
             return `<input type="checkbox" class="orders_checkbox" onclick="ids.includes(${id})?removeFromIds(${id}):ids.push(${id})">`;
         }
-console.log('hi');
         $.each(orders, (id, order) => {
             if (user !== 'all' && +user !== order.user_id)
                 return
@@ -62,7 +61,7 @@ console.log('hi');
                 return;
             if (COD && order.paymentMethod !== 'cod' && order.paymentMethod !== 'پرداخت در محل' && order.paymentMethod !== 'onDelivery')
                 return;
-            if(refund && order.total >= 0)
+            if (refund && order.total >= 0)
                 return;
             let website = false;
             if (order.user_id === 30 || order.user_id === 32 || order.user_id === 33 || order.user_id === 75)
@@ -158,30 +157,7 @@ console.log('hi');
                 buttons: [
                     'excelHtml5',
                 ],
-                language: {
-                    "decimal": "",
-                    "emptyTable": "هیچ سفارشی موجود نیست",
-                    "info": "نمایش _START_ تا _END_ از _TOTAL_ مورد",
-                    "infoEmpty": "نمایش  0 تا 0 از 0 مورد",
-                    "infoFiltered": "(فیلتر شده از مجموع _MAX_ داده)",
-                    "infoPostFix": "",
-                    "thousands": ",",
-                    "lengthMenu": "نمایش _MENU_ مورد",
-                    "loadingRecords": "در حال بارگذاری...",
-                    "processing": "در حال پردازش...",
-                    "search": "جستجو:",
-                    "zeroRecords": "هیچ مورد منطبقی یافت نشد",
-                    "paginate": {
-                        "first": "اولین",
-                        "last": "آخرین",
-                        "next": "بعدی",
-                        "previous": "قبلی"
-                    },
-                    aria: {
-                        "sortAscending": ": activate to sort column ascending",
-                        "sortDescending": ": activate to sort column descending"
-                    }
-                }
+                language: language,
             });
         }
 
@@ -317,8 +293,8 @@ console.log('hi');
             alert('ابتدا فاکتور باید تایید شود!');
             return;
         }
-        if(order.total < 0){
-            $.post('/set_send_method/' + id,{
+        if (order.total < 0) {
+            $.post('/set_send_method/' + id, {
                     _token: token
                 }
             ).done(function (res) {
@@ -437,42 +413,67 @@ console.log('hi');
             });
             return;
         }
-        dialog = Dialog(payMethodText);
+        $.post('/viewPaymentMethods/' + id, {_token: token})
+            .done(res => {
+                dialog = Dialog(res);
+                $(".checkboxradio").checkboxradio();
+                dtp1Instance = new mds.MdsPersianDateTimePicker($('#payInDate')[0], {
+                    targetTextSelector: '#dateOfPayment',
+                    targetDateSelector: '[name="payInDate"]',
+                    persianNumber: true,
+                });
 
-        $(".checkboxradio").checkboxradio();
+                $("#paymentForm").submit(function (e) {
+                    e.preventDefault();
+                    let data = {};
+                    $('#paymentForm').serializeArray().forEach((value) => {
+                        data[value.name] = value.value;
+                    })
+                    $.post('/orders/paymentMethod/' + id, data)
+                        .done(function (res) {
+                            if (res[0] === "error")
+                                $.notify(res[1], 'warn');
+                            else if (res[0] === "ok") {
+                                $.notify("با موفقیت ذخیره شد.", "success");
+                                dialog.remove();
+                                order = res[1];
+                                $('#view_order_' + id).parent().html(operations(order));
+                                $('#state_' + id).parent().html(createdTime(order));
+                                $('#orderCondition_' + id).html(orderCondition(order));
+                            }
+                        }).fail(function () {
+                        $.notify('خطایی رخ داده است.', 'warn');
+                    });
+                });
+            })
 
-        dtp1Instance = new mds.MdsPersianDateTimePicker($('#payInDate')[0], {
-            targetTextSelector: '#dateOfPayment',
-            targetDateSelector: '[name="payInDate"]',
-            persianNumber: true,
-        });
 
-        $("#paymentForm").submit(function (e) {
-            e.preventDefault();
-            $.ajax({
-                type: "POST",
-                url: '/orders/paymentMethod/' + id,
-                data: new FormData(this),
-                processData: false,
-                contentType: false,
-                headers: {
-                    "Accept": "application/json"
-                }
-            }).done(function (res) {
-                if (res[0] === "error")
-                    $.notify(res[1], 'warn');
-                else if (res[0] === "ok") {
-                    $.notify("با موفقیت ذخیره شد.", "success");
-                    dialog.remove();
-                    order = res[1];
-                    $('#view_order_' + id).parent().html(operations(order));
-                    $('#state_' + id).parent().html(createdTime(order));
-                    $('#orderCondition_' + id).html(orderCondition(order));
-                }
-            }).fail(function () {
-                $.notify('خطایی رخ داده است.', 'warn');
-            });
-        });
+        // $("#paymentForm").submit(function (e) {
+        //     e.preventDefault();
+        //     $.ajax({
+        //         type: "POST",
+        //         url: '/orders/paymentMethod/' + id,
+        //         data: new FormData(this),
+        //         processData: false,
+        //         contentType: false,
+        //         headers: {
+        //             "Accept": "application/json"
+        //         }
+        //     }).done(function (res) {
+        //         if (res[0] === "error")
+        //             $.notify(res[1], 'warn');
+        //         else if (res[0] === "ok") {
+        //             $.notify("با موفقیت ذخیره شد.", "success");
+        //             dialog.remove();
+        //             order = res[1];
+        //             $('#view_order_' + id).parent().html(operations(order));
+        //             $('#state_' + id).parent().html(createdTime(order));
+        //             $('#orderCondition_' + id).html(orderCondition(order));
+        //         }
+        //     }).fail(function () {
+        //         $.notify('خطایی رخ داده است.', 'warn');
+        //     });
+        // });
     }
 
     function cancelInvoice(id) {

@@ -107,17 +107,6 @@
                                 <span class="btn btn-success fa fa-check"
                                       onclick="approveOrder({{$order->id}})"></span>
                             @endunless
-                            {{--                                @if($order->counter == 'waiting')--}}
-                            {{--                                <span class="btn btn-success fa fa-check"--}}
-                            {{--                                      onclick="approveOrder({{$order->id}})"></span>--}}
-                            {{--                                <span class="btn btn-danger fa fa-x"--}}
-                            {{--                                      onclick="rejectOrder({{$order->id}})"></span>--}}
-                            {{--                            @elseif($order->counter == 'rejected')--}}
-                            {{--                                <span class="btn btn-success fa fa-check"--}}
-                            {{--                                      onclick="approveOrder({{$order->id}})"></span>--}}
-                            {{--                            @elseif($order->counter == 'approved')--}}
-                            {{--                                --}}
-                            {{--                            @endif--}}
                             </span>
                     </td>
                 </tr>
@@ -131,13 +120,12 @@
 
 @section('files')
     <script>
-        let token;
+
         $(function () {
             $('#transaction-table').DataTable({
                 order: [[0, "desc"]],
                 pageLength: 100,
             });
-            token = $('input[name=_token]').val();
             $('input[type=radio]').checkboxradio();
         });
 
@@ -155,16 +143,10 @@
                 $.post('/rejectOrder/' + id, {_token: token, reason: reason})
                     .done(res => {
                         $(`#row-${id}`).remove();
-                        // $('#button_' + id).html(approveButton(id));
-                        // $('#status_' + id).html('<i class="btn btn-danger">رد شده</i>');
+
                     })
             }
         }
-
-        // function approveButton(id) {
-        //     return `<span class="btn btn-success fa fa-check"
-        //   onclick="approveOrder(${id})"></span>`;
-        // }
 
         function rejectButton(id) {
             return `<span class="btn btn-danger fa fa-x"

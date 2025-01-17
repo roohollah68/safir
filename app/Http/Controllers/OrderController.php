@@ -307,7 +307,7 @@ class OrderController extends Controller
             return [$order->state, 'ابتدا پرداخت فاکتور باید تایید شود.'];
         }
         //if($order->state == 10 && $order->total < 0 )
-            //return [+$order->state, 'خطا'];
+        //return [+$order->state, 'خطا'];
         $order->state = +$state;
         if ($order->paymentMethod == 'onDelivery') {
             if ($order->state == 1) {
@@ -373,7 +373,7 @@ class OrderController extends Controller
         }
         if ($order->state == 10) {
             // ثبت واریزی بازگشت به انبار
-            if($order->total<0){
+            if ($order->total < 0) {
                 $order->customer->transactions()->create([
                     'amount' => -$order->total,
                     'verified' => 'waiting',
@@ -637,7 +637,7 @@ class OrderController extends Controller
         Helper::access('changeOrderState');
         DB::beginTransaction();
         $order = Helper::Order(true)->findOrFail($id);
-        if($order->total < 0)
+        if ($order->total < 0)
             return $order;
         if (!$order->deliveryMethod || $order->isCreatorAdmin())
             $order->deliveryMethod = '';
@@ -655,10 +655,10 @@ class OrderController extends Controller
         $order = Helper::Order(true)->with('customer')->findOrFail($id);
         if ($order->confirm)
             return ['error', 'قبلا تایید شده.'];
-        if($order->customer->block)
+        if ($order->customer->block)
             return ['error', 'حساب مشتری مسدود شده است.'];
         // بازگشت به انبار
-        if($order->total < 0) {
+        if ($order->total < 0) {
             $order->update([
                 'confirm' => true,
                 'counter' => 'waiting',
@@ -668,23 +668,10 @@ class OrderController extends Controller
         }
         request()->validate([
             'paymentMethod' => 'required',
-            'cashPhoto' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
-            'chequePhoto' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
         ]);
         DB::beginTransaction();
         $paymentMethod = $req->paymentMethod;
-        $photo = null;
         $payInDate = '';
-        if ($paymentMethod == 'cash') {
-            if (!$req->file("cashPhoto"))
-                return ['error', 'باید عکس رسید بانکی بارگذاری شود.'];
-            $photo = $req->file("cashPhoto");
-        }
-        if ($paymentMethod == 'cheque') {
-            if (!$req->file("chequePhoto"))
-                return ['error', 'باید عکس چک بانکی بارگذاری شود.'];
-            $photo = $req->file("chequePhoto");
-        }
         if ($paymentMethod == 'payInDate') {
             if (strlen($req->payInDate) != 10)
                 return ['error', 'تاریخ باید مشخص شود.'];
@@ -700,24 +687,7 @@ class OrderController extends Controller
         $order->customer->update([
             'balance' => $order->customer->balance - $order->total,
         ]);
-        if ($photo) {
-            $trans = $order->customer->transactions()->create([
-                'amount' => $order->total,
-                'verified' => 'waiting',
-                'description' => $req->note . '/ ' . $order->payMethod(),
-                'photo' => $photo->store("", 'deposit'),
-            ]);
-            $order->paymentLinks()->create([
-                'customer_transaction_id' => $trans->id,
-                'amount' => $order->total,
-            ]);
-            $order->update([
-                'receipt' => $photo->store("", 'receipt'),
-            ]);
-            (new CommentController)->create($order, auth()->user(), 'سفارش تایید شد. ' . $req->note . '/ ' . $order->payMethod() . '/ ' . $payInDate, $photo->store("", 'comment'));
-        } else {
-            (new CommentController)->create($order, auth()->user(), 'سفارش تایید شد. ' . $req->note . '/ ' . $order->payMethod() . '/ ' . $payInDate);
-        }
+        (new CommentController)->create($order, auth()->user(), 'سفارش تایید شد. ' . $req->note . '/ ' . $order->payMethod() . '/ ' . $payInDate);
 
         DB::commit();
         return ['ok', $order];
@@ -791,6 +761,13 @@ class OrderController extends Controller
         $order->warehouse = $order->warehouse;
         DB::commit();
         return $order;
+    }
+
+    public function viewPaymentMethods($id)
+    {
+        return view('orders.paymentMethods', [
+            'order' => Order::find($id)
+        ]);
     }
 }
 

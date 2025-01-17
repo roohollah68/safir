@@ -19,4 +19,8 @@ class Bank extends Model
     {
         return $this->hasMany(Withdrawal::class);
     }
+    public function deposit()
+    {
+        return $this->hasMany(CustomerTransaction::class);
+    }
 }

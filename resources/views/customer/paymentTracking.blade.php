@@ -77,7 +77,7 @@
         </tbody>
     </table>
 
-    <div id="postponed">
+    <div id="postponeDiv">
         <div title="به تعویق انداختن پرداخت" class="dialogs">
             <input type="number" value="" id="days" style="width: 120px">
             <span class="btn btn-info m-1" onclick="postponedDay($('#days').val())">روز بعد</span><br>
@@ -94,12 +94,11 @@
 
 @section('files')
     <script>
-        let token = '{{csrf_token()}}';
         let postponedText;
         let postponedId;
         $(function () {
-            postponedText = $('#postponed').html();
-            $('#postponed').html('');
+            postponedText = $('#postponeDiv').html();
+            $('#postponeDiv').html('');
 
             $('#orders-table').DataTable({
                 // paging: false,
@@ -129,7 +128,8 @@
                 location.reload();
             })
         }
-        @if(auth()->user()->meta('allCustomers'))
+        @if(auth()->user()->meta('editAllCustomers'))
+
         function postponed(id) {
             postponedId = id;
             dialog = Dialog(postponedText);

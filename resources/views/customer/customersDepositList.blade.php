@@ -13,13 +13,11 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="user" class="input-group-text w-100">کاربر مرتبط:</label>
                     </div>
-                    <select class="form-control" name="user" id="user">
-                        <option value="all"
-                                selected
-                        >همه
-                        </option>
-                        @foreach($users as $user)
-                            <option value="{{$user->id}}" @selected(isset($_GET['user']) && $user->id == $_GET['user'])>
+                    <select class="form-control" name="user" id="user"
+                            onchange="window.location.replace('?{{$get}}user_id='+this.value)">
+                        <option value="" selected>همه</option>
+                        @foreach($users as $id => $user)
+                            <option value="{{$id}}" @selected($id == $user_id)>
                                 {{$user->name}}
                             </option>
                         @endforeach
@@ -28,17 +26,12 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group input-group">
-                    <input type="radio" id="waiting" name="verified" onclick="$('.hide').hide();$('.waiting').show()"
-                           checked>
-                    <label for="waiting">در انتظار بررسی</label>
-                    <input type="radio" id="approved" name="verified" onclick="$('.hide').hide();$('.approved').show()">
-                    <label for="approved">تایید شده</label>
-                    <input type="radio" id="rejected" name="verified" onclick="$('.hide').hide();$('.rejected').show()">
-                    <label for="rejected">رد شده</label>
+                    <a href="?{{$get}}verified=waiting" class="btn btn-{{$verified == 'waiting'?'':'outline-'}}info m-2">در انتظار بررسی</a>
+                    <a href="?{{$get}}verified=approved" class="btn btn-{{$verified == 'approved'?'':'outline-'}}success m-2">تایید شده</a>
+                    <a href="?{{$get}}verified=rejected" class="btn btn-{{$verified == 'rejected'?'':'outline-'}}danger m-2">رد شده</a>
                 </div>
             </div>
         </div>
-        <input type="submit" class="btn btn-primary" value="فیلتر">
     </form>
     <br>
 
@@ -56,39 +49,21 @@
         </tr>
         </thead>
         <tbody>
-        @foreach($transactions as $tran)
-            @continue($selectedUser != 'all' && $tran->customer->user->id != $selectedUser)
-            <tr class="hide {{$tran->verified}}">
+        @foreach($transactions as $id => $tran)
+            <tr>
                 <td>
                     <span class="d-none">
                          {{verta($tran->created_at)->getTimestamp()}}
                     </span>
-                    {{verta($tran->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}
+                    {{verta($tran->created_at)->timezone('Asia/tehran')->formatJalaliDate()}}
                 </td>
                 <td dir="ltr">{{number_format($tran->amount)}}</td>
                 <td>{{$tran->description}}</td>
-                <td id="status_{{$tran->id}}">
-                    @if($tran->verified == 'waiting')
-                        <i class="btn btn-info">در انتظار بررسی</i>
-                    @elseif($tran->verified == 'approved')
-                        <i class="btn btn-success">تایید شده</i>
-                    @elseif($tran->verified == 'rejected')
-                        <i class="btn btn-danger">رد شده</i>
-                    @endif
-                </td>
+                <td id="status_{{$tran->id}}">{!! $tran->verified() !!}</td>
                 <td><a href="/customer/transaction/{{$tran->customer_id}}">{{$tran->customer->name}}</a></td>
                 <td>{{$tran->customer->user->name}}</td>
                 <td>
-                    @if($tran->paymentLink && isset($transactions[$tran->paymentLink]))
-                        <a class="btn btn-info fa fa-eye"
-                           onclick="view_order({{$transactions[$tran->paymentLink]->order_id}})"
-                           title="مشاهده سفارش"></a>
-                        <a class="fa fa-file-invoice-dollar btn btn-secondary"
-                           onclick="invoice({{$transactions[$tran->paymentLink]->order_id}})"
-                           title=" فاکتور"></a>
-
-                    @endif
-                    <a class="btn btn-info fa fa-image" href="/deposit/{{$tran->photo}}" target="_blank"></a>
+                    <i class="btn btn-info fa fa-eye" onclick="view_deposit({{$id}})" title="جزئیات پرداخت"></i>
                     <span id="button_{{$tran->id}}">
                         @if($tran->verified == 'waiting')
                             <span id="" class="btn btn-success fa fa-check"
@@ -113,14 +88,13 @@
 
 @section('files')
     <script>
-        let token;
+
         $(function () {
             $('#transaction-table').DataTable({
                 order: [[0, "desc"]],
-                // pageLength: 100,
+                pageLength: 100,
                 paging: false,
             });
-            token = $('input[name=_token]').val();
             $('input[type=radio]').checkboxradio();
         });
 
@@ -128,8 +102,10 @@
         function approveDeposit(id) {
             $.post('/approveDeposit/' + id, {_token: token})
                 .done(res => {
-                    $('#button_' + id).html(rejectButton(id));
-                    $('#status_' + id).html('<i class="btn btn-success">تایید شده</i>');
+                    if(res == 'approved') {
+                        $('#button_' + id).html(rejectButton(id));
+                        $('#status_' + id).html('<i class="btn btn-success">تایید شده</i>');
+                    }
                 })
         }
 
@@ -138,8 +114,10 @@
             if (reason != null) {
                 $.post('/rejectDeposit/' + id, {_token: token, reason: reason})
                     .done(res => {
-                        $('#button_' + id).html(approveButton(id));
-                        $('#status_' + id).html('<i class="btn btn-danger">رد شده</i>');
+                        if(res == 'rejected') {
+                            $('#button_' + id).html(approveButton(id));
+                            $('#status_' + id).html('<i class="btn btn-danger">رد شده</i>');
+                        }
                     })
             }
         }
@@ -153,12 +131,6 @@
             return `<span class="btn btn-danger fa fa-x"
 onclick="rejectDeposit(${id})"></span>`;
         }
-
-
     </script>
-    <style>
-        .waiting {
-            display: table-row;
-        }
-    </style>
+
 @endsection

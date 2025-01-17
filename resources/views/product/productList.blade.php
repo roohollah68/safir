@@ -122,7 +122,6 @@
 @section('files')
     <script>
         let products = {}, goods = {!! $goods !!};
-        let token = "{{ csrf_token() }}";
         let table;
         let low, high, normal, unavailableFilter, availableFilter, undefinedFilter, final, raw, pack, hideCols,
             warehouseId = {{auth()->user()->meta('warehouseId')}};
