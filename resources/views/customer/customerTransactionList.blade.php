@@ -174,10 +174,12 @@
             $('#deposit').DataTable({
                 paging: false,
                 order: [[0, "desc"]],
+                language:language,
             });
             $('#orders-table').DataTable({
                 paging: false,
                 order: [[0, "desc"]],
+                language:language,
             });
         });
 

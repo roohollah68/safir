@@ -85,6 +85,7 @@
                 // pageLength: 100,
                 paging: false,
                 destroy: true,
+                language:language,
             });
         })
 

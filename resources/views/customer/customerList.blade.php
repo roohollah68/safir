@@ -121,6 +121,7 @@
             $('#customer-table').DataTable({
                 order: [[3, "asc"]],
                 pageLength: 100,
+                language:language,
             });
         });
 

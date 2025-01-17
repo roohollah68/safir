@@ -47,6 +47,7 @@
             table = $('#product-table').DataTable({
                 order: [[6, "desc"]],
                 pageLength: 100,
+                language:language,
                 layout: {
                     topStart: {
                         buttons: [

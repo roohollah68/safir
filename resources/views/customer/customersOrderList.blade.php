@@ -125,6 +125,7 @@
             $('#transaction-table').DataTable({
                 order: [[0, "desc"]],
                 pageLength: 100,
+                language:language,
             });
             $('input[type=radio]').checkboxradio();
         });

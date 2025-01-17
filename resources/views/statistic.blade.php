@@ -253,6 +253,7 @@
         $(function () {
             $('#statistic-table').DataTable({
                 order: [[2, "desc"]],
+                language:language,
                 layout: {
                     topStart: {
                         buttons: ['copyHtml5', 'excelHtml5', 'csvHtml5', 'pdfHtml5']

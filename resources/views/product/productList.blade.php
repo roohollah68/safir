@@ -256,6 +256,7 @@
                     order: [[3, "desc"]],
                     pageLength: 100,
                     destroy: true,
+                    language:language,
                     columnDefs: [
                         {
                             targets: hideCols,

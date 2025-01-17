@@ -97,6 +97,7 @@
                 data: data,
                 pageLength: 100,
                 destroy: true,
+                language:language,
             });
         }
     }
