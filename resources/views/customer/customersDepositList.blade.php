@@ -93,6 +93,7 @@
             $('#transaction-table').DataTable({
                 order: [[0, "desc"]],
                 pageLength: 100,
+                language:language,
                 // paging: false,
             });
             $('input[type=radio]').checkboxradio();
