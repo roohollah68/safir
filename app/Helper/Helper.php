@@ -73,6 +73,7 @@ class Helper
             return $orders;
         else
             return $orders->where(function ($query) {
+                $user = auth()->user();
                 $warehouses = Warehouse::where('user_id', $user->id)->get()->keyBy('id')->keys();
                 $query->orWhere('user_id', $user->id)->orWhereIn('warehouse_id', $warehouses);
             });
