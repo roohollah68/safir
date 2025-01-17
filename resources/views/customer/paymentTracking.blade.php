@@ -21,18 +21,25 @@
                 </select>
             </div>
         </div>
+{{--        <div class="col-md-6 m-1">--}}
+{{--            <div class="form-group input-group ">--}}
+{{--                <label for="all">مشاهده همه شامل معوقه ها</label>--}}
+{{--                <input type="checkbox" id="all" class="checkboxradio" name="all" @checked($_GET['all']??false)>--}}
+{{--            </div>--}}
+{{--        </div>--}}
         <div class="col-md-6 m-1">
             <div class="form-group input-group ">
                 <div class="input-group-append" style="min-width: 160px">
                     <label for="number" class="input-group-text w-100">تعداد رکورد:</label>
                 </div>
                 <input type="number" min="1" step="1" id="number" name="number" value="{{old('number')?:$_GET['number']??100}}">
+            <input type="submit" class="btn btn-primary" value="اعمال تغییرات">
             </div>
         </div>
-        <br>
-        <input type="submit" class="btn btn-primary" value="فیلتر">
-    </form>
 
+
+    </form>
+    <br>
     <table class="table table-striped" id="orders-table">
         <thead>
         <tr>
@@ -68,7 +75,7 @@
                     <a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice({{$id}})" title=" فاکتور"></a>
                     <a class="fa fa-comment btn btn-info" onclick="view_comment({{$id}})"></a>
                     <span class="btn btn-primary fa fa-chain" onclick="showOrderLink({{$id}})"></span>
-                    @if(auth()->user()->meta('allCustomers'))
+                    @if($User->meta('allCustomers'))
                         <span class="btn btn-secondary fa fa-clock" onclick="postponed({{$id}})"></span>
                     @endif
                 </td>
@@ -97,6 +104,7 @@
         let postponedText;
         let postponedId;
         $(function () {
+            $('.checkboxradio').checkboxradio();
             postponedText = $('#postponeDiv').html();
             $('#postponeDiv').html('');
 

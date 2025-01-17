@@ -152,7 +152,6 @@ class Order extends Model
     {
         if ($this->total <= 0 || $this->user->safir())
             return 0;
-
         $payLinks = $this->paymentLinks;
         $Total = 0;
         foreach ($payLinks as $payLink) {

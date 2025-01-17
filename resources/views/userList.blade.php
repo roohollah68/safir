@@ -5,11 +5,11 @@
 @endsection
 
 @section('files')
-    <script src="js/manage-users.js"></script>
+
 @endsection
 
 @section('content')
-    @csrf
+
     @if(auth()->user()->meta('usersEdit'))
         <a href="/user/add" class="btn btn-outline-info fa fa-plus mb-4">افزودن کاربر</a>
     @endif
@@ -71,7 +71,7 @@
         </thead>
         <tbody>
         @foreach($users as $user)
-            @unless($user->verified)
+            @if(!$user->verified)
                 <tr>
                     <td>{{$user->name}}</td>
                     <td>{{$user->username}}</td>
@@ -81,7 +81,7 @@
                         <a class="btn btn-danger" href="/user/delete/{{$user->id}}">حذف</a>
                     </td>
                 </tr>
-            @endunless
+            @endif
         @endforeach
         </tbody>
     </table>

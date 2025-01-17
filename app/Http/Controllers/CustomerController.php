@@ -509,18 +509,30 @@ class CustomerController extends Controller
     {
         Helper::access(['editAllCustomers', 'allCustomers']);
         $orders = [];
-        $Orders = Order::with('paymentLinks');
+        $Orders = Order::with(['user', 'paymentLinks']);
+        $Orders = $Orders->where([
+            ['counter', 'approved'],
+            ['confirm', true],
+            ['total', '>', 0],
+        ])->with(['user', 'paymentLinks']);
+
         if (isset($req->user) && $req->user != 'all')
             $Orders = $Orders->where('user_id', $req->user);
+
+        if (!auth()->user()->meta('allCustomers'))
+            $Orders = $Orders->where('user_id', auth()->user()->id);
+
+        $Orders = $Orders->where(function ($query) {
+            $query->orWhere('payInDate', '<', Carbon::now()->toDateString())->orWhereNull('payInDate');
+        })->where(function ($query) {
+            $query->orWhere('postponeDate', '<', Carbon::now()->toDateString())->orWhereNull('postponeDate');
+        });
+
         $Orders = $Orders->get()->keyBy('id')->reverse();
         foreach ($Orders as $id => $Order) {
             if (count($orders) >= ($req->number ?? 100))
                 break;
-            if ($Order->counter != 'approved' || !$Order->confirm)
-                continue;
-            if (!auth()->user()->meta('allCustomers') && auth()->user()->id != $Order->user_id)
-                continue;
-            if ($Order->payPercent() < 100 && time() > strtotime($Order->payInDate) && time() > strtotime($Order->postponeDate) && $Order->total > 0)
+            if ($Order->unpaid() > 0)
                 $orders[$id] = $Order;
         }
         return view('customer.paymentTracking', [
