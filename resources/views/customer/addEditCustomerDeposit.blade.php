@@ -13,7 +13,7 @@
         @endisset
     </div>
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
-    <form action="/customerDeposit/add/{{$customer->id}}/{{$order->id?:0}}/{{$deposit->id}}" method="post" enctype="multipart/form-data">
+    <form action="/customerDeposit/addEdit/{{$customer->id}}/{{$order->id?:0}}/{{$deposit->id}}" method="post" enctype="multipart/form-data">
         @csrf
         <div class="row">
             <div class="col-md-6">

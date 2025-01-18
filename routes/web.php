@@ -112,7 +112,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/customer/SOA/{id}', 'customerSOA');
         Route::get('/customerDeposit/add/{customerId}/{orderId?}', 'newForm');
         Route::get('/customerDeposit/edit/{customerId}/{depositId}', 'editForm');
-        Route::post('/customerDeposit/add/{customerId}/{orderId?}/{depositId?}', 'store');
+        Route::post('/customerDeposit/addEdit/{customerId}/{orderId?}/{depositId?}', 'store');
         Route::post('/customerDeposit/delete/{id}', 'deleteDeposit');
         Route::post('/customerDeposit/view/{id}', 'viewDeposit');
         Route::get('/customerPaymentTracking', 'paymentTracking');
