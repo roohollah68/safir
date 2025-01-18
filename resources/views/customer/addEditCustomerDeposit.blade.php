@@ -37,7 +37,7 @@
     </div>
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
     <form method="post" enctype="multipart/form-data"
-          action="/customerDeposit/addEdit/{{$customer->id}}/{{$order->id?:'0'}}/{{$deposit->id}}">
+          action="/customerDeposit/addEdit/{{$customer->id}}/{{$order->id?:'0'}}{{$deposit->id?('/'.$deposit->id):''}}">
         @csrf
         <div class="row">
             <div class="col-md-6">
