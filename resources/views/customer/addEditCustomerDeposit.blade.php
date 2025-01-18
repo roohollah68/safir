@@ -4,6 +4,25 @@
     افزودن رسید پرداخت
 @endsection
 
+@section('files')
+    <script>
+        $(() => {
+            $('.checkboxradio').checkboxradio();
+
+            @if((old('pay_method')?:$deposit->pay_method)=='cheque')
+            $('.cash').hide().prop('required', false);
+            @else
+            $('.cheque').hide().prop('required', false);
+            @endif
+
+            const chequeDate = new mds.MdsPersianDateTimePicker($('#cheque_date_farsi')[0], {
+                targetTextSelector: '#cheque_date_farsi',
+                targetDateSelector: '#cheque_date',
+                @if(old('cheque_date')?:$deposit->cheque_date)
+                selectedDate: new Date('{{old('cheque_date')?:$deposit->cheque_date}}'),
+        @endif   </script>
+@endsection
+
 @section('content')
     <div class="m-3 p-3 bg-light">
         <span>ثبت سند واریزی برای: </span><b>{{$customer->name}}</b><br>
@@ -15,9 +34,7 @@
     </div>
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
     @if($order->id)
-        <form action="/customerDeposit/addEdit/{{$customer->id}}/{{$order->id}}" method="post"
-              enctype="multipart/form-data">
-
+        <form method="post" action="/customerDeposit/{{$customer->id}}/{{$order->id}}" enctype="multipart/form-data">
             @elseif($deposit->id)
                 <form action="/customerDeposit/addEdit/{{$customer->id}}/{{$deposit->id}}" method="post"
                       enctype="multipart/form-data">
@@ -154,23 +171,6 @@
 
                         </form>
 
-                        @endsection
-
-                        @section('files')
-                            <script>
-                                $(() => {
-                                    $('.checkboxradio').checkboxradio();
-
-                                    @if((old('pay_method')?:$deposit->pay_method)=='cheque')
-                                    $('.cash').hide().prop('required', false);
-                                    @else
-                                    $('.cheque').hide().prop('required', false);
-                                    @endif
-
-                                    const chequeDate = new mds.MdsPersianDateTimePicker($('#cheque_date_farsi')[0], {
-                                        targetTextSelector: '#cheque_date_farsi',
-                                        targetDateSelector: '#cheque_date',
-                                        @if(old('cheque_date')?:$deposit->cheque_date)
-                                        selectedDate: new Date('{{old('cheque_date')?:$deposit->cheque_date}}'),
-                                @endif   </script>
         @endsection
+
+
