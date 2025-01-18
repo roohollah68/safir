@@ -211,7 +211,6 @@ class CustomerController extends Controller
 
     public function store(Request $req, $customerId, $orderId = null, $depositId = null)
     {
-        dd($req->all());
         DB::beginTransaction();
         $user = auth()->user();
         request()->validate([
