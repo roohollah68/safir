@@ -1,7 +1,7 @@
 <div title="نحوه پرداخت" class="dialogs">
     <form method="post" id="paymentForm" action="" enctype="multipart/form-data">
         @csrf
-        <a class="btn btn-info" onclick="dialog.remove();" target="_blank" href="/customerDeposit/add/{{$order->customer_id}}/{{$order->id}}">پرداخت نقدی یا چکی</a>
+        <a class="btn btn-info" onclick="dialog.remove();" href="/customerDeposit/add/{{$order->customer_id}}/{{$order->id}}">پرداخت نقدی یا چکی</a>
         <br>
         <br>
         <input type="radio" id="cod" value="cod" name="paymentMethod" class="checkboxradio" >
