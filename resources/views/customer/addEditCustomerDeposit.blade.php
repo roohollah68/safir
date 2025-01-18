@@ -31,23 +31,23 @@
             </div>
 
             {{--            نوع پرداخت--}}
-            <div class="col-md-6 my-2">
-                <div class="form-group input-group required">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label class="input-group-text ">روش پرداخت:</label>
-                    </div>
-                    <label for="cash" class="">نقدی</label>
-                    <input type="radio" class="checkboxradio" name="pay_method" id="cash"
-                           value="cash" @checked((old('pay_method')?:$deposit->pay_method)!='cheque')
-                           onclick="$('.cash').show().prop('required',true);
-                           $('.cheque').hide().prop('required',false)">
-                    <label for="cheque" class="">چکی</label>
-                    <input type="radio" class="checkboxradio" name="pay_method" id="cheque"
-                           value="cheque" @checked((old('pay_method')?:$deposit->pay_method)=='cheque')
-                           onclick="$('.cash').hide().prop('required',false);
-                           $('.cheque').show().prop('required',true)">
-                </div>
-            </div>
+{{--            <div class="col-md-6 my-2">--}}
+{{--                <div class="form-group input-group required">--}}
+{{--                    <div class="input-group-append" style="min-width: 160px">--}}
+{{--                        <label class="input-group-text ">روش پرداخت:</label>--}}
+{{--                    </div>--}}
+{{--                    <label for="cash" class="">نقدی</label>--}}
+{{--                    <input type="radio" class="checkboxradio" name="pay_method" id="cash"--}}
+{{--                           value="cash" @checked((old('pay_method')?:$deposit->pay_method)!='cheque')--}}
+{{--                           onclick="$('.cash').show().prop('required',true);--}}
+{{--                           $('.cheque').hide().prop('required',false)">--}}
+{{--                    <label for="cheque" class="">چکی</label>--}}
+{{--                    <input type="radio" class="checkboxradio" name="pay_method" id="cheque"--}}
+{{--                           value="cheque" @checked((old('pay_method')?:$deposit->pay_method)=='cheque')--}}
+{{--                           onclick="$('.cash').hide().prop('required',false);--}}
+{{--                           $('.cheque').show().prop('required',true)">--}}
+{{--                </div>--}}
+{{--            </div>--}}
 
             {{--            انتخاب بانک--}}
             <div class="col-md-6 my-2 cash">
@@ -141,11 +141,11 @@
         $(() => {
             $('.checkboxradio').checkboxradio();
 
-            @if((old('pay_method')?:$deposit->pay_method)=='cheque')
-            $('.cash').hide().prop('required', false);
-            @else
-            $('.cheque').hide().prop('required', false);
-            @endif
+            {{--@if((old('pay_method')?:$deposit->pay_method)=='cheque')--}}
+            {{--$('.cash').hide().prop('required', false);--}}
+            {{--@else--}}
+            {{--$('.cheque').hide().prop('required', false);--}}
+            {{--@endif--}}
 
             const chequeDate = new mds.MdsPersianDateTimePicker($('#cheque_date_farsi')[0], {
                 targetTextSelector: '#cheque_date_farsi',
