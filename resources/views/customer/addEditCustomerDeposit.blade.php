@@ -15,6 +15,7 @@
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
     <form action="/customerDeposit/addEdit/{{$customer->id}}/{{$order->id?:0}}/{{$deposit->id}}" method="post" enctype="multipart/form-data">
         @csrf
+        <button type="submit" formmethod="post" formaction="/customerDeposit/addEdit/{{$customer->id}}/{{$order->id?:0}}/{{$deposit->id}}">Submit</button>
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group input-group required">
