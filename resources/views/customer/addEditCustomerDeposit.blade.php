@@ -19,8 +19,11 @@
                 targetTextSelector: '#cheque_date_farsi',
                 targetDateSelector: '#cheque_date',
                 @if(old('cheque_date')?:$deposit->cheque_date)
-                selectedDate: new Date('{{old('cheque_date')?:$deposit->cheque_date}}'),
-        @endif   </script>
+                selectedDate: new Date("{{old('cheque_date')?:$deposit->cheque_date}}"),
+                @endif
+            });
+        });
+    </script>
 @endsection
 
 @section('content')
@@ -33,9 +36,8 @@
         @endisset
     </div>
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
-    <form method="post" action="/customerDeposit/{{$customer->id}}/{{$order->id?:'0'}}{{$deposit->id?('/$deposit->id'):''}}"
-          enctype="multipart/form-data">
-
+    <form method="post" enctype="multipart/form-data"
+          action="/customerDeposit/{{$customer->id}}/{{$order->id?:'0'}}{{$deposit->id?('/$deposit->id'):''}}">
         @csrf
         <div class="row">
             <div class="col-md-6">
