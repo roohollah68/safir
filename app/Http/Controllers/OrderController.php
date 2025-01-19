@@ -655,8 +655,6 @@ class OrderController extends Controller
         $order = Helper::Order(true)->with('customer')->findOrFail($id);
         if ($order->confirm)
             return ['error', 'قبلا تایید شده.'];
-        if ($order->customer->block)
-            return ['error', 'حساب مشتری مسدود شده است.'];
         // بازگشت به انبار
         if ($order->total < 0) {
             $order->update([
@@ -666,6 +664,8 @@ class OrderController extends Controller
             ]);
             return ['ok', $order];
         }
+        if ($order->customer->block)
+            return ['error', 'حساب مشتری مسدود شده است.'];
         request()->validate([
             'paymentMethod' => 'required',
         ]);
