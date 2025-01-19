@@ -191,6 +191,7 @@ class CustomerController extends Controller
             'deposit' => new CustomerTransaction(),
             'order' => $order,
             'banks' => Bank::where('enable', true)->get()->keyBy('id'),
+            'edit' => false,
         ]);
     }
 
@@ -206,6 +207,7 @@ class CustomerController extends Controller
             'deposit' => $customer->transactions()->find($depositId),
             'order' => new Order(),
             'banks' => Bank::where('enable', true)->get()->keyBy('id'),
+            'edit' => true,
         ]);
     }
 
@@ -216,9 +218,8 @@ class CustomerController extends Controller
         request()->validate([
             'photo' => 'required_without:old_Photo|mimes:jpeg,jpg,png,bmp|max:2048',
             'old_Photo' => 'required_without:photo',
-            'amount' => 'required',
         ], [
-            'photo.required_without' => 'ارائه رسید بانکی الزامی است!',
+            'photo.required_without' => 'ارائه تصویر الزامی است!',
             'old_Photo.required_without' => '',
             'photo.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
         ]);

@@ -100,7 +100,6 @@
 
 @section('files')
     <script>
-        let token = '{{csrf_token()}}';
         let withdrawals = {!!json_encode($withdrawals)!!};
         $(function () {
             $('#withdrawal-table').DataTable({
@@ -137,7 +136,7 @@
             Dialog(`@include('withdrawal.counter')`);
             $('.checkboxradio').checkboxradio();
             $(`input[value=${withdrawal.counter_confirm}]`).click();
-            $('select[name=bank]').val(withdrawal.bank).change();
+            $('select[name=bank_id]').val(withdrawal.bank_id).change();
         }
         @endif
 

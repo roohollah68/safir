@@ -8,10 +8,10 @@
     <span>شماره مشتری:</span> <b>{{$deposit->customer_id}}</b> <br>
     <span>شماره واریز:</span> <b>{{$deposit->id}}</b> <br>
     <span>مبلغ:</span> <b>{{number_format($deposit->amount)}}</b> <br>
-    <span>روش پرداخت:</span> <b>{{$deposit->pay_method=='cash'?'نقدی':'چکی'}}</b> <br>
+    <span>روش پرداخت:</span> <b>{{config('payMethods')[$deposit->pay_method]}}</b> <br>
     @if($deposit->pay_method=='cash')
         <span>بانک:</span> <b>{{$deposit->bank_id?$deposit->bank->name:'نا مشخص'}}</b> <br>
-    @else
+    @elseif($deposit->pay_method=='cheque')
         <span>نام صاحب چک:</span> <b>{{$deposit->cheque_name}}</b> <br>
         <span>تاریخ چک:</span> <b>{{verta($deposit->cheque_date)->formatJalaliDate()}}</b> <br>
         <span>کد 16 رقمی چک:</span> <b dir="ltr">{{wordwrap($deposit->cheque_code , 4 , ' ' , true )}}</b> <br>

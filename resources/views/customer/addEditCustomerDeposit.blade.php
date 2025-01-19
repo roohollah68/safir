@@ -1,17 +1,23 @@
 @extends('layout.main')
 
 @section('title')
-    افزودن رسید پرداخت
+    @if($edit)
+        ویرایش رسید پرداخت
+    @else
+        افزودن رسید پرداخت
+    @endif
+
 @endsection
 
 @section('files')
     <script>
         $(() => {
             $('.checkboxradio').checkboxradio();
-
-            @if((old('pay_method')?:$deposit->pay_method)=='cheque')
+            @php($pay_method = (old('pay_method')?:$deposit->pay_method?:'cash'))
+            @if($pay_method!='cash')
             $('.cash').hide().prop('required', false);
-            @else
+            @endif
+            @if($pay_method!='cheque')
             $('.cheque').hide().prop('required', false);
             @endif
 
@@ -63,17 +69,16 @@
                         <label class="input-group-text ">روش پرداخت:</label>
                     </div>
                     <label for="cash" class="">نقدی</label>
-                    <input type="radio" class="checkboxradio" name="pay_method" id="cash"
-                           value="cash"
-                           @checked((old('pay_method')?:$deposit->pay_method)!='cheque')
-                           onclick="$('.cash').show().prop('required',true);
-                           $('.cheque').hide().prop('required',false)">
+                    <input type="radio" class="checkboxradio" name="pay_method" id="cash" value="cash" checked
+                           onclick="$('.cash').show().prop('required',true); $('.cheque').hide().prop('required',false)">
+
                     <label for="cheque" class="">چکی</label>
-                    <input type="radio" class="checkboxradio" name="pay_method" id="cheque"
-                           value="cheque"
-                           @checked((old('pay_method')?:$deposit->pay_method)=='cheque')
-                           onclick="$('.cash').hide().prop('required',false);
-                           $('.cheque').show().prop('required',true)">
+                    <input type="radio" class="checkboxradio" name="pay_method" id="cheque" value="cheque" @checked($pay_method=='cheque')
+                           onclick="$('.cash').hide().prop('required',false); $('.cheque').show().prop('required',true)">
+
+                    <label for="cash2" class="">پول نقد</label>
+                    <input type="radio" class="checkboxradio" name="pay_method" id="cash2" value="cash2"
+                           @checked($pay_method=='cash2') onclick="$('.cash,.cheque').hide().prop('required',false);">
                 </div>
             </div>
 
