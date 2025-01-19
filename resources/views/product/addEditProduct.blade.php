@@ -18,7 +18,7 @@
         <a class="btn btn-danger" href="{{route('productList')}}">بازگشت</a>
         <hr>
     @endif
-    <form action="/product/addOrEdit/{{$edit ? $product->id : ''}}" method="post" enctype="multipart/form-data">
+    <form action="/product/addOrEdit{{$edit ? '/'.$product->id : ''}}" method="post" enctype="multipart/form-data">
         @csrf
         <div class="row">
             {{--نام محصول--}}
@@ -282,7 +282,6 @@
 
 @section('files')
     <script>
-        let token = '{!! csrf_token() !!}'
         $(function () {
             $('.checkboxradio').checkboxradio();
             $('input[name="available"], input[name="category"]').checkboxradio();
