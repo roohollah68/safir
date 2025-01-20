@@ -12,11 +12,13 @@ use App\Models\Customer;
 use App\Models\CustomerTransaction;
 use App\Models\Oldcustomer;
 use App\Models\Order;
+
 //use App\Models\Product;
 //use App\Models\ProductData;
 use App\Models\OrderProduct;
 use App\Models\Product;
 use App\Models\Setting;
+
 //use App\Models\User;
 //use GuzzleHttp\Psr7\Query;
 use App\Models\Supplier;
@@ -24,6 +26,7 @@ use App\Models\Warehouse;
 use App\Models\Withdrawal;
 use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
+
 //use Illuminate\Support\Carbon;
 //use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
@@ -56,7 +59,7 @@ class SettingController extends Controller
         return view('invoiceData', [
             'setting' => $this->settings(),
             'warehouses' => Warehouse::all()->keyBy('id'),
-            ]);
+        ]);
     }
 
     public function invoiceDataSave(Request $req)
@@ -78,12 +81,22 @@ class SettingController extends Controller
 
     public function command()
     {
-        Order::where('customer_id', 3019)->update(['customer_id'=>1660]);
-        Order::where('customer_id', 3020)->update(['customer_id'=>1660]);
-        CustomerTransaction::where('customer_id', 3019)->update(['customer_id'=>1660]);
-        CustomerTransaction::where('customer_id', 3020)->update(['customer_id'=>1660]);
-    }
+        $froms = [1201 , 2547];
+        $to = 2597;
+        foreach ($froms as $from) {
+            Order::where('customer_id', $from)->update(['customer_id' => $to]);
+            CustomerTransaction::where('customer_id', $from)->update(['customer_id' => $to]);
+            Customer::find($from)->delete();
+        }
 
+        $froms = [4212];
+        $to = 2275;
+        foreach ($froms as $from) {
+            Order::where('customer_id', $from)->update(['customer_id' => $to]);
+            CustomerTransaction::where('customer_id', $from)->update(['customer_id' => $to]);
+            Customer::find($from)->delete();
+        }
+    }
 }
 
 
