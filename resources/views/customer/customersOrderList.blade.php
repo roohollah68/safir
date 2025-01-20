@@ -95,6 +95,10 @@
                         <a class="fa fa-file-invoice-dollar btn btn-secondary"
                            onclick="invoice({{$order->id}})"
                            title=" فاکتور"></a>
+                        @foreach($order->paymentLinks as $paymentLink)
+                            <i class="btn btn-warning fa fa-eye"
+                               onclick="view_deposit({{$paymentLink->customerTransaction->id}})" title="جزئیات پرداخت"></i>
+                        @endforeach
                         @if($order->receipt)
                             <a class="btn btn-info fa fa-image" href="/deposit/{{$order->receipt}}" target="_blank"></a>
                         @endif

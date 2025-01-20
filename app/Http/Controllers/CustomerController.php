@@ -352,10 +352,9 @@ class CustomerController extends Controller
     {
         Helper::access('counter');
         return view('customer.customersOrderList', [
-            'orders' => Order::where('confirm', true)->where('customer_id', '>', '0')
-                ->where('state', false)->with('user')->get()->keyBy('id'),
+            'orders' => Order::where('confirm', true)->whereNotNull('customer_id')
+                ->where('state', false)->with(['user' , 'paymentLinks.customerTransaction'])->get()->keyBy('id'),
             'users' => User::where('role', '<>', 'user')->where('verified', true)->select('id', 'name')->get(),
-//            'users' => User::where('verified', true)->select('id', 'name')->get(),
             'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
 
         ]);
