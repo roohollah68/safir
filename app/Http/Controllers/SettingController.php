@@ -81,21 +81,21 @@ class SettingController extends Controller
 
     public function command()
     {
-        $froms = [1201 , 2547];
-        $to = 2597;
+        $froms = [4894 , 4895 , 4896];
+        $to = 13;
         foreach ($froms as $from) {
             Order::where('customer_id', $from)->update(['customer_id' => $to]);
             CustomerTransaction::where('customer_id', $from)->update(['customer_id' => $to]);
             Customer::find($from)->delete();
         }
 
-        $froms = [4212];
-        $to = 2275;
-        foreach ($froms as $from) {
-            Order::where('customer_id', $from)->update(['customer_id' => $to]);
-            CustomerTransaction::where('customer_id', $from)->update(['customer_id' => $to]);
-            Customer::find($from)->delete();
-        }
+//        $froms = [4212];
+//        $to = 2275;
+//        foreach ($froms as $from) {
+//            Order::where('customer_id', $from)->update(['customer_id' => $to]);
+//            CustomerTransaction::where('customer_id', $from)->update(['customer_id' => $to]);
+//            Customer::find($from)->delete();
+//        }
     }
 }
 
