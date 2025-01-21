@@ -456,11 +456,11 @@ class OrderController extends Controller
         }
         $res = [];
         $start = 0;
-        foreach ($pageContents as $id => $pageContent) {
+        foreach ($pageContents as $pageNumber => $pageContent) {
             $page = view('orders.invoice', [
-                'firstPage' => ($id == 0) ? '' : 'd-none',
-                'lastPage' => ($id == count($pageContents) - 1) ? '' : 'd-none',
-                'page' => $id + 1,
+                'firstPage' => ($pageNumber == 0) ? '' : 'd-none',
+                'lastPage' => ($pageNumber == count($pageContents) - 1) ? '' : 'd-none',
+                'page' => $pageNumber + 1,
                 'pages' => count($pageContents),
                 'order' => $order,
                 'start' => $start,
