@@ -251,12 +251,15 @@
             </tr>
             </thead>
             <tbody>
-            @foreach($product->productChange()->get()->keyBy('id') as $productChange)
+            @foreach($product->productChange->keyBy('id') as $productChange)
                 <tr class="{{$productChange->isDeleted?'deleted':''}}">
                     <td dir="ltr">{{verta($productChange->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
                     <td>
                         @if($productChange->order_id)
-                            خرید مشتری {{$productChange->order->name}}
+                            @if($productChange->change>0)
+                                حذف رکورد :
+                            @endif
+                            خرید مشتری {{$productChange->order()->withTrashed()->first()->name}}
                         @else
                             {{$productChange->desc}}
                         @endif

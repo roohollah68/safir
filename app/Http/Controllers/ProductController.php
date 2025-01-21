@@ -47,7 +47,7 @@ class ProductController extends Controller
     public function showEditForm($id)
     {
         Helper::access('warehouse');
-        $product = Product::with('good')->findOrfail($id);
+        $product = Product::with(['good' , 'productChange.order'])->findOrfail($id);
         return view('product.addEditProduct', [
             'product' => $product,
             'good' => $product->good,
