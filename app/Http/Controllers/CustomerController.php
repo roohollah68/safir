@@ -297,12 +297,12 @@ class CustomerController extends Controller
     {
         Helper::access('counter');
         $req->verified = $req->verified ?: 'waiting';
-        $transactions = CustomerTransaction::limit(2000)->whereHas('customer.user', function ($query) {
+        $transactions = CustomerTransaction::whereHas('customer.user', function ($query) {
             if (isset($_GET['user_id']) && $_GET['user_id'])
                 $query->where('id', $_GET['user_id']);
             else
                 $query;
-        })->where('verified', $req->verified)->with(['customer.user']);
+        })->where('verified', $req->verified)->with(['customer.user'])->limit(2000)->orderBy('id', 'desc');
 
         return view('customer.customersDepositList', [
             'transactions' => $transactions->get()->keyBy('id'),
