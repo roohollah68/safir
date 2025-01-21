@@ -429,7 +429,6 @@ class OrderController extends Controller
     public function invoice($id, Request $request)
     {
         $order = Helper::Order(false)->findOrFail($id);
-//        $order->desc .= '(انبار ' . $order->warehouse->name . ')';
         $total_no_dis = 0;
         $total_dis = 0;
         $totalProducts = 0;
