@@ -11,41 +11,20 @@
 @section('files')
 
     <script>
-        let Current =
-            `@foreach(config('expense_type')['current'] as $data)
-            <option>{{$data}}</option>
-            @endforeach`
-        let Property =
-            `@foreach(config('expense_type')['property'] as $data)
-            <option>{{$data}}</option>
-            @endforeach`
+
         let suppliers = {!! json_encode($suppliers) !!}
         $(() => {
             $(".checkboxradio").checkboxradio();
-            let date_property = {
+
+            const chequeDate = new mds.MdsPersianDateTimePicker(document.getElementById('cheque_date_farsi'), {
                 targetTextSelector: '[name="cheque_date_farsi"]',
                 targetDateSelector: '[name="cheque_date"]',
-            }
-            @if(old('cheque_date')?:$withdrawal->cheque_date)
-                date_property.selectedDate = new Date('{{old('cheque_date')?:$withdrawal->cheque_date}}');
-            @endif
-            const chequeDate = new mds.MdsPersianDateTimePicker(document.getElementById('cheque_date_farsi'), date_property);
-            @if((old('pay_method')?:$withdrawal->pay_method)=='cheque')
-            $('.cash').hide().prop('required', false);
-            @else
-            $('.cheque').hide().prop('required', false);
-            @endif
+                @if(old('cheque_date')?:$withdrawal->cheque_date)
+                selectedDate : new Date('{{old('cheque_date')?:$withdrawal->cheque_date}}'),
+                @endif
+            });
 
-            @if((old('expense_type')?:$withdrawal->expense_type)=='current')
-            $('#expense_desc').html(Current).val('{{old('expense_desc')?:$withdrawal->expense_desc}}').change()
-            @elseif((old('expense_type')?:$withdrawal->expense_type)=='property')
-            $('#expense_desc').html(Property).val('{{old('expense_desc')?:$withdrawal->expense_desc}}').change()
-            @endif
-
-            @if((old('official')?:$withdrawal->official)==1)
-            $('.VAT').show();
-            @endif
-
+            $('input[value={{old('pay_method')?:$withdrawal->pay_method?:'cash'}}').click();
 
             $("#account_name").autocomplete({
                 source: Object.keys(suppliers),
@@ -167,66 +146,6 @@
                     </div>
                     <input type="text" class="form-control cheque" name="cheque_date_farsi" id="cheque_date_farsi" required>
                     <input type="hidden" name="cheque_date">
-                </div>
-            </div>
-
-            {{--            دسته هزینه--}}
-            <div class="col-md-6 my-2">
-                <div class="form-group input-group required">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label class="input-group-text ">دسته هزینه:</label>
-                    </div>
-                    <input type="radio" name="expense_type" value="" class="hide">
-                    <label for="current" class="">هزینه</label>
-                    <input type="radio" class="checkboxradio" name="expense_type" id="current"
-                           value="current" @checked((old('expense_type')?:$withdrawal->expense_type)=='current')
-                           onclick="$('#expense_desc').html(Current).change()">
-                    <label for="property" class="">دارایی</label>
-                    <input type="radio" class="checkboxradio" name="expense_type" id="property"
-                           value="property" @checked((old('expense_type')?:$withdrawal->expense_type)=='property')
-                           onclick="$('#expense_desc').html(Property).change()">
-                </div>
-            </div>
-
-            {{--            نوع هزینه--}}
-            <div class="col-md-6 my-2">
-                <div class="form-group input-group required">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label for="expense_desc" class="input-group-text w-100">نوع هزینه:</label>
-                    </div>
-                    <select name="expense_desc" id="expense_desc"></select>
-                </div>
-            </div>
-
-            {{--            نوع فاکتور--}}
-            <div class="col-md-6 my-2">
-                <div class="form-group input-group">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label class="input-group-text ">نوع فاکتور:</label>
-                    </div>
-                    <label for="official" class="">رسمی</label>
-                    <input type="radio" class="checkboxradio" name="official" id="official"
-                           value="1" @checked((old('official')?:$withdrawal->official)==1)
-                           onclick="$('.VAT').show()">
-                    <label for="unofficial" class="">غیر رسمی</label>
-                    <input type="radio" class="checkboxradio" name="official" id="unofficial"
-                           value="0" @checked((old('official')?:$withdrawal->official)!=1)
-                           onclick="$('.VAT').hide()">
-                </div>
-            </div>
-
-            {{--            ارزش افزوده(10%)--}}
-            <div class="col-md-6 my-2 VAT hide">
-                <div class="form-group input-group">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label class="input-group-text ">ارزش افزوده(10%):</label>
-                    </div>
-                    <label for="vat" class="">دارد</label>
-                    <input type="radio" class="checkboxradio" name="vat" id="vat"
-                           value="1" @checked((old('vat')?:$withdrawal->vat)==1)>
-                    <label for="no-vat" class="">ندارد</label>
-                    <input type="radio" class="checkboxradio" name="vat" id="no-vat"
-                           value="0" @checked((old('vat')?:$withdrawal->vat)!=1)>
                 </div>
             </div>
 

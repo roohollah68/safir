@@ -29,14 +29,14 @@ class WithdrawalController extends Controller
         Helper::access(['withdrawal', 'allWithdrawal']);
         request()->validate([
             'user_file' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
-            'expense_desc' => 'required',
         ], [
             'user_file.mimes' => 'فایل با این پسوند قابل قبول نیست!',
             'user_file.max' => 'حجم فایل نباید از 3 mb بیشتر باشد!',
-            'expense_desc.required' => 'نوع هزینه باید مشخص شود!'
         ]);
         $req->merge(['amount' => +str_replace(",", "", $req->amount)]);
-        $withdrawal = $user->withdrawals()->where('manager_confirm', '<', 1)->updateOrCreate(['id' => $req->id], $req->merge([
+        $withdrawal = $user->withdrawals()->where('manager_confirm', '<>', 1)->updateOrCreate([
+            'id' => $req->id
+        ], $req->merge([
             'counter_confirm' => 0,
             'manager_confirm' => 0,
             'payment_confirm' => 0
@@ -134,12 +134,14 @@ class WithdrawalController extends Controller
     public function counter($id, Request $req)
     {
         Helper::access('counter');
-        $withdrawal = Withdrawal::findOrFail($id);
-        $withdrawal->counter_confirm = $req->counter_confirm;
-        $withdrawal->manager_confirm = 0;
-        $withdrawal->counter_desc = $req->counter_desc;
-        $withdrawal->bank_id = $req->bank_id;
-        $withdrawal->save();
+        request()->validate([
+            'expense_desc' => 'required',
+        ], [
+            'expense_desc.required' => 'نوع هزینه باید مشخص شود!'
+        ]);
+        Withdrawal::findOrFail($id)->update($req->merge([
+            'manager_confirm' => 0
+        ])->all());
         return redirect()->back();
     }
 

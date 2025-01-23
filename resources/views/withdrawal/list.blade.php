@@ -13,7 +13,7 @@
     <i class="mx-3"></i>
     <i>تا تاریخ: </i><input type="text" value="" style="width: 120px" id="to_date">
     <hr>
-    <a class="btn btn-{{$get?'outline-':''}}success" href="/Withdrawal/list">همه</a>
+    <a class="btn btn-{{($get!='&')?'outline-':''}}success" href="/Withdrawal/list">همه</a>
     <i class="mx-3"></i>
     <a class="btn btn-{{$filter=='counter'?'':'outline-'}}primary" href="?{{$get}}filter=counter">منتظر تایید
         حسابدار</a>
@@ -101,6 +101,16 @@
 @section('files')
     <script>
         let withdrawals = {!!json_encode($withdrawals)!!};
+
+        let Current =
+            `@foreach(config('expense_type')['current'] as $data)
+            <option>{{$data}}</option>
+            @endforeach`
+        let Property =
+            `@foreach(config('expense_type')['property'] as $data)
+            <option>{{$data}}</option>
+            @endforeach`
+
         $(function () {
             $('#withdrawal-table').DataTable({
                 pageLength: 100,
@@ -137,6 +147,10 @@
             $('.checkboxradio').checkboxradio();
             $(`input[value=${withdrawal.counter_confirm}]`).click();
             $('select[name=bank_id]').val(withdrawal.bank_id).change();
+            $(`input[value=${withdrawal.expense_type}]`).click();
+            $('select[name=expense_desc]').val(withdrawal.expense_desc).change()
+            $(`input[name=official][value=${withdrawal.official}]`).click();
+            $(`input[name=vat][value=${withdrawal.vat}]`).click();
         }
         @endif
 
