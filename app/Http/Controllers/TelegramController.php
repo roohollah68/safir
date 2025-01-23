@@ -76,6 +76,8 @@ class TelegramController extends Controller
     {
         $content = array("caption" => 'backup', "document" => "https://matchano.ir/safir_database_backup/safir.sql.gz");
         $chatId = '1444566712';
-        print_r($this->sendDocumentToBale($content, $chatId));
+        $chatId2 = '1160743866';
+        $this->sendDocumentToBale($content, $chatId);
+        $this->sendDocumentToBale($content, $chatId2);
     }
 }
