@@ -29,7 +29,6 @@
 @section('files')
     <script>
         let dialog;
-        let token = '{{ csrf_token() }}';
 
         function showDesc(report) {
             let text = `<div title="گزارش کار ${report.user.name}" class="dialogs">` +
