@@ -102,6 +102,7 @@
             $('#table').DataTable({
                 pageLength: 100,
                 order: [[0, "desc"]],
+                language: language,
             });
 
             {{--            const date1 = new mds.MdsPersianDateTimePicker($('#from_date')[0], {--}}
