@@ -56,6 +56,7 @@
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{route('customersOrderList')}}">بررسی سفارشات</a>
                         <a class="dropdown-item" href="{{route('customersDepositList')}}">بررسی واریزی ها</a>
+                        <a class="dropdown-item" href="{{route('BankTransactionList')}}">مدیریت نقدینگی</a>
                     </div>
                 </li>
             @endif

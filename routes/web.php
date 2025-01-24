@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\BankTransactionController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CustomerController;
@@ -189,7 +190,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
     Route::controller(WithdrawalController::class)->prefix('Withdrawal')->group(function () {
         ///Withdrawal
         Route::get('/add', 'new')->name('addWithdrawal');
-        Route::post('/add', 'insertOrUpdate');
+        Route::post('/add/{id?}', 'insertOrUpdate');
         Route::get('/edit/{id}', 'edit');
         Route::get('/list', 'list')->name('WithdrawalList');
         Route::post('/view/{id}', 'view');
@@ -200,8 +201,18 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('/tankhah/add', 'addTankhah');
         Route::get('/tankhah/edit/{id}', 'editTankhah');
         Route::post('/tankhah/add/{id?}', 'addEditTankhah');
-
     });
+
+    Route::controller(BankTransactionController::class)->prefix('BankTransaction')->group(function () {
+        ///BankManagement
+        Route::get('/add', 'new')->name('addTransaction');
+        Route::post('/addEdit/{id?}', 'insertOrUpdate');
+        Route::get('/edit/{id}', 'edit');
+        Route::get('/delete/{id}', 'delete');
+        Route::get('/list', 'list')->name('BankTransactionList');
+        Route::post('/view/{id}', 'view');
+    });
+
 
     Route::controller(SupplierController::class)->prefix('Supplier')->group(function () {
         ///SUPPLIERS

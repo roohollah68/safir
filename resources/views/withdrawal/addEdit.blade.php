@@ -1,7 +1,7 @@
 @extends('layout.main')
 
 @section('title')
-    @if(!$withdrawal->id)
+    @if(!$edit)
         افزودن درخواست پرداخت
     @else
         ویرایش درخواست پرداخت
@@ -40,9 +40,8 @@
 
 @section('content')
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
-    <form action="/Withdrawal/add" method="post" enctype="multipart/form-data">
+    <form action="/Withdrawal/add{{$edit?('/'.$withdrawal->id):''}}" method="post" enctype="multipart/form-data">
         @csrf
-        <input type="hidden" name="id" value="{{$withdrawal->id}}">
         <div class="row my-4">
 
             {{--            مبلغ--}}
@@ -183,7 +182,7 @@
         @endif
         <br>
         <br>
-        @if($withdrawal->id)
+        @if($edit)
             <input type="submit" class="btn btn-success" value="ویرایش">
         @else
             <input type="submit" class="btn btn-success" value="افزودن">

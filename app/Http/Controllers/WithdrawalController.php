@@ -19,10 +19,11 @@ class WithdrawalController extends Controller
         return view('withdrawal.addEdit', [
             'suppliers' => Supplier::all()->keyBy('name'),
             'withdrawal' => new Withdrawal(),
+            'edit' =>false,
         ]);
     }
 
-    public function insertOrUpdate(Request $req)
+    public function insertOrUpdate(Request $req, $id = null)
     {
         DB::beginTransaction();
         $user = auth()->user();
@@ -35,7 +36,7 @@ class WithdrawalController extends Controller
         ]);
         $req->merge(['amount' => +str_replace(",", "", $req->amount)]);
         $withdrawal = $user->withdrawals()->where('manager_confirm', '<>', 1)->updateOrCreate([
-            'id' => $req->id
+            'id' => $id
         ], $req->merge([
             'counter_confirm' => 0,
             'manager_confirm' => 0,
@@ -67,6 +68,7 @@ class WithdrawalController extends Controller
         return view('withdrawal.addEdit', [
             'suppliers' => Supplier::all()->keyBy('name'),
             'withdrawal' => $withdrawal,
+            'edit' => true,
         ]);
     }
 

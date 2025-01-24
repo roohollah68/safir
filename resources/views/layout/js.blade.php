@@ -62,6 +62,13 @@
             })
     }
 
+    function view_bankTransaction(id) {
+        $.post('/BankTransaction/view/' + id, {_token: token})
+            .done(res => {
+                dialog = Dialog(res);
+            })
+    }
+
     function addComment(id) {
         $('#commentForm').submit(function (e) {
             e.preventDefault();
