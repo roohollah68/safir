@@ -18,6 +18,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TelegramController;
 use App\Http\Controllers\WithdrawalController;
+use App\Http\Controllers\ChequeController;
 use App\Livewire\Counter;
 use App\Models\Order;
 use App\Models\Product;
@@ -214,6 +215,11 @@ Route::middleware(['auth', 'verify'])->group(function () {
     });
 
 
+    // CHEQUES
+    Route::get('/cheques', [ChequeController::class, 'list'])->name('cheques');
+    Route::get('/chequeView/{id}', [ChequeController::class, 'view'])->name('chequeView');
+
+
     Route::controller(SupplierController::class)->prefix('Supplier')->group(function () {
         ///SUPPLIERS
         Route::get('/add', 'new');
@@ -226,6 +232,8 @@ Route::middleware(['auth', 'verify'])->group(function () {
 
     Route::get('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteOrder']);
     Route::get('/woocommerce', [WoocommerceController::class, 'viewFile']);
+
+    
 
 });
 
