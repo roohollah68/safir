@@ -530,8 +530,8 @@ class CustomerController extends Controller
 
         $Orders = $Orders->get()->keyBy('id')->reverse();
         foreach ($Orders as $id => $Order) {
-            if (count($orders) >= ($req->number ?? 100))
-                break;
+//            if (count($orders) >= ($req->number ?? 100))
+//                break;
             if ($Order->unpaid() > 0)
                 $orders[$id] = $Order;
         }
