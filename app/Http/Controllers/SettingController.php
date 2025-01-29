@@ -81,6 +81,11 @@ class SettingController extends Controller
 
     public function command()
     {
+        $this->fcn2();
+    }
+
+    public function combineCustomers()
+    {
         $froms = [4894 , 4895 , 4896];
         $to = 13;
         foreach ($froms as $from) {
@@ -88,14 +93,35 @@ class SettingController extends Controller
             CustomerTransaction::where('customer_id', $from)->update(['customer_id' => $to]);
             Customer::find($from)->delete();
         }
+    }
 
-//        $froms = [4212];
-//        $to = 2275;
-//        foreach ($froms as $from) {
-//            Order::where('customer_id', $from)->update(['customer_id' => $to]);
-//            CustomerTransaction::where('customer_id', $from)->update(['customer_id' => $to]);
-//            Customer::find($from)->delete();
-//        }
+    public function fcn1()
+    {
+        $orders = Order::whereNotNull('customer_id')->with('customer')->get();
+        foreach ($orders as $order)
+            if($order->user_id != $order->customer->user_id) {
+                echo $order->id . '<br>';
+//                $order->user_id = $order->customer->user_id;
+//                $order->save();
+            }
+    }
+
+    public function fcn2()
+    {
+        $orders = Order::whereNotNull('customer_id')->with('user')->get();
+        $ii = 1;
+        $arr = [];
+        foreach ($orders as $order) {
+            if ($order->user->safir()) {
+//                echo $ii++ .'- '. $order->id . '<br>';
+                $arr[] = $order->id;
+//                $order->customer_id = null;
+//                $order->save();
+            }
+
+        }
+        echo Order::whereIn('id',$arr)->update(['customer_id'=> null]);
+//        dd($arr);
     }
 }
 

@@ -27,17 +27,17 @@
 {{--                <input type="checkbox" id="all" class="checkboxradio" name="all" @checked($_GET['all']??false)>--}}
 {{--            </div>--}}
 {{--        </div>--}}
-        <div class="col-md-6 m-1">
-            <div class="form-group input-group ">
-                <div class="input-group-append" style="min-width: 160px">
-                    <label for="number" class="input-group-text w-100">تعداد رکورد:</label>
-                </div>
-                <input type="number" min="1" step="1" id="number" name="number" value="{{old('number')?:$_GET['number']??100}}">
-            <input type="submit" class="btn btn-primary" value="اعمال تغییرات">
-            </div>
-        </div>
+{{--        <div class="col-md-6 m-1">--}}
+{{--            <div class="form-group input-group ">--}}
+{{--                <div class="input-group-append" style="min-width: 160px">--}}
+{{--                    <label for="number" class="input-group-text w-100">تعداد رکورد:</label>--}}
+{{--                </div>--}}
+{{--                <input type="number" min="1" step="1" id="number" name="number" value="{{old('number')?:$_GET['number']??100}}">--}}
+{{--            --}}
+{{--            </div>--}}
+{{--        </div>--}}
 
-
+        <input type="submit" class="btn btn-primary" value="فیلتر">
     </form>
     <br>
     <table class="table table-striped" id="orders-table">
@@ -109,7 +109,7 @@
             $('#postponeDiv').html('');
 
             $('#orders-table').DataTable({
-                // paging: false,
+                language: language,
                 pageLength: 100,
                 order: [[0, "desc"]],
             });
