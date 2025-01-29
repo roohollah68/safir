@@ -1,11 +1,13 @@
 <script>
-
     function invoice(id) {
         let randSTR = makeid(3);
         let printInvoice = (page, index) => {
             $('#invoice-wrapper' + index).html(page);
-            domtoimage.toJpeg($('#invoice' + index)[0], {width: 2100, height: 2970})
-                .then(function (dataUrl) {
+            domtoimage.toJpeg($('#invoice' + index)[0], {
+                    width: 2100,
+                    height: 2970
+                })
+                .then(function(dataUrl) {
                     let link = document.createElement('a');
                     link.download = id + `_` + index + `_` + randSTR + '.jpg';
                     link.href = dataUrl;
@@ -35,42 +37,70 @@
     }
 
     function view_order(id) {
-        $.post('/viewOrder/' + id, {_token: token})
+        $.post('/viewOrder/' + id, {
+                _token: token
+            })
             .done(res => {
                 dialog = Dialog(res);
             })
     }
 
     function view_withdrawal(id) {
-        $.post('/Withdrawal/view/' + id, {_token: token})
+        $.post('/Withdrawal/view/' + id, {
+                _token: token
+            })
+            .done(res => {
+                dialog = Dialog(res);
+            })
+    }
+
+    function view_given_cheque(id) {
+        $.get('/cheque/given/' + id, {
+                _token: token
+            })
+            .done(res => {
+                dialog = Dialog(res);
+            })
+    }
+
+    function view_recieved_cheque(id) {
+        $.get('/cheque/recieved/' + id, {
+                _token: token
+            })
             .done(res => {
                 dialog = Dialog(res);
             })
     }
 
     function view_comment(id) {
-        $.post('/viewComment/' + id, {_token: token})
+        $.post('/viewComment/' + id, {
+                _token: token
+            })
             .done(res => {
                 dialog = Dialog(res);
             })
     }
 
     function view_deposit(id) {
-        $.post('/customerDeposit/view/' + id, {_token: token})
+        $.post('/customerDeposit/view/' + id, {
+                _token: token
+            })
             .done(res => {
                 dialog = Dialog(res);
             })
     }
 
     function view_bankTransaction(id) {
-        $.post('/BankTransaction/view/' + id, {_token: token})
+        $.post('/BankTransaction/view/' + id, {
+                _token: token
+            })
             .done(res => {
                 dialog = Dialog(res);
             })
     }
 
     function addComment(id) {
-        $('#commentForm').submit(function (e) {
+        $('#commentForm').submit(function(e) {
             e.preventDefault();
             $.ajax({
                 type: "POST",
@@ -81,12 +111,12 @@
                 headers: {
                     "Accept": "application/json"
                 }
-            }).done(function (res) {
+            }).done(function(res) {
                 if (res === "ok") {
                     $.notify("با موفقیت ذخیره شد.", "success");
                     dialog.remove();
                 }
-            }).fail(function () {
+            }).fail(function() {
                 $.notify('خطایی رخ داده است.', 'warn');
             });
         });
@@ -103,7 +133,7 @@
             modal: true,
             open: () => {
                 $('.ui-dialog-titlebar-close').hide();
-                $('.ui-widget-overlay').bind('click', function () {
+                $('.ui-widget-overlay').bind('click', function() {
                     dialog.remove()
                 });
             },
@@ -116,20 +146,20 @@
         return dialog;
     }
 
-    $(function () {
+    $(function() {
         let $loading = $('#loadingDiv').hide();
         $(document)
-            .ajaxStart(function () {
+            .ajaxStart(function() {
                 $loading.show();
             })
-            .ajaxStop(function () {
+            .ajaxStop(function() {
                 $loading.hide();
             });
         priceInput();
     })
 
     function priceInput() {
-        $(".price-input").on("keyup", function (event) {
+        $(".price-input").on("keyup", function(event) {
             // When user select text in the document, also abort.
             var selection = window.getSelection().toString();
             if (selection !== '') {
@@ -144,11 +174,11 @@
             var input = $this.val();
             input = input.replace(/[\D\s\._\-]+/g, "");
             input = input ? parseInt(input, 10) : 0;
-            $this.val(function () {
+            $this.val(function() {
                 return (input === 0) ? "0" : input.toLocaleString("en-US");
             });
         });
-        $(".price-input").each(function (event) {
+        $(".price-input").each(function(event) {
             // When user select text in the document, also abort.
             var selection = window.getSelection().toString();
             if (selection !== '') {
@@ -163,7 +193,7 @@
             var input = $this.val();
             input = input.replace(/[\D\s\._\-]+/g, "");
             input = input ? parseInt(input, 10) : 0;
-            $this.val(function () {
+            $this.val(function() {
                 return (input === 0) ? "0" : input.toLocaleString("en-US");
             });
         });

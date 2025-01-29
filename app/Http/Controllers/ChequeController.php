@@ -3,29 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cheque;
+use App\Models\Withdrawal;
 
 class ChequeController extends Controller
 {
-    public function list()
+    public function cheque()
     {
         $cheque = new Cheque();
         $receivedCheque = $cheque->receivedCheque();
         $givenCheque = $cheque->givenCheque();
-
         return view('cheque.cheque', compact('receivedCheque', 'givenCheque'));
     }
 
     public function view($id)
     {
-    $viewCheque = \DB::table('withdrawals')
-        ->select('id', 'cheque_date', 'cheque_id', 'amount', 'account_name', 'user_file', 
-                 'expense', 'location', 'user_desc', 'pay_method', 'expense_type', 
-                 'expense_desc', 'official', 'vat', 'bank_id')
-        ->where('pay_method', 'cheque')
-        ->where('id', $id) 
-        ->first();  
+        $cheque = new Cheque();
+        $viewCheque = $cheque->viewGivenCheque($id);
+        return view('cheque.givenView', compact('viewCheque'))->render();
+    }
 
-    return view('cheque.chequeView', compact('viewCheque'));
+    public function recievedView($id)
+    {
+        $cheque = new Cheque();
+        $viewCheque = $cheque->viewReceivedCheque($id);
+        return view('cheque.receivedView', compact('viewCheque'))->render();
     }
 
 }
