@@ -61,12 +61,9 @@ class OrderController extends Controller
                 $query->where('category', '<>', 'pack');
             else
                 $query->where('category', 'final');
-        })->with('good')->get()->keyBy('id');
-        $products = $this->calculateDis($products, $user);
-
+        })->with('good.couponLinks.coupon')->get()->keyBy('id');
+        $products = $this->calculateDiscount($products, $user);
         $order->customer = new Customer();
-        $order->customer->city_id = 301;
-        $cities = City::with('province')->get()->keyBy('id');
         return view('addEditOrder.addEditOrder', [
             'products' => $products,
             'settings' => Helper::settings(),
@@ -75,9 +72,9 @@ class OrderController extends Controller
             'creatorIsAdmin' => ($this->superAdmin() || $this->admin()),
             'order' => $order,
             'customers' => $user->customers()->get()->keyBy('id'),
-            'cities' => $cities,
             'warehouses' => Warehouse::all(),
             'warehouseId' => $warehouseId,
+            'edit' => false,
         ]);
     }
 
@@ -90,50 +87,46 @@ class OrderController extends Controller
             'name' => 'required|string|min:3',
             'address' => 'required|string|min:3',
             'phone' => 'required|string|min:11,max:11',
+            'cart' => 'required|array|min:1'
         ]);
         $user = auth()->user();
-
-        $order = new Order;
-        $order->name = $request->name;
-        $order->phone = Helper::number_Fa_En($request->phone);
-        $order->zip_code = Helper::number_Fa_En($request->zip_code);
-        $order->orders = '';
-        $order->desc = $request->desc;
-        $order->total = 0;  //جمع با احتساب تخفیف
+        $order = $user->orders()->create([
+            'name' => $request->name,
+            'address' => $request->address,
+            'warehouse_id' => $request->warehouse_id,
+            'paymentMethod' => $request->paymentMethod,
+            'deliveryMethod' => $request->deliveryMethod,
+            'desc' => $request->desc,
+            'customer_id' => $request->customer_id,
+            'phone' => Helper::number_Fa_En($request->phone),
+            'zip_code' => Helper::number_Fa_En($request->zip_code),
+            'total' => 0, // جمع با احتساب تخفیف
+            'confirm' => $this->safir(),
+            'counter' => $this->safir() ? 'approved' : 'waiting',
+            'orders' => ''
+        ]);
         $Total = 0;     //جمع بدون احتساب تخفیف
-        $order->paymentMethod = $request->paymentMethod;
-        $order->deliveryMethod = $request->deliveryMethod;
-        $order->confirm = $this->safir();
-        $order->counter = $this->safir() ? 'approved' : 'waiting';
-        $order->user_id = $user->id;
-        $order->address = $request->address;
-        $order->warehouse_id = $request->warehouseId;
-        $products = Product::find(array_keys($request->cart))->keyBy('id');
-        $products = $this->calculateDis($products, $user);
-        $request->orderList = [];
-        if (count($request->cart) == 0) {
-            return $this->errorBack('محصولی انتخاب نشده است!');
-        }
-        foreach ($request->cart as $id => $number) {
+        $products = Product::with('good')->find(array_keys($request->cart))->keyBy('id');
+        $products = $this->calculateDiscount($products, $user);
+        foreach ($request->cart as $id => $item) {
             $product = $products[$id];
-            $discount = +$product->coupon;
-            if (auth()->user()->meta('changeDiscount'))
-                $discount = +$request['discount_' . $id];
+            $discount = +$product->discount;
+            if ($user->meta('changeDiscount'))
+                $discount = +$item['discount'];
             $price = round((100 - $discount) * $product->good->price / 100);
             $editPrice = false;
-            if (auth()->user()->meta('changePrice')) {
-                $price = +str_replace(",", "", $request['price_' . $id]);
+            if ($user->meta('changePrice')) {
+                $price = +str_replace(",", "", $item['price']);
                 $editPrice = $price != $product->good->price;
-                $price = $price = round((100 - $discount) * $price / 100);
+                $price = round((100 - $discount) * $price / 100);
             }
-            $order->total += $price * (+$number);
-            $Total += $product->good->price * (+$number);
-            $order->save();
+            $order->total += $price * (+$item['number']);
+            $Total += $product->good->price * (+$item['number']);
             $order->orderProducts()->create([
                 'name' => $product->good->name,
                 'price' => $price,
                 'product_id' => $id,
-                'number' => $number,
+                'number' => $item['number'],
                 'discount' => $discount,
                 'editPrice' => $editPrice
             ]);
@@ -141,16 +134,23 @@ class OrderController extends Controller
         if ($order->total < 0) {
             $order->desc .= ' (فاکتور برگشت به انبار)';
         }
-        if ($this->safir()) {
+        if ($user->safir()) {
             $deliveryCost = Helper::settings()->{$request->deliveryMethod};
             if ($Total < Helper::settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
                 $order->total += $deliveryCost;
             if ($request->paymentMethod == 'credit') {
-                if ($order->total > ($user->balance + Helper::settings()->negative)) {
+                if ($order->total > ($user->balance + Helper::settings()->negative))
                     return $this->errorBack('اعتبار شما کافی نیست!');
-                } else {
+                else {
                     $user->update([
                         'balance' => $user->balance - $order->total
+                    ]);
+                    $order->transactions()->create([
+                        'user_id' => auth()->user()->id,
+                        'amount' => $order->total,
+                        'balance' => auth()->user()->balance,
+                        'type' => false,
+                        'description' => 'ثبت سفارش',
                     ]);
                 }
             } elseif ($request->paymentMethod == 'receipt') {
@@ -164,16 +164,9 @@ class OrderController extends Controller
                 $order->customerCost = round($Total * (100 - $request->customerDiscount) / 100 + $deliveryCost);
             } else
                 return $this->errorBack('روش پرداخت به درستی انتخاب نشده است!');
-        }
-        $order->customer_id = $this->addToCustomers($request, $order);
-        if ($order->customer_id == 'not match')
-            return $this->errorBack('نام مشتری مطابقت ندارد!');
-
-        $this->addToTransactions($request, $order);
-
-        if ($this->safir()) {
             app('Telegram')->sendOrderToBale($order, env('GroupId'));
         }
+
         $order->save();
         (new CommentController)->create($order, $user, 'سفارش ایجاد شد');
 
@@ -184,13 +177,13 @@ class OrderController extends Controller
 
     public function editOrder($id)
     {
-        $order = Helper::Order(true)->with(['customer.city', 'user'])->findOrFail($id);
+        $order = Helper::Order(true)->with(['customer', 'user'])->findOrFail($id);
         $user = $order->user;
         if (($order->state && $user->safir()) || ($order->confirm && $user->admin()))
             return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
         if ($order->total < 0)
             return view('error')->with(['message' => 'فاکتور بازگشت به انبار قابل ویرایش نیست، لطفا حذف کنید و مجدد ثبت کنید.']);
-        $products = Product::withTrashed()->where('warehouse_id', $order->warehouse_id)->where('available', true)->
+        $products = Product::where('warehouse_id', $order->warehouse_id)->where('available', true)->
         whereHas('good', function (Builder $query) {
             if (auth()->user()->meta('sellRawProduct'))
                 $query->where('category', '<>', 'pack');
@@ -199,25 +192,22 @@ class OrderController extends Controller
         })->get()->keyBy('id');
         $cart = [];
 
-        $products = $this->calculateDis($products, $user);
+        $products = $this->calculateDiscount($products, $user);
 
         $selectedProducts = $order->orderProducts->keyBy('product_id');
         foreach ($selectedProducts as $id => $orderProduct) {
             if (isset($products[$id])) {
                 $cart[$id] = (int)$orderProduct->number;
-                $products[$id]->coupon = +$orderProduct->discount;
+                $products[$id]->discount = +$orderProduct->discount;
                 $products[$id]->priceWithDiscount = +$orderProduct->price;
-            }
+            }else
+                echo $orderProduct->name . ' از محصولات حذف شده است';
         }
-        if (!$order->customer) {
-            $order->customer = new Customer();
-            $order->customer->city_id = 0;
-        }
+
         $cities = City::with('province')->get()->keyBy('id');
         return view('addEditOrder.addEditOrder')->with([
             'cart' => $cart,
-            'cities' => $cities,
-            'creatorIsAdmin' => $order->user->admin() || $order->user->superAdmin(),
+            'creatorIsAdmin' => !$user->safir(),
             'customers' => $user->customers()->get()->keyBy('id'),
             'edit' => true,
             'order' => $order,
@@ -240,39 +230,34 @@ class OrderController extends Controller
             'name' => 'required|string|min:3',
             'address' => 'required|string|min:3',
             'phone' => 'required|string|min:11,max:11',
+            'cart' => 'required|array|min:1',
         ]);
 
-        $request->phone = Helper::number_Fa_En($request->phone);
-        $request->zip_code = Helper::number_Fa_En($request->zip_code);
-
-        if (!$order->user->safir()) {
-            $products = Product::withTrashed()->where('available', true)->where('warehouse_id', $order->warehouse_id)->get()->keyBy('id');
-            $products = $this->calculateDis($products, $user);
+        if (!$user->safir()) {
+            $products = Product::with('good')->find(array_keys($request->cart))->keyBy('id');
+            $products = $this->calculateDiscount($products, $user);
             $order->orderProducts()->delete();
-            if (count($request->cart) == 0) {
-                return $this->errorBack('محصولی انتخاب نشده است!');
-            }
             $order->total = 0;
-            foreach ($request->cart as $id => $number) {
+            foreach ($request->cart as $id => $item) {
                 $product = $products[$id];
-                $discount = $product->coupon;
-                $editPrice = false;
+                $discount = +$product->discount;
                 if ($user->meta('changeDiscount'))
-                    $discount = +$request['discount_' . $id];
+                    $discount = +$item['discount'];
                 $price = round((100 - $discount) * $product->good->price / 100);
+                $editPrice = false;
                 if ($user->meta('changePrice')) {
-                    $price = +str_replace(",", "", $request['price_' . $id]);
+                    $price = +str_replace(",", "", $item['price']);
                     $editPrice = $price != $product->good->price;
                     $price = round((100 - $discount) * $price / 100);
                 }
-                $order->total += $price * (+$number);
+                $order->total += $price * (+$item['number']);
                 $order->orderProducts()->create([
                     'name' => $product->good->name,
                     'price' => $price,
                     'product_id' => $id,
-                    'number' => $number,
+                    'number' => $item['number'],
                     'discount' => $discount,
-                    'editPrice' => $editPrice,
+                    'editPrice' => $editPrice
                 ]);
             }
         }
@@ -280,16 +265,16 @@ class OrderController extends Controller
         $order->save();
         $order->update([
             'name' => $order->user->safir() ? $request->name : $order->name,
-            'phone' => $request->phone,
+            'phone' => Helper::number_Fa_En($request->phone),
             'address' => $request->address,
-            'zip_code' => $request->zip_code,
+            'zip_code' => Helper::number_Fa_En($request->zip_code),
             'desc' => $request->desc,
         ]);
 
         $order->paymentLinks()->delete();
         (new CommentController)->create($order, auth()->user(), 'سفارش ویرایش شد');
 
-        $this->addToCustomers($request, $order);
+//        $this->addToCustomers($request, $order);
         app('Telegram')->editOrderInBale($order, env('GroupId'));
         DB::commit();
 
@@ -547,69 +532,42 @@ class OrderController extends Controller
         return 'مشکلی به وجود آمده!';
     }
 
-    public function calculateDis($products, $user)
+    public function calculateDiscount($products, $user)
     {
-        if ($user->safir()) {
-            $discounts = [];
-            foreach ($user->couponLinks as $couponLink) {
-                if (isset($discounts[$couponLink->good_id]))
-                    $discounts[$couponLink->good_id] = max($discounts[$couponLink->good_id], $couponLink->coupon->percent);
-                else
-                    $discounts[$couponLink->good_id] = $couponLink->coupon->percent;
-            }
-            foreach ($products as $id => $product) {
-                $products[$id]->coupon = $discounts[$product->good_id] ?? 0;
-                $products[$id]->priceWithDiscount = round((100 - $products[$id]->coupon) * $product->good->price / 100);
-            }
-        } else {
-            foreach ($products as $id => $product) {
-                $products[$id]->coupon = 0;
-                $products[$id]->priceWithDiscount = $product->good->price;
-            }
+        foreach ($products as $id => $product) {
+            $product->discount = $product->discount($user);
+            $product->priceWithDiscount = round((100 - $product->discount) * $product->good->price / 100);
         }
         return $products;
     }
 
-    public function addToCustomers($request, $order)
-    {
-        if ($this->safir()) {
-            $request->customerId = false;
-        }
-        if ($this->safir() && !$request->addToCustomers) {
-            return null;
-        }
-        $data = [
-            'name' => $order->name,
-            'phone' => $order->phone,
-            'address' => $order->address,
-            'zip_code' => $order->zip_code,
-            'city_id' => $request->city_id,
-        ];
-        if ($request->customerId) {
-            $customer = Customer::findOrFail($request->customerId);
-            if ($request->addToCustomers)
-                $customer->update($data);
-            else
-                if ($customer->name != $request->name)
-                    return 'not match';
-        } else
-            $customer = auth()->user()->customers()->Create($data);
-
-        return $customer->id;
-    }
-
-    public function addToTransactions($request, $order)
-    {
-        if ($this->safir() && $request->paymentMethod == 'credit')
-            $order->transactions()->create([
-                'user_id' => auth()->user()->id,
-                'amount' => $order->total,
-                'balance' => auth()->user()->balance,
-                'type' => false,
-                'description' => 'ثبت سفارش',
-            ]);
-    }
-
+//    public function addToCustomers($request, $order)
+//    {
+//        if ($this->safir()) {
+//            $request->customerId = false;
+//        }
+//        if ($this->safir() && !$request->addToCustomers) {
+//            return null;
+//        }
+//        $data = [
+//            'name' => $order->name,
+//            'phone' => $order->phone,
+//            'address' => $order->address,
+//            'zip_code' => $order->zip_code,
+//            'city_id' => $request->city_id,
+//        ];
+//        if ($request->customerId) {
+//            $customer = Customer::findOrFail($request->customerId);
+//            if ($request->addToCustomers)
+//                $customer->update($data);
+//            else
+//                if ($customer->name != $request->name)
+//                    return 'not match';
+//        } else
+//            $customer = auth()->user()->customers()->Create($data);
+//
+//        return $customer->id;
+//    }
     public function dateFilter(Request $request)
     {
         $from = date($request->date1 . ' 00:00:00');

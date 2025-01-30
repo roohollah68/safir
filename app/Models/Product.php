@@ -70,4 +70,15 @@ class Product extends Model
     {
         return $this->belongsTo(Warehouse::class);
     }
+
+    public function discount($user)
+    {
+        $discount = 0;
+        if($user->safir()){
+            $couponLinks = $this->good->couponLinks->where('user_id' , $user->id)->all();
+            foreach ($couponLinks as $couponLink)
+                $discount = max(+$couponLink->coupon->percent, $discount);
+        }
+        return $discount;
+    }
 }

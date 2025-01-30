@@ -11,8 +11,8 @@
     <br>
 @endif
 <div id="hidden-input"></div>
-<input type="hidden" name="warehouseId" value="{{$warehouseId}}">
-<span id="agreement"></span>
+<input type="hidden" name="warehouse_id" value="{{$warehouseId}}">
+<span id="customer-agreement"></span>
 <div id="formElements" class="bg-white">
     <div class="row">
         <div class="col-md-6 mb-2">
@@ -20,14 +20,28 @@
                 <div class="input-group-append" style="min-width: 160px">
                     <label for="name" class="input-group-text w-100">نام و نام خانوادگی:</label>
                 </div>
-                <input value="{{old('name')?:$order->name}}" type="text" id="name" class="form-control"
-                       name="name" required @readonly($edit && $creatorIsAdmin)>
+                <input value="{{old('name')?:$order->name}}" type="text" id="name"
+                       class="form-control {{$creatorIsAdmin?'hide':''}}"
+                       name="name" required>
                 @if($creatorIsAdmin)
-                    @if($user->meta('changeDiscount'))
-                        <span class="btn btn-info" id="set-customer-discount"></span>
+                    <select name="customer_id" id="customer_id" class="form-control" required
+                            onchange="setCustomerInfo(this.value)" @disabled($edit)>
+                        <option value=""></option>
+                        @foreach($customers as $id => $customer)
+                            <option
+                                value="{{$id}}" @selected(old('customer_id')?:$order->customer_id == $id)>{{$customer->name}}</option>
+                        @endforeach
+                    </select>
+                    @if(!$edit)
+                        <a class="btn btn-success fa fa-user-plus" title="افزودن مشتری"
+                           href="{{route("newCustomer")}}"></a>
                     @endif
-                    <input type="number" value="{{old('customerId')?:$order->customer_id}}" name="customerId"
-                           id="customerId" style="width: 70px" readonly>
+                    @if($user->meta('changeDiscount'))
+                        <span class="btn btn-info" id="set-customer-discount">0%</span>
+                    @endif
+                    <span id="customerId" style="width: 70px; text-align: left; padding-top: 5px;">
+                        {{old('customerId')?:$order->customer_id}}
+                    </span>
                 @endif
             </div>
         </div>
@@ -39,13 +53,12 @@
                     oninput="this.setCustomValidity('')" placeholder="مانند 09123456789">شماره تماس:
         </x-col-md-6>
 
-        @if($creatorIsAdmin)
-            <x-col-md-6 :name="'city'" value="{{old('city')?:$order->customer->city->name}}">شهر:</x-col-md-6>
-            <input type="hidden" id="city_id" name="city_id" value="{{old('city_id')?:$order->customer->city->id}}">
-
-        @else
-            <input type="hidden" name="city_id" value="0">
-        @endif
+        {{--        @if($creatorIsAdmin)--}}
+        {{--            <x-col-md-6 :name="'city'" value="{{old('city')?:$order->customer->city->name}}">شهر:</x-col-md-6>--}}
+        {{--            <input type="hidden" id="city_id" name="city_id" value="{{old('city_id')?:$order->customer->city->id}}">--}}
+        {{--        @else--}}
+        {{--            <input type="hidden" name="city_id" value="0">--}}
+        {{--        @endif--}}
 
         <x-col-md-6 :name="'zip_code'" value="{{old('zip_code')?:$order->zip_code}}"
                     minlength="10"
@@ -116,7 +129,8 @@
                        id="peykeShahri" class="checkboxradio">
 
                 <label for="paskerayeh"
-                       onclick="deliveryMethod=`paskerayeh`;refreshProducts()">{{config('sendMethods')['paskerayeh']}} (هزینه
+                       onclick="deliveryMethod=`paskerayeh`;refreshProducts()">{{config('sendMethods')['paskerayeh']}}
+                    (هزینه
                     ارسال به عهده مشتری)</label>
                 <input value="paskerayeh" onclick="deliveryMethod=`paskerayeh`;refreshProducts()" type="radio"
                        name="deliveryMethod"
@@ -130,9 +144,9 @@
 
     @endif
 
-    <input type="checkbox" name="addToCustomers" id="addToCustomers"
-           class="checkboxradio" onclick="$('#city, #category').prop('disabled', (i, v) => !v);">
-    <label for="addToCustomers">افزودن/ ویرایش مشتری</label>
+    {{--    <input type="checkbox" name="addToCustomers" id="addToCustomers"--}}
+    {{--           class="checkboxradio" onclick="$('#city, #category').prop('disabled', (i, v) => !v);">--}}
+    {{--    <label for="addToCustomers">افزودن/ ویرایش مشتری</label>--}}
 
 
     <input type="submit" class="btn btn-success mx-4" style="width: 200px;" value="{{$edit?'ویرایش':'ثبت'}}">&nbsp;
@@ -147,7 +161,8 @@
             <th>قیمت قبل تخفیف</th>
             <th>تخفیف(%)
                 @if($user->meta('changeDiscount'))
-                    <input type="number" min="0" max="100" step="0.25" style="width: 50px" onchange="$('.discount-value').val(this.value).change()">
+                    <input type="number" min="0" max="100" step="0.25" style="width: 50px"
+                           onchange="$('.discount-value').val(this.value).change()">
                 @endif
             </th>
             <th>قیمت بعد تخفیف</th>

@@ -81,7 +81,7 @@ class SettingController extends Controller
 
     public function command()
     {
-        $this->fcn2();
+
     }
 
     public function combineCustomers()

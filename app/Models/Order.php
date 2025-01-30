@@ -124,7 +124,7 @@ class Order extends Model
     public function orders()
     {
         $orderProducts = $this->orderProducts;
-        $text = $this->orders;
+        $text = $this->orders??'';
         foreach ($orderProducts as $orderProduct) {
             $text .= ' ' . $orderProduct->name . ' ' . +$orderProduct->number . 'عدد' . '،';
         }

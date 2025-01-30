@@ -4,7 +4,7 @@
     let deliveryMethod = "peyk";
     let products = {!!json_encode($products)!!};
     let cart = {!!json_encode($cart)!!};
-    let cities = {!!json_encode($cities)!!};
+    {{--let cities = {!!json_encode($cities)!!};--}}
     let creatorIsAdmin = !!'{{$creatorIsAdmin}}';
     let edit = !!'{{$edit}}';
     let changeDiscountPermit = !!'{{$user->meta('changeDiscount')}}';
@@ -25,12 +25,14 @@
         });
         refreshProducts();
         paymentAction();
-        // deliveryAction();
     });
 
     @if($creatorIsAdmin || !$edit)
     $(function () {
-        createTable()
+        table = $('#product-table').DataTable({
+            pageLength: 100,
+            language:language,
+        });
 
         let customersName = {};
         $.each(customers, (id, customer) => {
@@ -40,67 +42,12 @@
             source: Object.keys(customersName),
             select: function (event, ui) {
                 let id = customersName[ui.item.value];
-                setCustomerInfo(customers[id]);
-            }
-        });
-
-
-        let cityName = {};
-        $.each(cities, (id, city) => {
-            cityName[city.name + ` (${city.province.name})`] = id;
-        })
-
-        $("#city").autocomplete({
-            source: Object.keys(cityName),
-            select: function () {
-                $('#city').change();
-            }
-        });
-
-        $('#city').change(function () {
-            let id = cityName[this.value];
-            if (id)
-                $('#city_id').val(id);
-            else {
-                let city = cities[$('#city_id').val()];
-                $('#city').val(city.name + ` (${city.province.name})`)
+                setCustomerInfo(id);
             }
         });
     });
 
     @endif
-
-    function createTable() {
-        let data = [];
-
-        $.each(products, (id, product) => {
-
-            let price;
-            if (product.coupon > 0)
-                price = `${priceFormat(product.priceWithDiscount)} (${product.coupon}%)`;
-            else
-                price = priceFormat(product.good.price);
-            data.push([
-                product.good.name,
-                price,
-                `<span dir="ltr">${+product.quantity}</span>`,
-                `<span class="btn btn-primary fa fa-add" onclick="addProduct(${id});refreshProducts();"></span>`,
-            ]);
-
-        });
-        if (table) {
-            table.clear();
-            table.rows.add(data);
-            table.draw();
-        } else {
-            table = $('#product-table').DataTable({
-                data: data,
-                pageLength: 100,
-                destroy: true,
-                language:language,
-            });
-        }
-    }
 
     function addProduct(id) {
         let product = products[id];
@@ -110,45 +57,11 @@
         } else
             cart[id] = 1;
         $('#selected-product-table').show();
-        if(product.coupon != 100)
-            product.price = product.priceWithDiscount * 100 / (100-product.coupon)
+        if(product.discount != 100)
+            product.price = product.priceWithDiscount * 100 / (100-product.discount)
         else
             product.price = product.good.price;
-        let text = `<tr id="product-${id}">
-        <td>${product.good.name}</td>
-        <td>
-            <span class="btn btn-primary fa fa-plus" onclick="num_plus(${id})"></span>
-            <input class="product-number"
-            name="product_${id}" id="product_${id}"
-            onchange="num_product(${id},this.value)"
-            type="number" value="${cart[id]}"
-            style="width: 50px" step="1" ${(edit && (!creatorIsAdmin)) ? 'readonly' : ''}>
-            <span class="btn btn-primary fa fa-minus" onclick="num_minus(${id})"></span>
-            <span class="btn btn-outline-info" dir="ltr">${+product.quantity}</span>
-        </td>
-        <td>
-            <input type="text" class="price-input" style="width: 80px;"
-            name="price_${id}" id="price_${id}" value="${product.price}"
-            onchange="changePrice(${id},this.value)" ${changePricePermit ? '' : 'disabled'}>
-        </td>
-        <td>
-            <input type="number" name="discount_${id}" class="discount-value" id="discount_${id}"
-            value="${product.coupon}" style="width: 80px" onchange="changeDiscount(${id},this.value)"
-            ${changeDiscountPermit ? '' : 'disabled'} min="0" max="100" step="0.25">
-        @if($user->meta('changeDiscount'))
-            <span class="btn btn-outline-info fa fa-plus" dir="ltr"
-            onclick="$('#discount_${id}').val((index,value)=>{return +value+5}).change()">5
-            <i class="fa fa-percent"></i></span>
-        @endif
-        </td>
-        <td>
-            <span class="text-success" id="price_discount_${id}">${priceFormat(product.priceWithDiscount)}</span>
-        </td>
-        <td>
-            <span class="btn btn-danger fa fa-trash" onclick="deleteProduct(${id})"></span>
-        </td>
-        </tr>`;
-        $('#product-form').append(text);
+        $('#product-form').append(`@include('addEditOrder.addToCart')`);
         priceInput();
     }
 
@@ -175,15 +88,13 @@
     function refreshProducts() {
         let total = 0, Total = 0;
         let hasProduct = false;
-        $('#hidden-input').html('');
         $.each(cart, (id, number) => {
             if (number) {
-                $('#product_' + id).val(number);
-                let price = +$('#price_' + id).val().replaceAll(',', '');
+                $(`input[name='cart[${id}][name]']`).val(number);
+                let price = +$(`input[name='cart[${id}][price]']`).val().replaceAll(',', '');
                 let price_discount = +$('#price_discount_' + id).html().replaceAll(',', '');
                 total += price_discount * number; //جمع قیمت با تخفیف;
                 Total += price * number;  //قیمت بدون تخفیف;
-                $('#hidden-input').append(`<input type="hidden" name="cart[${id}]" value="${number}">`);
                 hasProduct = true;
             }
         })
@@ -252,18 +163,18 @@
         refreshProducts();
     }
 
-    function setCustomerInfo(customer) {
-        $('#customerId').val(customer.id);
+    function setCustomerInfo(id) {
+        let customer  = customers[id] || {};
+        $('#customerId').html(id);
         $("#name").val(customer.name)
         $('#phone').val(customer.phone);
         $('#address').val(customer.address);
         $('#zip_code').val(customer.zip_code);
-        $('#set-customer-discount').html(customer.discount + ' %').click(()=>{
-            $('.discount-value').val(customer.discount).change();
+        $('#set-customer-discount').html((customer.discount || '0') + ' %').click(()=>{
+            $('.discount-value').val(customer.discount || 0).change();
         });
-        $('#agreement').html('<span>توافق: </span>' + (customer.agreement || ' '));
-        let city = cities[customer.city_id];
-        $('#city').val(city.name + ` (${city.province.name})`).change();
+        $('#customer-agreement').html('<span>تفاهم: </span>' + (customer.agreement || ' '));
+ 
     }
 
     function changeDiscount(id, discount) {
@@ -293,7 +204,8 @@
             alert('محصولی انتخاب نشده است');
             return false;
         }
-        if (cart.some(x => x >= 0) && cart.some(x => x <= 0)) {
+        let values = Object.values(cart);
+        if ((values.some(x => x >= 0) && values.some(x => x <= 0))|| values.some(x => x == 0) ) {
             alert('تعداد همگی باید مثبت یا منفی باشند');
             return false;
         }
