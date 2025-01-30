@@ -214,10 +214,12 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/view/{id}', 'view');
     });
 
-
-    // CHEQUES
-    Route::get('/cheques', [ChequeController::class, 'list'])->name('cheques');
-    Route::get('/chequeView/{id}', [ChequeController::class, 'view'])->name('chequeView');
+    //CHEQUES
+    Route::controller(ChequeController::class)->prefix('cheque')->group(function () {
+        Route::get('/cheque', 'cheque')->name('chequeList');
+        Route::get('/given/{id}', 'view')->name('cheque.view');
+        Route::get('/recieved/{id}', 'recievedView')->name('cheque.view2');
+    });
 
 
     Route::controller(SupplierController::class)->prefix('Supplier')->group(function () {

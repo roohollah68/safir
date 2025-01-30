@@ -54,7 +54,7 @@
                         <a class="dropdown-item" href="{{ route('customersOrderList') }}">بررسی سفارشات</a>
                         <a class="dropdown-item" href="{{ route('customersDepositList') }}">بررسی واریزی ها</a>
                         <a class="dropdown-item" href="{{ route('BankTransactionList') }}">مدیریت نقدینگی</a>
-                        <a class="dropdown-item" href="{{ route('cheques') }}">لیست چک‌ها</a>
+                        <a class="dropdown-item" href="{{ route('chequeList') }}">لیست چک‌ها</a>
                     </div>
                 </li>
             @endif

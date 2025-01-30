@@ -93,9 +93,9 @@
                                 <td><span>پاس نشده</span></td>
                                 <td>
                                     <div class="ms-2">
-                                        <a href="" class="fa fa-eye btn-info btn"></a>
+                                        <span class="fa fa-eye btn btn-info"
+                                            onclick="view_recieved_cheque({{ $cheque->id }})" title="مشاهده"></span>
                                     </div>
-                                    </span>
                                 </td>
                             </tr>
                         @endforeach
@@ -126,8 +126,8 @@
                                 <td><span>پاس نشده</span></td>
                                 <td>
                                     <div class="ms-2">
-                                        <a href="{{ route('chequeView', ['id' => $cheque->id]) }}"
-                                            class="fa fa-eye btn-info btn"></a>
+                                        <span class="fa fa-eye btn btn-info"
+                                            onclick="view_given_cheque({{ $cheque->id }})" title="مشاهده"></span>
                                     </div>
                                 </td>
                             </tr>
