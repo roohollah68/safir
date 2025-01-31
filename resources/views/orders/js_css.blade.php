@@ -229,7 +229,7 @@
 
         if (!order.state && (!order.confirm || creatorRole === 'user'))
             res += deleteOrder;
-        if (!order.confirm || (creatorRole === 'user' && !order.state))
+        if ((!order.confirm && order.total > 0) || (creatorRole === 'user' && !order.state))
             res += editOrder + changeWarehouse;
 
         if (changeOrdersPermit && order.state)
@@ -334,7 +334,8 @@
     }
 
     function change_state(id, state) {
-        if ((!orders[id].confirm || orders[id].counter !== "approved") && +orders[id].state !== 4) {
+        order = orders[id];
+        if ((!order.confirm || order.counter !== "approved") && +order.state !== 4) {
             alert('ابتدا فاکتور باید تایید شود!');
             return;
         }
@@ -342,11 +343,11 @@
             _token: token,
         })
             .done(res => {
-                orders[id].state = +res[0];
+                order.state = +res[0];
                 $.notify(res[1], 'info');
-                $('#view_order_' + id).parent().html(operations(orders[id]));
-                $('#state_' + id).parent().html(createdTime(orders[id]));
-                $('#orderCondition_' + id).html(orderCondition(orders[id]));
+                $('#view_order_' + id).parent().html(operations(order));
+                $('#state_' + id).parent().html(createdTime(order));
+                $('#orderCondition_' + id).html(orderCondition(order));
 
             });
     }
@@ -391,12 +392,14 @@
     @if($admin || $superAdmin)
 
     function selectPayment(id) {
-        let order = orders[id]
-        if (order.confirm)
-            return
-        $.post('/viewPaymentMethods/' + id, {_token: token})
-            .done(res => {
-                dialog = Dialog(res);
+        $.post('/confirmAuthorize/' + id, {_token: token})
+            .done((order) => {
+                console.log(order.total);
+                if (order.total < 0) {
+                    applyChanges(order);
+                    return;
+                }
+                dialog = Dialog(`@include('orders.paymentMethods')`);
                 $(".checkboxradio").checkboxradio();
                 dtp1Instance = new mds.MdsPersianDateTimePicker($('#payInDate')[0], {
                     targetTextSelector: '#dateOfPayment',
@@ -411,24 +414,25 @@
                         data[value.name] = value.value;
                     })
                     $.post('/orders/paymentMethod/' + id, data)
-                        .done(function (res) {
-                            if (res[0] === "error")
-                                $.notify(res[1], 'warn');
-                            else if (res[0] === "ok") {
-                                $.notify("با موفقیت ذخیره شد.", "success");
-                                dialog.remove();
-                                order = res[1];
-                                $('#view_order_' + id).parent().html(operations(order));
-                                $('#state_' + id).parent().html(createdTime(order));
-                                $('#orderCondition_' + id).html(orderCondition(order));
-                            }
-                        }).fail(function () {
-                        $.notify('خطایی رخ داده است.', 'warn');
-                    });
-                });
-            }).fail(e=>{
+                        .done((order)=>{
+                            applyChanges(order);
+                            dialog.remove();
+                        })
+                        .fail(function (e) {
+                            $.notify(e.responseJSON.message)
+                        });
+                })
+            })
+            .fail(function (e) {
                 $.notify(e.responseJSON.message)
-        })
+            });
+
+        let applyChanges = function (order){
+            $.notify("با موفقیت تائید شد.", "success");
+            $('#view_order_' + id).parent().html(operations(order));
+            $('#state_' + id).parent().html(createdTime(order));
+            $('#orderCondition_' + id).html(orderCondition(order));
+        }
     }
 
     function cancelInvoice(id) {

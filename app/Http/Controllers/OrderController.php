@@ -611,9 +611,7 @@ class OrderController extends Controller
     public function paymentMethod($id, Request $req)
     {
         $order = Helper::Order(true)->with('customer')->findOrFail($id);
-        if ($order->confirm)
-            return ['error', 'قبلا تایید شده.'];
-
+        $this->confirmAuthorize($id);
         request()->validate([
             'paymentMethod' => 'required',
         ]);
@@ -622,7 +620,7 @@ class OrderController extends Controller
         $payInDate = '';
         if ($paymentMethod == 'payInDate') {
             if (strlen($req->payInDate) != 10)
-                return ['error', 'تاریخ باید مشخص شود.'];
+                return abort(405, 'تاریخ باید مشخص شود.');
             $payInDate = $req->payInDatePersian;
         }
         $order->update([
@@ -638,7 +636,7 @@ class OrderController extends Controller
         (new CommentController)->create($order, auth()->user(), 'سفارش تایید شد. ' . $req->note . '/ ' . $order->payMethod() . '/ ' . $payInDate);
 
         DB::commit();
-        return ['ok', $order];
+        return $order;
     }
 
 //    public function orderExcel($id)
@@ -711,16 +709,23 @@ class OrderController extends Controller
         return $order;
     }
 
-    public function viewPaymentMethods($id)
+    public function confirmAuthorize($id)
     {
         $order = Order::find($id);
-//        if ($order->customer->credit_limit - $order->total < -$order->customer->balance())
-//            return abort(405, 'بدهی مشتری بیش از سقف اعتبار است.');
+
         if ($order->customer->block)
             return abort(405, 'حساب مشتری مسدود شده است.');
-        return view('orders.paymentMethods', [
-            'order' => $order,
-        ]);
+        if ($order->confirm)
+            return abort(405, 'سفارش قبلا تائید شده.');
+//        if ($order->customer->credit_limit - $order->total < -$order->customer->balance())
+//            return abort(405, 'بدهی مشتری بیش از سقف اعتبار است.');
+        if ($order->total < 0)
+            $order->update([
+                'confirm' => true,
+                'counter' => 'waiting',
+                'paymentNote' => 'بازگشت به انبار، ',
+            ]);
+        return $order;
     }
 }
 
