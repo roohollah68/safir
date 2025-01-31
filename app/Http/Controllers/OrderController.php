@@ -714,8 +714,8 @@ class OrderController extends Controller
     public function viewPaymentMethods($id)
     {
         $order = Order::find($id);
-        if ($order->customer->credit_limit - $order->total < -$order->customer->balance())
-            return abort(405, 'بدهی مشتری بیش از سقف اعتبار است.');
+//        if ($order->customer->credit_limit - $order->total < -$order->customer->balance())
+//            return abort(405, 'بدهی مشتری بیش از سقف اعتبار است.');
         if ($order->customer->block)
             return abort(405, 'حساب مشتری مسدود شده است.');
         return view('orders.paymentMethods', [
