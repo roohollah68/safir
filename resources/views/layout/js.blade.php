@@ -248,4 +248,121 @@
     }
 
     let token = "{{ csrf_token() }}";
+
+    // CHEQUE FILTERS
+
+    function confirmPassCheque(chequeId, type) {
+        if (confirm('آیا از تغییر وضعیت این چک مطمئن هستید؟')) {
+            var button = $('input[onclick="confirmPassCheque(' + chequeId + ', \'' + type + '\')"]');
+            button.prop('disabled', true);
+            $.ajax({
+                url: '/cheque/pass',
+                type: 'POST',
+                data: {
+                    _token: token,
+                    cheque_id: chequeId,
+                    type: type
+                },
+                success: function(response) {
+                    if (response.success) {
+                        button.val('پاس شده').removeClass('btn-warning').addClass('btn-success');
+                    } else {
+                        button.prop('disabled', false);
+                    }
+                }
+            });
+        }
+    }
+
+    function filterChequeDate() {
+        var startDate = $('#start_date').val();
+        var endDate = $('#end_date').val();
+        var state = $('.state-filter-btn.active').data('state');
+        var tables = ['#receivedTable', '#givenTable'];
+        tables.forEach(function(table) {
+            $(table + ' tbody tr').each(function() {
+                var chequeDate = $(this).find('td:nth-child(2)').text();
+                var chequeState = $(this).find('td:nth-child(5) input').hasClass('btn-success') ? '1' :
+                    '0';
+
+                var show = true;
+
+                if (startDate && new Date(chequeDate) < new Date(startDate)) {
+                    show = false;
+                }
+
+                if (endDate && new Date(chequeDate) > new Date(endDate)) {
+                    show = false;
+                }
+
+                if (state !== undefined && state !== '' && chequeState !== state) {
+                    show = false;
+                }
+
+                $(this).toggle(show);
+            });
+        });
+    }
+
+    function filterPassedCheques(passed) {
+        var tables = ['#receivedTable', '#givenTable'];
+        tables.forEach(function(table) {
+            $(table + ' tbody tr').each(function() {
+                var chequeState = $(this).find('td:nth-child(5) input').hasClass('btn-success') ? '1' :
+                    '0';
+                var show = (passed === 'all' || chequeState === passed);
+                $(this).toggle(show);
+            });
+        });
+    }
+
+    function setNextMonth() {
+        var today = new Date();
+
+        var persianToday = mds.MdsPersianDateTimePicker.convertDateToJalali(today);
+
+        var persianFirstOfNextMonth = {
+            year: persianToday.month === 12 ? persianToday.year + 1 : persianToday.year,
+            month: persianToday.month === 12 ? 1 : persianToday.month + 1,
+            day: 1
+        };
+
+        var persianLastOfNextMonth = {
+            year: persianFirstOfNextMonth.year,
+            month: persianFirstOfNextMonth.month,
+            day: mds.MdsPersianDateTimePicker.getDaysInMonth(persianFirstOfNextMonth.year, persianFirstOfNextMonth
+                .month)
+        };
+
+        $('#start_date').val(persianFirstOfNextMonth.year + '/' + persianFirstOfNextMonth.month + '/' +
+            persianFirstOfNextMonth.day);
+        $('#end_date').val(persianLastOfNextMonth.year + '/' + persianLastOfNextMonth.month + '/' +
+            persianLastOfNextMonth.day);
+
+        filterChequeDate();
+    }
+
+    function pastCheques() {
+        var today = new Date();
+        var persianToday = mds.MdsPersianDateTimePicker.convertDateToJalali(today);
+
+        ['#receivedTable', '#givenTable'].forEach(function(table) {
+            $(table + ' tbody tr').each(function() {
+                var chequeDateStr = $(this).find('td:nth-child(2)').text().trim();
+                var chequeDateParts = chequeDateStr.split('/');
+                var chequeDate = {
+                    year: parseInt(chequeDateParts[0]),
+                    month: parseInt(chequeDateParts[1]),
+                    day: parseInt(chequeDateParts[2])
+                };
+
+                var isPast = chequeDate.year < persianToday.year ||
+                    (chequeDate.year === persianToday.year && chequeDate.month < persianToday.month) ||
+                    (chequeDate.year === persianToday.year && chequeDate.month === persianToday.month &&
+                        chequeDate.day < persianToday.day);
+
+                $(this).toggle(isPast);
+            });
+        });
+    }
 </script>

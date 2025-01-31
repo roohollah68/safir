@@ -1,8 +1,21 @@
 <div title="مشاهده جزئیات چک" class="dialogs">
     @if ($viewCheque->user_file)
-        <a class="btn btn-info" href="/withdrawal/{{ $viewCheque->user_file }}" target="_blank">مشاهده فایل</a>
+        <a class="btn btn-info mb-2" href="/withdrawal/{{ $viewCheque->user_file }}" target="_blank">مشاهده فایل</a>
     @endif
-    <br>
+    @if ($viewCheque->payment_file)
+        <a class="btn btn-info mb-2" href="/withdrawal/{{ $viewCheque->payment_file }}" target="_blank">رسید پرداخت</a>
+    @endif
+    @if ($viewCheque->payment_file2)
+        <a class="btn btn-info mb-2" href="/withdrawal/{{ $viewCheque->payment_file2 }}" target="_blank">رسید پرداخت 2</a>
+    @endif
+    @if ($viewCheque->payment_file3)
+        <a class="btn btn-info mb-2" href="/withdrawal/{{ $viewCheque->payment_file3 }}" target="_blank">رسید پرداخت
+            3</a>
+    @endif
+    @if ($viewCheque->recipient_file)
+        <a class="btn btn-info mb-2" href="/withdrawal/{{ $viewCheque->recipient_file }}" target="_blank">رسید
+            دریافت</a>
+    @endif
     <br>
     <span>مبلغ درخواستی:</span> <b>{{ number_format($viewCheque->amount) }}</b> <br>
     <span>بابت:</span> <b>{{ $viewCheque->expense }}</b> <br>

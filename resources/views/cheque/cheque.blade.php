@@ -29,7 +29,41 @@
                 language: language
             });
         });
+
+        $(document).ready(function() {
+            const date1 = new mds.MdsPersianDateTimePicker($('#start_date')[0], {
+                targetTextSelector: '#start_date',
+                textFormat: 'yyyy/MM/dd',
+                isGregorian: false,
+                enableTimePicker: false,
+                englishNumber: true,
+                placement: 'bottom',
+                trigger: 'focus',
+                onSelect: function() {
+                    filterChequeDate();
+                }
+            });
+
+            const date2 = new mds.MdsPersianDateTimePicker($('#end_date')[0], {
+                targetTextSelector: '#end_date',
+                textFormat: 'yyyy/MM/dd',
+                isGregorian: false,
+                enableTimePicker: false,
+                englishNumber: true,
+                placement: 'bottom',
+                trigger: 'focus',
+                onSelect: function() {
+                    filterChequeDate();
+                }
+            });
+
+            $('#start_date, #end_date').on('change', function() {
+                filterChequeDate();
+            });
+
+        });
     </script>
+
     <style>
         .ui-tabs .ui-tabs-nav .ui-state-active a {
             background: #007bff !important;
@@ -41,17 +75,55 @@
             color: black !important;
             background: none !important;
         }
+
+        .state-filter-btn.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .filter-section {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-section label,
+        .filter-section input {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .filter-section input {
+            width: 100px;
+        }
     </style>
 @endsection
 
 @section('content')
     <div class="container mt-4">
         <h1 class="mb-4">لیست چک‌ها</h1>
-        <div id="tabs" dir="rtl">
 
+        {{-- فیلترها --}}
+
+        <div class="filter-section mb-4">
+            <label for="start_date">از تاریخ:</label>
+            <input type="text" id="start_date" class="form-control" autocomplete="off">
+            <label for="end_date">تا تاریخ:</label>
+            <input type="text" id="end_date" class="form-control" autocomplete="off">
+        </div>
+
+        <button class="btn btn-secondary mb-4" onclick="filterPassedCheques('all')">همه</button>
+        <button class="btn btn-success mb-4" onclick="filterPassedCheques('1')">پاس شده</button>
+        <button class="btn btn-warning mb-4" onclick="filterPassedCheques('0')">پاس نشده</button>
+        <button class="btn btn-info mb-4" onclick="setNextMonth()">چک‌های ماه آینده</button>
+        <button class="btn btn-danger mb-4" onclick="pastCheques()">چک‌های گذشته</button>
+
+        {{-- جداول --}}
+
+        <div id="tabs" dir="rtl">
             <ul class="nav nav-tabs" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link" id="received-tab" data-bs-toggle="tab" href="#received" role="tab"
+                    <a class="nav-link active" id="received-tab" data-bs-toggle="tab" href="#received" role="tab"
                         aria-controls="received" aria-selected="true">
                         چک‌های دریافتی
                     </a>
@@ -64,7 +136,7 @@
                 </li>
             </ul>
 
-            <div id="received">
+            <div id="received" class="tab-pane fade show active">
                 <h3 class="mt-4 mb-4">چک‌های دریافتی</h3>
 
                 <table id="receivedTable" class="table table-striped mt-4 mb-4" style="width:100%">
@@ -90,7 +162,14 @@
                                 <td>{{ verta($cheque->cheque_date)->formatJalaliDate() }}</td>
                                 <td>{{ number_format($cheque->amount) }}</td>
                                 <td>{{ $cheque->cheque_code }}</td>
-                                <td><span>پاس نشده</span></td>
+                                <td>
+                                    @if ($cheque->cheque_pass)
+                                        <input type="button" class="btn btn-success" value="پاس شده" disabled>
+                                    @else
+                                        <input type="button" class="btn btn-warning" value="پاس نشده"
+                                            onclick="confirmPassCheque({{ $cheque->id }}, 'received')">
+                                    @endif
+                                </td>
                                 <td>
                                     <div class="ms-2">
                                         <span class="fa fa-eye btn btn-info"
@@ -103,7 +182,7 @@
                 </table>
             </div>
 
-            <div id="given">
+            <div id="given" class="tab-pane fade">
                 <h3 class="mt-4 mb-4">چک‌های پرداختی</h3>
                 <table id="givenTable" class="table table-striped mt-4 mb-4" style="width:100%">
                     <thead>
@@ -123,7 +202,14 @@
                                 <td>{{ verta($cheque->cheque_date)->formatJalaliDate() }}</td>
                                 <td>{{ number_format($cheque->amount) }}</td>
                                 <td>{{ $cheque->cheque_id }}</td>
-                                <td><span>پاس نشده</span></td>
+                                <td>
+                                    @if ($cheque->cheque_pass)
+                                        <input type="button" class="btn btn-success" value="پاس شده" disabled>
+                                    @else
+                                        <input type="button" class="btn btn-warning" value="پاس نشده"
+                                            onclick="confirmPassCheque({{ $cheque->id }}, 'given')">
+                                    @endif
+                                </td>
                                 <td>
                                     <div class="ms-2">
                                         <span class="fa fa-eye btn btn-info"

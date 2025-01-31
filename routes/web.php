@@ -219,6 +219,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('/cheque', 'cheque')->name('chequeList');
         Route::get('/given/{id}', 'view')->name('cheque.view');
         Route::get('/recieved/{id}', 'recievedView')->name('cheque.view2');
+        Route::post('/pass', 'passCheque');
     });
 
 
