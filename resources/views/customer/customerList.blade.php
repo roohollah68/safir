@@ -45,7 +45,7 @@
             <tr>
                 <th>شماره</th>
                 <th>نام</th>
-                <th>شماره تماس</th>
+                <th>سقف اعتبار(ریال)</th>
 
                 @if(!$safir)
                     <th>بدهکاری(ریال)</th>
@@ -60,24 +60,27 @@
             </tr>
             </thead>
             <tbody>
-            @foreach($customers as $customer)
+            @foreach($customers as $id => $customer)
                 @continue(!$customer->user)
                 @isset($_GET['trust'])
                     @continue(+$_GET['trust'] ^ $customer->trust)
                 @endisset
                 <tr>
-                    <td>{{$customer->id}}</td>
+                    <td>{{$id}}</td>
                     <td>{{$customer->name}}
                         @if($customer->block)
                             <span class="btn btn-danger">مسدود</span>
                         @endif
                     </td>
-                    <td>{{$customer->phone}}</td>
+                    <td>
+                        <span class="btn btn-{{$customer->credit_limit >= -$customer->balance?"success":"danger"}}">
+                            {{number_format($customer->credit_limit)}}
+                        </span>
+                    </td>
 
                     @if(!$safir)
-                        <td dir="ltr"><a href="/customer/transaction/{{$customer->id}}"
+                        <td dir="ltr"><a href="/customer/transaction/{{$id}}"
                                          class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
-                        {{--                                         class="btn btn-outline-danger">{{number_format($customer->balance())}}</a></td>--}}
                     @else
                         <td>{{$customer->address}}</td>
                         <td>{{$customer->zip_code}}</td>
@@ -89,17 +92,17 @@
 
                     <td>
                         <a class="btn btn-primary fa fa-user-edit" title="ویرایش مشتری"
-                           href="/customer/edit/{{$customer->id}}"></a>
+                           href="/customer/edit/{{$id}}"></a>
                         @if(!$safir)
                             <a class="btn btn-info fa fa-file-invoice" title="تراکنش ها"
-                               href="/customer/transaction/{{$customer->id}}"></a>
+                               href="/customer/transaction/{{$id}}"></a>
                             @if($viewAllAuth)
                                 @if($customer->trust)
                                     <span class="btn btn-success fa fa-check"
-                                          onclick="changeTrust({{$customer->id}} , this)"
+                                          onclick="changeTrust({{$id}} , this)"
                                           title="مورد اطمینان است."></span>
                                 @else
-                                    <span class="btn btn-danger fa fa-x" onclick="changeTrust({{$customer->id}} , this)"
+                                    <span class="btn btn-danger fa fa-x" onclick="changeTrust({{$id}} , this)"
                                           title="هنوز قابل اطمینان نیست."></span>
                                 @endif
                             @endif

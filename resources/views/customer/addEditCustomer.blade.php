@@ -1,7 +1,7 @@
 @extends('layout.main')
 
 @section('title')
-    @if($customer->name)
+    @if($edit)
         ویرایش مشتری
     @else
         افزودن مشتری
@@ -52,7 +52,7 @@
 
 @section('content')
     <x-auth-validation-errors class="mb-4" :errors="$errors"/>
-    <form action="" method="post">
+    <form action="/customer/add{{$edit?"/$customer->id":""}}" method="post">
         @csrf
         <div class="row">
             <div class="col-md-6">
@@ -109,7 +109,7 @@
                 </div>
             </div>
 
-            @if(auth()->user()->meta('editAllCustomers'))
+            @if($User->meta('editAllCustomers'))
                 <div class="col-md-6">
                     <div class="form-group input-group required">
                         <div class="input-group-append" style="min-width: 160px">
@@ -126,11 +126,21 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="col-md-6">
+                    <div class="form-group input-group">
+                        <div class="input-group-append" style="min-width: 160px">
+                            <label for="credit_limit" class="input-group-text w-100">سقف اعتبار (ریال):</label>
+                        </div>
+                        <input value="{{old('credit_limit')?:$customer->credit_limit?:0}}" type="text"
+                               id="credit_limit" class="form-control price-input" name="credit_limit" step="1">
+                    </div>
+                </div>
             @else
                 <input type="hidden" name="user"
                        value="{{old('user')?:$customer->user->id}}">
             @endif
-            @unless(auth()->user()->safir())
+            @if(!$User->safir())
                 <div class="col-md-6">
                     <div class="form-group input-group">
                         <div class="input-group-append" style="min-width: 160px">
@@ -144,7 +154,7 @@
                 <div class="col-md-6">
                     <div class="form-group input-group">
                         <div class="input-group-append" style="min-width: 160px">
-                            <label for="agreement" class="input-group-text w-100">توافق:</label>
+                            <label for="agreement" class="input-group-text w-100">تفاهم:</label>
                         </div>
                         <textarea id="agreement" class="form-control" name="agreement" rows="3"
                         >{{old('agreement')?:$customer->agreement?:''}}</textarea>
@@ -153,7 +163,7 @@
             @endunless
         </div>
 
-        @if($customer->name)
+        @if($edit)
             <input type="submit" class="btn btn-success" value="ویرایش">
         @else
             <input type="submit" class="btn btn-success" value="افزودن">

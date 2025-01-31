@@ -76,28 +76,38 @@ class CustomerController extends Controller
             'citiesId' => City::all()->keyBy('id'),
             'province' => Province::all()->keyBy('id'),
             'users' => User::where('verified', true)->get(),
+            'edit' => false,
         ]);
     }
 
-    public function storeNewCustomer(Request $request)
+    public function storeCustomer(Request $request, $id = null)
     {
         request()->validate([
             'name' => 'required|string|min:3',
             'phone' => 'required|string|max:11|min:11',
             'address' => 'required|string',
         ]);
-        $request->phone = Helper::number_Fa_En($request->phone);
-        $request->zip_code = Helper::number_Fa_En($request->zip_code);
 
-        Customer::create([
+        if ($id) {
+            if (auth()->user()->meta('editAllCustomers'))
+                $customer = Customer::findOrFail($id);
+            else
+                $customer = auth()->user()->customers()->findOrFail($id);
+        } else
+            $customer = new Customer();
+        $customer->fill([
             'name' => $request->name,
-            'phone' => $request->phone,
+            'phone' => Helper::number_Fa_En($request->phone),
             'address' => $request->address,
-            'zip_code' => $request->zip_code,
+            'zip_code' => Helper::number_Fa_En($request->zip_code),
             'city_id' => $request->city_id,
             'user_id' => $request->user,
+            'credit_limit' => +str_replace(",", "", $request->credit_limit),
             'discount' => $request->discount,
             'agreement' => $request->agreement,
+        ])->save();
+        $customer->orders()->update([
+            'user_id' => $request->user,
         ]);
         return redirect()->route('CustomerList');
     }
@@ -115,38 +125,8 @@ class CustomerController extends Controller
             'citiesId' => City::all()->keyBy('id'),
             'province' => Province::all()->keyBy('id'),
             'users' => User::where('verified', true)->get(),
+            'edit' => true,
         ]);
-    }
-
-    public function updateCustomer($id, Request $request)
-    {
-        request()->validate([
-            'name' => 'required|string|min:3',
-            'phone' => 'required|string|max:11|min:11',
-            'address' => 'required|string',
-        ]);
-
-        $request->phone = Helper::number_Fa_En($request->phone);
-        $request->zip_code = Helper::number_Fa_En($request->zip_code);
-
-        if (auth()->user()->meta('editAllCustomers'))
-            $customer = Customer::findOrFail($id);
-        else
-            $customer = auth()->user()->customers()->findOrFail($id);
-        $customer->update([
-            'name' => $request->name,
-            'phone' => $request->phone,
-            'address' => $request->address,
-            'zip_code' => $request->zip_code,
-            'city_id' => $request->city_id,
-            'user_id' => $request->user,
-            'discount' => $request->discount,
-            'agreement' => $request->agreement,
-        ]);
-        $customer->orders()->update([
-            'user_id' => $request->user,
-        ]);
-        return redirect()->route('CustomerList');
     }
 
     public function deleteCustomer($id)
@@ -250,11 +230,10 @@ class CustomerController extends Controller
                 'order_id' => $orderId,
                 'amount' => $transaction->amount,
             ]);
-            if (!$customer->block)
-                Order::findOrFail($orderId)->update([
-                    'confirm' => true,
-                    'paymentMethod' => $req->pay_method == 'cash' ? 1 : 2,
-                ]);
+            Order::findOrFail($orderId)->update([
+                'confirm' => true,
+                'paymentMethod' => $req->pay_method == 'cash' ? 1 : 2,
+            ]);
         } else {
             $transaction->paymentLinks()->delete();
         }
@@ -353,7 +332,7 @@ class CustomerController extends Controller
         Helper::access('counter');
         return view('customer.customersOrderList', [
             'orders' => Order::where('confirm', true)->whereNotNull('customer_id')
-                ->where('state', false)->with(['user' , 'paymentLinks.customerTransaction'])->get()->keyBy('id'),
+                ->where('state', false)->with(['user', 'paymentLinks.customerTransaction'])->get()->keyBy('id'),
             'users' => User::where('role', '<>', 'user')->where('verified', true)->select('id', 'name')->get(),
             'selectedUser' => (!$req->user || $req->user == 'all') ? 'all' : +$req->user,
 

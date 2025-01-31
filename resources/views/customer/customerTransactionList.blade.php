@@ -15,11 +15,13 @@
         <span>نام کاربر مرتبط:</span> <b>{{$customer->user->name}}</b><br>
         <span>شماره مشتری:</span> <b>{{$customer->id}}</b><br>
         <span>شماره تماس:</span> <b>{{$customer->phone}}</b><br>
-        <span>توافق:</span> <b>{{$customer->agreement}}</b><br>
+        <span>تفاهم:</span> <b>{{$customer->agreement}}</b><br>
         <span>شهر:</span> <b>{{$customer->city->name}}</b><br>
         <span>آدرس:</span> <b>{{$customer->address}}</b><br>
         <span>کد پستی:</span> <b>{{$customer->zip_code}}</b><br>
-        <span class="h3">بدهکاری:</span>
+        <span>تخفیف پیشفرض:</span> <b>{{$customer->discount}} %</b><br>
+        <span class="h4">سقف اعتبار:</span> <b class="h4">{{number_format($customer->credit_limit)}}</b> <span class="h4">ریال</span><br><br>
+        <span >بدهکاری:</span>
         <b dir="ltr" class="h3 text-danger">{{number_format($customer->balance())}}</b>
         <span class="h3">ریال</span><br>
         <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب"

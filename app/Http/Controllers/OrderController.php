@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 use Illuminate\Database\Eloquent\Builder;
+use function Laravel\Prompts\error;
 
 
 class OrderController extends Controller
@@ -200,7 +201,7 @@ class OrderController extends Controller
                 $cart[$id] = (int)$orderProduct->number;
                 $products[$id]->discount = +$orderProduct->discount;
                 $products[$id]->priceWithDiscount = +$orderProduct->price;
-            }else
+            } else
                 echo $orderProduct->name . ' از محصولات حذف شده است';
         }
 
@@ -612,17 +613,7 @@ class OrderController extends Controller
         $order = Helper::Order(true)->with('customer')->findOrFail($id);
         if ($order->confirm)
             return ['error', 'قبلا تایید شده.'];
-        // بازگشت به انبار
-        if ($order->total < 0) {
-            $order->update([
-                'confirm' => true,
-                'counter' => 'waiting',
-                'paymentNote' => 'بازگشت به انبار، سفارش: ' . $order->id,
-            ]);
-            return ['ok', $order];
-        }
-        if ($order->customer->block)
-            return ['error', 'حساب مشتری مسدود شده است.'];
+
         request()->validate([
             'paymentMethod' => 'required',
         ]);
@@ -722,8 +713,13 @@ class OrderController extends Controller
 
     public function viewPaymentMethods($id)
     {
+        $order = Order::find($id);
+        if ($order->customer->credit_limit - $order->total < -$order->customer->balance())
+            return abort(405, 'بدهی مشتری بیش از سقف اعتبار است.');
+        if ($order->customer->block)
+            return abort(405, 'حساب مشتری مسدود شده است.');
         return view('orders.paymentMethods', [
-            'order' => Order::find($id)
+            'order' => $order,
         ]);
     }
 }

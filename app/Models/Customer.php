@@ -8,19 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Customer extends Model
 {
     public $timestamps = false;
-    protected $fillable = [
-        'name',
-        'address',
-        'phone',
-        'zip_code',
-        'balance',
-        'category',
-        'city_id',
-        'user_id',
-        'discount',
-        'trust',
-        'block',
-        'agreement',
+    protected $guarded = [
+        'id',
     ];
 
     public function user()

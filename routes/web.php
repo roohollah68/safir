@@ -99,10 +99,10 @@ Route::middleware(['auth', 'verify'])->group(function () {
         ///CUSTOMER
         Route::get('/customers', 'customersList')->name('CustomerList');
         Route::get('/customer/add', 'addForm')->name('newCustomer');
-        Route::post('/customer/add', 'storeNewCustomer');
+        Route::post('/customer/add/{id?}', 'storeCustomer');
         Route::post('/customer/delete/{id}', 'deleteCustomer');
         Route::get('/customer/edit/{id}', 'showEditForm');
-        Route::post('/customer/edit/{id}', 'updateCustomer');
+//        Route::post('/customer/edit/{id}', 'updateCustomer');
         Route::get('/changeTrust/{id}', 'changeTrust');
         Route::get('/blockList', 'blockList');
         Route::get('/changeBlock/{id}', 'changeBlock');
@@ -235,7 +235,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
     Route::get('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteOrder']);
     Route::get('/woocommerce', [WoocommerceController::class, 'viewFile']);
 
-    
+
 
 });
 

@@ -394,25 +394,6 @@
         let order = orders[id]
         if (order.confirm)
             return
-        // بازگشت به انبار
-        if (order.total < 0) {
-            $.post('/orders/paymentMethod/' + id, {
-                _token: token
-            }).done(function (res) {
-                if (res[0] === "error")
-                    $.notify(res[1], 'warn');
-                else if (res[0] === "ok") {
-                    $.notify("با موفقیت ذخیره شد.", "success");
-                    order = res[1];
-                    $('#view_order_' + id).parent().html(operations(order));
-                    $('#state_' + id).parent().html(createdTime(order));
-                    $('#orderCondition_' + id).html(orderCondition(order));
-                }
-            }).fail(function () {
-                $.notify('خطایی رخ داده است.', 'warn');
-            });
-            return;
-        }
         $.post('/viewPaymentMethods/' + id, {_token: token})
             .done(res => {
                 dialog = Dialog(res);
@@ -445,35 +426,9 @@
                         $.notify('خطایی رخ داده است.', 'warn');
                     });
                 });
-            })
-
-
-        // $("#paymentForm").submit(function (e) {
-        //     e.preventDefault();
-        //     $.ajax({
-        //         type: "POST",
-        //         url: '/orders/paymentMethod/' + id,
-        //         data: new FormData(this),
-        //         processData: false,
-        //         contentType: false,
-        //         headers: {
-        //             "Accept": "application/json"
-        //         }
-        //     }).done(function (res) {
-        //         if (res[0] === "error")
-        //             $.notify(res[1], 'warn');
-        //         else if (res[0] === "ok") {
-        //             $.notify("با موفقیت ذخیره شد.", "success");
-        //             dialog.remove();
-        //             order = res[1];
-        //             $('#view_order_' + id).parent().html(operations(order));
-        //             $('#state_' + id).parent().html(createdTime(order));
-        //             $('#orderCondition_' + id).html(orderCondition(order));
-        //         }
-        //     }).fail(function () {
-        //         $.notify('خطایی رخ داده است.', 'warn');
-        //     });
-        // });
+            }).fail(e=>{
+                $.notify(e.responseJSON.message)
+        })
     }
 
     function cancelInvoice(id) {

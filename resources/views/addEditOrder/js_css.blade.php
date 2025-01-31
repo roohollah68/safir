@@ -174,7 +174,7 @@
             $('.discount-value').val(customer.discount || 0).change();
         });
         $('#customer-agreement').html('<span>تفاهم: </span>' + (customer.agreement || ' '));
- 
+
     }
 
     function changeDiscount(id, discount) {
