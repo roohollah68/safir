@@ -19,7 +19,7 @@ class WithdrawalController extends Controller
         return view('withdrawal.addEdit', [
             'suppliers' => Supplier::all()->keyBy('name'),
             'withdrawal' => new Withdrawal(),
-            'edit' =>false,
+            'edit' => false,
         ]);
     }
 
@@ -42,9 +42,9 @@ class WithdrawalController extends Controller
             'manager_confirm' => 0,
             'payment_confirm' => 0
         ])->all());
-        $supplier = Supplier::updateOrCreate(['name' => $req->account_name],[
-           'account' => $req->account_number,
-           'code' => $req->cheque_id,
+        $supplier = Supplier::updateOrCreate(['name' => $req->account_name], [
+            'account' => $req->account_number,
+            'code' => $req->cheque_id,
         ]);
         $withdrawal->update(['supplier_id' => $supplier->id]);
         if ($req->file("user_file")) {
@@ -111,19 +111,19 @@ class WithdrawalController extends Controller
             $withdrawals = $withdrawals->where('official', $req->official);
         if (isset($req->Location))
             $withdrawals = $withdrawals->where('location', $req->Location);
-        if(isset($req->Supplier))
+        if (isset($req->Supplier))
             $withdrawals = $withdrawals->where('supplier_id', $req->Supplier);
-        if(isset($req->payMethod))
+        if (isset($req->payMethod))
             $withdrawals = $withdrawals->where('pay_method', $req->payMethod);
-        if(isset($req->from))
-            $withdrawals = $withdrawals->whereDate('created_at','>=', $req->from);
-        if(isset($req->to))
-            $withdrawals = $withdrawals->whereDate('created_at','<=', $req->to);
+        if (isset($req->from))
+            $withdrawals = $withdrawals->whereDate('created_at', '>=', $req->from);
+        if (isset($req->to))
+            $withdrawals = $withdrawals->whereDate('created_at', '<=', $req->to);
         return view('withdrawal.list', [
             'withdrawals' => $withdrawals->with('user')->get()->keyBy('id'),
             'suppliers' => Supplier::all()->keyBy('id')->sortBy('name'),
-            'banks' => Bank::where('enable' , true)->get()->keyBy('id'),
-            'get' => http_build_query($_GET).'&',
+            'banks' => Bank::where('enable', true)->get()->keyBy('id'),
+            'get' => http_build_query($_GET) . '&',
             'filter' => $req->filter,
             'official' => $req->official,
             'Location' => $req->Location,
@@ -213,8 +213,8 @@ class WithdrawalController extends Controller
         $user = auth()->user();
         $withdrawal = Withdrawal::with('bank');
         if (!$user->meta('allWithdrawal'))
-            $withdrawal = $withdrawal->where('user_id' , $user->id);
-            $withdrawal = $withdrawal->findOrFail($id);
+            $withdrawal = $withdrawal->where('user_id', $user->id);
+        $withdrawal = $withdrawal->findOrFail($id);
         return view('withdrawal.view', [
             'withdrawal' => $withdrawal,
         ]);
@@ -245,7 +245,7 @@ class WithdrawalController extends Controller
         ]);
     }
 
-    public function addEditTankhah(Request $req , $id = null)
+    public function addEditTankhah(Request $req, $id = null)
     {
         DB::beginTransaction();
         $user = auth()->user();
@@ -266,7 +266,7 @@ class WithdrawalController extends Controller
             'payment_confirm' => 1,
             'recipient_confirm' => 1,
         ])->all());
-        $supplier = Supplier::updateOrCreate(['name' => $req->account_name],[
+        $supplier = Supplier::updateOrCreate(['name' => $req->account_name], [
             'account' => $req->account_number,
             'code' => $req->cheque_id,
         ]);
@@ -284,16 +284,23 @@ class WithdrawalController extends Controller
 
     public function bale($id)
     {
-        $withdrawal = Withdrawal::find($id);
-
+        $withdrawal = Withdrawal::findOrFail($id);
         $array = [
-            'text' => view('withdrawal.bale',compact('withdrawal')),
-            'reply_to_message_id' => $withdrawal->bale_id
+            'chat_id' => 5032678768,
+            'text' => view('withdrawal.bale', compact('withdrawal')),
+            'message_id' => $withdrawal->bale_id
         ];
-        $bale_id = $this->sendMessageToBale($array, 5032678768)->result->message_id;
-        $withdrawal->update([
-            'bale_id' => $bale_id,
-        ]);
+        if ($withdrawal->counter_confirm == 1) {
+            if ($withdrawal->bale_id) {
+                $this->editText($array);
+            } else {
+                $bale_id = $this->sendMessageToBale($array, 5032678768)->result->message_id;
+                $withdrawal->update([
+                    'bale_id' => $bale_id,
+                ]);
+            }
+        }
+
     }
 
 }
