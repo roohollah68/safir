@@ -175,7 +175,7 @@
         @endif
         $('#customerId').html(id);
         $('#customer_id').val(id);
-        $("#name").val(customer.name)
+        $('#name').val(customer.name)
         $('#phone').val(customer.phone).change();
         $('#address').val(customer.address);
         $('#zip_code').val(customer.zip_code).change();
