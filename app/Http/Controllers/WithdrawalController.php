@@ -53,7 +53,6 @@ class WithdrawalController extends Controller
             $withdrawal->user_file = null;
         }
         $withdrawal->save();
-        $this->bale($withdrawal->id);
         DB::commit();
         return redirect(route('WithdrawalList'));
     }
@@ -145,7 +144,6 @@ class WithdrawalController extends Controller
         Withdrawal::findOrFail($id)->update($req->merge([
             'manager_confirm' => 0
         ])->all());
-        $this->bale($id);
         return redirect()->back();
     }
 
@@ -161,7 +159,6 @@ class WithdrawalController extends Controller
         $withdrawal->payment_confirm = 0;
         $withdrawal->manager_desc = $req->manager_desc;
         $withdrawal->save();
-        $this->bale($withdrawal->id);
         return redirect()->back();
     }
 
@@ -186,7 +183,6 @@ class WithdrawalController extends Controller
         if ($req->file('payment_file3'))
             $withdrawal->payment_file3 = $req->file("payment_file3")->store("", 'withdrawal');
         $withdrawal->save();
-        $this->bale($withdrawal->id);
         return redirect()->back();
     }
 
@@ -204,7 +200,6 @@ class WithdrawalController extends Controller
         if ($req->file('recipient_file'))
             $withdrawal->recipient_file = $req->file("recipient_file")->store("", 'withdrawal');
         $withdrawal->save();
-        $this->bale($withdrawal->id);
         return redirect()->back();
     }
 
@@ -278,22 +273,7 @@ class WithdrawalController extends Controller
             $withdrawal->user_file = null;
         }
         $withdrawal->save();
-        $this->bale($withdrawal->id);
         DB::commit();
         return redirect(route('WithdrawalList'));
-    }
-
-    public function bale($id)
-    {
-        $withdrawal = Withdrawal::find($id);
-
-        $array = [
-            'text' => view('withdrawal.bale',compact('withdrawal')),
-            'reply_to_message_id' => $withdrawal->bale_id
-        ];
-        $bale_id = $this->sendMessageToBale($array, 5032678768)->result->message_id;
-        $withdrawal->update([
-            'bale_id' => $bale_id,
-        ]);
     }
 }
