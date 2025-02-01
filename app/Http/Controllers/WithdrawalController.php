@@ -145,7 +145,7 @@ class WithdrawalController extends Controller
         Withdrawal::findOrFail($id)->update($req->merge([
             'manager_confirm' => 0
         ])->all());
-        $this->bale($withdrawal->id);
+        $this->bale($id);
         return redirect()->back();
     }
 
