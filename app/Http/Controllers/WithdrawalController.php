@@ -204,6 +204,7 @@ class WithdrawalController extends Controller
         if ($req->file('recipient_file'))
             $withdrawal->recipient_file = $req->file("recipient_file")->store("", 'withdrawal');
         $withdrawal->save();
+        $this->bale($withdrawal->id);
         return redirect()->back();
     }
 
@@ -287,8 +288,8 @@ class WithdrawalController extends Controller
         $withdrawal = Withdrawal::findOrFail($id);
         $array = [
             'chat_id' => 5032678768,
-            'text' => view('withdrawal.bale', compact('withdrawal')),
-            'message_id' => $withdrawal->bale_id
+            'text' => view('withdrawal.bale', compact('withdrawal'))->render(),
+            'message_id' => $withdrawal->bale_id,
         ];
         if ($withdrawal->counter_confirm == 1) {
             if ($withdrawal->bale_id) {
