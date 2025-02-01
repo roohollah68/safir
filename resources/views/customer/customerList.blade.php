@@ -45,9 +45,10 @@
             <tr>
                 <th>شماره</th>
                 <th>نام</th>
-                <th>سقف اعتبار(ریال)</th>
+
 
                 @if(!$safir)
+                    <th>سقف اعتبار(ریال)</th>
                     <th>بدهکاری(ریال)</th>
                 @else
                     <th>آدرس</th>
@@ -72,13 +73,14 @@
                             <span class="btn btn-danger">مسدود</span>
                         @endif
                     </td>
-                    <td>
+
+                    @if(!$safir)
+                        <td>
                         <span class="btn btn-{{$customer->credit_limit >= -$customer->balance?"success":"danger"}}">
                             {{number_format($customer->credit_limit)}}
                         </span>
-                    </td>
+                        </td>
 
-                    @if(!$safir)
                         <td dir="ltr"><a href="/customer/transaction/{{$id}}"
                                          class="btn btn-outline-danger">{{number_format($customer->balance)}}</a></td>
                     @else

@@ -294,6 +294,22 @@ class BaleAPIv2{
 		}
 		return $return;
 	}
+
+    public function sendMediaGroup($arr)
+    {
+        if(is_array($arr)){
+            if(isset($arr["chat_id"]) and isset($arr["media"])){
+                $arr["command"]='sendMediaGroup';
+//                $arr['media']=trim($arr['media']);
+                $return=$this->sendrequest($arr);
+            }else{
+                $return="undefined chatid or photo";
+            }
+        }else{
+            $return="it is not an array";
+        }
+        return $return;
+    }
 	public function sendAudio($arr)
 	{
 		if(is_array($arr)){
