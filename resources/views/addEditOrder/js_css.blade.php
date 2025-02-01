@@ -169,7 +169,6 @@
 
     function setCustomerInfo(id) {
         let customer = customers[id] || {};
-        let customer = customers[id] || {};
         @if(!$creatorIsAdmin)
         if (!customer.name)
             return;
