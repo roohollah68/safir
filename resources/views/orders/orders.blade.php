@@ -76,8 +76,8 @@
     <table id="main-table" class="table table-striped">
     </table>
 
-    <div class="d-none" id="sendMethodText">
-        @include('orders.sendMethods')
-    </div>
+{{--    <div class="d-none" id="sendMethodText">--}}
+{{--        @include('orders.sendMethods')--}}
+{{--    </div>--}}
 
 @endsection
