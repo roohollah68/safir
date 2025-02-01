@@ -1,7 +1,7 @@
-@if($withdrawal->user_file)
- {{env('APP_URL')}}withdrawal/{{$withdrawal->user_file}}
-@endif
 شماره درخواست: {{$withdrawal->id}}
+@if($withdrawal->user_file)
+فایل درخواست: {{env('APP_URL')}}withdrawal/{{$withdrawal->user_file}}
+@endif
 کاربر ثبت کننده: {{$withdrawal->user->name}}
 مبلغ درخواستی: {{number_format($withdrawal->amount)}}
 بابت: {{$withdrawal->expense}}
@@ -17,8 +17,7 @@
 @endif
 دسته هزینه: {{$withdrawal->expense_type=='current'?'هزینه':'دارایی'}}
 نوع هزینه: {{$withdrawal->expense_desc}}
-نوع فاکتور:
- {{$withdrawal->official != 1?'غیر رسمی':('رسمی '.($withdrawal->vat == 1?'با ارزش افزوده':'بدون ارزش افزوده'))}}
+نوع فاکتور: {{$withdrawal->official != 1?'غیر رسمی':('رسمی '.($withdrawal->vat == 1?'با ارزش افزوده':'بدون ارزش افزوده'))}}
 *حسابداری*===========================
 تایید حسابداری: {{ strip_tags($withdrawal->counter_status()) }}
 توضیحات حسابداری: {{$withdrawal->counter_desc}}
