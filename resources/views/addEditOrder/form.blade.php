@@ -21,7 +21,7 @@
                     <label for="name" class="input-group-text w-100">نام و نام خانوادگی:</label>
                 </div>
                 <input value="{{old('name')?:$order->name}}" type="text" id="name"
-                       class="form-control " name="name" required @disabled($edit && $creatorIsAdmin)>
+                       class="form-control " name="name" required @readonly($edit && $creatorIsAdmin)>
                 @if($creatorIsAdmin)
                     <input type="hidden" name="customer_id" id="customer_id" class="form-control hide" required>
                     @if(!$edit)
