@@ -242,5 +242,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
 Route::post('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteOrder']);
 Route::get('/backup', [TelegramController::class, 'backUpDatabase']);
 
+Route::get('/baletest/{id}', [WithdrawalController::class, 'bale']);
+
 
 require __DIR__ . '/auth.php';

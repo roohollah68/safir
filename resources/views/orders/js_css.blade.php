@@ -391,7 +391,7 @@
             $('#state_' + id).parent().html(createdTime(order));
             $('#orderCondition_' + id).html(orderCondition(order));
         }
-        
+
         $.post('/confirmAuthorize/' + id, {_token: token})
             .done((order) => {
                 console.log(order.total);

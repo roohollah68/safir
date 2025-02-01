@@ -101,6 +101,13 @@ class Controller extends BaseController
         return json_decode($bot->sendPhoto($array));
     }
 
+    public function sendMediaGroupToBale($array, $chatId)
+    {
+        $bot = new BaleAPIv2(env('BaleToken'));
+        $array["chat_id"] = $chatId;
+        return json_decode($bot->sendMediaGroup($array));
+    }
+
     public function sendDocumentToBale($array, $chatId)
     {
         $bot = new BaleAPIv2(env('BaleToken'));
