@@ -31,24 +31,21 @@
 @if($withdrawal->counter_confirm != 0 && $withdrawal->manager_confirm != 0)
  تایید پرداخت: {{ strip_tags($withdrawal->payment_status()) }}
  توضیحات پرداخت: {{$withdrawal->payment_desc}}
- @if($withdrawal->payment_file)
+@if($withdrawal->payment_file)
  رسید پرداخت: {{env('APP_URL')}}withdrawal/{{$withdrawal->payment_file}}
-
- @endif
- @if($withdrawal->payment_file2)
+@endif
+@if($withdrawal->payment_file2)
  رسید پرداخت2: {{env('APP_URL')}}withdrawal/{{$withdrawal->payment_file2}}
-
- @endif
- @if($withdrawal->payment_file3)
+@endif
+@if($withdrawal->payment_file3)
  رسید پرداخت3: {{env('APP_URL')}}withdrawal/{{$withdrawal->payment_file3}}
-
- @endif
+@endif
 *دریافت*===========================
 @endif
 @if($withdrawal->counter_confirm != 0 && $withdrawal->manager_confirm != 0 && $withdrawal->payment_confirm != 0)
  تایید دریافت کالا یا خدمات: {{ strip_tags($withdrawal->recipient_status()) }}
  توضیحات دریافت: {{$withdrawal->recipient_desc}}
- @if($withdrawal->recipient_file)
+@if($withdrawal->recipient_file)
  رسید دریافت: {{env('APP_URL')}}withdrawal/{{$withdrawal->recipient_file}}
- @endif
+@endif
 @endif
