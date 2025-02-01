@@ -31,7 +31,7 @@
     $(function () {
         table = $('#product-table').DataTable({
             pageLength: 100,
-            language:language,
+            language: language,
         });
 
         let customersName = {};
@@ -45,6 +45,10 @@
                 setCustomerInfo(id);
             }
         });
+        $("#name").change((data) => {
+            let id = customersName[data.target.value];
+            setCustomerInfo(id);
+        });
     });
 
     @endif
@@ -57,8 +61,8 @@
         } else
             cart[id] = 1;
         $('#selected-product-table').show();
-        if(product.discount != 100)
-            product.price = product.priceWithDiscount * 100 / (100-product.discount)
+        if (product.discount != 100)
+            product.price = product.priceWithDiscount * 100 / (100 - product.discount)
         else
             product.price = product.good.price;
         $('#product-form').append(`@include('addEditOrder.addToCart')`);
@@ -164,13 +168,18 @@
     }
 
     function setCustomerInfo(id) {
-        let customer  = customers[id] || {};
+        let customer = customers[id] || {};
+        let customer = customers[id] || {};
+        @if(!$creatorIsAdmin)
+        if (!customer.name)
+            return;
+        @endif
         $('#customerId').html(id);
         $("#name").val(customer.name)
-        $('#phone').val(customer.phone);
+        $('#phone').val(customer.phone).change();
         $('#address').val(customer.address);
-        $('#zip_code').val(customer.zip_code);
-        $('#set-customer-discount').html((customer.discount || '0') + ' %').click(()=>{
+        $('#zip_code').val(customer.zip_code).change();
+        $('#set-customer-discount').html((customer.discount || '0') + ' %').click(() => {
             $('.discount-value').val(customer.discount || 0).change();
         });
         $('#customer-agreement').html('<span>تفاهم: </span>' + (customer.agreement || ' '));
@@ -183,7 +192,7 @@
         discount = Math.round(discount * 4) / 4;
         $('#discount_' + id).val(discount);
         let price = $(`#price_${id}`).val().replaceAll(',', '');
-        let price_discount = Math.round(price*(100-discount)/100);
+        let price_discount = Math.round(price * (100 - discount) / 100);
         $(`#price_discount_${id}`).html(priceFormat(price_discount));
         refreshProducts();
     }
@@ -191,7 +200,7 @@
     function changePrice(id, value) {
         let price = value.replaceAll(',', '');
         let discount = $(`#discount_${id}`).val();
-        let price_discount = Math.round(price*(100-discount)/100);
+        let price_discount = Math.round(price * (100 - discount) / 100);
         $(`#price_discount_${id}`).html(priceFormat(price_discount));
         refreshProducts();
     }
@@ -205,7 +214,7 @@
             return false;
         }
         let values = Object.values(cart);
-        if ((values.some(x => x >= 0) && values.some(x => x <= 0))|| values.some(x => x == 0) ) {
+        if ((values.some(x => x >= 0) && values.some(x => x <= 0)) || values.some(x => x == 0)) {
             alert('تعداد همگی باید مثبت یا منفی باشند');
             return false;
         }
@@ -215,11 +224,11 @@
         return true;
     }
 
-    function enableEditPrice(id , checked){
+    function enableEditPrice(id, checked) {
         let priceInput = $(`#price_${id}`).prop('disabled', checked);
-        if(checked){
+        if (checked) {
             priceInput.val(products[id].good.price).change();
-        }else{
+        } else {
 
         }
         refreshProducts();

@@ -21,17 +21,9 @@
                     <label for="name" class="input-group-text w-100">نام و نام خانوادگی:</label>
                 </div>
                 <input value="{{old('name')?:$order->name}}" type="text" id="name"
-                       class="form-control {{$creatorIsAdmin?'hide':''}}"
-                       name="name" required>
+                       class="form-control " name="name" required @disabled($edit && $creatorIsAdmin)>
                 @if($creatorIsAdmin)
-                    <select name="customer_id" id="customer_id" class="form-control" required
-                            onchange="setCustomerInfo(this.value)" @disabled($edit)>
-                        <option value=""></option>
-                        @foreach($customers as $id => $customer)
-                            <option
-                                value="{{$id}}" @selected(old('customer_id')?:$order->customer_id == $id)>{{$customer->name}}</option>
-                        @endforeach
-                    </select>
+                    <input type="hidden" name="customer_id" id="customer_id" class="form-control hide" required>
                     @if(!$edit)
                         <a class="btn btn-success fa fa-user-plus" title="افزودن مشتری"
                            href="{{route("newCustomer")}}"></a>
