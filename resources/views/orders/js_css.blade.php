@@ -13,15 +13,10 @@
     let changeOrdersPermit = !!'{{$user->meta('showAllOrders')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     let dtp1Instance;
-    let sendMethods = {!!json_encode(config('sendMethods'))!!};
-    let payMethods = {!!json_encode(config('payMethods'))!!};
-    let payMethodText, sendMethodText;
+    {{--let sendMethods = {!!json_encode(config('sendMethods'))!!};--}}
+    {{--let payMethods = {!!json_encode(config('payMethods'))!!};--}}
     let dialog;
     $(() => {
-        payMethodText = $('#paymentMethodText').html();
-        $('#paymentMethodText').html('');
-        sendMethodText = $('#sendMethodText').html();
-        $('#sendMethodText').html('');
         $(".checkboxradio").checkboxradio();
         prepare_data();
 
@@ -294,20 +289,18 @@
             return;
         }
         if (order.total < 0) {
-            $.post('/set_send_method/' + id, {
-                    _token: token
-                }
+            $.post('/set_send_method/' + id, {_token: token}
             ).done(function (res) {
                 $.notify("با موفقیت ذخیره شد.", "success");
                 order = res;
                 change_state(id, 10)
-            }).fail(function () {
-                $.notify('خطایی رخ داده است.', 'warn');
+            }).fail(function (e) {
+                $.notify(e.responseJSON.message)
             });
             return;
         }
 
-        dialog = Dialog(sendMethodText);
+        dialog = Dialog(`@include('orders.sendMethods')`);
 
         $(".checkboxradio").checkboxradio();
 
@@ -392,6 +385,13 @@
     @if($admin || $superAdmin)
 
     function selectPayment(id) {
+        let applyChanges = function (order) {
+            $.notify("با موفقیت تائید شد.", "success");
+            $('#view_order_' + id).parent().html(operations(order));
+            $('#state_' + id).parent().html(createdTime(order));
+            $('#orderCondition_' + id).html(orderCondition(order));
+        }
+        
         $.post('/confirmAuthorize/' + id, {_token: token})
             .done((order) => {
                 console.log(order.total);
@@ -414,7 +414,7 @@
                         data[value.name] = value.value;
                     })
                     $.post('/orders/paymentMethod/' + id, data)
-                        .done((order)=>{
+                        .done((order) => {
                             applyChanges(order);
                             dialog.remove();
                         })
@@ -426,13 +426,6 @@
             .fail(function (e) {
                 $.notify(e.responseJSON.message)
             });
-
-        let applyChanges = function (order){
-            $.notify("با موفقیت تائید شد.", "success");
-            $('#view_order_' + id).parent().html(operations(order));
-            $('#state_' + id).parent().html(createdTime(order));
-            $('#orderCondition_' + id).html(orderCondition(order));
-        }
     }
 
     function cancelInvoice(id) {
