@@ -152,11 +152,11 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="form-group input-group">
+                    <div class="form-group input-group required">
                         <div class="input-group-append" style="min-width: 160px">
                             <label for="agreement" class="input-group-text w-100">تفاهم:</label>
                         </div>
-                        <textarea id="agreement" class="form-control" name="agreement" rows="3"
+                        <textarea id="agreement" class="form-control" name="agreement" rows="3" required
                         >{{old('agreement')?:$customer->agreement?:''}}</textarea>
                     </div>
                 </div>

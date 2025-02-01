@@ -86,15 +86,24 @@ class CustomerController extends Controller
             'name' => 'required|string|min:3',
             'phone' => 'required|string|max:11|min:11',
             'address' => 'required|string',
+            'agreement' => 'required'
+        ],[
+            'agreement.required'=>'پر کردن فیلد تفاهم اجباری است.',
+            'name.required'=>'پر کردن فیلد نام اجباری است.',
         ]);
 
         if ($id) {
             if (auth()->user()->meta('editAllCustomers'))
                 $customer = Customer::findOrFail($id);
-            else
+            else {
                 $customer = auth()->user()->customers()->findOrFail($id);
-        } else
+                $request->credit_limit = ''.$customer->credit_limit;
+            }
+        } else {
             $customer = new Customer();
+            $request->credit_limit = $request->credit_limit??'0';
+        }
+
         $customer->fill([
             'name' => $request->name,
             'phone' => Helper::number_Fa_En($request->phone),
