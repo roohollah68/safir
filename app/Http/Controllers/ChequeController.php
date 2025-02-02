@@ -14,10 +14,10 @@ class ChequeController extends Controller
         $cheque = new Cheque();
         $receivedCheque = $cheque->receivedCheque();
         $givenCheque = $cheque->givenCheque();
-//        $receivedCheque = CustomerTransaction::where('pay_method', 'cheque')
-//            ->where('verified','approved')->get();
-//        $givenCheque = Withdrawal::where('pay_method', 'cheque')
-//            ->where('payment_confirm', 1)->get();
+        $receivedCheque = CustomerTransaction::where('pay_method', 'cheque')
+            ->where('verified','approved')->get();
+        $givenCheque = Withdrawal::where('pay_method', 'cheque')
+            ->where('payment_confirm', 1)->get();
 
         return view('cheque.cheque', compact('receivedCheque', 'givenCheque'));
     }
@@ -27,6 +27,7 @@ class ChequeController extends Controller
         $cheque = new Cheque();
         $viewCheque = $cheque->viewGivenCheque($id);
 //        $viewCheque = Withdrawal::findOrFail($id);
+//        $viewCheque = Withdrawal::with('user')->findOrFail($id);
         return view('cheque.givenView', compact('viewCheque'))->render();
     }
 
