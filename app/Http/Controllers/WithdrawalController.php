@@ -291,7 +291,7 @@ class WithdrawalController extends Controller
             'text' => view('withdrawal.bale', compact('withdrawal'))->render(),
             'message_id' => $withdrawal->bale_id,
         ];
-        if ($withdrawal->counter_confirm == 1) {
+        if ($withdrawal->payment_confirm == 1) {
             if ($withdrawal->bale_id) {
                 $this->editText($array);
             } else {
