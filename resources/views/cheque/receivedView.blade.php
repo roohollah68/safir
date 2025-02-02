@@ -10,6 +10,11 @@
         </span>
     </b>
     <br>
+{{--    <span>کاربر مرتبط:</span> <b>{{ $viewCheque->customer->user->name }}</b> <br>--}}
+{{--    <span>نام مشتری:</span>--}}
+{{--    <a href="/customer/transaction/{{ $viewCheque->customer_id }}">--}}
+{{--        <b>{{ $viewCheque->customer->name }}</b>--}}
+{{--    </a> <br>--}}
     <span>شماره مشتری:</span> <b>{{ $viewCheque->customer_id }}</b> <br>
     <span>شماره واریز:</span> <b>{{ $viewCheque->id }}</b> <br>
     <span>مبلغ:</span> <b>{{ number_format($viewCheque->amount) }}</b> <br>

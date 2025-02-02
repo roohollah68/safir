@@ -17,6 +17,7 @@
             دریافت</a>
     @endif
     <br>
+{{--    <span>کاربر مرتبط:</span> <b>{{ $viewCheque->user->name }}</b> <br>--}}
     <span>مبلغ درخواستی:</span> <b>{{ number_format($viewCheque->amount) }}</b> <br>
     <span>بابت:</span> <b>{{ $viewCheque->expense }}</b> <br>
     <span>مکان درخواست:</span> <b>{{ config('withdrawalLocation')[$viewCheque->location] }}</b> <br>
@@ -33,6 +34,7 @@
     <b>{{ $viewCheque->official != 1 ? 'غیر رسمی' : 'رسمی ' . ($viewCheque->vat == 1 ? 'با ارزش افزوده' : 'بدون ارزش افزوده') }}</b>
     <br>
     <span>بانک پرداخت کننده:</span>
+{{--        <b>{{$viewCheque->bank_id?$viewCheque->bank->name:'نامشخص'}}</b>--}}
     @if ($viewCheque->bank_id)
         <b>
             @switch($viewCheque->bank_id)
