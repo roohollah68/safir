@@ -104,7 +104,7 @@
                 .done(res => {
                     if(res == 'approved') {
                         $('#button_' + id).html(rejectButton(id));
-                        $('#status_' + id).html('<i class="btn btn-success">تایید شده</i>');
+                        $('#status_' + id).html('<i class="btn btn-success">تایید</i>');
                     }
                 })
         }
@@ -116,7 +116,7 @@
                     .done(res => {
                         if(res == 'rejected') {
                             $('#button_' + id).html(approveButton(id));
-                            $('#status_' + id).html('<i class="btn btn-danger">رد شده</i>');
+                            $('#status_' + id).html('<i class="btn btn-danger">رد</i>');
                         }
                     })
             }

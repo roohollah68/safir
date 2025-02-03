@@ -20,8 +20,9 @@
         <span>آدرس:</span> <b>{{$customer->address}}</b><br>
         <span>کد پستی:</span> <b>{{$customer->zip_code}}</b><br>
         <span>تخفیف پیشفرض:</span> <b>{{$customer->discount}} %</b><br>
-        <span class="h4">سقف اعتبار:</span> <b class="h4">{{number_format($customer->credit_limit)}}</b> <span class="h4">ریال</span><br><br>
-        <span >بدهکاری:</span>
+        <span class="h4">سقف اعتبار:</span> <b class="h4">{{number_format($customer->credit_limit)}}</b> <span
+            class="h4">ریال</span><br><br>
+        <span>بدهکاری:</span>
         <b dir="ltr" class="h3 text-danger">{{number_format($customer->balance())}}</b>
         <span class="h3">ریال</span><br>
         <a class="btn btn-secondary fa fa-file-pdf" title="گردش حساب"
@@ -67,7 +68,8 @@
                             @endif
                             @if( $deposit->verified != 'approved')
                                 <a class="btn btn-danger fa fa-trash" onclick="deleteDeposit({{$id}})"></a>
-                                <a class="btn btn-warning fa fa-edit" href="/customerDeposit/edit/{{$customer->id}}/{{$id}}"></a>
+                                <a class="btn btn-warning fa fa-edit"
+                                   href="/customerDeposit/edit/{{$customer->id}}/{{$id}}"></a>
                             @endif
                         </td>
                     </tr>
@@ -103,15 +105,8 @@
                         </td>
                         <td dir="ltr">{{number_format($order->total)}}</td>
                         <td>
-                            @if($order->total < 0)
-                                <i class="btn btn-info">بازگشت به انبار</i>
-                            @elseif($order->payPercentApproved() == 0)
-                                <i class="btn btn-danger">0 %</i>
-                            @elseif($order->payPercentApproved() == 100)
-                                <i class="btn btn-success">100 %</i>
-                            @else
-                                <i class="btn btn-warning">{{$order->payPercentApproved()}} %</i>
-                            @endif
+                            <x-pay-percent :percent="$order->payPercentApproved()"
+                                           :total="$order->total"></x-pay-percent>
                         </td>
                         <td>
                             <a class="btn btn-info fa fa-eye" onclick="view_order({{$id}})"
@@ -176,12 +171,12 @@
             $('#deposit').DataTable({
                 paging: false,
                 order: [[0, "desc"]],
-                language:language,
+                language: language,
             });
             $('#orders-table').DataTable({
                 paging: false,
                 order: [[0, "desc"]],
-                language:language,
+                language: language,
             });
         });
 

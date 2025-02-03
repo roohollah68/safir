@@ -174,4 +174,5 @@ class Order extends Model
             return 100;
         return round($Total / $this->total * 100);
     }
+
 }

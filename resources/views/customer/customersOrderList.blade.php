@@ -76,12 +76,14 @@
                     <td>{{$order->paymentNote}}</td>
                     <td id="status_{{$order->id}}">
                         @if($order->counter == 'waiting')
-                            <i class="btn btn-info">در انتظار بررسی</i>
+                            <i class="btn btn-info">بررسی</i>
                         @elseif($order->counter == 'approved')
-                            <i class="btn btn-success">تایید شده</i>
+                            <i class="btn btn-success">تایید</i>
                         @elseif($order->counter == 'rejected')
-                            <i class="btn btn-danger">رد شده</i>
+                            <i class="btn btn-danger">رد</i>
                         @endif
+                            <x-pay-percent :percent="$order->payPercentApproved()"
+                                           :total="$order->total"></x-pay-percent>
                     </td>
                     <td><a href="/customer/transaction/{{$order->customer_id}}">{{$order->customer->name}}</a></td>
                     <td>{{$order->user->name}}</td>
@@ -138,7 +140,7 @@
             $.post('/approveOrder/' + id, {_token: token})
                 .done(res => {
                     $('#button_' + id).html(rejectButton(id));
-                    $('#status_' + id).html('<i class="btn btn-success">تایید شده</i>');
+                    $('#status_' + id).html('<i class="btn btn-success">تایید</i>');
                 })
         }
 

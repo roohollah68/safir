@@ -46,11 +46,11 @@ class CustomerTransaction extends Model
     public function verified()
     {
         if ($this->verified == 'waiting')
-            return '<i class="btn btn-info">در انتظار بررسی</i>';
+            return '<i class="btn btn-info">بررسی</i>';
         if ($this->verified == 'approved')
-            return '<i class="btn btn-success">تایید شده</i>';
+            return '<i class="btn btn-success">تایید</i>';
         if ($this->verified == 'rejected')
-            return '<i class="btn btn-danger">رد شده</i>';
+            return '<i class="btn btn-danger">شده</i>';
     }
 
 }
