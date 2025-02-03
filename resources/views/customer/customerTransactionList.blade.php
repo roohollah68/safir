@@ -105,12 +105,12 @@
                         <td>
                             @if($order->total < 0)
                                 <i class="btn btn-info">بازگشت به انبار</i>
-                            @elseif($order->payPercent() == 0)
+                            @elseif($order->payPercentApproved() == 0)
                                 <i class="btn btn-danger">0 %</i>
-                            @elseif($order->payPercent() == 100)
+                            @elseif($order->payPercentApproved() == 100)
                                 <i class="btn btn-success">100 %</i>
                             @else
-                                <i class="btn btn-warning">{{$order->payPercent()}} %</i>
+                                <i class="btn btn-warning">{{$order->payPercentApproved()}} %</i>
                             @endif
                         </td>
                         <td>
