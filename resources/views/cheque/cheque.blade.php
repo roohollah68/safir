@@ -30,37 +30,28 @@
             });
         });
 
-        $(document).ready(function() {
-            const date1 = new mds.MdsPersianDateTimePicker($('#start_date')[0], {
-                targetTextSelector: '#start_date',
+        $(function() {
+            const date1 = new mds.MdsPersianDateTimePicker($('#from_date')[0], {
+                targetTextSelector: '#from_date',
                 textFormat: 'yyyy/MM/dd',
                 isGregorian: false,
                 enableTimePicker: false,
                 englishNumber: true,
-                placement: 'bottom',
-                trigger: 'focus',
-                onSelect: function() {
-                    filterChequeDate();
-                }
+                @if (isset($from))
+                    selectedDate: '{{ $from }}',
+                @endif
             });
 
-            const date2 = new mds.MdsPersianDateTimePicker($('#end_date')[0], {
-                targetTextSelector: '#end_date',
+            const date2 = new mds.MdsPersianDateTimePicker($('#to_date')[0], {
+                targetTextSelector: '#to_date',
                 textFormat: 'yyyy/MM/dd',
                 isGregorian: false,
                 enableTimePicker: false,
                 englishNumber: true,
-                placement: 'bottom',
-                trigger: 'focus',
-                onSelect: function() {
-                    filterChequeDate();
-                }
+                @if (isset($to))
+                    selectedDate: '{{ $to }}',
+                @endif
             });
-
-            $('#start_date, #end_date').on('change', function() {
-                filterChequeDate();
-            });
-
         });
     </script>
 
@@ -105,18 +96,32 @@
 
         {{-- فیلترها --}}
 
-        <div class="filter-section mb-4">
-            <label for="start_date">از تاریخ:</label>
-            <input type="text" id="start_date" class="form-control" autocomplete="off">
-            <label for="end_date">تا تاریخ:</label>
-            <input type="text" id="end_date" class="form-control" autocomplete="off">
-        </div>
+        <form action="{{ route('cheque.filterChequeDate') }}" method="get">
+            <div class="filter-section mb-4">
+                <i>از تاریخ: </i><input type="text" value="{{ $from ?? '' }}" style="width: 120px" id="from_date"
+                    name="from">
+                <i class="mx-3"></i>
+                <i>تا تاریخ: </i><input type="text" value="{{ $to ?? '' }}" style="width: 120px" id="to_date"
+                    name="to">
+            </div>
 
-        <button class="btn btn-secondary mb-4" onclick="filterPassedCheques('all')">همه</button>
-        <button class="btn btn-success mb-4" onclick="filterPassedCheques('1')">پاس شده</button>
-        <button class="btn btn-warning mb-4" onclick="filterPassedCheques('0')">پاس نشده</button>
-        <button class="btn btn-info mb-4" onclick="setNextMonth()">چک‌های ماه آینده</button>
-        <button class="btn btn-danger mb-4" onclick="pastCheques()">چک‌های گذشته</button>
+            <select name="state">
+                <option value="">همه</option>
+                <option value="1">پاس شده</option>
+                <option value="0">پاس نشده</option>
+            </select>
+            <button type="submit">فیلتر</button>
+        </form>
+
+        {{-- <form action="{{ route('cheque.setNextMonth') }}" method="get">
+            @csrf
+            <button type="submit">چک‌های 30 روز آینده</button>
+        </form>
+
+        <form action="{{ route('cheque.pastCheques') }}" method="get">
+            @csrf
+            <button type="submit">چک‌های تاریخ گذشته</button>
+        </form>  --}}
 
         {{-- جداول --}}
 

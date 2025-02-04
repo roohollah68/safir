@@ -2,19 +2,17 @@
     {{-- <a href="/deposit/{{ $viewCheque->photo }}" target="_blank">
         <img style="width: 300px" src="/deposit/{{ $viewCheque->photo }}">
     </a> --}}
-    {{-- <br> --}}
-    <span class="border-0 focus-outline-0">کاربر مرتبط:</span> <b class="border-0 focus-outline-0">
+    <span>کاربر مرتبط:</span> <b>
         <span onclick="window.location.href='/customer/transaction/{{ $viewCheque->customer_id }}'" class="text-primary"
             style="cursor: pointer;">
-            {{ $viewCheque->cheque_name }}
+            {{ $viewCheque->customer->user->name }}
         </span>
     </b>
     <br>
-{{--    <span>کاربر مرتبط:</span> <b>{{ $viewCheque->customer->user->name }}</b> <br>--}}
-{{--    <span>نام مشتری:</span>--}}
-{{--    <a href="/customer/transaction/{{ $viewCheque->customer_id }}">--}}
-{{--        <b>{{ $viewCheque->customer->name }}</b>--}}
-{{--    </a> <br>--}}
+    <span>نام مشتری:</span>
+    <a href="/customer/transaction/{{ $viewCheque->customer_id }}" class="text-primary text-decoration-none">
+        <b>{{ $viewCheque->customer->name }}</b>
+    </a> <br>
     <span>شماره مشتری:</span> <b>{{ $viewCheque->customer_id }}</b> <br>
     <span>شماره واریز:</span> <b>{{ $viewCheque->id }}</b> <br>
     <span>مبلغ:</span> <b>{{ number_format($viewCheque->amount) }}</b> <br>

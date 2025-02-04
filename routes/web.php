@@ -222,6 +222,10 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('/given/{id}', 'view')->name('cheque.view');
         Route::get('/recieved/{id}', 'recievedView')->name('cheque.view2');
         Route::post('/pass', 'passCheque');
+        Route::get('/cheque/filterChequeDate', 'filterChequeDate')->name('cheque.filterChequeDate');
+        Route::get('/cheque/filterPassedCheques', 'filterPassedCheques')->name('cheque.filterPassedCheques');
+        Route::get('/cheque/setNextMonth','setNextMonth')->name('cheque.setNextMonth');
+        Route::get('/cheque/past', 'pastCheques')->name('cheque.pastCheques');
     });
 
 
