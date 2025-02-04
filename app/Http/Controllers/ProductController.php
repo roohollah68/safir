@@ -47,7 +47,7 @@ class ProductController extends Controller
     public function showEditForm($id)
     {
         Helper::access('warehouse');
-        $product = Product::with(['good' , 'productChange.order'])->findOrfail($id);
+        $product = Product::with(['good', 'productChange.order'])->findOrfail($id);
         return view('product.addEditProduct', [
             'product' => $product,
             'good' => $product->good,
@@ -81,10 +81,10 @@ class ProductController extends Controller
             if ($change != 0)
                 $productChange->save();
             $good = $product->good;
-        }else
+        } else
             $good = new Good();
         request()->validate([
-            'name' => 'required|string|max:255|min:4|unique:goods,name,'. $good->id,
+            'name' => 'required|string|max:255|min:4|unique:goods,name,' . $good->id,
             'price' => 'required|integer',
             'productPrice' => 'integer',
         ]);
@@ -309,5 +309,30 @@ class ProductController extends Controller
             $warehouse->save();
         }
         return redirect('/warehouse/manager');
+    }
+
+    public function tags()
+    {
+        Helper::access('warehouse');
+        $goods = Good::all()->keyBy('id');
+        return view('product.tagManagement', [
+            'goods' => $goods,
+        ]);
+    }
+
+    public function saveTags(Request $req, $id)
+    {
+        Helper::access('warehouse');
+        $good = Good::findOrFail($id);
+        $req->validate([
+            'tag' => 'numeric|digits:13|nullable',
+            'vat' => 'boolean',
+            'isic' => 'numeric|digits:7|nullable'
+        ], [
+            'tag.numeric' => 'شناسه کالا باید عدد باشد',
+            'tag.digits' => 'شناسه کالا باید عدد 13 رقمی باشد',
+        ]);
+        $good->update($req->all());
+        return $good;
     }
 }

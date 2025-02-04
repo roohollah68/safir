@@ -15,7 +15,7 @@
         </span>
     @endforeach
     <br>
-    @foreach(['final'=>'محصول نهایی', 'raw'=>'ماده اولیه' , 'pack'=>'ملزومات بسته بندی'] as $category => $desc)
+    @foreach(config('goodCat') as $category => $desc)
         <span class="btn btn-info m-1"
               onclick="$('.{{$category}}').toggle().is(':visible')?
                   $(this).addClass('btn-info').removeClass('btn-outline-info'):

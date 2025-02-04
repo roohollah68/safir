@@ -64,7 +64,8 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="isic" class="input-group-text w-100">اینتا کد:</label>
                     </div>
-                    <select id="isic" class="form-control" name="isic" value="{{old('isic')?:$good->isic}}">
+                    <select id="isic" class="form-control" name="isic">
+                        <option value="">لطفا انتخاب کنید</option>
                         <option value="1020250" @selected(old('isic')?:$good->isic==1020250)>قهوه، کاکائو، پودر و خمیر حاصل از آنها</option>
                         <option value="1010020" @selected(old('isic')?:$good->isic==1010020)>انواع چای(خشک کردن، سورت و بسته بندی)</option>
                         <option value="1010030" @selected(old('isic')?:$good->isic==1010030)>انواع گیاهان طبی و دارویی</option>

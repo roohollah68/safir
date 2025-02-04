@@ -35,6 +35,10 @@
         <span class=" fa fa-user"></span>
         تعیین مسئول انبار
     </a>
+    <a class="btn btn-info mb-3" href="good/tag">
+        <span class=" fa fa-tag"></span>
+        ثبت شناسه کالا
+    </a>
     <br>
     <div class="container border input-box">
         <div class="row">
