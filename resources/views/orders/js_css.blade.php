@@ -244,12 +244,12 @@
             else
                 res += confirmInvoice;
         }
-        if (creatorRole !== 'user') {
-            if (order.confirm)
-                res += invoice;
-            else
-                res += preInvoice;
-        }
+        // if (creatorRole !== 'user') {
+        if (order.confirm)
+            res += invoice;
+        else
+            res += preInvoice;
+        // }
 
         @endif
             return res;
