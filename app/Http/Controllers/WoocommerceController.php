@@ -25,12 +25,7 @@ class WoocommerceController extends Controller
             format('Y-n-j_H-i-s') . ' _ ' . $website . ' _ ' . $request->billing->first_name .
             ' ' . $request->billing->last_name . '.txt', file_get_contents('php://input'));
 
-        $websiteTitle = [
-            'matchano' => 'ماچانو',
-            'peptina' => 'پپتینا',
-            'matchashop' => 'ماچا شاپ',
-            'berrynocom' => 'برینو',
-        ][$website];
+        $websiteTitle = config('websites')[$website];
 
         $orders = '';
         $products = array();

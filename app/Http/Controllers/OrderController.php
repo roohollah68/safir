@@ -28,7 +28,7 @@ class OrderController extends Controller
     {
         $user = auth()->user();
         $users = User::withTrashed()->get()->keyBy("id");
-        $orders = Helper::Order(false)->orderBy('id', 'desc')->with(['website', 'orderProducts', 'warehouse'])
+        $orders = Helper::Order(false)->orderBy('id', 'desc')->with(['user','website', 'orderProducts', 'warehouse'])
             ->limit($user->meta('NuRecords'))->get()->keyBy('id');
         foreach ($orders as $order) {
             $order->orders = $order->orders();

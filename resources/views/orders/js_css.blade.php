@@ -13,6 +13,7 @@
     let changeOrdersPermit = !!'{{$user->meta('showAllOrders')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     let dtp1Instance;
+    let websites = {!!json_encode(config('websites'))!!};
     {{--let sendMethods = {!!json_encode(config('sendMethods'))!!};--}}
     {{--let payMethods = {!!json_encode(config('payMethods'))!!};--}}
     {{--let payMethodText, sendMethodText;--}}
@@ -63,14 +64,12 @@
                 return;
             if (refund && order.total >= 0)
                 return;
-            let website = false;
-            if (order.user_id === 30 || order.user_id === 32 || order.user_id === 33 || order.user_id === 75)
-                website = true;
-            if (users[order.user_id].role === 'admin' && !adminOrders)
+            let isWebsite = websites[order.user_id];
+            if (order.user.role === 'admin' && !adminOrders)
                 return
-            if (users[order.user_id].role === 'user' && !website && !safirOrders)
+            if (order.user.role === 'user' && !isWebsite && !safirOrders)
                 return
-            if (website && !siteOrders)
+            if (isWebsite && !siteOrders)
                 return
             counter++;
             res.push([
@@ -80,7 +79,7 @@
 
                 order.customer_id ? '<a href="/customer/transaction/' + order.customer_id + '">' + order.name + '</a>' : order.name,
 
-                users[order.user_id].name + ((website && order.website) ? `(${order.website.website_id})` : ''),
+                order.user.name + ((isWebsite && order.website) ? `(${order.website.website_id})` : ''),
 
                 (order.orders.length > 30) ? order.orders.substr(0, 30) + ' ...' : order.orders,
 
