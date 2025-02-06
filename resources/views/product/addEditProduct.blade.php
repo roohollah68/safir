@@ -66,9 +66,14 @@
                     </div>
                     <select id="isic" class="form-control" name="isic">
                         <option value="">لطفا انتخاب کنید</option>
-                        <option value="1020250" @selected(old('isic')?:$good->isic==1020250)>قهوه، کاکائو، پودر و خمیر حاصل از آنها</option>
-                        <option value="1010020" @selected(old('isic')?:$good->isic==1010020)>انواع چای(خشک کردن، سورت و بسته بندی)</option>
-                        <option value="1010030" @selected(old('isic')?:$good->isic==1010030)>انواع گیاهان طبی و دارویی</option>
+                        <option value="1020250" @selected(old('isic')?:$good->isic==1020250)>قهوه، کاکائو، پودر و خمیر
+                            حاصل از آنها
+                        </option>
+                        <option value="1010020" @selected(old('isic')?:$good->isic==1010020)>انواع چای(خشک کردن، سورت و
+                            بسته بندی)
+                        </option>
+                        <option value="1010030" @selected(old('isic')?:$good->isic==1010030)>انواع گیاهان طبی و دارویی
+                        </option>
                     </select>
 
                 </div>
@@ -260,10 +265,14 @@
                     <td dir="ltr">{{verta($productChange->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
                     <td>
                         @if($productChange->order_id)
-                            @if($productChange->change>0)
-                                حذف رکورد :
+                            @if($productChange->order->total<0)
+                                فاکتور بازگشت به انبار
+                            @else()
+                                @if($productChange->change>0)
+                                    حذف رکورد :
+                                @endif
+                                خرید مشتری {{$productChange->order()->withTrashed()->first()->name}}
                             @endif
-                            خرید مشتری {{$productChange->order()->withTrashed()->first()->name}}
                         @else
                             {{$productChange->desc}}
                         @endif

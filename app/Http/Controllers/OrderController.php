@@ -290,10 +290,11 @@ class OrderController extends Controller
         $user = $order->user;
         // جلوگیری از ارسال سفارشات نقدی و چکی بدون تایید پرداخت
         if (+$state == 1 && $order->payPercentApproved() < 100 && ($order->paymentMethod == 'cash' || $order->paymentMethod == 'cheque')) {
-            return [$order->state, 'ابتدا پرداخت فاکتور باید تایید شود.'];
+            return abort(405, 'ابتدا پرداخت فاکتور باید تایید شود.');
         }
-        //if($order->state == 10 && $order->total < 0 )
-        //return [+$order->state, 'خطا'];
+        if (+$state == 1 && !$order->confirm) {
+            return abort(405, 'ابتدا فاکتور باید تایید شود.');
+        }
         $order->state = +$state;
         if ($order->paymentMethod == 'onDelivery') {
             if ($order->state == 1) {
@@ -331,7 +332,7 @@ class OrderController extends Controller
                     'product_id' => $productChange->product_id,
                     'change' => -$productChange->change,
                     'quantity' => $product->quantity,
-                    'desc' => 'لغو خرید مشتری ' . $order->name,
+//                    'desc' => 'لغو خرید مشتری ' . $order->name,
                     'isDeleted' => true,
                 ]);
             }
@@ -344,15 +345,10 @@ class OrderController extends Controller
                     $product->update([
                         'quantity' => $product->quantity - $orderProduct->number,
                     ]);
-                    if ($order->total < 0)
-                        $desc = 'بازگشت به انبار ';
-                    else
-                        $desc = ' خرید مشتری ';
                     $order->productChange()->create([
                         'product_id' => $product->id,
                         'change' => -$orderProduct->number,
                         'quantity' => $product->quantity,
-                        'desc' => $desc . $order->name,
                     ]);
                 }
             }

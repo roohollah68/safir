@@ -229,7 +229,7 @@
 
         if (!order.state && (!order.confirm || creatorRole === 'user'))
             res += deleteOrder;
-        if ((!order.confirm && order.total > 0) || (creatorRole === 'user' && !order.state))
+        if ((!order.confirm && order.customer_id) || (creatorRole === 'user' && !order.state))
             res += editOrder + changeWarehouse;
 
         if (changeOrdersPermit && order.state)
@@ -346,8 +346,9 @@
                 $('#view_order_' + id).parent().html(operations(order));
                 $('#state_' + id).parent().html(createdTime(order));
                 $('#orderCondition_' + id).html(orderCondition(order));
-
-            });
+            }).fail(function (e) {
+            $.notify(e.responseJSON.message)
+        });
     }
 
     @endif

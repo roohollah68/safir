@@ -65,6 +65,7 @@
                 @isset($_GET['trust'])
                     @continue(+$_GET['trust'] ^ $customer->trust)
                 @endisset
+                @continue($viewAllAuth && $customer->user->safir())
                 <tr>
                     <td>{{$id}}</td>
                     <td>{{$customer->name}}
