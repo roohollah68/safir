@@ -9,14 +9,44 @@ use Hekmatinasser\Verta\Verta;
 
 class ChequeController extends Controller
 {
-    public function cheque()
+    public function cheque(Request $request)
     {
-        $receivedCheque = CustomerTransaction::where('pay_method', 'cheque')
-            ->where('verified', 'approved')
-            ->get();
-        $givenCheque = Withdrawal::where('pay_method', 'cheque')
-            ->where('payment_confirm', 1)
-            ->get();
+        $receivedCheque = CustomerTransaction::where('pay_method', 'cheque')->where('verified', 'approved');
+        $givenCheque = Withdrawal::where('pay_method', 'cheque')->where('payment_confirm', 1);
+
+        if ($request->state == '0') {
+            $receivedCheque = $receivedCheque->where('cheque_pass', false);
+            $givenCheque = $givenCheque->where('cheque_pass', false);
+        } elseif ($request->state == '1') {
+            $receivedCheque = $receivedCheque->where('cheque_pass', true);
+            $givenCheque = $givenCheque->where('cheque_pass', true);
+        }
+
+        if ($request->from) {
+            $receivedCheque = $receivedCheque->whereDate('cheque_date', '>=', Verta::parse($request->from)->DateTime());
+            $givenCheque = $givenCheque->whereDate('cheque_date', '>=', Verta::parse($request->from)->DateTime());
+        }
+
+        if ($request->to) {
+            $receivedCheque = $receivedCheque->whereDate('cheque_date', '<=', Verta::parse($request->to)->DateTime());
+            $givenCheque = $givenCheque->whereDate('cheque_date', '<=', Verta::parse($request->to)->DateTime());
+        }
+
+        if ($request->has('next')) {
+            $today = Verta::today();
+            $next = $today->copy()->addDays(30);
+            $receivedCheque = $receivedCheque->whereBetween('cheque_date', [$today->DateTime(), $next->DateTime()]);
+            $givenCheque = $givenCheque->whereBetween('cheque_date', [$today->DateTime(), $next->DateTime()]);
+        }
+
+        if ($request->has('previous')) {
+            $today = Verta::today();
+            $receivedCheque = $receivedCheque->whereDate('cheque_date', '<', $today->DateTime());
+            $givenCheque = $givenCheque->whereDate('cheque_date', '<', $today->DateTime());
+        }
+
+        $receivedCheque = $receivedCheque->get();
+        $givenCheque = $givenCheque->get();
 
         return view('cheque.cheque', compact('receivedCheque', 'givenCheque'));
     }
@@ -48,58 +78,5 @@ class ChequeController extends Controller
         $cheque->save();
 
         return response()->json(['success' => true]);
-    }
-
-    // ------------------------ FILTERS ------------------------ //
-
-    public function filterChequeDate(Request $request)
-    {
-        $startDate = $request->input('from');
-        $endDate = $request->input('to');
-        $state = $request->input('state');
-
-        $startDate = Verta::parse($startDate)->DateTime()->format('Y-m-d');
-        $endDate = Verta::parse($endDate)->DateTime()->format('Y-m-d');
-        
-        $receivedChequeQuery = CustomerTransaction::query();
-        $givenChequeQuery = Withdrawal::query();
-
-        if ($startDate) {
-            $receivedChequeQuery->whereDate('cheque_date', '>=', $startDate) 
-            ->where('pay_method', 'cheque')
-            ->where('verified', 'approved');
-            $givenChequeQuery->whereDate('cheque_date', '>=', $startDate)
-            ->where('pay_method', 'cheque')
-            ->where('payment_confirm', 1);
-        }
-
-        if ($endDate) {
-            $receivedChequeQuery->whereDate('cheque_date', '<=', $endDate)
-            ->where('pay_method', 'cheque')
-            ->where('verified', 'approved');
-            $givenChequeQuery->whereDate('cheque_date', '<=', $endDate)
-            ->where('pay_method', 'cheque')
-            ->where('payment_confirm', 1);
-        }
-
-        if ($state !== '') {
-            $receivedChequeQuery->where('cheque_pass', $state)
-             ->where('pay_method', 'cheque')
-            ->where('verified', 'approved');
-            $givenChequeQuery->where('cheque_pass', $state)
-            ->where('pay_method', 'cheque')
-            ->where('payment_confirm', 1);
-        }
-
-        $receivedCheque = $receivedChequeQuery->get();
-        $givenCheque = $givenChequeQuery->get();
-
-        return view('cheque.cheque', [
-            'receivedCheque' => $receivedCheque,
-            'givenCheque' => $givenCheque,
-            'get' => http_build_query($request->except(['from', 'to', 'state'])) . '&',
-            'from' => $startDate,
-            'to' => $endDate,
-        ]);
     }
 }
