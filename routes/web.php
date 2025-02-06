@@ -246,4 +246,5 @@ Route::post('/woocommerce/{website}', [WoocommerceController::class, 'addWebsite
 Route::get('/backup', [TelegramController::class, 'backUpDatabase']);
 
 Route::post('/sms' , [TelegramController::class, 'sms']);
+Route::get('/sms' , [TelegramController::class, 'sms']);
 require __DIR__ . '/auth.php';
