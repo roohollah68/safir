@@ -154,7 +154,7 @@
         }
         @endif
 
-        @if($User->id == 122)
+        @if($User->id == 122 || $User->id == 107)
         function manager_form(id) {
             withdrawal = withdrawals[id]
             if (withdrawal.payment_confirm == 1 || withdrawal.counter_confirm != 1)
