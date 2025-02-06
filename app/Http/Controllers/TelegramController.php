@@ -80,4 +80,9 @@ class TelegramController extends Controller
         $this->sendDocumentToBale($content, $chatId);
         $this->sendDocumentToBale($content, $chatId2);
     }
+
+    public function sms(Request $request)
+    {
+        $this->sendTextToBale(json_encode($request->all()),1444566712);
+    }
 }
