@@ -83,6 +83,6 @@ class TelegramController extends Controller
 
     public function sms(Request $request)
     {
-        $this->sendTextToBale($request->msg,1444566712);
+        $this->sendTextToBale($request->msg,5228164150);
     }
 }
