@@ -463,14 +463,14 @@ class OrderController extends Controller
         DB::beginTransaction();
         $order = Helper::Order(!Helper::meta('counter'))->findOrFail($id);
         if (!$order->confirm)
-            return $order;
+            return abort(405,'سفارش قبلا لغو شده است');
         if ($order->state) {
             $order->state = 4;
             (new CommentController)->create($order, auth()->user(), 'سفارش بعد از تایید ویرایش شد');
         }
         $order->confirm = false;
-        if ($order->counter == 'approved')
-            (new CustomerController)->rejectOrder($id, $req);
+//        if ($order->counter == 'approved')
+//            (new CustomerController)->rejectOrder($id, $req);
         $order->customer->update([
             'balance' => $order->customer->balance + $order->total,
         ]);

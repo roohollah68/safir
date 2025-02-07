@@ -442,6 +442,9 @@
                     $('#view_order_' + id).parent().html(operations(orders[id]));
                     $('#state_' + id).parent().html(createdTime(orders[id]));
                     $('#orderCondition_' + id).html(orderCondition(orders[id]));
+                })
+                .fail(function (e) {
+                    $.notify(e.responseJSON.message)
                 });
         }
 
