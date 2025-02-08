@@ -48,7 +48,7 @@ class ProductController extends Controller
     {
         Helper::access('warehouse');
         $product = Product::with(['good', 'productChange.order'])->findOrfail($id);
-        return view('product.addEditProduct', [
+        echo view('product.addEditProduct', [
             'product' => $product,
             'good' => $product->good,
             'edit' => true,

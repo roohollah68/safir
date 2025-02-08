@@ -271,7 +271,7 @@
                                 @if($productChange->change>0)
                                     حذف رکورد :
                                 @endif
-                                خرید مشتری {{$productChange->order()->withTrashed()->first()->name}}
+                                خرید مشتری {{$productChange->order->name}}
                             @endif
                         @else
                             {{$productChange->desc}}
