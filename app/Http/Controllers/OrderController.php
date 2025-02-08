@@ -717,8 +717,8 @@ class OrderController extends Controller
 //            return abort(405, 'بدهی مشتری بیش از سقف اعتبار است.');
         if (!$order->customer->agreement)
             return abort(405, 'لطفا قسمت تفاهم با مشتری را در ویرایش مشتری کامل کنید.');
-        if ($order->user->credit < ($order->user->totalDepth() + $order->total))
-            return abort(405, 'مجموع بدهی مشتریان از اعتبار کاربر بیشتر است.');
+//        if ($order->user->credit < ($order->user->totalDepth() + $order->total))
+//            return abort(405, 'مجموع بدهی مشتریان از اعتبار کاربر بیشتر است.');
         if ($order->total < 0)
             $order->update([
                 'confirm' => true,
