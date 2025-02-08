@@ -305,6 +305,7 @@
             $('#table1').DataTable({
                 order: [[0, "desc"]],
                 pageLength: 100,
+                language: language,
             });
             $('select#location').val('{{$product->location}}')
             @endif
