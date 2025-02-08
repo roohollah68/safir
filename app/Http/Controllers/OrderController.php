@@ -28,7 +28,7 @@ class OrderController extends Controller
     {
         $user = auth()->user();
         $users = User::withTrashed()->get()->keyBy("id");
-        $orders = Helper::Order(false)->orderBy('id', 'desc')->with(['user','website', 'orderProducts', 'warehouse'])
+        $orders = Helper::Order(false)->orderBy('id', 'desc')->with(['user', 'website', 'orderProducts', 'warehouse'])
             ->limit($user->meta('NuRecords'))->get()->keyBy('id');
         foreach ($orders as $order) {
             $order->orders = $order->orders();
@@ -463,7 +463,7 @@ class OrderController extends Controller
         DB::beginTransaction();
         $order = Helper::Order(!Helper::meta('counter'))->findOrFail($id);
         if (!$order->confirm)
-            return abort(405,'سفارش قبلا لغو شده است');
+            return abort(405, 'سفارش قبلا لغو شده است');
         if ($order->state) {
             $order->state = 4;
             (new CommentController)->create($order, auth()->user(), 'سفارش بعد از تایید ویرایش شد');
@@ -715,13 +715,20 @@ class OrderController extends Controller
             return abort(405, 'سفارش قبلا تائید شده.');
 //        if ($order->customer->credit_limit - $order->total < -$order->customer->balance())
 //            return abort(405, 'بدهی مشتری بیش از سقف اعتبار است.');
-        if(!$order->customer->agreement)
+        if (!$order->customer->agreement)
             return abort(405, 'لطفا قسمت تفاهم با مشتری را در ویرایش مشتری کامل کنید.');
+        if ($order->user->credit < ($order->user->totalDepth() + $order->total))
+            return abort(405, 'مجموع بدهی مشتریان از اعتبار کاربر بیشتر است.');
         if ($order->total < 0)
             $order->update([
                 'confirm' => true,
                 'counter' => 'waiting',
                 'paymentNote' => 'بازگشت به انبار، ',
+            ]);
+        if ($order->total == 0)
+            $order->update([
+                'confirm' => true,
+                'counter' => 'waiting',
             ]);
         return $order;
     }

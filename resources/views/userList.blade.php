@@ -5,7 +5,15 @@
 @endsection
 
 @section('files')
-
+<script>
+    $(()=>{
+        $('#table').DataTable({
+            // order: [[0, "desc"]],
+            pageLength: 100,
+            language: language,
+        });
+    })
+</script>
 @endsection
 
 @section('content')
@@ -15,9 +23,10 @@
     @endif
     <br>
     <h3>لیست کاربران تایید شده:</h3>
-    <table class="table table-striped">
+    <table class="table table-striped" id="table">
         <thead>
         <tr>
+            <th>شماره</th>
             <th>نام و نام خانوادگی</th>
             <th>نام کاربری</th>
             <th>شماره تماس</th>
@@ -29,6 +38,7 @@
         @foreach($users as $user)
             @if($user->verified)
                 <tr>
+                    <td>{{$user->id}}</td>
                     <td>{{$user->name}}
                         @if($user->superAdmin())
                             ( سوپر ادمین )

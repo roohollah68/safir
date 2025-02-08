@@ -91,19 +91,22 @@ class UserController extends Controller
     public function update(Request $request, $id = null)
     {
         $user = auth()->user();
+        $request->merge(['credit' => str_replace(",", "", $request->credit)]);
         if (!$user->meta('usersEdit'))
             $id = $user->id;
         $request->validate([
             'name' => 'required|string|max:255|unique:users,name,'.$id,
             'username' => 'required|string|max:255|min:5|unique:users,username,'.$id,
             'phone' => 'required|string|max:11|min:11',
-            'NuRecords' => 'integer|min:1|max:3000'
+            'NuRecords' => 'integer|min:1|max:3000',
+            'credit' =>'numeric',
         ]);
         $request->phone = Helper::number_Fa_En($request->phone);
 
         User::find($id)->update([
             'name' => $request->name,
             'phone' => $request->phone,
+            'credit' => $request->credit,
         ]);
 
         if ($request->password) {

@@ -50,7 +50,7 @@
                             <label for="role" class="input-group-text" style="min-width: 160px">نوع حساب کاربری:</label>
                         </div>
                         <select name="role" id="role" class="form-control">
-                            <option value="superAdmin">سوپر ادمین</option>
+{{--                            <option value="superAdmin">سوپر ادمین</option>--}}
                             <option value="admin">فروشنده با فاکتور</option>
                             <option value="user">سفیر</option>
 {{--                            <option value="warehouse">انبار دار</option>--}}
@@ -59,6 +59,9 @@
                         </select>
                     </div>
                 </div>
+                <x-col-md-6 :name="'credit'" value="{{$user->credit}}"
+                            class="price-input form-control">اعتبار (ریال):
+                </x-col-md-6>
 
             @endif
 
@@ -82,9 +85,10 @@
                     </div>
                 </div>
                 @if($User->meta('usersEdit'))
-                    <a href="/invoiceData" class="btn btn-secondary" style="width: 200px">ویرایش اطلاعات فاکتور</a>
-                    <h4>دسترسی ها</h4>
+                    <a href="/invoiceData" class="btn btn-secondary my-2" style="width: 200px">ویرایش اطلاعات فاکتور</a>
                     <hr>
+                    <h4>دسترسی ها</h4>
+
                     @foreach(config('userMeta.access') as $access => $desc)
                         <div class="m-1">
                             <label for="{{$access}}">{{$desc}}</label>

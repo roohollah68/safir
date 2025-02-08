@@ -12,7 +12,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
     use SoftDeletes;
-
+    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -29,6 +29,7 @@ class User extends Authenticatable
         'telegram_code',
         'balance',
         'role',
+        'credit',
     ];
 
     /**
@@ -152,6 +153,15 @@ class User extends Authenticatable
     public function bankTransactions()
     {
         return $this->hasMany(BankTransaction::class);
+    }
+
+    public function totalDepth()
+    {
+        $total = 0;
+        foreach ($this->customers as $customer){
+            $total += $customer->balance();
+        }
+        return -$total;
     }
 
 }

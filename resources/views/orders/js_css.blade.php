@@ -400,7 +400,7 @@
         $.post('/confirmAuthorize/' + id, {_token: token})
             .done((order) => {
                 console.log(order.total);
-                if (order.total < 0) {
+                if (order.total <= 0) {
                     applyChanges(order);
                     return;
                 }
