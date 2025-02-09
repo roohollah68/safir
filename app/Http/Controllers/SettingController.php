@@ -16,6 +16,7 @@ use App\Models\Order;
 //use App\Models\Product;
 //use App\Models\ProductData;
 use App\Models\OrderProduct;
+use App\Models\PaymentLink;
 use App\Models\Product;
 use App\Models\Setting;
 
@@ -81,6 +82,12 @@ class SettingController extends Controller
 
     public function command()
     {
+        foreach (PaymentLink::all() as $paymentLink){
+            $order = $paymentLink->order;
+            if(!$order)
+                $paymentLink->delete();
+        }
+
 
     }
 
