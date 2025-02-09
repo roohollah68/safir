@@ -40,7 +40,7 @@
                 <tr>
                     <td>{{$user->id}}</td>
                     <td>{{$user->name}}
-                        @elseif($user->admin())
+                        @if($user->admin())
                             ( فروشنده با فاکتور )
                         @elseif($user->safir())
                             ( سفیر )
