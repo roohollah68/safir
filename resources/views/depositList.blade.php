@@ -12,9 +12,9 @@
         <thead>
         <tr>
             <th>#</th>
-            @if($superAdmin)
-                <th>نام سفیر</th>
-            @endif
+
+            <th>نام سفیر</th>
+
             <th>تاریخ ثبت</th>
             <th>مبلغ (ریال)</th>
 
@@ -33,9 +33,9 @@
             @continue(!isset($users[$deposit->user_id]))
             <tr>
                 <td>{{$counter--}}</td>
-                @if($superAdmin)
-                    <th>{{$users[$deposit->user_id]->name}}</th>
-                @endif
+
+                <th>{{$users[$deposit->user_id]->name}}</th>
+                
                 <td>{{verta($deposit->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
                 <td>{{number_format($deposit->amount)}}</td>
 
