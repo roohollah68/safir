@@ -82,10 +82,12 @@ class SettingController extends Controller
 
     public function command()
     {
-        foreach (PaymentLink::all() as $paymentLink){
-            $order = $paymentLink->order;
-            if(!$order)
-                $paymentLink->delete();
+        foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {
+            if ($customer->balance() != $customer->balance) {
+                echo $customer->name. $customer->balance() . '=>'.  $customer->balance . '<br>';
+                $customer->balance = $customer->balance();
+                $customer->save();
+            }
         }
 
 
@@ -93,7 +95,7 @@ class SettingController extends Controller
 
     public function combineCustomers()
     {
-        $froms = [4894 , 4895 , 4896];
+        $froms = [4894, 4895, 4896];
         $to = 13;
         foreach ($froms as $from) {
             Order::where('customer_id', $from)->update(['customer_id' => $to]);
