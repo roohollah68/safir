@@ -136,6 +136,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('/edit/{id}', 'editDeposit');
         Route::post('/edit/{id}', 'updateDeposit');
         Route::post('/changeConfirm/{id}', 'changeConfirm');
+        Route::post('/safir/view/{id}', 'view');
     });
 
     Route::controller(CouponController::class)->prefix('coupon')->group(function () {

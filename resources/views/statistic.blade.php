@@ -87,7 +87,9 @@
             @if($request->base=='productBase')
                 <br>
                 <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
-                <h4>مجموع سود در این دوره : <span>{{number_format($totalProfit)}}</span> ریال </h4>
+                @if($User->meta('statistic'))
+                    <h4>مجموع سود در این دوره : <span>{{number_format($totalProfit)}}</span> ریال </h4>
+                @endif
                 <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
                 <h4>تعداد محصولات فروخته شده : <span>{{$productNumber}}</span> عدد </h4>
                 <br>
@@ -98,8 +100,10 @@
                         <th>تعداد فروش</th>
                         <th>مبلغ کل(ریال)</th>
                         <th>قیمت میانگین(ریال)</th>
-                        <th>قیمت تولید(ریال)</th>
-                        <th>سود(ریال)</th>
+                        @if($User->meta('statistic'))
+                            <th>قیمت تولید(ریال)</th>
+                            <th>سود(ریال)</th>
+                        @endif
                     </tr>
                     </thead>
                     <tbody>
@@ -110,8 +114,10 @@
                             <td>{{$good->number}}</td>
                             <td>{{number_format($good->total)}}</td>
                             <td>{{number_format(($good->number>0)?$good->total/$good->number:0)}}</td>
-                            <td>{{number_format($good->productPrice)}}</td>
-                            <td>{{number_format($good->profit)}}</td>
+                            @if($User->meta('statistic'))
+                                <td>{{number_format($good->productPrice)}}</td>
+                                <td>{{number_format($good->profit)}}</td>
+                            @endif
 
                         </tr>
                     @endforeach
@@ -236,7 +242,10 @@
                     <tbody>
                     @foreach($cities as $id => $city)
                         <tr>
-                            <td><button class="btn btn-outline-primary" name="city" type="submit" value="{{$id}}">{{$city->name}}</button></td>
+                            <td>
+                                <button class="btn btn-outline-primary" name="city" type="submit"
+                                        value="{{$id}}">{{$city->name}}</button>
+                            </td>
                             <td>{{$city->orderNumber}}</td>
                             <td>{{number_format($city->totalSale)}}</td>
                         </tr>
@@ -253,7 +262,7 @@
         $(function () {
             $('#statistic-table').DataTable({
                 order: [[2, "desc"]],
-                language:language,
+                language: language,
                 layout: {
                     topStart: {
                         buttons: ['copyHtml5', 'excelHtml5', 'csvHtml5', 'pdfHtml5']

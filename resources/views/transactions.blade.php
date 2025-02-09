@@ -10,11 +10,12 @@
     <table class="table table-striped" id="transaction-table">
         <thead>
         <tr>
-            <th>id</th>
+            <th>#</th>
             <th>تاریخ</th>
             <th>توضیح</th>
             <th>مقدار(ریال)</th>
             <th>اعتبار(ریال)</th>
+            <th>عملیات</th>
         </tr>
         </thead>
         <tbody>
@@ -25,6 +26,16 @@
                 <td>{{$tran->description}}</td>
                 <td>{{number_format($tran->amount)}}</td>
                 <td dir="ltr">{{number_format($tran->balance)}}</td>
+                <td>
+                    @if($tran->order_id)
+                        <span class="btn btn-info fa fa-eye" onclick="view_order({{$tran->order_id}})"></span>
+                    @endif
+                    @if($tran->deposit_id)
+                        <span class="btn btn-primary fa fa-eye"
+                              onclick="view_safir_deposit({{$tran->deposit_id}})"></span>
+                    @endif
+                </td>
+
             </tr>
         @endforeach
         </tbody>
@@ -37,18 +48,8 @@
     <script>
         $(function () {
             $('#transaction-table').DataTable({
-                columnDefs: [
-                    {
-                        targets: [2, 3, 4],
-                        orderable: false
-                    },
-
-                    {
-                        targets: [0],
-                        visible: false
-                    }
-                ],
                 order: [[0, "desc"]],
+                language: language,
             });
         });
     </script>

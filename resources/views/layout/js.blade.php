@@ -113,6 +113,15 @@
             })
     }
 
+    function view_safir_deposit(id) {
+        $.post('/deposit/safir/view/' + id, {
+            _token: token
+        })
+            .done(res => {
+                dialog = Dialog(res);
+            })
+    }
+
     function view_bankTransaction(id) {
         $.post('/BankTransaction/view/' + id, {
                 _token: token

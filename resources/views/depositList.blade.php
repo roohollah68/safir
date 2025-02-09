@@ -59,6 +59,8 @@
                            title="ویرایش"></a>
                         <i class="fa fa-trash-alt btn btn-danger" onclick="delete_deposit({{$deposit->id}})"
                            title="حذف"></i>
+                        <span class="btn btn-primary fa fa-eye"
+                              onclick="view_safir_deposit({{$deposit->id}})"></span>
                     </div>
                 </td>
             </tr>

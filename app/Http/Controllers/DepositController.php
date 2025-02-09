@@ -137,4 +137,13 @@ class DepositController extends Controller
         return $deposit->confirmed;
 
     }
+
+    public function view($id)
+    {
+        $deposit = Deposit::find($id);
+        if(!isset($deposit)){
+            return '<div title="مشاهده پرداخت وجه" class="dialogs"><h3>واریزی حذف شده است!</h3></div>';
+        }
+        return view('safir.depositView' , compact('deposit'));
+    }
 }
