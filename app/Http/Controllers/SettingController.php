@@ -81,14 +81,11 @@ class SettingController extends Controller
 
     public function command()
     {
-<<<<<<< HEAD
 
     }
 
     public function combineCustomers()
     {
-=======
->>>>>>> 661f15aad5eeafa967bbd0fefb167b21a1288761
         $froms = [4894 , 4895 , 4896];
         $to = 13;
         foreach ($froms as $from) {
