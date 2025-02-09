@@ -6,7 +6,7 @@
                 dir="ltr">{{ number_format($User->balance) }}</span> ریال</a>
     @endif
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -20,11 +20,11 @@
             <li class="nav-item">
                 <a class="nav-link active" href="{{ route('listOrders') }}">مشاهده سفارشات</a>
             </li>
-            @if ($superAdmin || $admin || $safir)
-                <li class="nav-item">
-                    <a class="nav-link active" href="{{ route('CustomerList') }}">مشتریان</a>
-                </li>
-            @endif
+
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ route('CustomerList') }}">مشتریان</a>
+            </li>
+
             @if ($User->meta('warehouse'))
                 <li class="nav-item">
                     <a class="nav-link active" href="{{ route('productList') }}">محصولات</a>
@@ -38,7 +38,7 @@
             @if ($User->meta('manageSafir'))
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">مدیریت سفیران</a>
+                       data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">مدیریت سفیران</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ route('DepositList') }}">واریزی های سفیران</a>
                         <a class="dropdown-item" href="{{ route('couponList') }}">مدیریت تخفیف ها</a>
@@ -49,7 +49,7 @@
             @if ($User->meta('counter'))
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">حسابداری</a>
+                       data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">حسابداری</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="{{ route('customersOrderList') }}">بررسی سفارشات</a>
                         <a class="dropdown-item" href="{{ route('customersDepositList') }}">بررسی واریزی ها</a>

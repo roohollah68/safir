@@ -30,10 +30,10 @@ class Controller extends BaseController
         return auth()->user()->role;
     }
 
-    public function superAdmin()
-    {
-        return auth()->user()->superAdmin();
-    }
+//    public function superAdmin()
+//    {
+//        return auth()->user()->superAdmin();
+//    }
 
     public function admin()
     {
@@ -45,15 +45,15 @@ class Controller extends BaseController
         return auth()->user()->safir();
     }
 
-    public function print()
-    {
-        return auth()->user()->print();
-    }
+//    public function print()
+//    {
+//        return auth()->user()->print();
+//    }
 
-    public function warehouse()
-    {
-        return auth()->user()->warehouse();
-    }
+//    public function warehouse()
+//    {
+//        return auth()->user()->warehouse();
+//    }
 
     public function addCityToAddress($order)
     {

@@ -91,35 +91,35 @@ class User extends Authenticatable
         return $this->role == "admin";
     }
 
-    public function superAdmin()
-    {
-        return $this->role == 'superAdmin';
-    }
+//    public function superAdmin()
+//    {
+//        return $this->role == 'superAdmin';
+//    }
 
-    public function print()
-    {
-        return $this->role == "print";
-    }
+//    public function print()
+//    {
+//        return $this->role == "print";
+//    }
 
-    public function warehouse()
-    {
-        return $this->role == 'warehouse';
-    }
+//    public function warehouse()
+//    {
+//        return $this->role == 'warehouse';
+//    }
 
     public function safir()
     {
         return $this->role == 'user';
     }
 
-    public function counter()
-    {
-        return $this->role == 'counter';
-    }
+//    public function counter()
+//    {
+//        return $this->role == 'counter';
+//    }
 
-    public function account()
-    {
-        return $this->role == 'account';
-    }
+//    public function account()
+//    {
+//        return $this->role == 'account';
+//    }
 
     public function meta($name)
     {

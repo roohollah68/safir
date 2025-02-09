@@ -26,16 +26,14 @@
         </tr>
         </thead>
         <tbody>
-        @php
-            $counter = count($deposits);
-        @endphp
+
         @foreach($deposits as $deposit)
             @continue(!isset($users[$deposit->user_id]))
             <tr>
-                <td>{{$counter--}}</td>
+                <td>{{$deposit->id}}</td>
 
                 <th>{{$users[$deposit->user_id]->name}}</th>
-                
+
                 <td>{{verta($deposit->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</td>
                 <td>{{number_format($deposit->amount)}}</td>
 
@@ -50,12 +48,12 @@
 
                 <td>
                     @if($deposit->confirmed)
-                        <p class="btn btn-success" @if($superAdmin) id="confirm{{$deposit->id}}"
-                           onclick="confirm_deposit({{$deposit->id}})" @endif>
+                        <p class="btn btn-success" id="confirm{{$deposit->id}}"
+                           onclick="confirm_deposit({{$deposit->id}})">
                             تایید شده</p>
                     @else
-                        <p class="btn btn-danger" @if($superAdmin) id="confirm{{$deposit->id}}"
-                           onclick="confirm_deposit({{$deposit->id}})" @endif>تایید
+                        <p class="btn btn-danger" id="confirm{{$deposit->id}}"
+                           onclick="confirm_deposit({{$deposit->id}})">تایید
                             نشده</p>
                     @endif
                 </td>
@@ -79,12 +77,14 @@
     @csrf
     <script>
         $(function () {
-            $('#product-table').DataTable();
+            $('#product-table').DataTable({
+                order: [[0, "desc"]],
+            });
         });
 
         function delete_deposit(id) {
             confirm("برای همیشه حذف شود؟") ?
-                $.post('/deposit/delete/' + id, {_token: "{{ csrf_token() }}"})
+                $.post('/deposit/delete/' + id, {_token: token})
                     .done(res => {
                         location.reload();
                     })
@@ -92,9 +92,9 @@
                 ""
         }
 
-        @if($superAdmin)
+        @if($User->meta('manageSafir'))
         function confirm_deposit(id) {
-            $.post('/deposit/changeConfirm/' + id, {_token: "{{ csrf_token() }}"})
+            $.post('/deposit/changeConfirm/' + id, {_token: token})
                 .done(res => {
                     if (res) {
                         $('#confirm' + id).removeClass('btn-danger').addClass('btn-success').html('تایید شده');

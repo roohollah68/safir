@@ -32,10 +32,8 @@ class ViewServiceProvider extends ServiceProvider
     {
         View::composer('*', function ($view) {
             if (auth()->user()) {
-//                $user = User::with('userMetas')->find(auth()->user()->id);
                 $user = auth()->user();
                 $view->with('User', $user);
-                $view->with('superAdmin', $user->superAdmin());
                 $view->with('admin', $user->admin());
                 $view->with('safir', $user->safir());
             }

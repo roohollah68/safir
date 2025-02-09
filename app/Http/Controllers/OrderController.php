@@ -70,7 +70,7 @@ class OrderController extends Controller
             'settings' => Helper::settings(),
             'user' => $user,
             'cart' => [],
-            'creatorIsAdmin' => ($this->superAdmin() || $this->admin()),
+            'creatorIsAdmin' => $this->admin(),
             'order' => $order,
             'customers' => $user->customers()->get()->keyBy('id'),
             'warehouses' => Warehouse::all(),

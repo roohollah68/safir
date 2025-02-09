@@ -1,7 +1,7 @@
 <script>
 
 
-    let superAdmin = !!"{{$superAdmin ? 'true' : ''}}";
+    {{--let superAdmin = !!"{{$superAdmin ? 'true' : ''}}";--}}
     let admin = {{$admin ? 'true' : 'false'}};
     let safir = {{$safir ? 'true' : 'false'}};
     let table;
@@ -387,7 +387,7 @@
     }
     @endif
 
-    @if($admin || $superAdmin)
+    @if($admin)
 
     function selectPayment(id) {
         let applyChanges = function (order) {
