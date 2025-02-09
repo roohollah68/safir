@@ -571,7 +571,7 @@ class OrderController extends Controller
         $to = date($request->date2 . ' 23:59:59');
         $limit = $request->limit;
 
-        $orders = Helper::Order(false)->with(['website', 'orderProducts', 'warehouse'])
+        $orders = Helper::Order(false)->with(['website', 'orderProducts', 'warehouse', 'user'])
             ->whereBetween('created_at', [$from, $to])
             ->limit($limit)
             ->get()->keyBy('id');
