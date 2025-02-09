@@ -5,15 +5,15 @@
 @endsection
 
 @section('files')
-<script>
-    $(()=>{
-        $('#table').DataTable({
-            // order: [[0, "desc"]],
-            pageLength: 100,
-            language: language,
-        });
-    })
-</script>
+    <script>
+        $(() => {
+            $('#table').DataTable({
+                // order: [[0, "desc"]],
+                pageLength: 100,
+                language: language,
+            });
+        })
+    </script>
 @endsection
 
 @section('content')
@@ -40,20 +40,10 @@
                 <tr>
                     <td>{{$user->id}}</td>
                     <td>{{$user->name}}
-                        @if($user->superAdmin())
-                            ( سوپر ادمین )
                         @elseif($user->admin())
                             ( فروشنده با فاکتور )
                         @elseif($user->safir())
                             ( سفیر )
-                        @elseif($user->print())
-                            ( ارسال سفارش )
-                        @elseif($user->warehouse())
-                            ( انباردار )
-                        @elseif($user->counter())
-                            ( حسابدار )
-                        @elseif($user->account())
-                            ( صاحب حساب بانکی )
                         @endif
                     </td>
                     <td>{{$user->username}}</td>
