@@ -6,6 +6,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DepositController;
+use App\Http\Controllers\KeysunController;
 use App\Http\Controllers\OrderProductController;
 use App\Http\Controllers\ProductChangeController;
 use App\Http\Controllers\ReportController;
@@ -239,7 +240,10 @@ Route::middleware(['auth', 'verify'])->group(function () {
     Route::get('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteOrder']);
     Route::get('/woocommerce', [WoocommerceController::class, 'viewFile']);
 
-
+    ///Keysun
+    Route::controller(KeysunController::class)->prefix('keysun')->group(function () {
+        Route::get('/good','good');
+    });
 
 });
 

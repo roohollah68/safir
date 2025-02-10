@@ -19,11 +19,11 @@
         <span class=" fa fa-plus"></span>
         افزودن محصول جدید
     </a>
-    <a class="btn btn-primary mb-3" href="warehouse/transfer">
+    <a class="btn btn-primary mb-3" href="/warehouse/transfer">
         <span class=" fa fa-warehouse"></span>
         انتقال بین انبارها
     </a>
-    <a class="btn btn-secondary mb-3" href="goods/management">
+    <a class="btn btn-secondary mb-3" href="/goods/management">
         <span class=" fa fa-list"></span>
         مدیریت کالاها
     </a>
@@ -31,13 +31,16 @@
         <span class=" fa fa-industry"></span>
         برنامه تولید
     </a>
-    <a class="btn btn-dark mb-3" href="warehouse/manager">
+    <a class="btn btn-dark mb-3" href="/warehouse/manager">
         <span class=" fa fa-user"></span>
         تعیین مسئول انبار
     </a>
-    <a class="btn btn-info mb-3" href="good/tag">
+    <a class="btn btn-info mb-3" href="/good/tag">
         <span class=" fa fa-tag"></span>
         ثبت شناسه کالا
+    </a>
+    <a class="btn btn-primary mb-3" href="/keysun/good">
+        دریافت اکسل کیسان
     </a>
     <br>
     <div class="container border input-box">

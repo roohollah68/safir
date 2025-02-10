@@ -120,6 +120,7 @@
                 searching: false,
                 paging: false,
                 ordering: false,
+                language:language,
                 layout: {
                     topStart: {
                         buttons: [
