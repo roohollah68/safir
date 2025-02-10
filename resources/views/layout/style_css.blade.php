@@ -15,8 +15,12 @@
         font-weight: bold;
     }
 
-    * , .ui-widget input ,.ui-widget{
+    * {
         font-family: IranSans ;
+    }
+
+    .ui-widget input ,.ui-widget , select{
+        font-family: IranSans !important ;
     }
 
     body {
