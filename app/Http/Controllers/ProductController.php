@@ -322,6 +322,9 @@ class ProductController extends Controller
 
     public function saveTags(Request $req, $id)
     {
+        if (is_string($req->tag) && $req->tag == 0)
+            $req->merge(['tag' => '0000000000000']);
+
         Helper::access('warehouse');
         $good = Good::findOrFail($id);
         $req->validate([

@@ -8,13 +8,11 @@
 
 
     @foreach(config('goodCat') as $category => $desc)
-        <span class="btn btn-info m-1"
-              onclick="$('.{{$category}}').toggle().is(':visible')?
-                  $(this).addClass('btn-info').removeClass('btn-outline-info'):
-                  $(this).addClass('btn-outline-info').removeClass('btn-info')">
-            {{$desc}}
-        </span>
+        <label for="{{$category}}">{{$desc}}</label>
+        <input type="checkbox" id="{{$category}}" class="checkboxradio" checked onclick="$('.{{$category}}').toggle(this.checked)">
     @endforeach
+    <label for="zero-tag">محصولات با شناسه صفر</label>
+    <input type="checkbox" id="zero-tag" class="checkboxradio" checked onclick="$('.zero-tag').toggle(this.checked)">
     <a class="btn btn-danger m-1" href="{{route('productList')}}">بازگشت</a>
 
 
@@ -34,10 +32,11 @@
             <tbody>
             @foreach($goods as $id=>$good)
                 <form>
-                <tr class="{{$good->category}}" id="good-{{$id}}">
+                <tr class="{{$good->category}} {{$good->tag === 0 ? 'zero-tag':''}}" id="good-{{$id}}">
                     <td>{{$id}}</td>
                     <td>{{$good->name}}</td>
-                    <td><input type="text" name="tag" value="{{$good->tag}}" maxlength="13"
+                    <td>
+                        <input type="text" name="tag" value="{{$good->tag}}" maxlength="13" style="width: 120px"
                                onkeypress="return event.charCode >= 48 && event.charCode <= 57" pattern="^[0-9]*$"></td>
                     <td><input type="checkbox" name="vat" @checked($good->vat)></td>
                     <td><select name="isic" >
@@ -71,12 +70,15 @@
             $('form').submit(e=>{
                 e.preventDefault();
             })
+            $(".checkboxradio").checkboxradio();
         })
+
+
 
         function save(id){
             $.post('/good/tag/'+id , {
                 _token: token,
-                tag : +$('#good-'+id + ' input[name=tag]').val() || null,
+                tag : $('#good-'+id + ' input[name=tag]').val() || null,
                 vat : +$('#good-'+id + ' input[name=vat]').is(':checked'),
                 isic : +$('#good-'+id + ' select[name=isic]').val() || null,
             }).done(res =>{
