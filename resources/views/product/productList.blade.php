@@ -66,14 +66,17 @@
                 <label class="btn btn-secondary " for="undefined">محصولات تعریف نشده</label>
             </div>
             <div class="col-md-4 border">
-                <input type="checkbox" id="final" checked>
-                <label class="btn btn-info mb-1" for="final">محصول نهایی</label><br>
+                @foreach(config('goodCat') as $cat => $desc)
+                    <input type="checkbox" id="{{$cat}}" checked>
+                    <label class="btn btn-info mb-1" for="{{$cat}}">{{$desc}}</label><br>
+                @endforeach
 
-                <input type="checkbox" id="raw">
-                <label class="btn btn-secondary mb-1" for="raw">مواد اولیه</label><br>
 
-                <input type="checkbox" id="pack">
-                <label class="btn btn-secondary" for="pack">ملزومات بسته بندی</label>
+{{--                <input type="checkbox" id="raw">--}}
+{{--                <label class="btn btn-secondary mb-1" for="raw">مواد اولیه</label><br>--}}
+
+{{--                <input type="checkbox" id="pack">--}}
+{{--                <label class="btn btn-secondary" for="pack">ملزومات بسته بندی</label>--}}
             </div>
         </div>
     </div>
@@ -130,7 +133,7 @@
     <script>
         let products = {}, goods = {!! $goods !!};
         let table;
-        let low, high, normal, unavailableFilter, availableFilter, undefinedFilter, final, raw, pack, hideCols,
+        let low, high, normal, unavailableFilter, availableFilter, undefinedFilter, final, raw, pack, other, hideCols,
             warehouseId = {{auth()->user()->meta('warehouseId')}};
         let Fast, dialog;
         let available = '<span class="btn btn-success">موجود</span>'
@@ -176,18 +179,9 @@
         });
 
         function refreshTable() {
-
             $.post('/product/getData', {
                 _token: token,
                 warehouseId: warehouseId,
-                available: availableFilter,
-                unavailable: unavailableFilter,
-                final: final,
-                raw: raw,
-                pack: pack,
-                low: low,
-                high: high,
-                normal: normal,
             }).done(res => {
                 products = res;
                 dataTable()
@@ -219,6 +213,8 @@
                 if (product.good.category === 'pack' && !pack)
                     return;
                 if (product.good.category === 'raw' && !raw)
+                    return;
+                if (product.good.category === 'other' && !other)
                     return;
                 data.push([
                     id,
@@ -314,8 +310,7 @@
             final = $('#final')[0].checked
             raw = $('#raw')[0].checked
             pack = $('#pack')[0].checked
-
-
+            other = $('#other')[0].checked
         }
 
         function columns() {

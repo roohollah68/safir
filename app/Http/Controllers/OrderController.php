@@ -59,9 +59,9 @@ class OrderController extends Controller
         $products = Product::where('warehouse_id', $warehouseId)->where('available', true)->
         whereHas('good', function (Builder $query) {
             if (auth()->user()->meta('sellRawProduct'))
-                $query->where('category', '<>', 'pack');
+                $query->whereIn('category', ['final' , 'other' , 'raw']);
             else
-                $query->where('category', 'final');
+                $query->whereIn('category', ['final' , 'other']);
         })->with('good.couponLinks.coupon')->get()->keyBy('id');
         $products = $this->calculateDiscount($products, $user);
         $order->customer = new Customer();
@@ -187,9 +187,9 @@ class OrderController extends Controller
         $products = Product::where('warehouse_id', $order->warehouse_id)->where('available', true)->
         whereHas('good', function (Builder $query) {
             if (auth()->user()->meta('sellRawProduct'))
-                $query->where('category', '<>', 'pack');
+                $query->whereIn('category', ['final' , 'other' , 'raw']);
             else
-                $query->where('category', 'final');
+                $query->whereIn('category', ['final' , 'other']);
         })->get()->keyBy('id');
         $cart = [];
 

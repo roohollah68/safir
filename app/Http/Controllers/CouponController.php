@@ -16,7 +16,7 @@ class CouponController extends Controller
     public function couponList()
     {
         return view('coupons', [
-            'coupons' => Coupon::with(['couponLinks.good','couponLinks.user'])->get(),
+            'coupons' => Coupon::with(['couponLinks.good', 'couponLinks.user'])->get(),
             'users' => User::all()->keyBy('id'),
         ]);
     }
@@ -25,8 +25,8 @@ class CouponController extends Controller
     {
         return view('addEditCoupon', [
             'coupon' => new Coupon(),
-            'users' => User::where('role','user')->get(),
-            'goods' => Good::where('category', 'final')->get(),
+            'users' => User::where('role', 'user')->get(),
+            'goods' => Good::whereIn('category', ['final', 'other'])->get(),
         ]);
     }
 
@@ -39,8 +39,8 @@ class CouponController extends Controller
         $coupon = new Coupon();
         $coupon->percent = $req->percent;
         $coupon->save();
-        $users = User::where('role','user')->get();
-        $goods = Good::where('category', 'final')->get();
+        $users = User::where('role', 'user')->get();
+        $goods = Good::whereIn('category', ['final', 'other'])->get();
         foreach ($users as $user) {
             foreach ($goods as $good) {
                 if ($req['user_' . $user->id] && $req['good_' . $good->id]) {
@@ -58,9 +58,9 @@ class CouponController extends Controller
     public function editForm($id)
     {
         return view('addEditCoupon', [
-            'coupon' => Coupon::with(['couponLinks.good','couponLinks.user'])->find($id),
-            'users' => User::where('role','user')->get(),
-            'goods' => Good::where('category', 'final')->get(),
+            'coupon' => Coupon::with(['couponLinks.good', 'couponLinks.user'])->find($id),
+            'users' => User::where('role', 'user')->get(),
+            'goods' => Good::whereIn('category', ['final', 'other'])->get(),
         ]);
     }
 
@@ -76,8 +76,8 @@ class CouponController extends Controller
 
         CouponLink::where('coupon_id', $id)->delete();
 
-        $users = User::where('role','user')->get();
-        $goods = Good::where('category', 'final')->get();
+        $users = User::where('role', 'user')->get();
+        $goods = Good::whereIn('category', ['final', 'other'])->get();
         foreach ($users as $user) {
             foreach ($goods as $good) {
                 if ($req['user_' . $user->id] && $req['good_' . $good->id]) {

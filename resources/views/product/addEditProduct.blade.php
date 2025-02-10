@@ -107,14 +107,16 @@
             </div>
 
             {{--دسته بندی محصول--}}
-            <div class="col-md-6 bg-light">
+            <div class="col-md-6">
                 <div class="form-group input-group">
-                    <input type="radio" name="category" id="final" value="final" @checked($good->category == 'final')>
-                    <label for="final">محصول نهایی</label>
-                    <input type="radio" name="category" id="raw" value="raw" @checked($good->category == 'raw')>
-                    <label for="raw">مواد اولیه</label>
-                    <input type="radio" name="category" id="pack" value="pack" @checked($good->category == 'pack')>
-                    <label for="pack">ملزومات بسته بندی</label>
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="category" class="input-group-text w-100">دسته بندی:</label>
+                    </div>
+                    <select id="category" class="form-control" name="category">
+                        @foreach(config('goodCat') as $cat => $desc)
+                            <option value="{{$cat}}" @selected(old('category')?:$good->category == $cat)>{{$desc}}</option>
+                        @endforeach
+                    </select>
 
                 </div>
             </div>

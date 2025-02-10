@@ -14,7 +14,7 @@
             </div>
         </div>
         <input type="text" id="name-dialog" class="form-control w-100" name="name"
-               value="{{$product->name}}" required>
+               value="{{$product->good->name}}" required>
         {{--قیمت محصول--}}
         <div class="col-md-12 mb-1">
             <div class="form-group input-group">
@@ -22,7 +22,7 @@
                     <label for="price-dialog" class="input-group-text">قیمت:</label>
                 </div>
                 <input type="text" id="price-dialog" class="form-control price-input" name="price"
-                       value="{{$product->price}}" required>
+                       value="{{$product->good->price}}" required>
                 <div class="input-group-append">
                     <label for="price" class="input-group-text">ریال</label>
                 </div>
@@ -35,7 +35,7 @@
                     <label for="productPrice" class="input-group-text w-100">قیمت تولید:</label>
                 </div>
                 <input type="text" id="productPrice" class="form-control price-input" name="productPrice"
-                       value="{{$product->productPrice}}">
+                       value="{{$product->good->productPrice}}">
                 <div class="input-group-append">
                     <label for="productPrice" class="input-group-text">ریال</label>
                 </div>
@@ -90,16 +90,18 @@
         </div>
 
         {{--دسته بندی محصول--}}
-        <input type="radio" class="checkboxradio" name="category" id="final-dialog" value="final" @checked($product->category
-        == 'final')>
-        <label for="final-dialog">محصول نهایی</label>
-        <input type="radio" class="checkboxradio" name="category" id="raw-dialog" value="raw" @checked($product->category
-        == 'raw')>
-        <label for="raw-dialog">مواد اولیه</label>
-        <input type="radio" class="checkboxradio" name="category" id="pack-dialog" value="pack" @checked($product->category
-        == 'pack')>
-        <label for="pack-dialog">ملزومات بسته بندی</label>
-
+        <div class="col-md-12">
+            <div class="form-group input-group">
+                <div class="input-group-append" style="min-width: 160px">
+                    <label for="category" class="input-group-text w-100">دسته بندی:</label>
+                </div>
+                <select id="category" class="form-control" name="category">
+                    @foreach(config('goodCat') as $cat => $desc)
+                        <option value="{{$cat}}" @selected(old('category')?:$product->good->category == $cat)>{{$desc}}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
         {{--وضعیت موجودی--}}
         <br>
         <input type="radio" class="checkboxradio" id="available-dialog" name="available" value="true"

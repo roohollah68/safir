@@ -267,7 +267,7 @@ class ProductController extends Controller
     public function fastEdit($id)
     {
         Helper::access('warehouse');
-        $product = Product::find($id);
+        $product = Product::with('good')->find($id);
         return view('product.productFastEdit', [
             'product' => $product,
             'warehouses' => Warehouse::all(),
