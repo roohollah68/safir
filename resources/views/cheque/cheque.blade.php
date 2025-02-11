@@ -92,11 +92,9 @@
 @endsection
 
 @section('content')
+    {{-- فیلترها --}}
+
     <div class="container mt-4">
-        <h1 class="mb-4">لیست چک‌ها</h1>
-
-        {{-- فیلترها --}}
-
         <div class="mb-4">
             <form action="#" method="post">
                 @csrf
@@ -124,13 +122,17 @@
 
                     <div class="vr ms-3 mb-2"></div>
 
-                    <div class="filter-section ms-1">
+                    <div class="filter-section ms-3 mb-2">
 
-                        <input type="radio" class="btn-check" id="next" name="next" value="1">
-                        <label class="btn btn-outline-secondary" for="next">چک‌های آتی</label>
+                        <span class="btn btn-outline-secondary me-2"
+                            onclick="$('#from_date').val('{{ verta()->format('Y/m/d') }}');$('#to_date').val('{{ verta()->addMonth(1)->format('Y/m/d') }}')">
+                            یک ماه آینده
+                        </span>
 
-                        <input type="radio" class="btn-check" id="previous" name="previous" value="0">
-                        <label class="btn btn-outline-danger" for="previous">چک‌های گذشته</label>
+                        <span class="btn btn-outline-danger"
+                            onclick="$('#from_date').val('');$('#to_date').val('{{ verta()->format('Y/m/d') }}')">
+                            تاریخ گذشته
+                        </span>
 
                     </div>
 
