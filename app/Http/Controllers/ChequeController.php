@@ -32,19 +32,6 @@ class ChequeController extends Controller
             $givenCheque = $givenCheque->whereDate('cheque_date', '<=', Verta::parse($request->to)->DateTime());
         }
 
-        if ($request->has('next')) {
-            $today = Verta::today();
-            $next = $today->copy()->addDays(30);
-            $receivedCheque = $receivedCheque->whereBetween('cheque_date', [$today->DateTime(), $next->DateTime()]);
-            $givenCheque = $givenCheque->whereBetween('cheque_date', [$today->DateTime(), $next->DateTime()]);
-        }
-
-        if ($request->has('previous')) {
-            $today = Verta::today();
-            $receivedCheque = $receivedCheque->whereDate('cheque_date', '<', $today->DateTime());
-            $givenCheque = $givenCheque->whereDate('cheque_date', '<', $today->DateTime());
-        }
-
         $receivedCheque = $receivedCheque->get();
         $givenCheque = $givenCheque->get();
 
@@ -59,11 +46,26 @@ class ChequeController extends Controller
         return view('cheque.givenView', compact('viewCheque'))->render();
     }
 
-    public function recievedView($id)
+    public function recievedView(Request $request, $id)
     {
         $viewCheque = CustomerTransaction::with('customer.user')
             ->where('id', $id)
             ->first();
+
+        if ($request->isMethod('post')) {
+            
+            $request->validate([
+            'cheque_receipt' => 'required|mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
+            ]);
+
+            if ($request->hasFile('cheque_receipt')) {
+            $path = $request->file('cheque_receipt')->store("", 'deposit');
+            $viewCheque->cheque_receipt = $path;
+            $viewCheque->save();
+            return redirect()->back();
+            }
+        }
+        
         return view('cheque.receivedView', compact('viewCheque'))->render();
     }
 
