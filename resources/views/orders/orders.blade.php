@@ -34,6 +34,7 @@
         <x-checkbox :id="'printWait'"> در انتظار پرینت</x-checkbox>
         <x-checkbox :id="'proccessWait'"> در حال پردازش</x-checkbox>
         <x-checkbox :id="'sent'">ارسال شده</x-checkbox>
+        <x-checkbox :id="'delivered'">تحویل داده شده</x-checkbox>
 
         @if($User->meta('showAllOrders'))
             <br>

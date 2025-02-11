@@ -8,15 +8,12 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let showDeleted, printWait, confirmWait, counterWait, proccessWait, sent, COD, refund, user = 'all',
+    let showDeleted, printWait, confirmWait, counterWait, proccessWait, sent, delivered, COD, refund, user = 'all',
         warehouseId = 'all';
     let changeOrdersPermit = !!'{{$user->meta('showAllOrders')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     let dtp1Instance;
     let websites = {!!json_encode(config('websites'))!!};
-    {{--let sendMethods = {!!json_encode(config('sendMethods'))!!};--}}
-    {{--let payMethods = {!!json_encode(config('payMethods'))!!};--}}
-    {{--let payMethodText, sendMethodText;--}}
     let dialog;
     $(() => {
         // payMethodText = $('#paymentMethodText').html();
@@ -49,6 +46,8 @@
             if (showDeleted ^ !!order.deleted_at)
                 return
             if (sent && order.state != 10)
+                return
+            if (delivered && order.state != 11)
                 return
             if (confirmWait && order.confirm)
                 return
@@ -170,19 +169,19 @@
         timestamp = `<span class="d-none" id="state_${order.id}">${timestamp}</span>`;
         let text = '';
         if (diff < 60) {
-            text += `<span>لحظاتی پیش</span>`;
+            text += `لحظاتی پیش`;
         } else if (diff < 3600) {
             let minute = Math.floor(diff / 60);
-            text += `<span>${minute} دقیقه قبل </span>`
+            text += `${minute} دقیقه قبل `
         } else if (diff < 3600 * 24) {
             let hour = Math.floor(diff / 3600);
-            text += `<span>${hour} ساعت قبل </span>`
+            text += `${hour} ساعت قبل `
         } else if (diff < 3600 * 24 * 30) {
             let day = Math.floor(diff / (3600 * 24));
-            text += `<span>${day} روز قبل </span>`
+            text += `${day} روز قبل `
         } else {
             let month = Math.floor(diff / (3600 * 24 * 30));
-            text += `<span>${month} ماه قبل </span>`
+            text += `${month} ماه قبل `
         }
 
         if (order.deleted_at) {
@@ -194,8 +193,10 @@
             res = `<span class="btn btn-warning" onclick="selectSendMethod(${order.id})">${text}<i class="fas fa-check"></i></span>`
         } else if (+order.state === 4) {
             res = `<span class="btn btn-danger" onclick="change_state(${order.id}, 0)">${text}<i class="fas fa-question"></i></span>`
-        } else {
-            res = `<span class="btn btn-success" onclick="change_state(${order.id}, 0)">${text}<i class="fas fa-check-double"></i></span>`
+        } else if (+order.state === 10) {
+            res = `<span class="btn btn-success" onclick="confirm('آیا وضعیت سفارش به در انتظار پرینت تغییر کند؟')&&change_state(${order.id}, 0)">${text}<i class="fas fa-check-double"></i></span>`
+        } else if (+order.state === 11) {
+            res = `<span class="btn btn-outline-success" onclick="confirm('آیا وضعیت سفارش به در انتظار پرینت تغییر کند؟')&&confirm(change_state(${order.id}, 0))">${text}<i class="fas fa-check-double"></i></span>`
         }
         return timestamp + res;
     }
@@ -255,6 +256,8 @@
     }
 
     function orderCondition(order) {
+        if (order.state === 11)
+            return 'تحویل داده شده';
         if (order.state === 10)
             return 'ارسال شده';
         if (order.counter === 'rejected')
@@ -342,9 +345,7 @@
             .done(res => {
                 order.state = +res[0];
                 $.notify(res[1], 'info');
-                $('#view_order_' + id).parent().html(operations(order));
-                $('#state_' + id).parent().html(createdTime(order));
-                $('#orderCondition_' + id).html(orderCondition(order));
+                updateRow(order);
             }).fail(function (e) {
             $.notify(e.responseJSON.message)
         });
@@ -392,9 +393,7 @@
     function selectPayment(id) {
         let applyChanges = function (order) {
             $.notify("با موفقیت تائید شد.", "success");
-            $('#view_order_' + id).parent().html(operations(order));
-            $('#state_' + id).parent().html(createdTime(order));
-            $('#orderCondition_' + id).html(orderCondition(order));
+            updateRow(order);
         }
 
         $.post('/confirmAuthorize/' + id, {_token: token})
@@ -437,11 +436,9 @@
     function cancelInvoice(id) {
         if (confirm('آیا از حذف کردن فاکتور مطمئن هستید؟')) {
             $.post('cancel_invoice/' + id, {_token: token})
-                .done(res => {
-                    orders[id] = res;
-                    $('#view_order_' + id).parent().html(operations(orders[id]));
-                    $('#state_' + id).parent().html(createdTime(orders[id]));
-                    $('#orderCondition_' + id).html(orderCondition(orders[id]));
+                .done(order => {
+                    orders[id] = order;
+                    updateRow(order)
                 })
                 .fail(function (e) {
                     $.notify(e.responseJSON.message)
@@ -491,6 +488,12 @@
         }).fail(() => {
             $.notify('مشکلی پیش آمده', 'warn');
         })
+    }
+
+    function updateRow(order) {
+        $('#view_order_' + order.id).parent().html(operations(order));
+        $('#state_' + order.id).parent().html(createdTime(order));
+        $('#orderCondition_' + order.id).html(orderCondition(order));
     }
 
 </script>

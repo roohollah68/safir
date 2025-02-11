@@ -132,27 +132,22 @@
     }
 
     function addComment(id) {
-        $('#commentForm').submit(function (e) {
-            e.preventDefault();
-            $.ajax({
-                type: "POST",
-                url: '/addComment/' + id,
-                data: new FormData(this),
-                processData: false,
-                contentType: false,
-                headers: {
-                    "Accept": "application/json"
-                }
-            }).done(function (res) {
-                if (res === "ok") {
-                    $.notify("با موفقیت ذخیره شد.", "success");
-                    dialog.remove();
-                }
-            }).fail(function () {
-                $.notify('خطایی رخ داده است.', 'warn');
-            });
+        $.ajax({
+            type: "POST",
+            url: '/addComment/' + id,
+            data: new FormData($('#commentForm')[0]),
+            processData: false,
+            contentType: false,
+            headers: {
+                "Accept": "application/json"
+            }
+        }).done(function (order) {
+            $.notify("با موفقیت ذخیره شد.", "success");
+            dialog.remove();
+            updateRow(order);
+        }).fail(function (e) {
+            $.notify(e.responseJSON.message)
         });
-        $('#commentForm').submit();
     }
 
     function num(x) {

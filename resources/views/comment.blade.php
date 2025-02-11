@@ -6,6 +6,10 @@
     @endforeach
     <br><form action="" method="post" id="commentForm">
         @csrf
+            @if($order->state == 10)
+                <input type="checkbox" class="checkboxradio" name="delivered" id="delivered">
+                <label for="delivered">اطلاعات ارسال</label>
+            @endif
         <div class="m-4">
             <div class="form-group input-group">
                 <span class="btn btn-outline-success fa fa-paper-plane" onclick="addComment({{$order->id}})"></span>

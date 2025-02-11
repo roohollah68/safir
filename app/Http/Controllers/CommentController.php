@@ -57,7 +57,10 @@ class CommentController extends Controller
         if (!$text && !$photo)
             abort(403);
         $this->create($id, auth()->user(), $text, $photo);
-        return 'ok';
+        if($req->delivered && $order->state == 10){
+            $order->update(['state' => 11]);
+        }
+        return $order;
     }
 }
 
