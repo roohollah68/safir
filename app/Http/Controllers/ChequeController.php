@@ -35,7 +35,12 @@ class ChequeController extends Controller
         $receivedCheque = $receivedCheque->get();
         $givenCheque = $givenCheque->get();
 
-        return view('cheque.cheque', compact('receivedCheque', 'givenCheque'));
+        return view('cheque.cheque', [
+        'receivedCheque' => $receivedCheque,
+        'givenCheque' => $givenCheque,
+        'from' => $request->from,
+        'to' => $request->to,
+        ]);
     }
 
     public function view($id)
@@ -46,7 +51,7 @@ class ChequeController extends Controller
         return view('cheque.givenView', compact('viewCheque'))->render();
     }
 
-    public function recievedView(Request $request, $id)
+    public function receivedView(Request $request, $id)
     {
         $viewCheque = CustomerTransaction::with('customer.user')
             ->where('id', $id)

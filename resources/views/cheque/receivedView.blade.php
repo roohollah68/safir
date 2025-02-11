@@ -4,10 +4,9 @@
         <br>
     @endif
     <span>کاربر مرتبط:</span> <b>
-        <span onclick="window.location.href='/customer/transaction/{{ $viewCheque->customer_id }}'" class="text-primary"
-            style="cursor: pointer;">
+        <a href="/customer/transaction/{{ $viewCheque->customer_id }}" class="text-primary text-decoration-none">
             {{ $viewCheque->customer->user->name }}
-        </span>
+        </a>
     </b>
     <br>
     <span>نام مشتری:</span>
@@ -27,15 +26,19 @@
     <span>زمان ویرایش:</span><b>{{ verta($viewCheque->updated_at)->formatJalaliDate() }}</b><br>
 
     @if ($viewCheque->cheque_receipt)
-        <a class="btn btn-info mb-2" href="{{ $viewCheque->cheque_receipt }}" target="_blank">مشاهده فایل</a>
+        <span>رسید چک:</span>
+        <a class="btn btn-secondary text-light mb-2" href="/deposit/{{ $viewCheque->cheque_receipt }}"
+            target="_blank">مشاهده
+            فایل</a>
         <br>
+    @else
+        <form action="{{ route('cheque.view2', $viewCheque->id) }}" method="post" enctype="multipart/form-data">
+            @csrf
+            <div class="form-group d-flex align-items-center">
+                <label for="cheque_receipt">آپلود رسید چک: </label>
+                <input type="file" id="cheque_receipt" name="cheque_receipt" required>
+                <button type="submit" class="btn btn-success" style="font-family: inherit">ذخیره</button>
+            </div>
+        </form>
     @endif
-    <form action="#" method="POST">
-        @csrf
-        <div class="form-group">
-            <label for="cheque_receipt">آپلود فایل چک:</label>
-            <input type="file" class="form-control" id="cheque_receipt" name="cheque_receipt" required>
-        </div>
-        <button type="submit" class="btn btn-primary mt-2">آپلود</button>
-    </form>
 </div>

@@ -31,18 +31,27 @@
         });
 
         $(function() {
-            const date1 = new mds.MdsPersianDateTimePicker($('#from_date')[0], {
-                targetTextSelector: '#from_date',
-                @if (isset($from))
-                    selectedDate: new Date('{{ $from }}'),
-                @endif
+            const fromDate =
+                @if ($from)
+                    new Date('{{ Verta::parse($from)->datetime()->format('Y-m-d') }}')
+                @else
+                    null
+                @endif ;
+            const toDate =
+                @if ($to)
+                    new Date('{{ Verta::parse($to)->datetime()->format('Y-m-d') }}')
+                @else
+                    null
+                @endif ;
+
+            new mds.MdsPersianDateTimePicker($('#from')[0], {
+                targetTextSelector: '#from',
+                selectedDate: fromDate
             });
 
-            const date2 = new mds.MdsPersianDateTimePicker($('#to_date')[0], {
-                targetTextSelector: '#to_date',
-                @if (isset($to))
-                    selectedDate: new Date('{{ $to }}'),
-                @endif
+            new mds.MdsPersianDateTimePicker($('#to')[0], {
+                targetTextSelector: '#to',
+                selectedDate: toDate
             });
         });
     </script>
@@ -100,9 +109,11 @@
                 @csrf
                 <div class="filter-section mb-3">
                     <label for="from">از تاریخ: </label>
-                    <input type="text" class="form-control" style="width: 120px" id="from_date" name="from">
+                    <input type="text" class="form-control" style="width: 120px" id="from" name="from"
+                        value="{{ $from ?? '' }}">
                     <label for="to">تا تاریخ: </label>
-                    <input type="text" class="form-control" style="width: 120px" id="to_date" name="to">
+                    <input type="text" class="form-control" style="width: 120px" id="to" name="to"
+                        value="{{ $to ?? '' }}">
                 </div>
 
                 <div class="filter-section">
@@ -125,12 +136,12 @@
                     <div class="filter-section ms-3 mb-2">
 
                         <span class="btn btn-outline-secondary me-2"
-                            onclick="$('#from_date').val('{{ verta()->format('Y/m/d') }}');$('#to_date').val('{{ verta()->addMonth(1)->format('Y/m/d') }}')">
+                            onclick="$('#from').val('{{ verta()->format('Y/m/d') }}');$('#to').val('{{ verta()->addMonth(1)->format('Y/m/d') }}')">
                             یک ماه آینده
                         </span>
 
                         <span class="btn btn-outline-danger"
-                            onclick="$('#from_date').val('');$('#to_date').val('{{ verta()->format('Y/m/d') }}')">
+                            onclick="$('#from').val('');$('#to').val('{{ verta()->format('Y/m/d') }}')">
                             تاریخ گذشته
                         </span>
 

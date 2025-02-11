@@ -64,9 +64,9 @@
     }
 
     function view_recieved_cheque(id) {
-        $.get('/cheque/recieved/' + id, {
-            _token: token
-        })
+        $.get('/cheque/received/' + id, {
+                _token: token
+            })
             .done(res => {
                 dialog = Dialog(res);
             })
