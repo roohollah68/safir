@@ -4,42 +4,46 @@ namespace App\Http\Controllers;
 
 use App\Helper\Helper;
 use App\Models\City;
-use App\Models\CouponLink;
 use App\Models\Customer;
-use App\Models\CustomerMeta;
-use App\Models\GoodMeta;
 use App\Models\Order;
-use App\Models\OrderProduct;
 use App\Models\Product;
-use App\Models\ProductChange;
-use App\Models\Setting;
 use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 use Illuminate\Database\Eloquent\Builder;
-use function Laravel\Prompts\error;
 
 
 class OrderController extends Controller
 {
     public function showOrders()
     {
-        $user = auth()->user();
         $users = User::withTrashed()->get()->keyBy("id");
-        $orders = Helper::Order(false)->orderBy('id', 'desc')->with(['user', 'website', 'orderProducts', 'warehouse'])
-            ->limit($user->meta('NuRecords'))->get()->keyBy('id');
+        return view('orders.orders', [
+            'users' => $users,
+            'orders' => $this->getOrders(),
+            'warehouses' => Warehouse::all(),
+        ]);
+    }
+
+    public function getOrders()
+    {
+        $orders = Helper::Order(false)
+            ->orderBy('id', 'desc')
+            ->with(['user', 'website', 'orderProducts', 'warehouse'])
+            ->limit(auth()->user()->meta('NuRecords'));
+        if (request('from'))
+            $orders = $orders->where('created_at', ">=", verta()
+                ->parse(request('from').' 20:30')->subDay()->toCarbon());
+        if (request('to'))
+            $orders = $orders->where('created_at', "<=", verta()
+                ->parse(request('to').' 20:30')->toCarbon());
+        $orders = $orders->get()->keyBy('id');
         foreach ($orders as $order) {
             $order->orders = $order->orders();
         }
-        return view('orders.orders', [
-            'users' => $users,
-            'orders' => $orders,
-            'user' => auth()->user(),
-            'limit' => $user->meta('NuRecords'),
-            'warehouses' => Warehouse::all(),
-        ]);
+        return $orders;
     }
 
     public function showOrder($id)
@@ -59,9 +63,9 @@ class OrderController extends Controller
         $products = Product::where('warehouse_id', $warehouseId)->where('available', true)->
         whereHas('good', function (Builder $query) {
             if (auth()->user()->meta('sellRawProduct'))
-                $query->whereIn('category', ['final' , 'other' , 'raw']);
+                $query->whereIn('category', ['final', 'other', 'raw']);
             else
-                $query->whereIn('category', ['final' , 'other']);
+                $query->whereIn('category', ['final', 'other']);
         })->with('good.couponLinks.coupon')->get()->keyBy('id');
         $products = $this->calculateDiscount($products, $user);
         $order->customer = new Customer();
@@ -187,9 +191,9 @@ class OrderController extends Controller
         $products = Product::where('warehouse_id', $order->warehouse_id)->where('available', true)->
         whereHas('good', function (Builder $query) {
             if (auth()->user()->meta('sellRawProduct'))
-                $query->whereIn('category', ['final' , 'other' , 'raw']);
+                $query->whereIn('category', ['final', 'other', 'raw']);
             else
-                $query->whereIn('category', ['final' , 'other']);
+                $query->whereIn('category', ['final', 'other']);
         })->get()->keyBy('id');
         $cart = [];
 
@@ -538,47 +542,6 @@ class OrderController extends Controller
         return $products;
     }
 
-//    public function addToCustomers($request, $order)
-//    {
-//        if ($this->safir()) {
-//            $request->customerId = false;
-//        }
-//        if ($this->safir() && !$request->addToCustomers) {
-//            return null;
-//        }
-//        $data = [
-//            'name' => $order->name,
-//            'phone' => $order->phone,
-//            'address' => $order->address,
-//            'zip_code' => $order->zip_code,
-//            'city_id' => $request->city_id,
-//        ];
-//        if ($request->customerId) {
-//            $customer = Customer::findOrFail($request->customerId);
-//            if ($request->addToCustomers)
-//                $customer->update($data);
-//            else
-//                if ($customer->name != $request->name)
-//                    return 'not match';
-//        } else
-//            $customer = auth()->user()->customers()->Create($data);
-//
-//        return $customer->id;
-//    }
-    public function dateFilter(Request $request)
-    {
-        $from = date($request->date1 . ' 00:00:00');
-        $to = date($request->date2 . ' 23:59:59');
-        $limit = $request->limit;
-
-        $orders = Helper::Order(false)->with(['website', 'orderProducts', 'warehouse', 'user'])
-            ->whereBetween('created_at', [$from, $to])
-            ->limit($limit)
-            ->get()->keyBy('id');
-
-        return $orders;
-    }
-
     public function viewOrder($id)
     {
         $order = Helper::Order(false)->findOrFail($id);
@@ -634,53 +597,6 @@ class OrderController extends Controller
         DB::commit();
         return $order;
     }
-
-//    public function orderExcel($id)
-//    {
-//        $order = Helper::Order(false)->findOrFail($id);
-//        $customer = $order->customer;
-//        $customerMeta = $customer->customerMetas->first();
-//        $orderProducts = $order->orderProducts->keyBy('id');
-//        foreach ($orderProducts as $orderProduct) {
-//            if ($orderProduct->discount == 100) {
-//                if (isset($orderProduct->product))
-//                    $orderProduct->original_price = $orderProduct->product->good->price;
-//                else
-//                    $orderProduct->original_price = 0;
-//            } else
-//                $orderProduct->original_price = +round($orderProduct->price * 100 / (100 - $orderProduct->discount));
-//            $orderProduct->add_value = $orderProduct->price * $orderProduct->number * 0.1;
-//        }
-//        return view('orders.orderExcel', [
-//            'order' => $order,
-//            'customer' => $customer,
-//            'customerMeta' => $customerMeta,
-//            'orderProducts' => $orderProducts,
-//        ]);
-//    }
-//
-//    public function saveExcelData($id, Request $req)
-//    {
-//        $order = Helper::Order(false)->findOrFail($id);
-//        if ($req->customer_code)
-//            CustomerMeta::updateOrCreate(
-//                ['customer_id' => $order->customer_id],
-//                [
-//                    'customer_code' => $req->customer_code
-//                ]
-//            );
-//        foreach ($order->orderProducts as $orderProduct) {
-//            GoodMeta::updateOrCreate(
-//                ['good_id' => $orderProduct->product->good_id],
-//                [
-//                    'warehouse_code' => $req->{'warehouse_code_' . $orderProduct->id},
-//                    'stuff_code' => $req->{'stuff_code_' . $orderProduct->id},
-////                    'added_value' => $req->{'added_value_' . $orderProduct->id},
-//                ]
-//            );
-//        }
-//        return 'با موفقیت ذخیره شد.';
-//    }
 
     public function changeWarehose($orderId, $warehouseId)
     {

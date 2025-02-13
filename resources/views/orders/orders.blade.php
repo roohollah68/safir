@@ -10,17 +10,14 @@
 
 @section('content')
 
-    <form action="" method="post" class="input-group col-12 mb-3" onsubmit="return dateFilter();">
+    <form action="" method="post" id="dateForm" class="input-group col-12 mb-3" onsubmit="return dateFilter();">
         <div class="col-md-6 d-flex">
-            <span class="input-group-text cursor-pointer" id="date1">📅</span>
-            <input type="text" class="form-control" placeholder="از تاریخ" data-name="date1-text" required>
-            <input type="hidden" name="from" data-name="date1-date">
+            <label for="from" class="input-group-text">📅</label>
+            <input type="text" id="from" name="from" class="form-control" placeholder="از تاریخ" required>
         </div>
         <div class=" col-md-6 d-flex">
-            <span class="input-group-text cursor-pointer" id="date2">📅</span>
-            <input type="text" class="form-control" placeholder="تا تاریخ" data-name="date2-text" required>
-            <input type="hidden" name="to" data-name="date2-date">
-            <input type="number" name="limit" value="{{$limit}}" placeholder="تعداد" min="1" max="5000" step="1">
+            <label for="to" class="input-group-text">📅</label>
+            <input type="text" id="to" name="to" class="form-control" placeholder="تا تاریخ" required>
             <input type="submit" value="اعمال فیلتر">
         </div>
     </form>
@@ -72,13 +69,11 @@
 
         <button class="btn btn-secondary my-2" onclick="generatePDFs()"> فایل PDF انتخابی ها</button>
         <a id="pdf-link" target="_blank"></a>
+        <button class="btn btn-success my-2" onclick="generateExcels()"> فایل Excel انتخابی ها</button>
+
     @endif
 
     <table id="main-table" class="table table-striped">
     </table>
-
-{{--    <div class="d-none" id="sendMethodText">--}}
-{{--        @include('orders.sendMethods')--}}
-{{--    </div>--}}
 
 @endsection

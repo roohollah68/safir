@@ -37,6 +37,8 @@
     <script src="/js/buttons.html5.min.js"></script>
     <script src="/js/buttons.print.min.js"></script>
 
+    <script src="/js/table2excel.min.js"></script>
+
     <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
     <link rel="stylesheet" href="/date-time-picker/mds.bs.datetimepicker.style.css">
 

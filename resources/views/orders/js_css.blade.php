@@ -1,7 +1,6 @@
 <script>
 
 
-    {{--let superAdmin = !!"{{$superAdmin ? 'true' : ''}}";--}}
     let admin = {{$admin ? 'true' : 'false'}};
     let safir = {{$safir ? 'true' : 'false'}};
     let table;
@@ -10,28 +9,34 @@
     let ids;
     let showDeleted, printWait, confirmWait, counterWait, proccessWait, sent, delivered, COD, refund, user = 'all',
         warehouseId = 'all';
-    let changeOrdersPermit = !!'{{$user->meta('showAllOrders')}}';
+    let changeOrdersPermit = !!'{{$User->meta('showAllOrders')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     let dtp1Instance;
     let websites = {!!json_encode(config('websites'))!!};
-    let dialog;
+    let dialog, reloadId;
     $(() => {
-        // payMethodText = $('#paymentMethodText').html();
-        // $('#paymentMethodText').html('');
-        // sendMethodText = $('#sendMethodText').html();
-        // $('#sendMethodText').html('');
         $(".checkboxradio").checkboxradio();
         prepare_data();
 
-        const dtp1Instance2 = new mds.MdsPersianDateTimePicker(document.getElementById('date1'), {
-            targetTextSelector: '[data-name="date1-text"]',
-            targetDateSelector: '[data-name="date1-date"]',
+        const dtp1Instance2 = new mds.MdsPersianDateTimePicker($('#from')[0], {
+            targetTextSelector: '#from',
         });
-        const dtp1Instance3 = new mds.MdsPersianDateTimePicker(document.getElementById('date2'), {
-            targetTextSelector: '[data-name="date2-text"]',
-            targetDateSelector: '[data-name="date2-date"]',
+        const dtp1Instance3 = new mds.MdsPersianDateTimePicker($('#to')[0], {
+            targetTextSelector: '#to',
         });
+
+        reloadId = setInterval(reload, 60000)
     });
+
+    function reload() {
+        $.post('/orders/reload', {_token: token})
+            .done(res => {
+                orders = res;
+                $.each(orders, (id, order) => {
+                    updateRow(order);
+                });
+            })
+    }
 
     function prepare_data() {
         ids = [];
@@ -209,7 +214,7 @@
         let changeWarehouse = `<i class="fa fa-warehouse btn btn-warning" onclick="changeWarehouse(${id})" title="تغییر انبار" ></i> `;
         let editOrder = `<a class="fa fa-edit btn btn-primary" href="edit_order/${id}" title="ویرایش سفارش"></a> `;
         let res = viewOrder + viewComment;
-        if (showDeleted)
+        if (order.deleted_at)
             return res;
         @if($safir)
         if (!order.state) {
@@ -256,6 +261,8 @@
     }
 
     function orderCondition(order) {
+        if (order.deleted_at)
+            return 'حذف شده';
         if (order.state === 11)
             return 'تحویل داده شده';
         if (order.state === 10)
@@ -285,9 +292,12 @@
                     $(element).parent().parent().remove()
                 }
             })
+            .fail(function (e) {
+                $.notify(e.responseJSON.message)
+            });
     }
 
-    @if($user->meta('changeOrderState'))
+    @if($User->meta('changeOrderState'))
 
     function selectSendMethod(id) {
         let order = orders[id];
@@ -353,10 +363,9 @@
 
     @endif
 
-    @if($user->meta(['showAllOrders','editAllOrders','changeOrderState']))
+    @if($User->meta(['showAllOrders','editAllOrders','changeOrderState']))
 
     function generatePDF(Ids) {
-
         $.get('pdfs/' + Ids.toString())
             .done(res => {
                 $('#pdf-link').html("لینک دانلود").attr('href', "{{env('APP_URL')}}" + res)[0].click();
@@ -385,6 +394,10 @@
         if (index > -1) {
             ids.splice(index, 1);
         }
+    }
+
+    function generateExcels() {
+        
     }
     @endif
 
@@ -449,18 +462,15 @@
     @endif
 
     function dateFilter() {
-        let date1 = $('input[name=from]').val();
-        let date2 = $('input[name=to]').val();
-        let limit = $('input[name=limit]').val();
-        $.post('/orders/dateFilter', {_token: token, date1: date1, date2: date2, limit: limit})
+        let from = $('#from').val();
+        let to = $('#to').val();
+        $.post('/orders/reload', {_token: token, from: from, to: to})
             .done(res => {
                 orders = res;
                 prepare_data();
             })
-
-
+        clearInterval(reloadId);
         return false;
-
     }
 
     function changeWarehouse(id) {
