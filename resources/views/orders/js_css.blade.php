@@ -25,7 +25,7 @@
             targetTextSelector: '#to',
         });
 
-        reloadId = setInterval(reload, 10000)
+        reloadId = setInterval(reload, 60000)
     });
 
     function reload() {
