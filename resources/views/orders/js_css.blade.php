@@ -25,16 +25,26 @@
             targetTextSelector: '#to',
         });
 
-        reloadId = setInterval(reload, 60000)
+        reloadId = setInterval(reload, 10000)
     });
 
     function reload() {
+        let $loading = $('#loadingDiv').hide();
+        $(document)
+            .ajaxStart(function () {
+                $loading.hide();
+            })
+
         $.post('/orders/reload', {_token: token})
             .done(res => {
                 orders = res;
                 $.each(orders, (id, order) => {
                     updateRow(order);
                 });
+                $(document)
+                    .ajaxStart(function () {
+                        $loading.show();
+                    })
             })
     }
 
@@ -397,7 +407,7 @@
     }
 
     function generateExcels() {
-        
+
     }
     @endif
 
