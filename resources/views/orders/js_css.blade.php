@@ -91,18 +91,16 @@
             return
         if (isWebsite && !siteOrders)
             return
-        // counter++;
         return [
             !!order.deleted_at ? '' : `<input type="checkbox" class="orders_checkbox" onclick="ids.includes(${id})?removeFromIds(${id}):ids.push(${id})">`,
 
             id,
-            // counter,
 
             order.customer_id ? '<a href="/customer/transaction/' + order.customer_id + '">' + order.name + '</a>' : order.name,
 
             order.user.name + ((isWebsite && order.website) ? `(${order.website.website_id})` : ''),
 
-            (order.orders.length > 30) ? order.orders.substr(0, 30) + ' ...' : order.orders,
+            `<span title="${order.orders}">` + ((order.orders.length > 30) ? order.orders.substr(0, 30) + ' ...' : order.orders) +`</span>`,
 
             createdTime(order),
 
