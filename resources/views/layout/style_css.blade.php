@@ -71,6 +71,12 @@
     .dt-length{
         display: none;
     }
+
+    .btn-delivered {
+        color: #fff;
+        background-color: deeppink;
+        border-color: deeppink;
+    }
 </style>
 
 <style>

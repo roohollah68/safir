@@ -209,7 +209,7 @@
         } else if (+order.state === 10) {
             res = `<span class="btn btn-success" onclick="confirm('آیا وضعیت سفارش به در انتظار پرینت تغییر کند؟')&&change_state(${order.id}, 0)">${text}<i class="fas fa-check-double"></i></span>`
         } else if (+order.state === 11) {
-            res = `<span class="btn btn-outline-success" onclick="confirm('آیا وضعیت سفارش به در انتظار پرینت تغییر کند؟')&&confirm(change_state(${order.id}, 0))">${text}<i class="fas fa-check-double"></i></span>`
+            res = `<span class="btn btn-delivered" onclick="confirm('آیا وضعیت سفارش به در انتظار پرینت تغییر کند؟')&&confirm(change_state(${order.id}, 0))">${text}<i class="fas fa-check-double"></i></span>`
         }
         return timestamp + res;
     }
