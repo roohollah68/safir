@@ -1,6 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary p-2" id="navbar">
-    <a class="navbar-brand" href="{{ route('editUser') }}/{{ $User->id }}"> {{ $User->name }} خوش آمدید
-        <span class="fa fa-gear"></span></a>
+    <a class="navbar-brand" href="{{ route('editUser') }}/{{ $User->id }}"> {{ $User->name }}</a>
     @if ($safir)
         <a class="navbar-brand" href="{{ route('DepositList') }}">| اعتبار <span
                 dir="ltr">{{ number_format($User->balance) }}</span> ریال</a>
@@ -14,7 +13,7 @@
         <ul class="navbar-nav mr-auto">
             @if ($User->meta('addOrder'))
                 <li class="nav-item">
-                    <a class="nav-link active" href="{{ route('newOrder') }}">ایجاد سفارش</a>
+                    <a class="nav-link active " href="{{ route('newOrder') }}">ایجاد سفارش</a>
                 </li>
             @endif
             <li class="nav-item">

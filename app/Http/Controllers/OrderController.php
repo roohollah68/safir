@@ -56,14 +56,6 @@ class OrderController extends Controller
         return $orders;
     }
 
-    public function showOrder($id)
-    {
-        $order = Helper::Order(false)->findOrFail($id);
-        return view('orders.order', [
-            'order' => $order,
-        ]);
-    }
-
     public function newOrder(Request $req)
     {
         Helper::access('addOrder');
