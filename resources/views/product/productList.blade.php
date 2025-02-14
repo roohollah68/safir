@@ -352,8 +352,6 @@
                             products[id] = res[1];
                             dialog.remove();
                             dataTable()
-                        }).fail(function () {
-                            $.notify('خطایی رخ داده است.', 'warn');
                         });
                     });
                 }));
@@ -366,8 +364,6 @@
             }).done(res => {
                 products['' + res.id] = res;
                 dataTable()
-            }).fail(function () {
-                $.notify('خطایی رخ داده است.', 'warn');
             });
         }
 
@@ -391,8 +387,6 @@
                         products[id] = res;
                         dialog.remove();
                         dataTable()
-                    }).fail(function () {
-                        $.notify('خطایی رخ داده است.', 'warn');
                     });
                 });
             })

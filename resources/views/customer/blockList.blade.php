@@ -62,9 +62,7 @@
                 } else {
                     $(object).removeClass('btn-danger').addClass('btn-success').html('آزاد');
                 }
-            }).fail(() => {
-                $.notify('مشکلی پیش آمده است.');
-            })
+            });
         }
     </script>
 @endsection

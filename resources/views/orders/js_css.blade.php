@@ -17,109 +17,109 @@
     $(() => {
         $(".checkboxradio").checkboxradio();
         prepare_data();
-
-        const dtp1Instance2 = new mds.MdsPersianDateTimePicker($('#from')[0], {
-            targetTextSelector: '#from',
+        const var1 = new mds.MdsPersianDateTimePicker($('#fromDate')[0], {
+            targetTextSelector: '#fromDate',
         });
-        const dtp1Instance3 = new mds.MdsPersianDateTimePicker($('#to')[0], {
-            targetTextSelector: '#to',
+        const var2 = new mds.MdsPersianDateTimePicker($('#toDate')[0], {
+            targetTextSelector: '#toDate',
         });
-
-        reloadId = setInterval(reload, 60000)
+        reloadId = setInterval(reload, 30000)
     });
 
     function reload() {
-        let $loading = $('#loadingDiv').hide();
-        $(document)
-            .ajaxStart(function () {
-                $loading.hide();
-            })
-
-        $.post('/orders/reload', {_token: token})
+        $.ajax('/orders/reload', {
+            method: "POST",
+            global: false,
+            data: {_token: token}
+        })
             .done(res => {
-                orders = res;
-                $.each(orders, (id, order) => {
-                    updateRow(order);
+                $.each(res, (id, order) => {
+                    if (orders[id]) {
+                        updateRow(order);
+                    } else {
+                        let row = singleRow(order);
+                        if (row) {
+                            table.rows.add([row]);
+                            table.draw();
+                        }
+                    }
+                    orders[id] = order;
                 });
-                $(document)
-                    .ajaxStart(function () {
-                        $loading.show();
-                    })
-            })
+            });
     }
 
     function prepare_data() {
         ids = [];
         let res = [];
-        let counter = 0;
-        let select = (id) => {
-            return `<input type="checkbox" class="orders_checkbox" onclick="ids.includes(${id})?removeFromIds(${id}):ids.push(${id})">`;
-        }
         $.each(orders, (id, order) => {
-            if (user !== 'all' && +user !== order.user_id)
-                return
-            if (showDeleted ^ !!order.deleted_at)
-                return
-            if (sent && order.state != 10)
-                return
-            if (delivered && order.state != 11)
-                return
-            if (confirmWait && order.confirm)
-                return
-            if (counterWait && (order.counter !== 'waiting' || !order.confirm || order.state))
-                return
-            if (printWait && (!order.confirm || order.state || order.counter !== 'approved'))
-                return
-            if (proccessWait && (order.state > 4 || order.state < 1))
-                return
-            if (+warehouseId !== +order.warehouse_id && warehouseId !== 'all')
-                return;
-            if (COD && order.paymentMethod !== 'cod' && order.paymentMethod !== 'پرداخت در محل' && order.paymentMethod !== 'onDelivery')
-                return;
-            if (refund && order.total >= 0)
-                return;
-            let isWebsite = websites[order.user_id];
-            if (order.user.role === 'admin' && !adminOrders)
-                return
-            if (order.user.role === 'user' && !isWebsite && !safirOrders)
-                return
-            if (isWebsite && !siteOrders)
-                return
-            counter++;
-            res.push([
-                !!order.deleted_at ? '' : select(id),
-
-                counter,
-
-                order.customer_id ? '<a href="/customer/transaction/' + order.customer_id + '">' + order.name + '</a>' : order.name,
-
-                order.user.name + ((isWebsite && order.website) ? `(${order.website.website_id})` : ''),
-
-                (order.orders.length > 30) ? order.orders.substr(0, 30) + ' ...' : order.orders,
-
-                createdTime(order),
-
-                operations(order),
-
-                `<span id='orderCondition_${id}'>` + orderCondition(order) + '</span>',
-
-                order.address,
-
-                order.desc,
-
-                order.orders,
-
-                order.phone,
-
-                order.zip_code,
-
-                id,
-
-                order.total,
-
-            ])
+            let row = singleRow(order);
+            if (row)
+                res.push(row)
         });
         create_table(res);
+    }
+
+    function singleRow(order) {
+        let id = order.id;
+        if (user !== 'all' && +user !== order.user_id)
+            return
+        if (showDeleted ^ !!order.deleted_at)
+            return
+        if (sent && order.state != 10)
+            return
+        if (delivered && order.state != 11)
+            return
+        if (confirmWait && order.confirm)
+            return
+        if (counterWait && (order.counter !== 'waiting' || !order.confirm || order.state))
+            return
+        if (printWait && (!order.confirm || order.state || order.counter !== 'approved'))
+            return
+        if (proccessWait && (order.state > 4 || order.state < 1))
+            return
+        if (+warehouseId !== +order.warehouse_id && warehouseId !== 'all')
+            return;
+        if (COD && order.paymentMethod !== 'cod' && order.paymentMethod !== 'پرداخت در محل' && order.paymentMethod !== 'onDelivery')
+            return;
+        if (refund && order.total >= 0)
+            return;
+        if (order.user.role === 'admin' && !adminOrders) {
+            return
+        }
+        let isWebsite = websites[order.user_id];
+        if (order.user.role === 'user' && !isWebsite && !safirOrders)
+            return
+        if (isWebsite && !siteOrders)
+            return
+        // counter++;
+        return [
+            !!order.deleted_at ? '' : `<input type="checkbox" class="orders_checkbox" onclick="ids.includes(${id})?removeFromIds(${id}):ids.push(${id})">`,
+
+            id,
+            // counter,
+
+            order.customer_id ? '<a href="/customer/transaction/' + order.customer_id + '">' + order.name + '</a>' : order.name,
+
+            order.user.name + ((isWebsite && order.website) ? `(${order.website.website_id})` : ''),
+
+            (order.orders.length > 30) ? order.orders.substr(0, 30) + ' ...' : order.orders,
+
+            createdTime(order),
+
+            operations(order),
+
+            `<span id='orderCondition_${id}'>` + orderCondition(order) + '</span>',
+
+            order.address,
+
+            order.desc,
+
+            order.orders,
+
+            order.phone,
+
+            order.zip_code,
+        ];
     }
 
     function create_table(data) {
@@ -128,10 +128,10 @@
             table.rows.add(data);
             table.draw();
         } else {
-            let hideCols = (changeOrdersPermit) ? [1, 8, 9, 10, 11, 12, 13, 14] : [0, 1, 3, 8, 9, 10, 11, 12, 13, 14]
+            let hideCols = (changeOrdersPermit) ? [8, 9, 10, 11, 12] : [0, 3, 8, 9, 10, 11, 12]
             table = $('#main-table').DataTable({
                 columns: [
-                    {title: "انتخاب"},
+                    {title: " "},
                     {title: "#"},
                     {title: "نام"},
                     {title: "سفیر"},
@@ -144,12 +144,10 @@
                     {title: "سفارشات"},
                     {title: "همراه"},
                     {title: "کدپستی"},
-                    {title: "آیدی"},
-                    {title: "مبلغ سفارش"},
                 ],
                 columnDefs: [
                     {
-                        targets: [0, 1, 5, 6],
+                        targets: [0, 5, 6],
                         searchable: false
                     },
                     {
@@ -165,11 +163,11 @@
                 pageLength: 100,
                 // paging: false,
                 data: data,
-                order: [[13, "desc"]],
-                dom: 'lBfrtip',
-                buttons: [
-                    'excelHtml5',
-                ],
+                order: [[1, "desc"]],
+                // dom: 'lBfrtip',
+                // buttons: [
+                //     'excelHtml5',
+                // ],
                 language: language,
             });
         }
@@ -302,9 +300,6 @@
                     $(element).parent().parent().remove()
                 }
             })
-            .fail(function (e) {
-                $.notify(e.responseJSON.message)
-            });
     }
 
     @if($User->meta('changeOrderState'))
@@ -321,9 +316,7 @@
                 $.notify("با موفقیت ذخیره شد.", "success");
                 order = res;
                 change_state(id, 10)
-            }).fail(function (e) {
-                $.notify(e.responseJSON.message)
-            });
+            })
             return;
         }
 
@@ -347,9 +340,7 @@
                 dialog.remove();
                 order = res;
                 change_state(id, 10)
-            }).fail(function () {
-                $.notify('خطایی رخ داده است.', 'warn');
-            });
+            })
         });
     }
 
@@ -366,9 +357,7 @@
                 order.state = +res[0];
                 $.notify(res[1], 'info');
                 updateRow(order);
-            }).fail(function (e) {
-            $.notify(e.responseJSON.message)
-        });
+            });
     }
 
     @endif
@@ -444,14 +433,8 @@
                         .done((order) => {
                             applyChanges(order);
                             dialog.remove();
-                        })
-                        .fail(function (e) {
-                            $.notify(e.responseJSON.message)
                         });
                 })
-            })
-            .fail(function (e) {
-                $.notify(e.responseJSON.message)
             });
 
     }
@@ -462,9 +445,6 @@
                 .done(order => {
                     orders[id] = order;
                     updateRow(order)
-                })
-                .fail(function (e) {
-                    $.notify(e.responseJSON.message)
                 });
         }
 
@@ -472,9 +452,9 @@
     @endif
 
     function dateFilter() {
-        let from = $('#from').val();
-        let to = $('#to').val();
-        $.post('/orders/reload', {_token: token, from: from, to: to})
+        let fromDate = $('#fromDate').val();
+        let toDate = $('#toDate').val();
+        $.post('/orders/reload', {_token: token, fromDate: fromDate, toDate: toDate})
             .done(res => {
                 orders = res;
                 prepare_data();
@@ -505,9 +485,7 @@
             orders[order_id] = res;
             prepare_data();
             $.notify('با موفقیت ذخیره شد.', 'success');
-        }).fail(() => {
-            $.notify('مشکلی پیش آمده', 'warn');
-        })
+        });
     }
 
     function updateRow(order) {

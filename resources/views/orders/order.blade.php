@@ -94,8 +94,6 @@
                     }
                 }).done(function (res) {
                     $.notify(res, "success");
-                }).fail(function () {
-                    $.notify('خطایی رخ داده است.', 'warn');
                 });
             });
 

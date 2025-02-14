@@ -120,8 +120,6 @@
                               onclick="deleteProduct(${product.id},${good_id},${warehouse_id})"></span>
                 `;
                 $(`#good-${good_id} .warehouse-${warehouse_id}`).html(text);
-            }).fail(function () {
-                $.notify('خطایی رخ داده است.', 'warn');
             });
         }
 
@@ -135,8 +133,6 @@
                         $(element).addClass('btn-danger').removeClass('btn-success');
                         $.notify('ناموجود شد.', 'success');
                     }
-                }).fail(function () {
-                    $.notify('خطایی رخ داده است.', 'warn');
                 });
         }
 

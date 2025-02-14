@@ -12,12 +12,12 @@
 
     <form action="" method="post" id="dateForm" class="input-group col-12 mb-3" onsubmit="return dateFilter();">
         <div class="col-md-6 d-flex">
-            <label for="from" class="input-group-text">📅</label>
-            <input type="text" id="from" name="from" class="form-control" placeholder="از تاریخ" required>
+            <label for="fromDate" class="input-group-text">📅</label>
+            <input type="text" id="fromDate" class="form-control" placeholder="از تاریخ" required>
         </div>
         <div class=" col-md-6 d-flex">
-            <label for="to" class="input-group-text">📅</label>
-            <input type="text" id="to" name="to" class="form-control" placeholder="تا تاریخ" required>
+            <label for="toDate" class="input-group-text">📅</label>
+            <input type="text" id="toDate" class="form-control" placeholder="تا تاریخ" required>
             <input type="submit" value="اعمال فیلتر">
         </div>
     </form>

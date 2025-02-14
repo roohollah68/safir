@@ -83,8 +83,6 @@
                 isic : +$('#good-'+id + ' select[name=isic]').val() || null,
             }).done(res =>{
                 $.notify('ذخیره شد','success');
-            }).fail(function (e) {
-                $.notify(e.responseJSON.message)
             });
         }
 

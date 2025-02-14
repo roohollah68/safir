@@ -137,8 +137,6 @@
                 } else {
                     $(object).removeClass('fa-check btn-success').addClass('fa-x btn-danger');
                 }
-            }).fail(() => {
-                $.notify('مشکلی پیش آمده است.')
             })
         }
     </script>

@@ -65,8 +65,8 @@
 
     function view_recieved_cheque(id) {
         $.get('/cheque/received/' + id, {
-                _token: token
-            })
+            _token: token
+        })
             .done(res => {
                 dialog = Dialog(res);
             })
@@ -145,9 +145,7 @@
             $.notify("با موفقیت ذخیره شد.", "success");
             dialog.remove();
             updateRow(order);
-        }).fail(function (e) {
-            $.notify(e.responseJSON.message)
-        });
+        })
     }
 
     function num(x) {
@@ -181,7 +179,15 @@
             })
             .ajaxStop(function () {
                 $loading.hide();
-            });
+            })
+            .on("ajaxError", function (e, a) {
+                $loading.hide();
+                if (a.responseJSON && a.responseJSON.message)
+                    $.notify(a.responseJSON.message);
+                else
+                    $.notify('مشکلی پیش آمده است');
+            })
+
         priceInput();
     })
 
