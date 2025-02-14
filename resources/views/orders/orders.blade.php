@@ -10,15 +10,23 @@
 
 @section('content')
 
-    <form action="" method="post" id="dateForm" class="input-group col-12 mb-3" onsubmit="return dateFilter();">
-        <div class="col-md-6 d-flex">
+    <form action="" method="post" id="dateForm" class="input-group col-12 mb-3" onsubmit="return filter();">
+        <div class="col-md-3 d-flex">
             <label for="fromDate" class="input-group-text">📅</label>
-            <input type="text" id="fromDate" class="form-control" placeholder="از تاریخ" required>
+            <input type="text" id="fromDate" class="form-control" placeholder="از تاریخ">
         </div>
-        <div class=" col-md-6 d-flex">
+        <div class=" col-md-3 d-flex">
             <label for="toDate" class="input-group-text">📅</label>
-            <input type="text" id="toDate" class="form-control" placeholder="تا تاریخ" required>
-            <input type="submit" value="اعمال فیلتر">
+            <input type="text" id="toDate" class="form-control" placeholder="تا تاریخ">
+        </div>
+        <div class="col-md-3 d-flex">
+            <label for="fromId" class="input-group-text">از شماره:</label>
+            <input type="number" step="1" id="fromId" class="form-control" >
+        </div>
+        <div class=" col-md-3 d-flex">
+            <label for="toId" class="input-group-text">تا شماره:</label>
+            <input type="number" step="1" id="toId" class="form-control" >
+            <button class="btn btn-success fa fa-search"></button>
         </div>
     </form>
 

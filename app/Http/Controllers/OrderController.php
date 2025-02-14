@@ -30,16 +30,26 @@ class OrderController extends Controller
     public function getOrders()
     {
         $orders = Helper::Order(false)
-            ->orderBy('id', 'desc')
             ->with(['user', 'website', 'orderProducts', 'warehouse'])
             ->limit(auth()->user()->meta('NuRecords'));
-        if (request('from'))
+
+        if (request('fromDate')) {
             $orders = $orders->where('created_at', ">=", verta()
-                ->parse(request('from').' 20:30')->subDay()->toCarbon());
-        if (request('to'))
+                ->parse(request('fromDate') . ' 20:30')->subDay()->toCarbon())
+                ->orderBy('id', 'asc');
+        }
+        if (request('toDate')) {
             $orders = $orders->where('created_at', "<=", verta()
-                ->parse(request('to').' 20:30')->toCarbon());
-        $orders = $orders->get()->keyBy('id');
+                ->parse(request('toDate') . ' 20:30')->toCarbon());
+        }
+        if(request('fromId')) {
+            $orders = $orders->where('id', '>=', request('fromId'))
+                ->orderBy('id', 'asc');
+        }
+        if(request('toId')) {
+            $orders = $orders->where('id', '<=', request('toId'));
+        }
+        $orders = $orders->orderBy('id', 'desc')->get()->keyBy('id');
         foreach ($orders as $order) {
             $order->orders = $order->orders();
         }

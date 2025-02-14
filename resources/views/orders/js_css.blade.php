@@ -451,10 +451,18 @@
     }
     @endif
 
-    function dateFilter() {
+    function filter() {
         let fromDate = $('#fromDate').val();
         let toDate = $('#toDate').val();
-        $.post('/orders/reload', {_token: token, fromDate: fromDate, toDate: toDate})
+        let fromId = $('#fromId').val();
+        let toId = $('#toId').val();
+        $.post('/orders/reload', {
+            _token: token,
+            fromDate: fromDate,
+            toDate: toDate,
+            fromId: fromId,
+            toId: toId
+        })
             .done(res => {
                 orders = res;
                 prepare_data();
