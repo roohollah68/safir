@@ -29,4 +29,12 @@ class OrderProduct extends Model
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function originalPrice()
+    {
+        if($this->price == 0 || $this->discount == 100)
+            return $this->product->good->price;
+        else
+            return $this->price * (100/(100-$this->discount));
+    }
 }

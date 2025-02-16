@@ -75,9 +75,9 @@
             </div>
         </div>
 
-        <button class="btn btn-secondary my-2" onclick="generatePDFs()"> فایل PDF انتخابی ها</button>
+        <button class="btn btn-secondary my-2" onclick="generatePDFs()"> دانلود PDF لیبل</button>
         <a id="pdf-link" target="_blank"></a>
-        <button class="btn btn-success my-2" onclick="generateExcels()"> فایل Excel انتخابی ها</button>
+        <button class="btn btn-success my-2" onclick="generateExcels()"> دانلود Excel کیسان</button>
 
     @endif
 

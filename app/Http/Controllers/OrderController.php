@@ -42,11 +42,11 @@ class OrderController extends Controller
             $orders = $orders->where('created_at', "<=", verta()
                 ->parse(request('toDate') . ' 20:30')->toCarbon());
         }
-        if(request('fromId')) {
+        if (request('fromId')) {
             $orders = $orders->where('id', '>=', request('fromId'))
                 ->orderBy('id', 'asc');
         }
-        if(request('toId')) {
+        if (request('toId')) {
             $orders = $orders->where('id', '<=', request('toId'));
         }
         $orders = $orders->orderBy('id', 'desc')->get()->keyBy('id');
@@ -147,6 +147,7 @@ class OrderController extends Controller
                 $order->total += $deliveryCost;
             if ($request->paymentMethod == 'credit') {
                 if ($order->total > ($user->balance + Helper::settings()->negative))
+//                if ($order->total > ($user->balance + $user->credit))
                     return $this->errorBack('اعتبار شما کافی نیست!');
                 else {
                     $user->update([
@@ -649,6 +650,18 @@ class OrderController extends Controller
                 'counter' => 'waiting',
             ]);
         return $order;
+    }
+
+    public function excelData(Request $request)
+    {
+        $orders = Helper::Order(false)
+            ->whereIn('id' , $request->ids)
+            ->with('orderProducts')
+            ->get()->keyBy('id');
+        return [
+            view('keysun.invoice1',compact('orders'))->render(),
+            view('keysun.invoice2',compact('orders'))->render()
+        ];
     }
 }
 
