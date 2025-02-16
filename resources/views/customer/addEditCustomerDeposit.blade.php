@@ -10,6 +10,7 @@
 @endsection
 
 @section('files')
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
     <script>
         $(() => {
             $('.checkboxradio').checkboxradio();
@@ -27,6 +28,57 @@
                 @if(old('cheque_date')?:$deposit->cheque_date)
                 selectedDate: new Date("{{old('cheque_date')?:$deposit->cheque_date}}"),
                 @endif
+            });
+        });
+
+        $(document).ready(function() {
+            $('form').submit(async function(e) {
+                e.preventDefault();
+                const fileInput = document.getElementById('photo');
+                const file = fileInput.files[0];
+
+                if (file) {
+                    try {
+                        //test
+                        console.log('Original file size:', (file.size / 1024).toFixed(2), 'KB');
+
+                        // Compress file
+                        const options = {
+                            maxSizeMB: 1,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true,
+                            fileType: file.type
+                        };
+
+                        // Compressor returns blob
+                        const compressedBlob = await imageCompression(file, options);
+                        console.log('Compressed Blob:', compressedBlob);
+
+                        // Convert from Blob to file 
+                        const compressedFile = new File([compressedBlob], file.name, {
+                            type: compressedBlob.type,
+                            lastModified: Date.now()
+                        });
+
+                        //test
+                        console.log('compressed file size:', (compressedFile.size / 1024).toFixed(2),
+                            'KB');
+
+                        // Replace original file with compressed file
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(compressedFile);
+                        fileInput.files = dataTransfer.files;
+
+                        // overrides initial submit
+                        HTMLFormElement.prototype.submit.call(this);
+
+                    } catch (error) {
+                        console.error('Compression error:', error);
+                        alert('خطا در فشرده‌سازی تصویر: ' + error.message);
+                    }
+                } else {
+                    this.submit(); // Submit normally if no file
+                }
             });
         });
     </script>
