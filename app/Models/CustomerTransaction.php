@@ -50,7 +50,7 @@ class CustomerTransaction extends Model
         if ($this->verified == 'approved')
             return '<i class="btn btn-success">تایید</i>';
         if ($this->verified == 'rejected')
-            return '<i class="btn btn-danger">شده</i>';
+            return '<i class="btn btn-danger">رد شده</i>';
     }
 
 }

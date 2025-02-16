@@ -239,9 +239,13 @@ class CustomerController extends Controller
                 'order_id' => $orderId,
                 'amount' => $transaction->amount,
             ]);
-            Order::findOrFail($orderId)->update([
+            $order = Order::findOrFail($orderId);
+            $order->update([
                 'confirm' => true,
                 'paymentMethod' => $req->pay_method == 'cash' ? 1 : 2,
+            ]);
+            $customer->update([
+                'balance' => $customer->balance - $order->total,
             ]);
         } else {
             $transaction->paymentLinks()->delete();

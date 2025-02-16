@@ -476,8 +476,6 @@ class OrderController extends Controller
             (new CommentController)->create($order, auth()->user(), 'سفارش بعد از تایید ویرایش شد');
         }
         $order->confirm = false;
-//        if ($order->counter == 'approved')
-//            (new CustomerController)->rejectOrder($id, $req);
         $order->customer->update([
             'balance' => $order->customer->balance + $order->total,
         ]);
@@ -585,6 +583,7 @@ class OrderController extends Controller
                 return abort(405, 'تاریخ باید مشخص شود.');
             $payInDate = $req->payInDatePersian;
         }
+        $order->paymentLinks()->delete();
         $order->update([
             'confirm' => true,
             'paymentMethod' => $paymentMethod,
