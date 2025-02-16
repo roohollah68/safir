@@ -85,8 +85,8 @@ class SettingController extends Controller
         foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {
             if ($customer->balance() != $customer->balance) {
                 echo $customer->name. $customer->balance() . '=>'.  $customer->balance . '<br>';
-                $customer->balance = $customer->balance();
-                $customer->save();
+//                $customer->balance = $customer->balance();
+//                $customer->save();
             }
         }
 
