@@ -73,6 +73,7 @@ class UserController extends Controller
     public function insertUser(Request $req)
     {
         Helper::access('usersEdit');
+        $req->merge(['credit' => str_replace(",", "", $req->credit)]);
         $req->validate([
             'name' => 'required|string|max:255|unique:users',
             'username' => 'required|unique:users|string|max:255|min:5',
