@@ -9,10 +9,10 @@
     <form action="" method="post">
         @csrf
 
-        <label for="minCoupon"> تخفیف مازاد کل سامانه(درصد) این عدد به کل تخفیف ها افزوده میشود:</label>
-        <input id="minCoupon" name="minCoupon" type="number" value="{{$setting->minCoupon}}">
+{{--        <label for="minCoupon"> تخفیف مازاد کل سامانه(درصد) این عدد به کل تخفیف ها افزوده میشود:</label>--}}
+{{--        <input id="minCoupon" name="minCoupon" type="number" value="{{$setting->minCoupon}}">--}}
 
-        <br>
+{{--        <br>--}}
 
         <label for="negative">سقف اعتبار منفی مجاز(ریال):</label>
         <input id="negative" name="negative" type="text" class="price-input" value="{{$setting->negative}}">
