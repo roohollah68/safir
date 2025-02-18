@@ -87,7 +87,7 @@ class SettingController extends Controller
                 echo $customer->name. $customer->balance() . '=>'.  $customer->balance . '<br>';
                 $customer->balance = $customer->balance();
 //            541    $customer->save();
-            },
+            }
         }
 
 
