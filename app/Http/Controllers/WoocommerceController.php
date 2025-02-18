@@ -116,7 +116,7 @@ class WoocommerceController extends Controller
                     $order->orderProducts()->delete();
                 }
             }
-            (new CommentController)->create($order, $user, 'سفارش دوباره ارسال شد');
+//            (new CommentController)->create($order, $user, 'سفارش دوباره ارسال شد');
         } else if ($request->status == 'processing' || $request->status == 'completed') {
             $order = $user->orders()->create($orderData);
             $web = $order->website()->create([
