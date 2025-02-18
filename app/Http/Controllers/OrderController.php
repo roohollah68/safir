@@ -9,10 +9,10 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Warehouse;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
-use Illuminate\Database\Eloquent\Builder;
 
 
 class OrderController extends Controller
@@ -146,21 +146,24 @@ class OrderController extends Controller
             if ($Total < Helper::settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
                 $order->total += $deliveryCost;
             if ($request->paymentMethod == 'credit') {
-                if ($order->total > ($user->balance + Helper::settings()->negative))
-//                if ($order->total > ($user->balance + $user->credit))
-                    return $this->errorBack('اعتبار شما کافی نیست!');
-                else {
-                    $user->update([
-                        'balance' => $user->balance - $order->total
-                    ]);
-                    $order->transactions()->create([
-                        'user_id' => auth()->user()->id,
-                        'amount' => $order->total,
-                        'balance' => auth()->user()->balance,
-                        'type' => false,
-                        'description' => 'ثبت سفارش',
-                    ]);
+                if ($user->credit > 0) {
+                    if ($order->total > ($user->balance + $user->credit))
+                        return $this->errorBack('اعتبار شما کافی نیست!');
+                } else {
+                    if ($order->total > ($user->balance + Helper::settings()->negative))
+                        return $this->errorBack('اعتبار شما کافی نیست!');
                 }
+                $user->update([
+                    'balance' => $user->balance - $order->total
+                ]);
+                $order->transactions()->create([
+                    'user_id' => auth()->user()->id,
+                    'amount' => $order->total,
+                    'balance' => auth()->user()->balance,
+                    'type' => false,
+                    'description' => 'ثبت سفارش',
+                ]);
+
             } elseif ($request->paymentMethod == 'receipt') {
                 if ($request->file("receipt"))
                     $order->receipt = $request->file("receipt")->store("", 'receipt');
@@ -635,8 +638,8 @@ class OrderController extends Controller
 //            return abort(405, 'بدهی مشتری بیش از سقف اعتبار است.');
         if (!$order->customer->agreement)
             return abort(405, 'لطفا قسمت تفاهم با مشتری را در ویرایش مشتری کامل کنید.');
-//        if ($order->user->credit < ($order->user->totalDepth() + $order->total))
-//            return abort(405, 'مجموع بدهی مشتریان از اعتبار کاربر بیشتر است.');
+        if ($order->user->credit > 0 && $order->user->credit < ($order->user->totalDepth() + $order->total))
+            return abort(405, 'مجموع بدهی مشتریان از اعتبار کاربر بیشتر است.');
         if ($order->total < 0)
             $order->update([
                 'confirm' => true,
@@ -654,12 +657,12 @@ class OrderController extends Controller
     public function excelData(Request $request)
     {
         $orders = Helper::Order(false)
-            ->whereIn('id' , $request->ids)
+            ->whereIn('id', $request->ids)
             ->with('orderProducts')
             ->get()->keyBy('id');
         return [
-            view('keysun.invoice1',compact('orders'))->render(),
-            view('keysun.invoice2',compact('orders'))->render()
+            view('keysun.invoice1', compact('orders'))->render(),
+            view('keysun.invoice2', compact('orders'))->render()
         ];
     }
 }
