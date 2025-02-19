@@ -281,6 +281,27 @@ class StatisticController extends Controller
             ]);
         }
     }
+public function productChart($id)
+{
+    $currentJYear = Verta::now()->year;
+    $startOfYear = Verta::createJalali($currentJYear, 1, 1, 0, 0, 0)->startDay()->toCarbon();
+    $endOfYear = Verta::createJalali($currentJYear, 12, 29, 23, 59, 59)->endDay()->toCarbon();
 
+    $orders = Order::whereBetween('created_at', [$startOfYear, $endOfYear])
+        ->whereHas('orderProducts', fn($query) => $query->where('product_id', $id))
+        ->with(['orderProducts' => fn($query) => $query->where('product_id', $id)])
+        ->get();
+
+     $salesData = $orders->groupBy(fn($order) => Verta::instance($order->created_at)->month)
+        ->map(fn($ordersInMonth) => (int) round(
+            $ordersInMonth->avg(fn($order) => $order->orderProducts->sum('number')) ?? 0
+        ));
+
+    $labels = collect(range(1, 12))->map(fn($month) => Verta::createJalali($currentJYear, $month, 1, 0, 0, 0)->formatWord('F'));
+
+    $data = $labels->keys()->map(fn($month) => $salesData->get($month + 1, 0));
+
+    return view('productChart', compact('labels', 'data'));
+}
 
 }

@@ -110,7 +110,7 @@
                     @foreach($goods as $good)
                         <tr>
                             {{--                        <td><a href="/product/edit/{{$product->id}}">{{$product->name}}</a></td>--}}
-                            <td>{{$good->name}}</td>
+                            <td><a href="{{ route('productChart', ['id' => $good->id]) }}">{{$good->name}}</a></td>
                             <td>{{$good->number}}</td>
                             <td>{{number_format($good->total)}}</td>
                             <td>{{number_format(($good->number>0)?$good->total/$good->number:0)}}</td>
