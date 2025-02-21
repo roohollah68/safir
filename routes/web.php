@@ -169,6 +169,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('goods/management', 'goods');
         Route::get('/good/tag', 'tags');
         Route::post('/good/tag/{id}', 'saveTags');
+        Route::post('/good/delete/{id}', 'deleteGood');
         Route::get('production/schedule/{id}', 'production');
         Route::post('/product/change/available/{id}', 'changeAvailable');
 

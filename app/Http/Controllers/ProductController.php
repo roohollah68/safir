@@ -4,13 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Helper\Helper;
 use App\Models\Good;
-use App\Models\GoodMeta;
-use App\Models\Order;
 use App\Models\Product;
-use App\Models\ProductChange;
 use App\Models\User;
 use App\Models\Warehouse;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -314,7 +310,7 @@ class ProductController extends Controller
     public function tags()
     {
         Helper::access('warehouse');
-        $goods = Good::all()->keyBy('id');
+        $goods = Good::whereIn('category', ['final', 'other'])->get()->keyBy('id');
         return view('product.tagManagement', [
             'goods' => $goods,
         ]);
@@ -337,5 +333,17 @@ class ProductController extends Controller
         ]);
         $good->update($req->all());
         return $good;
+    }
+
+    public function deleteGood($id)
+    {
+        DB::beginTransaction();
+        Helper::access('warehouse');
+        $good = Good::findOrFail($id);
+        $products = $good->products();
+        $products->delete();
+        $good->delete();
+        DB::commit();
+        return 'ok';
     }
 }
