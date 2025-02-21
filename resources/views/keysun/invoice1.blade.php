@@ -35,7 +35,7 @@
             <td>1</td>
             <td></td>
             <td></td>
-            <td>{{$order->zip_code}}</td>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>

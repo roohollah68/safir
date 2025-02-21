@@ -32,13 +32,13 @@
         <tr>
             <td>{{$id}}</td>
             <td><input type="text" value="{!!verta($order->created_at)->format('Y/m/d')!!}"></td>
-            <td>{{$orderProduct->product->good->tag}}</td>
+            <td>{{$orderProduct->product->good->id}}</td>
             <td>1627</td>
             <td>{{$orderProduct->number}}</td>
             <td>364</td>
             <td>1</td>
             <td>{{$orderProduct->originalPrice()}}</td>
-            <td>{{}}</td>
+            <td></td>
             <td>{{$orderProduct->product->good->vat?'10':'0'}}</td>
             <td></td>
             <td></td>
