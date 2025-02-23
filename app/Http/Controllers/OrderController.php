@@ -297,6 +297,8 @@ class OrderController extends Controller
         Helper::access('changeOrderState');
         DB::beginTransaction();
         $order = Helper::Order(true)->findOrFail($id);
+        if($order->state == $state)
+            return abort(405, 'عملیات ممکن نیست.');
         $user = $order->user;
         // جلوگیری از ارسال سفارشات نقدی و چکی بدون تایید پرداخت
         if (+$state == 1 && $order->payPercentApproved() < 100 && ($order->paymentMethod == 'cash' || $order->paymentMethod == 'cheque')) {
