@@ -28,6 +28,13 @@
         margin-bottom: 150px !important;
     }
 
+   .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding-right: 25px;
+            background: url('https://cdn-icons-png.flaticon.com/512/622/622669.png') no-repeat right 5px center;
+            background-size: 15px 15px;
+            border-radius: 5px;
+        }
+
     .ui-widget {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
         font-size: 1em;

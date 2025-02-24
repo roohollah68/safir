@@ -139,19 +139,24 @@
         });
 
         @if($User->meta('counter'))
-        function counter_form(id) {
-            withdrawal = withdrawals[id]
-            if (withdrawal.manager_confirm == 1)
-                return;
-            Dialog(`@include('withdrawal.counter')`);
-            $('.checkboxradio').checkboxradio();
-            $(`input[value=${withdrawal.counter_confirm}]`).click();
-            $('select[name=bank_id]').val(withdrawal.bank_id).change();
-            $(`input[value=${withdrawal.expense_type}]`).click();
-            $('select[name=expense_desc]').val(withdrawal.expense_desc).change()
-            $(`input[name=official][value=${withdrawal.official}]`).click();
-            $(`input[name=vat][value=${withdrawal.vat}]`).click();
-        }
+            function counter_form(id) {
+                withdrawal = withdrawals[id]
+                if (withdrawal.manager_confirm == 1)
+                    return;
+                Dialog(`@include('withdrawal.counter')`);
+                $('.checkboxradio').checkboxradio();
+                $(`input[value=${withdrawal.counter_confirm}]`).click();
+                $('select[name=bank_id]').val(withdrawal.bank_id).change();
+                $(`input[value=${withdrawal.expense_type}]`).click();
+                $('select[name=expense_desc]').select2();
+                $('#expense_desc').select2({
+                    dropdownParent: $('.dialogs'),
+                    placeholder: "انتخاب"
+                });
+                $('select[name=expense_desc]').val(withdrawal.expense_desc).change()
+                $(`input[name=official][value=${withdrawal.official}]`).click();
+                $(`input[name=vat][value=${withdrawal.vat}]`).click();
+            }
         @endif
 
         @if($User->id == 122 || $User->id == 107)

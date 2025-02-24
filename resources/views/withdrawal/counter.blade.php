@@ -46,7 +46,7 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="expense_desc" class="input-group-text w-100">نوع هزینه:</label>
                     </div>
-                    <select name="expense_desc" id="expense_desc"></select>
+                    <select name="expense_desc" id="expense_desc" style="min-width: 300px;"></select>
                 </div>
             </div>
 

@@ -43,6 +43,9 @@
     <script src="/date-time-picker/mds.bs.datetimepicker.js"></script>
     <link rel="stylesheet" href="/date-time-picker/mds.bs.datetimepicker.style.css">
 
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     @include('layout.style_css')
     @include('layout.js')
     @yield('files')
