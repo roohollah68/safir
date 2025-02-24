@@ -284,11 +284,12 @@
 
    $(function() {
     $(document).on('submit', 'form', async e => {
+        const form = e.target;
+        if (!form.querySelectorAll('input.compress-image[type="file"]').length) return;
         e.preventDefault();
+
         try {
-            const form = e.target;
-            const inputs = [...form.querySelectorAll('input.compress-image[type="file"]')];
-            
+            const inputs = [...form.querySelectorAll('input.compress-image[type="file"]')];           
             await Promise.all(inputs.map(async input => {
                 const file = input.files[0];
                 if (!file) return;
