@@ -281,27 +281,50 @@ class StatisticController extends Controller
             ]);
         }
     }
-public function productChart($id)
-{
-    $currentJYear = Verta::now()->year;
-    $startOfYear = Verta::createJalali($currentJYear, 1, 1, 0, 0, 0)->startDay()->toCarbon();
-    $endOfYear = Verta::createJalali($currentJYear, 12, 29, 23, 59, 59)->endDay()->toCarbon();
+    public function productChart($id)
+    {
+        $good = Good::findOrFail($id);
+        $productIds = $good->products()->pluck('id');
 
-    $orders = Order::whereBetween('created_at', [$startOfYear, $endOfYear])
-        ->whereHas('orderProducts', fn($query) => $query->where('product_id', $id))
-        ->with(['orderProducts' => fn($query) => $query->where('product_id', $id)])
-        ->get();
+        $currentJYear = Verta::now()->year;
+        $startOfYear = Verta::createJalali($currentJYear, 1, 1, 0, 0, 0)->startDay()->toCarbon();
+        $endOfYear = Verta::createJalali($currentJYear, 12, 29, 23, 59, 59)->endDay()->toCarbon();
 
-     $salesData = $orders->groupBy(fn($order) => Verta::instance($order->created_at)->month)
-        ->map(fn($ordersInMonth) => (int) round(
-            $ordersInMonth->avg(fn($order) => $order->orderProducts->sum('number')) ?? 0
-        ));
+        $orderProducts = OrderProduct::whereIn('product_id', $productIds)
+            ->whereHas('order', fn($query) => $query
+                ->whereBetween('created_at', [$startOfYear, $endOfYear])
+                ->where('total', '>', 0)
+            )
+            ->with(['order' => fn($query) => $query
+                ->whereBetween('created_at', [$startOfYear, $endOfYear])
+                ->where('total', '>', 0)
+            ])
+            ->get();
 
-    $labels = collect(range(1, 12))->map(fn($month) => Verta::createJalali($currentJYear, $month, 1, 0, 0, 0)->formatWord('F'));
+        $salesData = $orderProducts->groupBy(
+            fn($op) => Verta::instance($op->order->created_at)->month
+        )->map(
+            fn($productsInMonth) => (int) round(
+                $productsInMonth->groupBy('order_id')
+                    ->map(fn($orderProducts) => $orderProducts->sum('number'))
+                    ->avg() ?? 0
+            )
+        );
 
-    $data = $labels->keys()->map(fn($month) => $salesData->get($month + 1, 0));
+        $pricesData = $orderProducts->groupBy(
+            fn($op) => Verta::instance($op->order->created_at)->month
+        )->map(
+            fn($productsInMonth) => (int) round(
+                $productsInMonth->avg('price') ?? 0
+            )
+        );
 
-    return view('productChart', compact('labels', 'data'));
-}
+        $labels = collect(range(1, 12))->map(fn($month) => Verta::createJalali($currentJYear, $month, 1, 0, 0, 0)->formatWord('F'));
+
+        $data = $labels->keys()->map(fn($month) => $salesData->get($month + 1, 0));
+        $priceValues = $labels->keys()->map(fn($month) => $pricesData->get($month + 1, 0));
+
+        return view('productChart', compact('labels', 'data', 'priceValues'));
+    }
 
 }
