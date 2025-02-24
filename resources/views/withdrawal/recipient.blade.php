@@ -16,7 +16,7 @@
         <br>
         <br>
         <label for="recipient_file">رسید انبار:</label>
-        <input type="file" name="recipient_file" id="recipient_file"><br><br>
+        <input type="file" name="recipient_file" id="recipient_file" class="compress-image"><br><br>
         <a class="btn btn-info hide" id="recipient_file_old" href="/withdrawal/${withdrawal.recipient_file}" target="_blank">مشاهده فایل</a>
         <br>
         <br>

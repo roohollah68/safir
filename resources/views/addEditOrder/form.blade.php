@@ -80,7 +80,7 @@
                     {{config('payMethods')['onDelivery']}}</x-radio><br>
                 <label for='receiptPhoto' class="btn btn-info m-2 hide receiptPhoto">بارگذاری تصویر رسید بانکی <i
                         class="fa fa-image"></i></label>
-                <input type="file" id="receiptPhoto" class="hide" name="receipt">
+                <input type="file" id="receiptPhoto" class="hide" name="receipt" class="compress-image">
                 <label for="customerDiscount">درصد تخفیف به مشتری</label>
                 <input type="number" style="max-width: 60px" min="0" max="50" id="customerDiscount"
                        name="customerDiscount" value="{{old('customerDiscount')}}" onchange="refreshProducts()"><br>

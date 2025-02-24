@@ -14,7 +14,7 @@
             <div class="form-group input-group">
                 <span class="btn btn-outline-success fa fa-paper-plane" onclick="addComment({{$order->id}})"></span>
                 <input value="" type="text" id="text" class="form-control" name="text">
-                <input type="file" name="photo" id="photo" style="display: none;">
+                <input type="file" name="photo" id="photo" class="compress-image" style="display: none;">
                 <label for="photo" class="btn btn-info fa fa-paperclip"></label>
             </div>
         </div>

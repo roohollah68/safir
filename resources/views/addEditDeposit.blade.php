@@ -53,7 +53,7 @@
                         <div class="input-group-append" style="width: 160px">
                             <label for="photo" class="input-group-text w-100">تصویر رسید بانکی:</label>
                         </div>
-                        <input type="file" id="photo" class="" name="photo">
+                        <input type="file" id="photo" class="compress-image" name="photo">
                     </div>
                 </div>
             @endif

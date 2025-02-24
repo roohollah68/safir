@@ -21,17 +21,17 @@
 
         <br>
         <label for="payment_file">رسید پرداخت:</label>
-        <input type="file" name="payment_file" id="payment_file"><br><br>
+        <input type="file" name="payment_file" id="payment_file" class="compress-image"><br><br>
         <a class="btn btn-info hide" id="payment_file_old" href="/withdrawal/${withdrawal.payment_file}" target="_blank">مشاهده فایل</a>
         <br>
         <br>
         <label for="payment_file2">رسید پرداخت 2:</label>
-        <input type="file" name="payment_file2" id="payment_file2"><br><br>
+        <input type="file" name="payment_file2" id="payment_file2" class="compress-image"><br><br>
         <a class="btn btn-info hide" id="payment_file_old2" href="/withdrawal/${withdrawal.payment_file2}" target="_blank">مشاهده فایل2</a>
         <br>
         <br>
         <label for="payment_file3">رسید پرداخت 3:</label>
-        <input type="file" name="payment_file3" id="payment_file3"><br><br>
+        <input type="file" name="payment_file3" id="payment_file3" class="compress-image"><br><br>
         <a class="btn btn-info hide" id="payment_file_old3" href="/withdrawal/${withdrawal.payment_file3}" target="_blank">مشاهده فایل3</a>
         <br>
         <br>

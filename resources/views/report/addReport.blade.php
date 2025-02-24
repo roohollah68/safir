@@ -14,7 +14,7 @@
         <textarea name="description" rows="10" style="width: 700px">{{$report->description}}</textarea>
         <br>
         <label for="photo">الصاق تصویر:</label>
-        <input type="file" name="photo" id="photo">
+        <input type="file" name="photo" id="photo" class="compress-image">
         @if($report->photo)
             <span class="btn btn-danger" onclick="$('#oldPhoto').val('');$('#displayPhoto').hide();$(this).hide()">حذف تصویر</span>
         @endif

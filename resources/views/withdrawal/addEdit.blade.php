@@ -165,7 +165,7 @@
                 <div class="input-group-append" style="width: 160px">
                     <label for="user_file" class="input-group-text w-100">ارسال فایل توضیحات:</label>
                 </div>
-                <input type="file" id="user_file" name="user_file">
+                <input type="file" id="user_file" name="user_file" class="compress-image">
             </div>
             <span>فرمت های مجاز: jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx | حجم مجاز: 3mb</span>
         </div>
