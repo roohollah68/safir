@@ -282,58 +282,48 @@
 
     let token = "{{ csrf_token() }}";
 
-    $(function() {
+   $(function() {
     $(document).on('submit', 'form', async e => {
         e.preventDefault();
-        const form = e.target;  
-        const fileInputs = Array.from(form.querySelectorAll('input.compress-image[type="file"]'));
         try {
-            const processedFiles = await Promise.all(
-                fileInputs.map(async input => {
-                    const file = input.files[0];
-                    if (!file) return null;
-                    if (!file.type.startsWith('image/')) return file;
-
-                    const compressedBlob = await imageCompression(file, {
+            const form = e.target;
+            const inputs = [...form.querySelectorAll('input.compress-image[type="file"]')];
+            
+            await Promise.all(inputs.map(async input => {
+                const file = input.files[0];
+                if (!file) return;
+                
+                let processed = file;
+                if (file.type.startsWith('image/')) {
+                    const compressed = await imageCompression(file, {
                         maxSizeMB: 0.9,
                         maxWidthOrHeight: 1920,
                         useWebWorker: true,
                         fileType: file.type
                     });
+                    processed = new File([compressed], file.name, {
+                        type: compressed.type,
+                        lastModified: Date.now()
+                    });
+                }
+                
+                const dt = new DataTransfer();
+                dt.items.add(processed);
+                input.files = dt.files;
+            }));
 
-                    return {
-                        input,
-                        file: new File([compressedBlob], file.name, {
-                            type: compressedBlob.type,
-                            lastModified: Date.now()
-                        })
-                    };
-                })
-            );
-
-            processedFiles.forEach(result => {
-                if (!result) return;
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(result.file);
-                result.input.files = dataTransfer.files;
-            });
-
-            const formData = new FormData(form);
             await $.ajax({
                 url: form.action,
                 method: form.method,
-                data: formData,
+                data: new FormData(form),
                 processData: false,
-                contentType: false,
-                 success: function() {
-                    location.reload(true);
-                }
+                contentType: false
             });
-
+            
+            location.reload();
         } catch (error) {
-            console.error('Error:', error);
             alert(`خطا در آپلود: ${error.message}`);
         }
     });
-    });
+});
 </script>
