@@ -286,36 +286,41 @@ class StatisticController extends Controller
         $good = Good::findOrFail($id);
         $productIds = $good->products()->pluck('id');
 
-        $currentJYear = Verta::now()->year;
-        $startOfYear = Verta::createJalali($currentJYear, 1, 1, 0, 0, 0)->startDay()->toCarbon();
-        $endOfYear = Verta::createJalali($currentJYear, 12, 29, 23, 59, 59)->endDay()->toCarbon();
+        $endDate = Verta::now()->endDay()->toCarbon();
+        $startDate = Verta::now()->subMonths(11)->startDay()->toCarbon();
 
         $orderProducts = OrderProduct::whereIn('product_id', $productIds)
-        ->whereHas('order', fn($query) => $query
-                ->whereBetween('created_at', [$startOfYear, $endOfYear])
+            ->whereHas('order', fn($query) => $query
+                ->whereBetween('created_at', [$startDate, $endDate])
                 ->where('total', '>', 0)
             )
-        ->with('order')
-        ->get();
+            ->with('order')
+            ->get();
 
         $salesData = $orderProducts->groupBy(
-            fn($op) => Verta::instance($op->order->created_at)->month
+            fn($op) => Verta::instance($op->order->created_at)->format('Y-m')
         )->map(fn($productsInMonth) => (int)$productsInMonth->sum('number'));
 
         $pricesData = $orderProducts->groupBy(
-            fn($op) => Verta::instance($op->order->created_at)->month
+            fn($op) => Verta::instance($op->order->created_at)->format('Y-m')
         )->map(
-            fn($productsInMonth) => (int) round(
-                $productsInMonth->avg('price') ?? 0
-            )
+            fn($productsInMonth) => (int) round($productsInMonth->avg('price') ?? 0)
         );
 
-        $labels = collect(range(1, 12))->map(fn($month) => Verta::createJalali($currentJYear, $month, 1, 0, 0, 0)->formatWord('F'));
+        $monthData = collect(range(11, 0, -1))->map(function ($monthsAgo) {
+            $monthDate = Verta::now()->subMonths($monthsAgo);
+            return [
+                'key' => $monthDate->format('Y-m'),
+                'label' => $monthDate->formatWord('F')
+            ];
+        });
 
-        $data = $labels->keys()->map(fn($month) => $salesData->get($month + 1, 0));
-        $priceValues = $labels->keys()->map(fn($month) => $pricesData->get($month + 1, 0));
+        $month = $monthData->pluck('key');
+        $labels = $monthData->pluck('label');
+
+        $data = $month->map(fn($key) => $salesData->get($key, 0));
+        $priceValues = $month->map(fn($key) => $pricesData->get($key, 0));
 
         return view('productChart', compact('labels', 'data', 'priceValues'));
-    }
-
+}
 }

@@ -8,15 +8,15 @@
     <div class="container mt-5">
         <div class="card">
             <div class="card-body">
-                <canvas id="salesChart" width="350" height="150" style="direction: rtl"></canvas>
+                <canvas id="salesChart" width="320" height="150" style="direction: rtl"></canvas>
             </div>
         </div>
     </div>
 
     <div class="card mt-4">
-    <div class="card-body">
-        <canvas id="priceChart" width="350" height="150" style="direction: rtl"></canvas>
-    </div>
+        <div class="card-body">
+            <canvas id="priceChart" width="200" height="100" style="direction: rtl"></canvas>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -42,14 +42,14 @@
             data: {
                 labels: @json($labels),
                 datasets: [{
-                    label: 'میانگین تعداد فروش',
+                    label: 'تعداد فروش در ماه',
                     data: @json($data),
                     borderColor: '#3b82f6',
-                    tension: 0.1
+                    tension: 0.1,
                 }]
             },
             options: {
-                plugins: { 
+                plugins: {
                     tooltip: {
                         titleAlign: 'right',
                         bodyAlign: 'right',
@@ -88,60 +88,61 @@
             }
         });
 
-    // Chart 2    
-    const ctx2 = document.getElementById('priceChart').getContext('2d');
-    new Chart(ctx2, {
-    type: 'line',
-    data: {
-        labels: @json($labels),
-        datasets: [{
-            label: 'قیمت میانگین (ريال)',
-            data: @json($priceValues),
-            borderColor: '#f97316',
-            tension: 0.1
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                rtl: true,
-                labels: {
-                    font: {
-                        family: 'Vazir'
-                    }
-                }
+        // Chart 2    
+        const ctx2 = document.getElementById('priceChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: @json($labels),
+                datasets: [{
+                    label: 'قیمت میانگین (ريال)',
+                    data: @json($priceValues),
+                    borderColor: '#f97316',
+                    tension: 0.1
+                }]
             },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        return context.raw.toLocaleString() + ' ريال';
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        titleAlign: 'right',
+                        bodyAlign: 'right',
+                        displayColors: false,
+                        backgroundColor: '#2d3748',
+                        titleColor: '#cbd5e0',
+                        bodyColor: '#cbd5e0'
                     }
-                }
-            }
-        },
-        scales: {
-            x: {
-                ticks: {
-                    font: {
-                        family: 'Vazir'
+                },
+                interaction: {
+                    mode: 'nearest',
+                    intersect: false
+                },
+                elements: {
+                    point: {
+                        hitRadius: 20
                     }
-                }
-            },
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    font: {
-                        family: 'Vazir'
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            font: {
+                                family: 'Vazir'
+                            }
+                        }
                     },
-                    callback: function(value) {
-                        return value.toLocaleString('fa-IR') + ' ريال';
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                family: 'Vazir'
+                            },
+                            callback: function(value) {
+                                return value.toLocaleString('fa-IR') + ' ريال';
+                            }
+                        }
                     }
                 }
             }
-        }
-    }
-});
-
+        });
     </script>
 @endsection
