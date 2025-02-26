@@ -291,25 +291,16 @@ class StatisticController extends Controller
         $endOfYear = Verta::createJalali($currentJYear, 12, 29, 23, 59, 59)->endDay()->toCarbon();
 
         $orderProducts = OrderProduct::whereIn('product_id', $productIds)
-            ->whereHas('order', fn($query) => $query
+        ->whereHas('order', fn($query) => $query
                 ->whereBetween('created_at', [$startOfYear, $endOfYear])
                 ->where('total', '>', 0)
             )
-            ->with(['order' => fn($query) => $query
-                ->whereBetween('created_at', [$startOfYear, $endOfYear])
-                ->where('total', '>', 0)
-            ])
-            ->get();
+        ->with('order')
+        ->get();
 
         $salesData = $orderProducts->groupBy(
             fn($op) => Verta::instance($op->order->created_at)->month
-        )->map(
-            fn($productsInMonth) => (int) round(
-                $productsInMonth->groupBy('order_id')
-                    ->map(fn($orderProducts) => $orderProducts->sum('number'))
-                    ->avg() ?? 0
-            )
-        );
+        )->map(fn($productsInMonth) => (int)$productsInMonth->sum('number'));
 
         $pricesData = $orderProducts->groupBy(
             fn($op) => Verta::instance($op->order->created_at)->month
