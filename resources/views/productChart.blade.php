@@ -81,6 +81,9 @@
                         ticks: {
                             font: {
                                 family: 'Vazir'
+                            },
+                            callback: function(value) {
+                                return value.toLocaleString('fa-IR');
                             }
                         }
                     }
