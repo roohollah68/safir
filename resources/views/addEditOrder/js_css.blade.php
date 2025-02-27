@@ -43,12 +43,30 @@
             select: function (event, ui) {
                 let id = customersName[ui.item.value];
                 setCustomerInfo(id);
+                fetchOrderData(id);
             }
         });
         $("#name").change((data) => {
             let id = customersName[data.target.value];
             setCustomerInfo(id);
         });
+
+        function fetchOrderData(customerId) {
+        $.ajax({
+            url: '{{ route('history') }}',
+            method: 'GET',
+            data: {
+                customer_id: customerId,
+                _token: '{{ csrf_token() }}' 
+            },
+            success: function(response) {
+            $('#history').html(response);
+            },
+            error: function(xhr) {
+            console.error('خطا در دریافت اطلاعات:', xhr.responseText);
+            }
+        });
+    }
     });
 
     @endif

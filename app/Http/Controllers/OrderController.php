@@ -667,5 +667,18 @@ class OrderController extends Controller
             view('keysun.invoice2', compact('orders'))->render()
         ];
     }
+
+    public function orderHistory(Request $request)
+    {   
+        $request->validate(['customer_id' => 'required|integer']);
+
+        $orders = Order::with(['orderProducts.product.good'])
+            ->where('customer_id', $request->customer_id)
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('addEditOrder.history', compact('orders'));
+
+    }
 }
 

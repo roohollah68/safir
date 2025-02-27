@@ -63,6 +63,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('cancel_invoice/{id}', 'cancelInvoice');
         Route::post('change_state/{id}/{state}', 'changeState');
         Route::post('/set_send_method/{id}', 'setSendMethod');
+        Route::get('/history', 'orderHistory')->name('history');
     });
 
     Route::controller(SettingController::class)->group(function () {
