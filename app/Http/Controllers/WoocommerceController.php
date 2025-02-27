@@ -16,7 +16,7 @@ class WoocommerceController extends Controller
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
         $request = json_decode(file_get_contents('php://input'));
         if (env('APP_ENV') == 'local') {
-            $request = json_decode(file_get_contents('woo/1403-8-27_09-35-04 _ berrynocom _ سارا خوش قدم.txt'));
+            $request = json_decode(file_get_contents('woo/1403-12-8_23-52-04 _ peptina _ هلیا ضیغمی.txt'));
 //            dd($request);
         }
         if (!isset($request->billing))
@@ -57,14 +57,15 @@ class WoocommerceController extends Controller
         $user = User::where('username', $website)->first();
 
         $web = Websites::where('website_id', $request->id)->where('website', $website)->first();
-        $deliveryTime = '';
-        $metaData = collect($request->meta_data)->keyBy('key');
-        if (isset($metaData['_delivery_time_novin']))
-            $deliveryTime = $metaData['_delivery_time_novin']->value;
+        $metaData = (object)collect($request->meta_data)->keyBy('key')->map(fn($data) => $data->value)->all();
+        $deliveryTime = $metaData->_delivery_time_novin ?? '';
+        $house_num = isset($metaData->_billing_house_num) ? ' پلاک: ' . $metaData->_billing_house_num : '';
+        $unit_num = isset($metaData->_billing_unit_num) ? ' واحد: ' . $metaData->_billing_unit_num : '';
         $orderData = [
             'name' => $request->billing->first_name . ' ' . $request->billing->last_name,
             'phone' => $request->billing->phone,
-            'address' => $request->billing->state . ' ' .$request->billing->city . ' ' . $request->billing->address_1,
+            'address' => $request->billing->state . '، ' . $request->billing->city . '، '
+                . $request->billing->address_1 . '، ' . $unit_num . $house_num,
             'zip_code' => $request->billing->postcode,
             'orders' => $orders,
             'desc' => $request->customer_note . ($desc ? ' - ' . $desc : ''),
@@ -145,7 +146,7 @@ class WoocommerceController extends Controller
 
     public function viewFile()
     {
-        $file = '1403-8-27_09-35-04 _ berrynocom _ سارا خوش قدم';
+        $file = '1403-12-8_23-52-04 _ peptina _ هلیا ضیغمی';
         $data = json_decode(file_get_contents("woo/{$file}.txt"));
         dd($data);
     }
