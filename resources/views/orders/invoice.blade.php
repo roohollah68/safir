@@ -147,21 +147,25 @@
             <div class="w-100 normal {{$lastPage}}">
                 @if($order->payMethod())
                     نحوه پرداخت: {{$order->payMethod()}}
-                    /
+                    *
                 @endif
                 @if($order->sendMethod())
                     نحوه ارسال: {{$order->sendMethod()}}
-                    /
+                    *
                 @endif
                 @if($order->desc)
                     توضیحات: {{$order->desc}}
-                    /
+                    *
                 @endif
-                     (انبار {{$order->warehouse->name}})
-                    /
-                @unless($order->confirm)
+                     انبار: {{$order->warehouse->name}}
+                    *
+                @if($order->user->admin())
+                    بدهی: <span dir="ltr">{{-$order->customer->balance()}}</span>
+                    *
+                @endif
+                @if(!$order->confirm)
                         <span style="white-space: pre-wrap;">{{$setting->invoice_note1}}</span>
-                @endunless
+                @endif
                     <sapn style="font-weight: bold;white-space: pre-wrap;">{{$setting->invoice_note2}}</sapn>
             </div>
         </div>

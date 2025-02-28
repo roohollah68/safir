@@ -282,49 +282,54 @@
 
     let token = "{{ csrf_token() }}";
 
-   $(function() {
-    $(document).on('submit', 'form', async e => {
-        const form = e.target;
-        if (!form.querySelectorAll('input.compress-image[type="file"]').length) return;
-        e.preventDefault();
+    $(function () {
+        $('form').submit( async e => {
+            const form = e.target;
+            console.log(form);
+            if (!form.querySelectorAll('input.compress-image[type="file"]').length)
+                return;
+            e.preventDefault();
 
-        try {
-            const inputs = [...form.querySelectorAll('input.compress-image[type="file"]')];           
-            await Promise.all(inputs.map(async input => {
-                const file = input.files[0];
-                if (!file) return;
-                
-                let processed = file;
-                if (file.type.startsWith('image/')) {
-                    const compressed = await imageCompression(file, {
-                        maxSizeMB: 0.9,
-                        maxWidthOrHeight: 1920,
-                        useWebWorker: true,
-                        fileType: file.type
-                    });
-                    processed = new File([compressed], file.name, {
-                        type: compressed.type,
-                        lastModified: Date.now()
-                    });
-                }
-                
-                const dt = new DataTransfer();
-                dt.items.add(processed);
-                input.files = dt.files;
-            }));
+            try {
+                const inputs = [...form.querySelectorAll('input.compress-image[type="file"]')];
+                await Promise.all(inputs.map(async input => {
+                    $(input).removeClass('compress-image');
+                    const file = input.files[0];
+                    if (!file) return;
 
-            await $.ajax({
-                url: form.action,
-                method: form.method,
-                data: new FormData(form),
-                processData: false,
-                contentType: false
-            });
-            
-            location.reload();
-        } catch (error) {
-            alert(`خطا در آپلود: ${error.message}`);
-        }
+                    let processed = file;
+                    if (file.type.startsWith('image/')) {
+                        const compressed = await imageCompression(file, {
+                            maxSizeMB: 0.9,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true,
+                            fileType: file.type
+                        });
+                        processed = new File([compressed], file.name, {
+                            type: compressed.type,
+                            lastModified: Date.now()
+                        });
+                    }
+
+                    const dt = new DataTransfer();
+                    dt.items.add(processed);
+                    input.files = dt.files;
+                }));
+                $(form).append('<input type="submit">')
+                $(form).find('input[type=submit]').click();
+                // $(form).find('input[type=submit]').click();
+                // await $.ajax({
+                //     url: form.action,
+                //     method: form.method,
+                //     data: new FormData(form),
+                //     processData: false,
+                //     contentType: false
+                // });
+
+                // location.reload();
+            } catch (error) {
+                alert(`خطا در آپلود: ${error.message}`);
+            }
+        });
     });
-});
 </script>

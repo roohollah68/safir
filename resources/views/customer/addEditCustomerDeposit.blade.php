@@ -52,10 +52,8 @@
                         <label for="amount" class="input-group-text w-100">مبلغ واریزی:</label>
                     </div>
                     <input value="{{old('amount')?:$deposit->amount?:($order->unpaid()??'')}}"
-                           type="text"
-                           id="amount"
-                           class="form-control price-input" name="amount"
-                           pattern="^([-+,0-9.]+)" dir="ltr" required>
+                           type="text" id="amount" class="form-control price-input" name="amount"
+                            dir="ltr" required>
                     <div class="input-group-prepend" style="min-width: 120px">
                         <label for="amount" class="input-group-text w-100"> ریال</label>
                     </div>
