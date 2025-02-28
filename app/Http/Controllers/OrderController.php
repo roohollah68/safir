@@ -670,14 +670,32 @@ class OrderController extends Controller
 
     public function orderHistory(Request $request)
     {
-        $request->validate(['customer_id' => 'required|integer']);
+        $request->validate([
+            'customer_id' => 'required|integer',
+            'warehouse_id' => 'required|integer',
+        ]);
 
-        $orders = Order::with(['orderProducts.product.good'])
-            ->where('customer_id', $request->customer_id)
-            ->orderByDesc('created_at')
-            ->get();
+        $warehouseId = $request->warehouse_id;
+        $customerId = $request->customer_id;
 
-        return view('addEditOrder.history', compact('orders'));
+        $orders = Order::with([
+            'orderProducts' => function ($query) use ($warehouseId) {
+                $query->whereHas('product', function ($q) use ($warehouseId) {
+                    $q->where('warehouse_id', $warehouseId)
+                    ->where('available', 1);
+                });
+            }
+        ])
+        ->where('customer_id', $customerId)
+        ->orderByDesc('created_at')
+        ->get();
+
+        $filteredOrders = $orders->filter(fn($order) => $order->orderProducts->isNotEmpty());
+
+        return view('addEditOrder.history', [
+            'orders' => $filteredOrders,
+            'customerId' => $customerId  
+        ]);
 
     }
 }

@@ -52,11 +52,13 @@
         });
 
         function fetchOrderData(customerId) {
+        let warehouseId = $('input[name="warehouse_id"]').val();
         $.ajax({
             url: '{{ route('history') }}',
             method: 'GET',
             data: {
                 customer_id: customerId,
+                warehouse_id: warehouseId,
                 _token: '{{ csrf_token() }}' 
             },
             success: function(response) {
