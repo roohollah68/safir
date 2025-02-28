@@ -331,7 +331,7 @@ class OrderController extends Controller
         }
         $text = null;
         if ($order->state == 0) {
-            $text = 'سفارش به انبار بازگشت';
+            $text = 'سفارش به حالت در انتظار پرینت بازگشت';
             foreach ($order->productChange()->get() as $productChange) {
                 $productChange->update(['isDeleted' => true]);
                 $product = $productChange->product()->withTrashed()->first();
@@ -669,7 +669,7 @@ class OrderController extends Controller
     }
 
     public function orderHistory(Request $request)
-    {   
+    {
         $request->validate(['customer_id' => 'required|integer']);
 
         $orders = Order::with(['orderProducts.product.good'])

@@ -240,12 +240,13 @@ class CustomerController extends Controller
                 'amount' => $transaction->amount,
             ]);
             $order = Order::findOrFail($orderId);
+            if(!$order->confirm)
+                $customer->update([
+                    'balance' => $customer->balance - $order->total,
+                ]);
             $order->update([
                 'confirm' => true,
-                'paymentMethod' => $req->pay_method == 'cash' ? 1 : 2,
-            ]);
-            $customer->update([
-                'balance' => $customer->balance - $order->total,
+                'paymentMethod' =>  ['cash'=>1 , 'cheque'=>2][$req->pay_method],
             ]);
         } else {
             $transaction->paymentLinks()->delete();
@@ -308,10 +309,10 @@ class CustomerController extends Controller
     public function approveDeposit($id)
     {
         Helper::access('counter');
-        $trans = CustomerTransaction::with('customer')->findOrFail($id);
+        $trans = CustomerTransaction::findOrFail($id);
         if ($trans->verified == 'approved')
             return $trans->verified;
-        $trans->customer->update([
+        echo $trans->customer->update([
             'balance' => $trans->customer->balance + $trans->amount,
         ]);
         $trans->update([
@@ -324,7 +325,7 @@ class CustomerController extends Controller
     {
         DB::beginTransaction();
         Helper::access('counter');
-        $trans = CustomerTransaction::with('customer')->findOrFail($id);
+        $trans = CustomerTransaction::findOrFail($id);
         if ($trans->verified == 'rejected')
             return $trans->verified;
         if ($trans->verified == 'approved')

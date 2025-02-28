@@ -86,7 +86,7 @@ class SettingController extends Controller
             if ($customer->balance() != $customer->balance) {
                 echo $customer->name. $customer->balance() . '=>'.  $customer->balance . '<br>';
                 $customer->balance = $customer->balance();
-//            541    $customer->save();
+                $customer->save();
             }
         }
 
