@@ -24,7 +24,7 @@
                         </tr>
 
                         @foreach ($order->orderProducts as $orderProduct)
-                            @continue($orderProduct->product)
+                            @continue(!isset($orderProduct->product))
                             <tr class="product-row">
                                 <td></td>
                                 <td></td>
