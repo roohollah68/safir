@@ -4,8 +4,6 @@
                 <h5 class="mb-3 btn btn-outline-dark disabled">تعداد سفارشات: {{ $orders->count() }} </h5>
                 <thead>
                     <tr>
-                        <th>شماره‌ی سفارش</th>
-                        <th>تاریخ سفارش</th>
                         <th>نام محصول</th>
                         <th>تعداد</th>
                         <th>مقدار تخفیف</th>
@@ -16,29 +14,28 @@
                 <tbody>
 
                     @foreach ($orders as $order)
-                        <tr class="order-header bg-light">
-                            <td class="fw-bold">{{ $order->id }}</td>
-                            <td>{{ verta($order->created_at)->formatJalaliDate() }}</td>
-                            <td colspan="4"></td>
-                            <td><span class="btn btn-primary fa fa-add"></span></td>
+                        <tr class="order-header bg-secondary p-2 bg-opacity-50 fw-bold">
+                            <td colspan="7">
+                                <span class="me-5">شماره‌ی سفارش: {{ $order->id }}</span>
+                                <span class="ms-5">تاریخ سفارش:
+                                    {{ verta($order->created_at)->formatJalaliDate() }}</span>
+                            </td>
                         </tr>
 
                         @foreach ($order->orderProducts as $orderProduct)
                             @continue(!isset($orderProduct->product))
                             <tr class="product-row">
-                                <td></td>
-                                <td></td>
-                                <td>{{ $orderProduct->product->name }}</td>
+                                <td>{{ $orderProduct->name }}</td>
                                 <td>{{ number_format($orderProduct->number) }}</td>
                                 <td>{{ number_format($orderProduct->discount) }}%</td>
                                 <td>{{ number_format($orderProduct->price) }}</td>
                                 <td>{{ number_format($orderProduct->product->good->price) }}</td>
+                                <td>
+                                    <span class="btn btn-primary fa fa-add"
+                                        onclick="addProduct({{ $orderProduct->product_id }});refreshProducts();"></span>
+                                </td>
                             </tr>
                         @endforeach
-
-                        <tr class="order-footer">
-                            <td colspan="7" class="bg-white" style="height: 2px"></td>
-                        </tr>
                     @endforeach
 
                 </tbody>
@@ -53,21 +50,7 @@
 
     <style>
         .order-header td {
-            border-bottom: 2px solid #dee2e6 !important;
-        }
-
-        .product-row td:first-child,
-        .product-row td:nth-child(2) {
-            background: repeating-linear-gradient(135deg,
-                    rgba(0, 0, 0, 0.05),
-                    rgba(0, 0, 0, 0.05) 5px,
-                    transparent 5px,
-                    transparent 10px);
-        }
-
-        .order-footer {
-            height: 15px;
-            background: #f8f9fa;
+            color: white !important;
         }
 
         td {
