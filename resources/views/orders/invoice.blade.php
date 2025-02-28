@@ -159,8 +159,10 @@
                 @endif
                      انبار: {{$order->warehouse->name}}
                     *
+                @if($order->user->admin())
                     بدهی: <span dir="ltr">{{-$order->customer->balance()}}</span>
                     *
+                @endif
                 @if(!$order->confirm)
                         <span style="white-space: pre-wrap;">{{$setting->invoice_note1}}</span>
                 @endif

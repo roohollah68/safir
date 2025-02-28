@@ -91,21 +91,6 @@ class User extends Authenticatable
         return $this->role == "admin";
     }
 
-//    public function superAdmin()
-//    {
-//        return $this->role == 'superAdmin';
-//    }
-
-//    public function print()
-//    {
-//        return $this->role == "print";
-//    }
-
-//    public function warehouse()
-//    {
-//        return $this->role == 'warehouse';
-//    }
-
     public function safir()
     {
         return $this->role == 'user';
