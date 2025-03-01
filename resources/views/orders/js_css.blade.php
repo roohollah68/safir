@@ -9,6 +9,7 @@
     let ids;
     let showDeleted, printWait, confirmWait, counterWait, proccessWait, sent, delivered, COD, refund, user = 'all',
         warehouseId = 'all';
+    let notsent = false;
     let changeOrdersPermit = !!'{{$User->meta('showAllOrders')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     let dtp1Instance;
@@ -76,6 +77,8 @@
             return
         if (proccessWait && (order.state > 4 || order.state < 1))
             return
+        if (notsent && !NotSent(order))
+            return;
         if (+warehouseId !== +order.warehouse_id && warehouseId !== 'all')
             return;
         if (COD && order.paymentMethod !== 'cod' && order.paymentMethod !== 'پرداخت در محل' && order.paymentMethod !== 'onDelivery')
@@ -118,7 +121,11 @@
             order.zip_code,
         ];
     }
-
+    function NotSent(order) {
+        const lastUpdate = new Date(order.updated_at).getTime();
+        const processingTime = Date.now() - lastUpdate;
+        return (order.state === 1 || order.state === 2) && processingTime > 172800000;
+    }
     function create_table(data) {
         if (table) {
             table.clear();
@@ -199,15 +206,26 @@
         } else if (!order.state) {
             let btn = order.confirm ? (order.counter === 'waiting' ? 'info' : 'secondary') : 'primary';
             res = `<span class="btn btn-${btn}" onclick="change_state(${order.id}, 1)">${text}</span>`
-        } else if (order.state < 3) {
-            res = `<span class="btn btn-warning" onclick="selectSendMethod(${order.id})">${text}<i class="fas fa-check"></i></span>`
-        } else if (+order.state === 4) {
+        } 
+        //else if (order.state < 3) {
+        //     res = `<span class="btn btn-warning" onclick="selectSendMethod(${order.id})">${text}<i class="fas fa-check"></i></span>`
+        // } 
+        else if (+order.state === 4) {
             res = `<span class="btn btn-danger" onclick="change_state(${order.id}, 0)">${text}<i class="fas fa-question"></i></span>`
         } else if (+order.state === 10) {
             res = `<span class="btn btn-success" onclick="confirm('آیا وضعیت سفارش به در انتظار پرینت تغییر کند؟')&&change_state(${order.id}, 0)">${text}<i class="fas fa-check-double"></i></span>`
         } else if (+order.state === 11) {
             res = `<span class="btn btn-delivered" onclick="confirm('آیا وضعیت سفارش به در انتظار پرینت تغییر کند؟')&&confirm(change_state(${order.id}, 0))">${text}<i class="fas fa-check-double"></i></span>`
         }
+        else if ([1, 2].includes(+order.state)) {
+        const isExpired = NotSent(order);
+        const color = isExpired ? 'danger' : 'warning';
+        const icon = isExpired ? 'clock' : 'check';
+        
+        res = `<span class="btn btn-${color}" onclick="selectSendMethod(${order.id})">
+            ${text}<i class="fas fa-${icon}"></i></span>`;
+        }
+        console.log('Order:', order.id, 'State:', order.state, 'Updated:', order.updated_at);
         return timestamp + res;
     }
 
@@ -281,8 +299,15 @@
         }
         if (order.confirm && order.counter === 'approved' && order.state === 0)
             return 'در انتظار پرینت';
-        if (order.state === 1 || order.state === 2)
-            return 'در حال پردازش برای ارسال';
+        // if (order.state === 1 || order.state === 2)
+        //     return 'در حال پردازش برای ارسال';
+        if (order.state === 1 || order.state === 2) {
+            if (NotSent(order)) {
+                return 'ارسال نشده';
+            } else {
+                return 'در حال پردازش برای ارسال';
+            }
+        }
         if (order.state === 4)
             return 'در انتظار پرینت';
     }
