@@ -59,7 +59,7 @@
             data: {
                 customer_id: customerId,
                 warehouse_id: warehouseId,
-                _token: '{{ csrf_token() }}' 
+                _token: '{{ csrf_token() }}'
             },
             success: function(response) {
             $('#history').html(response);
@@ -228,7 +228,7 @@
     function beforeSubmit() {
 
         let number = Object.keys(cart).length;
-
+        console.log('hi');
         if (!number) {
             alert('محصولی انتخاب نشده است');
             return false;
@@ -238,9 +238,7 @@
             alert('تعداد همگی باید مثبت یا منفی باشند');
             return false;
         }
-        if (submitStatus)
-            return false;
-        submitStatus = true
+        $('input[type=submit]').attr('disabled','disabled');
         return true;
     }
 
