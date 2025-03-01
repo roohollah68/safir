@@ -679,13 +679,13 @@ class OrderController extends Controller
         $customerId = $request->customer_id;
 
         $orders = Order::with([
-            'orderProducts' => function ($query) use ($warehouseId) {
-                $query->whereHas('product', function ($q) use ($warehouseId) {
-                    $q->where('warehouse_id', $warehouseId)
-                    ->where('available', 1);
+            'orderProducts' => function ($query) {
+                $query->whereHas('product', function ($q)  {
+                    $q->where('available', 1);
                 });
             }
         ])
+        ->where('warehouse_id', $warehouseId)
         ->where('customer_id', $customerId)
         ->orderByDesc('created_at')
         ->get();
@@ -694,7 +694,7 @@ class OrderController extends Controller
 
         return view('addEditOrder.history', [
             'orders' => $filteredOrders,
-            'customerId' => $customerId  
+            'customerId' => $customerId
         ]);
 
     }
