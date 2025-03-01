@@ -7,9 +7,8 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let showDeleted, printWait, confirmWait, counterWait, proccessWait, sent, delivered, COD, refund, user = 'all',
+    let showDeleted, printWait, confirmWait, counterWait, proccessWait, notsent, sent, delivered, COD, refund, user = 'all',
         warehouseId = 'all';
-    let notsent = false;
     let changeOrdersPermit = !!'{{$User->meta('showAllOrders')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     let dtp1Instance;
