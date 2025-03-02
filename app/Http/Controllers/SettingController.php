@@ -83,7 +83,7 @@ class SettingController extends Controller
 
         $comments = Comment::with('order')
             ->whereHas('order' , function ($order){
-                $order->where('state','>=',10)->whereNotNull('sent_at');
+                $order->where('state','>=',10)->whereNull('sent_at');
             })
             ->where('text' , 'سفارش ارسال شد')
             ->get();
@@ -92,7 +92,7 @@ class SettingController extends Controller
                 'sent_at' => $comment->created_at,
             ]);
         }
-        Order::where('state','>=',10)->whereNotNull('sent_at')->update([
+        Order::where('state','>=',10)->whereNull('sent_at')->update([
             'sent_at' => DB::raw('`updated_at`'),
         ]);
     }
