@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 //use App\Models\Good;
 use App\Helper\Helper;
 use App\Models\Bank;
+use App\Models\Comment;
 use App\Models\CouponLink;
 use App\Models\Customer;
 use App\Models\CustomerTransaction;
@@ -82,15 +83,29 @@ class SettingController extends Controller
 
     public function command()
     {
-        foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {
-            if ($customer->balance() != $customer->balance) {
-                echo $customer->name. $customer->balance() . '=>'.  $customer->balance . '<br>';
-                $customer->balance = $customer->balance();
-//                $customer->save();
-            }
+//        foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {
+//            if ($customer->balance() != $customer->balance) {
+//                echo $customer->name. $customer->balance() . '=>'.  $customer->balance . '<br>';
+//                $customer->balance = $customer->balance();
+////                $customer->save();
+//            }
+//        }
+
+
+        $comments = Comment::with('order')
+            ->whereHas('order' , function ($order){
+                $order->where('state','>=',10)->whereNotNull('sent_at');
+            })
+            ->where('text' , 'سفارش ارسال شد')
+            ->get();
+        foreach ($comments as $comment){
+            $comment->order->update([
+                'sent_at' => $comment->created_at,
+            ]);
         }
-
-
+        Order::where('state','>=',10)->whereNotNull('sent_at')->update([
+            'sent_at' => DB::raw('`updated_at`'),
+        ]);
     }
 
     public function combineCustomers()

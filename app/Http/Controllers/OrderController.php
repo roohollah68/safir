@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Warehouse;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -375,6 +376,7 @@ class OrderController extends Controller
                 ]);
             }
             $text = 'سفارش ارسال شد';
+            $order->sent_at = Carbon::now();
         }
         if ($text)
             (new CommentController)->create($order, auth()->user(), $text);
