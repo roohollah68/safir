@@ -4,24 +4,14 @@ namespace App\Http\Controllers;
 
 
 use App\Helper\Helper;
-use App\Models\Bank;
 use App\Models\Comment;
-use App\Models\CouponLink;
 use App\Models\Customer;
 use App\Models\CustomerTransaction;
-use App\Models\Oldcustomer;
 use App\Models\Order;
-use App\Models\OrderProduct;
-use App\Models\PaymentLink;
-use App\Models\Product;
 use App\Models\Setting;
-use App\Models\Supplier;
 use App\Models\Warehouse;
-use App\Models\Withdrawal;
-use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 
 class SettingController extends Controller
 {
@@ -81,18 +71,18 @@ class SettingController extends Controller
 //        }
 
         $comments = Comment::with('order')
-            ->whereHas('order' , function ($order){
-                $order->where('state','>=',1)->whereNull('processed_at');
+            ->whereHas('order', function ($order) {
+                $order->where('confirm', true)->whereNull('confirmed_at');
             })
-            ->where('text' , 'سفارش در حال پردازش برای ارسال')
+            ->where('text', 'LIKE', '%سفارش تایید شد. %')
             ->get();
-        foreach ($comments as $comment){
+        foreach ($comments as $comment) {
             $comment->order->update([
-                'processed_at' => $comment->created_at,
+                'confirmed_at' => $comment->created_at,
             ]);
         }
-        Order::where('state','>=',1)->whereNull('processed_at')->update([
-            'processed_at' => DB::raw('`updated_at`'),
+        Order::where('confirm',true)->whereNull('confirmed_at')->update([
+            'confirmed_at' => DB::raw('`updated_at`'),
         ]);
     }
 

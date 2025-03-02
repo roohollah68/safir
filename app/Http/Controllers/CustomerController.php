@@ -246,8 +246,10 @@ class CustomerController extends Controller
                 ]);
             $order->update([
                 'confirm' => true,
+                'confirmed_at' => Carbon::now(),
                 'paymentMethod' =>  ['cash'=>1 , 'cheque'=>2][$req->pay_method],
             ]);
+            (new CommentController)->create($order, auth()->user(), 'سفارش تایید شد. ' . $req->description . '/ ' . $order->payMethod());
         } else {
             $transaction->paymentLinks()->delete();
         }

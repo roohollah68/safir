@@ -298,7 +298,7 @@ class OrderController extends Controller
         Helper::access('changeOrderState');
         DB::beginTransaction();
         $order = Helper::Order(true)->findOrFail($id);
-        if($order->state == $state)
+        if ($order->state == $state)
             return abort(405, 'عملیات ممکن نیست.');
         $user = $order->user;
         // جلوگیری از ارسال سفارشات نقدی و چکی بدون تایید پرداخت
@@ -332,6 +332,8 @@ class OrderController extends Controller
         }
         $text = null;
         if ($order->state == 0) {
+            $order->processed_at = null;
+            $order->sent_at = Carbon::now();
             $text = 'سفارش به حالت در انتظار پرینت بازگشت';
             foreach ($order->productChange()->get() as $productChange) {
                 $productChange->update(['isDeleted' => true]);
@@ -479,6 +481,9 @@ class OrderController extends Controller
         $order = Helper::Order(!Helper::meta('counter'))->findOrFail($id);
         if (!$order->confirm)
             return abort(405, 'سفارش قبلا لغو شده است');
+        if ($order->state >= 10) {
+            return abort(405, 'سفارش ارسال شده است');
+        }
         if ($order->state) {
             $order->state = 4;
             (new CommentController)->create($order, auth()->user(), 'سفارش بعد از تایید ویرایش شد');
@@ -491,6 +496,7 @@ class OrderController extends Controller
         $order->paymentMethod = null;
         $order->payInDate = null;
         $order->paymentNote = null;
+        $order->confirmed_at = null;
         (new CommentController)->create($order, auth()->user(), 'سفارش به حالت پیش فاکتور بازگشت ');
         $order->save();
         DB::commit();
@@ -594,6 +600,7 @@ class OrderController extends Controller
         $order->paymentLinks()->delete();
         $order->update([
             'confirm' => true,
+            'confirmed_at' => Carbon::now(),
             'paymentMethod' => $paymentMethod,
             'payInDate' => $req->payInDate,
             'paymentNote' => $req->note,
@@ -683,15 +690,15 @@ class OrderController extends Controller
 
         $orders = Order::with([
             'orderProducts' => function ($query) {
-                $query->whereHas('product', function ($q)  {
+                $query->whereHas('product', function ($q) {
                     $q->where('available', 1);
                 });
             }
         ])
-        ->where('warehouse_id', $warehouseId)
-        ->where('customer_id', $customerId)
-        ->orderByDesc('created_at')
-        ->get();
+            ->where('warehouse_id', $warehouseId)
+            ->where('customer_id', $customerId)
+            ->orderByDesc('created_at')
+            ->get();
 
         $filteredOrders = $orders->filter(fn($order) => $order->orderProducts->isNotEmpty());
 
