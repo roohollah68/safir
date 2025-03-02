@@ -38,6 +38,7 @@
         <x-checkbox :id="'counterWait'">در انتظار تایید حسابدار</x-checkbox>
         <x-checkbox :id="'printWait'"> در انتظار پرینت</x-checkbox>
         <x-checkbox :id="'proccessWait'"> در حال پردازش</x-checkbox>
+        <x-checkbox :id="'notsent'">ارسال نشده</x-checkbox>
         <x-checkbox :id="'sent'">ارسال شده</x-checkbox>
         <x-checkbox :id="'delivered'">تحویل داده شده</x-checkbox>
 
