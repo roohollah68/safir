@@ -71,20 +71,20 @@ class SettingController extends Controller
 //            }
 //        }
 
-        $comments = Comment::with('order')
-            ->whereHas('order', function ($order) {
-                $order->where('confirm', true)->whereNull('confirmed_at');
-            })
-            ->where('text', 'LIKE', '%سفارش تایید شد. %')
-            ->get();
-        foreach ($comments as $comment) {
-            $comment->order->update([
-                'confirmed_at' => $comment->created_at,
-            ]);
-        }
-        Order::where('confirm',true)->whereNull('confirmed_at')->update([
-            'confirmed_at' => DB::raw('`updated_at`'),
-        ]);
+//        $comments = Comment::with('order')
+//            ->whereHas('order', function ($order) {
+//                $order->where('confirm', true)->whereNull('confirmed_at');
+//            })
+//            ->where('text', 'LIKE', '%سفارش تایید شد. %')
+//            ->get();
+//        foreach ($comments as $comment) {
+//            $comment->order->update([
+//                'confirmed_at' => $comment->created_at,
+//            ]);
+//        }
+//        Order::where('state','>=',10)->whereNull('sent_at')->update([
+//            'sent_at' => DB::raw('`updated_at`'),
+//        ]);
     }
 
     public function combineCustomers()

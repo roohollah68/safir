@@ -82,7 +82,8 @@
                 <thead>
                 <tr>
                     <th>شماره</th>
-                    <th>زمان</th>
+                    <th>زمان تایید سفارش</th>
+                    <th>زمان ارسال</th>
                     <th>وضعیت</th>
                     <th>مبلغ(ریال)</th>
                     <th>درصد پرداخت</th>
@@ -93,16 +94,10 @@
                 @foreach($orders as $id => $order)
                     <tr>
                         <td>{{$order->id}}</td>
-                        <td>{{verta($order->created_at)->timezone('Asia/tehran')->format('Y/m/d')}}</td>
+                        <td dir="ltr">{{$order->confirmed_at?verta($order->confirmed_at)->timezone('Asia/tehran')->format('Y/m/d h:i'):'-'}}</td>
+                        <td dir="ltr">{{$order->sent_at?verta($order->sent_at)->timezone('Asia/tehran')->format('Y/m/d h:i'):'-'}}</td>
                         <td>
                             {!! $order->orderCondition() !!}
-{{--                            @if($order->counter == 'waiting')--}}
-{{--                                <i class="btn btn-info">در انتظار بررسی</i>--}}
-{{--                            @elseif($order->counter == 'approved')--}}
-{{--                                <i class="btn btn-success">تایید شده</i>--}}
-{{--                            @elseif($order->counter == 'rejected')--}}
-{{--                                <i class="btn btn-danger">رد شده</i>--}}
-{{--                            @endif--}}
                         </td>
                         <td dir="ltr">{{number_format($order->total)}}</td>
                         <td>
