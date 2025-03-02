@@ -352,6 +352,7 @@ class OrderController extends Controller
         }
         if ($order->state == 1) {
             $text = 'سفارش در حال پردازش برای ارسال';
+            $order->processed_at = Carbon::now();
             foreach ($order->orderProducts as $orderProduct) {
                 $product = $orderProduct->product()->withTrashed()->first();
                 if ($product) {

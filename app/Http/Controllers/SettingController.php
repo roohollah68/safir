@@ -80,20 +80,19 @@ class SettingController extends Controller
 //            }
 //        }
 
-
         $comments = Comment::with('order')
             ->whereHas('order' , function ($order){
-                $order->where('state','>=',10)->whereNull('sent_at');
+                $order->where('state','>=',1)->whereNull('processed_at');
             })
-            ->where('text' , 'سفارش ارسال شد')
+            ->where('text' , 'سفارش در حال پردازش برای ارسال')
             ->get();
         foreach ($comments as $comment){
             $comment->order->update([
-                'sent_at' => $comment->created_at,
+                'processed_at' => $comment->created_at,
             ]);
         }
-        Order::where('state','>=',10)->whereNull('sent_at')->update([
-            'sent_at' => DB::raw('`updated_at`'),
+        Order::where('state','>=',1)->whereNull('processed_at')->update([
+            'processed_at' => DB::raw('`updated_at`'),
         ]);
     }
 
