@@ -121,7 +121,7 @@
         ];
     }
     function NotSent(order) {
-        const lastUpdate = new Date(order.updated_at).getTime();
+        const lastUpdate = new Date(order.processed_at).getTime();
         const processingTime = Date.now() - lastUpdate;
         return (order.state === 1 || order.state === 2) && processingTime > 172800000;
     }
@@ -200,10 +200,10 @@
         } else if (!order.state) {
             let btn = order.confirm ? (order.counter === 'waiting' ? 'info' : 'secondary') : 'primary';
             res = `<span class="btn btn-${btn}" onclick="change_state(${order.id}, 1)">${text}</span>`
-        } 
+        }
         //else if (order.state < 3) {
         //     res = `<span class="btn btn-warning" onclick="selectSendMethod(${order.id})">${text}<i class="fas fa-check"></i></span>`
-        // } 
+        // }
         else if (+order.state === 4) {
             res = `<span class="btn btn-danger" onclick="change_state(${order.id}, 0)">${text}<i class="fas fa-question"></i></span>`
         } else if (+order.state === 10) {
@@ -215,7 +215,7 @@
         const isExpired = NotSent(order);
         const color = isExpired ? 'danger' : 'warning';
         const icon = isExpired ? 'clock' : 'check';
-        
+
         res = `<span class="btn btn-${color}" onclick="selectSendMethod(${order.id})">
             ${text}<i class="fas fa-${icon}"></i></span>`;
         }
