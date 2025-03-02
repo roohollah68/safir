@@ -12,6 +12,7 @@ use App\Models\Setting;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 class SettingController extends Controller
 {
