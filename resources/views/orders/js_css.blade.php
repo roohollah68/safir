@@ -158,13 +158,8 @@
                     }
                 ],
                 pageLength: 100,
-                // paging: false,
                 data: data,
                 order: [[1, "desc"]],
-                // dom: 'lBfrtip',
-                // buttons: [
-                //     'excelHtml5',
-                // ],
                 language: language,
             });
         }

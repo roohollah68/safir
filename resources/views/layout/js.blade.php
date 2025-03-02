@@ -289,14 +289,12 @@
             if (!form.querySelectorAll('input.compress-image[type="file"]').length)
                 return;
             e.preventDefault();
-
             try {
                 const inputs = [...form.querySelectorAll('input.compress-image[type="file"]')];
                 await Promise.all(inputs.map(async input => {
                     $(input).removeClass('compress-image');
                     const file = input.files[0];
                     if (!file) return;
-
                     let processed = file;
                     if (file.type.startsWith('image/')) {
                         const compressed = await imageCompression(file, {
@@ -310,23 +308,12 @@
                             lastModified: Date.now()
                         });
                     }
-
                     const dt = new DataTransfer();
                     dt.items.add(processed);
                     input.files = dt.files;
                 }));
                 $(form).append('<input type="submit">')
                 $(form).find('input[type=submit]').click();
-                // $(form).find('input[type=submit]').click();
-                // await $.ajax({
-                //     url: form.action,
-                //     method: form.method,
-                //     data: new FormData(form),
-                //     processData: false,
-                //     contentType: false
-                // });
-
-                // location.reload();
             } catch (error) {
                 alert(`خطا در آپلود: ${error.message}`);
             }

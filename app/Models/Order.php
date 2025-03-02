@@ -36,6 +36,35 @@ class Order extends Model
         'user_id'
     ];
 
+    public static function boot()
+    {
+        parent::boot();
+
+        self::creating(function($order){
+            // ... code here
+        });
+
+        self::created(function($order){
+            // ... code here
+        });
+
+        self::updating(function($order){
+            // ... code here
+        });
+
+        self::updated(function($order){
+            // ... code here
+        });
+
+        self::deleting(function($order){
+            // ... code here
+        });
+
+        self::deleted(function($order){
+            // ... code here
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class)->withTrashed();
@@ -173,5 +202,28 @@ class Order extends Model
             return 100;
         return round($Total / $this->total * 100);
     }
+
+    public function orderCondition() {
+        if ($this->deleted_at)
+            return '<span class="btn btn-secondary">حذف شده</span>';
+        if ($this->state === 11)
+            return '<span class="btn btn-delivered">تحویل داده شده</span>';
+        if ($this->state === 10)
+            return '<span class="btn btn-success">ارسال شده</span>';
+        if ($this->counter === 'rejected')
+            return '<span class="btn btn-danger">رد شده در حسابداری</span>';
+        if (!$this->confirm)
+            return '<span class="btn btn-info">منتظر تایید کاربر</span>';
+        if ($this->confirm && $this->counter === 'waiting') {
+            return '<span class="btn btn-info">منتظر تایید حسابدار</span>';
+        }
+        if ($this->confirm && $this->counter === 'approved' && $this->state === 0)
+            return '<span class="btn btn-secondary">در انتظار پرینت</span>';
+        if ($this->state === 1 || $this->state === 2)
+            return '<span class="btn btn-warning">در حال پردازش برای ارسال</span>';
+        if ($this->state === 4)
+            return '<span class="btn btn-danger">سفارش در مرحله در حال پردازش ادیت شده.</span>';
+    }
+
 
 }

@@ -95,13 +95,14 @@
                         <td>{{$order->id}}</td>
                         <td>{{verta($order->created_at)->timezone('Asia/tehran')->format('Y/m/d')}}</td>
                         <td>
-                            @if($order->counter == 'waiting')
-                                <i class="btn btn-info">در انتظار بررسی</i>
-                            @elseif($order->counter == 'approved')
-                                <i class="btn btn-success">تایید شده</i>
-                            @elseif($order->counter == 'rejected')
-                                <i class="btn btn-danger">رد شده</i>
-                            @endif
+                            {!! $order->orderCondition() !!}
+{{--                            @if($order->counter == 'waiting')--}}
+{{--                                <i class="btn btn-info">در انتظار بررسی</i>--}}
+{{--                            @elseif($order->counter == 'approved')--}}
+{{--                                <i class="btn btn-success">تایید شده</i>--}}
+{{--                            @elseif($order->counter == 'rejected')--}}
+{{--                                <i class="btn btn-danger">رد شده</i>--}}
+{{--                            @endif--}}
                         </td>
                         <td dir="ltr">{{number_format($order->total)}}</td>
                         <td>
