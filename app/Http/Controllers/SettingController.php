@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-//use App\Models\Customer;
-//use App\Models\CustomerTransaction;
-//use App\Models\Good;
+
 use App\Helper\Helper;
 use App\Models\Bank;
 use App\Models\Comment;
@@ -13,26 +11,17 @@ use App\Models\Customer;
 use App\Models\CustomerTransaction;
 use App\Models\Oldcustomer;
 use App\Models\Order;
-
-//use App\Models\Product;
-//use App\Models\ProductData;
 use App\Models\OrderProduct;
 use App\Models\PaymentLink;
 use App\Models\Product;
 use App\Models\Setting;
-
-//use App\Models\User;
-//use GuzzleHttp\Psr7\Query;
 use App\Models\Supplier;
 use App\Models\Warehouse;
 use App\Models\Withdrawal;
 use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
-
-//use Illuminate\Support\Carbon;
-//use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
-use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
+use Illuminate\Support\Facades\DB;
 
 class SettingController extends Controller
 {
