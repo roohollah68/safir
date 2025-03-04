@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -43,27 +42,27 @@ class Order extends Model
     {
         parent::boot();
 
-        self::creating(function($order){
+        self::creating(function ($order) {
             // ... code here
         });
 
-        self::created(function($order){
+        self::created(function ($order) {
             // ... code here
         });
 
-        self::updating(function($order){
+        self::updating(function ($order) {
             // ... code here
         });
 
-        self::updated(function($order){
+        self::updated(function ($order) {
             // ... code here
         });
 
-        self::deleting(function($order){
+        self::deleting(function ($order) {
             // ... code here
         });
 
-        self::deleted(function($order){
+        self::deleted(function ($order) {
             // ... code here
         });
     }
@@ -125,16 +124,7 @@ class Order extends Model
 
     public function payMethod(): string
     {
-        if ($this->user->safir() || $this->paymentMethod != 'admin')
-            if (isset(config('payMethods')[$this->paymentMethod])) {
-                return config('payMethods')[$this->paymentMethod];
-            } elseif ($this->paymentMethod) {
-                return $this->paymentMethod;
-            } else {
-                return '';
-            }
-        else
-            return config('payMethods')[$this->confirm];
+        return config('payMethods')[$this->paymentMethod]??$this->paymentMethod??'';
     }
 
     public function website()
@@ -155,7 +145,7 @@ class Order extends Model
     public function orders()
     {
         $orderProducts = $this->orderProducts;
-        $text = $this->orders??'';
+        $text = $this->orders ?? '';
         foreach ($orderProducts as $orderProduct) {
             $text .= ' ' . $orderProduct->name . ' ' . +$orderProduct->number . 'عدد' . '،';
         }
@@ -206,7 +196,8 @@ class Order extends Model
         return round($Total / $this->total * 100);
     }
 
-    public function orderCondition() {
+    public function orderCondition()
+    {
         if ($this->deleted_at)
             return '<span class="btn btn-secondary">حذف شده</span>';
         if ($this->state === 11)

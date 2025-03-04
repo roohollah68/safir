@@ -21,14 +21,16 @@
                 </select>
             </div>
         </div>
-        <label for="payInDate">پرداخت در تاریخ</label>
-        <input type="checkbox" name="payInDate" id="payInDate" class="checkboxradio" checked>
 
-        <label for="cod">پرداخت در محل</label>
-        <input type="checkbox" name="cod" id="cod" class="checkboxradio" checked>
+        @foreach($payMethods as $payMethod)
+            <label for="{{$payMethod}}">{{config('payMethods')[$payMethod]}}</label>
+            <input type="checkbox" name="paymethods[{{$payMethod}}]" id="{{$payMethod}}" class="checkboxradio" @checked($selectedPayMethod[$payMethod]??0)>
+        @endforeach
 
-        <label for="else">باقی موارد</label>
-        <input type="checkbox" name="else" id="else" class="checkboxradio" checked>
+        <br>
+        <br>
+        <label for="noPostpone">بدون در نظر گرفتن تعویق ها</label>
+        <input type="checkbox" name="noPostpone" id="noPostpone" class="checkboxradio" @checked(request('noPostpone')??0)>
         <br>
         <br>
         <input type="submit" class="btn btn-success" value="فیلتر">

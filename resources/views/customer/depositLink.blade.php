@@ -1,5 +1,5 @@
 <div title="اتصال پرداختی به سفارشات" class="dialogs">
-        <span>شماره پرداختی: </span><span>{{$transaction->id}}</span><br>
+        <span>شماره پرداختی: </span><span class="btn btn-secondary" onclick="view_deposit({{$transaction->id}})">{{$transaction->id}}</span><br>
         <span>مبلغ واریزی: </span><span>{{number_format($transaction->amount)}}</span><sapn>ریال</sapn><br>
         <span>مبلغ متصل شده به سفارشات: </span><span>{{number_format($payLinkTotal)}}</span><sapn>ریال</sapn><br>
         <span>مبلغ باقی مانده: </span><span>{{number_format($transaction->amount-$payLinkTotal)}}</span><sapn>ریال</sapn><br>

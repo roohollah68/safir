@@ -8,7 +8,7 @@
         <b>پرداخت های متصل</b><br>
         @foreach($payLinks as $paylink)
             <span>شماره: </span>
-            <span class="btn btn-info">{{$paylink->customer_transaction_id}}</span>
+            <span class="btn btn-info" onclick="view_deposit({{$paylink->customer_transaction_id}})">{{$paylink->customer_transaction_id}}</span>
             <span>واریزی: </span><i>{{number_format($paylink->amount)}}</i> <sapn>ریال</sapn>
             <span class="btn btn-danger fa fa-chain-broken" title="حذف اتصال"
                   onclick="removePayLink({{$paylink->id}})"></span><br>
@@ -20,7 +20,7 @@
             @foreach($transactions as $transaction)
                 @continue(+$transaction->linkedAmount() == $transaction->amount || $transaction->verified == 'rejected')
                 <span>شماره: </span>
-                <span class="btn btn-secondary">{{$transaction->id}}</span>
+                <span class="btn btn-secondary" onclick="view_deposit({{$transaction->id}})">{{$transaction->id}}</span>
                 <span>واریزی: </span><i>{{number_format($transaction->amount)}}</i> <sapn>ریال</sapn>
                 <span class="btn btn-success fa fa-chain" title="ایجاد اتصال"
                       onclick="addPayLink({{$transaction->id}},{{$order->id}})"></span><br>

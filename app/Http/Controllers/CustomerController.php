@@ -501,8 +501,8 @@ class CustomerController extends Controller
     public function paymentTracking(Request $req)
     {
         Helper::access('editAllCustomers');
-        $orders = Order::
-        with(['user', 'paymentLinks'])
+
+        $orders = Order::with(['user', 'paymentLinks'])
             ->where([
                 ['counter', 'approved'],
                 ['confirm', true],
@@ -514,10 +514,11 @@ class CustomerController extends Controller
                 $query->orWhereDate('payInDate', '<', today())->orWhere(function ($query) {
                     $query->whereDate('sent_at', '<', today()->addWeeks(-2))->whereNull('payInDate');
                 });
-            })->where(function ($query) {
+            });
+        if (!$req->noPostpone)
+            $orders = $orders->where(function ($query) {
                 $query->orWhere('postponeDate', '<', Carbon::now()->toDateString())->orWhereNull('postponeDate');
             });
-
 
         if (isset($req->user) && $req->user != 'all')
             $orders = $orders->where('user_id', $req->user);
@@ -526,7 +527,12 @@ class CustomerController extends Controller
 
         $orders = $orders->filter(fn($order) => $order->unpaid() > 0);
 
+        $payMethods = $orders->groupBy('paymentMethod')->map(fn($p) => 'on');
+        $selectedPayMethod = $req->paymethods ?? $payMethods;
+        $orders = $orders->filter(fn($order) => isset($selectedPayMethod[$order->paymentMethod]));
         return view('customer.paymentTracking', [
+            'payMethods' => $payMethods->keys(),
+            'selectedPayMethod' => $selectedPayMethod,
             'orders' => $orders,
             'users' => User::where('role', '<>', 'user')->get()->keyBy('id'),
         ]);
