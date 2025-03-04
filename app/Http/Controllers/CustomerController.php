@@ -84,8 +84,12 @@ class CustomerController extends Controller
             'name' => 'required|string|min:3',
             'phone' => 'required|string|max:11|min:11',
             'address' => 'required|string',
-            'agreement' => 'required'
-        ], [
+            'agreement' => 'required',
+            'national_code' => 'nullable|string|max:10|min:10',
+            'national_id' => 'nullable|string|max:11|min:11',
+            'economic_code' => 'nullable|string|max:12|min:12',
+            'customer_type' => 'required|in:Individual,LegalEntity',
+        ],[
             'agreement.required' => 'پر کردن فیلد تفاهم اجباری است.',
             'name.required' => 'پر کردن فیلد نام اجباری است.',
         ]);
@@ -112,6 +116,10 @@ class CustomerController extends Controller
             'credit_limit' => +str_replace(",", "", $request->credit_limit),
             'discount' => $request->discount,
             'agreement' => $request->agreement,
+            'customer_type' => $request->customer_type,
+            'national_code' => Helper::number_Fa_En($request->national_code),
+            'national_id' => Helper::number_Fa_En($request->national_id),
+            'economic_code' => Helper::number_Fa_En($request->economic_code),
         ])->save();
         $customer->orders()->update([
             'user_id' => $request->user,
