@@ -478,7 +478,7 @@ class OrderController extends Controller
     public function cancelInvoice($id, Request $req)
     {
         DB::beginTransaction();
-        $order = Helper::Order(!Helper::meta('counter'))->findOrFail($id);
+        $order = Helper::Order(true)->findOrFail($id);
         if (!$order->confirm)
             return abort(405, 'سفارش قبلا لغو شده است');
         if ($order->state >= 10) {

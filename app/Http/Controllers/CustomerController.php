@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\BaleAPIv2;
 use App\Helper\Helper;
 use App\Models\Bank;
 use App\Models\City;
@@ -11,7 +10,6 @@ use App\Models\CustomerTransaction;
 use App\Models\Order;
 use App\Models\PaymentLink;
 use App\Models\Province;
-use App\Models\Transaction;
 use App\Models\User;
 use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
@@ -87,9 +85,9 @@ class CustomerController extends Controller
             'phone' => 'required|string|max:11|min:11',
             'address' => 'required|string',
             'agreement' => 'required'
-        ],[
-            'agreement.required'=>'پر کردن فیلد تفاهم اجباری است.',
-            'name.required'=>'پر کردن فیلد نام اجباری است.',
+        ], [
+            'agreement.required' => 'پر کردن فیلد تفاهم اجباری است.',
+            'name.required' => 'پر کردن فیلد نام اجباری است.',
         ]);
 
         if ($id) {
@@ -97,11 +95,11 @@ class CustomerController extends Controller
                 $customer = Customer::findOrFail($id);
             else {
                 $customer = auth()->user()->customers()->findOrFail($id);
-                $request->credit_limit = ''.$customer->credit_limit;
+                $request->credit_limit = '' . $customer->credit_limit;
             }
         } else {
             $customer = new Customer();
-            $request->credit_limit = $request->credit_limit??'0';
+            $request->credit_limit = $request->credit_limit ?? '0';
         }
 
         $customer->fill([
@@ -240,14 +238,14 @@ class CustomerController extends Controller
                 'amount' => $transaction->amount,
             ]);
             $order = Order::findOrFail($orderId);
-            if(!$order->confirm)
+            if (!$order->confirm)
                 $customer->update([
                     'balance' => $customer->balance - $order->total,
                 ]);
             $order->update([
                 'confirm' => true,
                 'confirmed_at' => Carbon::now(),
-                'paymentMethod' =>  ['cash'=>1 , 'cheque'=>2][$req->pay_method],
+                'paymentMethod' => $req->pay_method,
             ]);
             (new CommentController)->create($order, auth()->user(), 'سفارش تایید شد. ' . $req->description . '/ ' . $order->payMethod());
         } else {
@@ -502,34 +500,32 @@ class CustomerController extends Controller
 
     public function paymentTracking(Request $req)
     {
-        Helper::access(['editAllCustomers', 'allCustomers']);
-        $orders = [];
-        $Orders = Order::with(['user', 'paymentLinks']);
-        $Orders = $Orders->where([
-            ['counter', 'approved'],
-            ['confirm', true],
-            ['total', '>', 0],
-        ])->with(['user', 'paymentLinks']);
+        Helper::access('editAllCustomers');
+        $orders = Order::
+        with(['user', 'paymentLinks'])
+            ->where([
+                ['counter', 'approved'],
+                ['confirm', true],
+                ['total', '>', 0],
+                ['customer_id', '>', 0],
+            ])
+            ->with(['user', 'paymentLinks'])
+            ->where(function ($query) {
+                $query->orWhereDate('payInDate', '<', today())->orWhere(function ($query) {
+                    $query->whereDate('sent_at', '<', today()->addWeeks(-2))->whereNull('payInDate');
+                });
+            })->where(function ($query) {
+                $query->orWhere('postponeDate', '<', Carbon::now()->toDateString())->orWhereNull('postponeDate');
+            });
+
 
         if (isset($req->user) && $req->user != 'all')
-            $Orders = $Orders->where('user_id', $req->user);
+            $orders = $orders->where('user_id', $req->user);
 
-        if (!auth()->user()->meta('allCustomers'))
-            $Orders = $Orders->where('user_id', auth()->user()->id);
+        $orders = $orders->get()->keyBy('id')->reverse();
 
-        $Orders = $Orders->where(function ($query) {
-            $query->orWhere('payInDate', '<', Carbon::now()->toDateString())->orWhereNull('payInDate');
-        })->where(function ($query) {
-            $query->orWhere('postponeDate', '<', Carbon::now()->toDateString())->orWhereNull('postponeDate');
-        });
+        $orders = $orders->filter(fn($order) => $order->unpaid() > 0);
 
-        $Orders = $Orders->get()->keyBy('id')->reverse();
-        foreach ($Orders as $id => $Order) {
-            if (count($orders) >= ($req->number ?? 100))
-                break;
-            if ($Order->unpaid() > 0)
-                $orders[$id] = $Order;
-        }
         return view('customer.paymentTracking', [
             'orders' => $orders,
             'users' => User::where('role', '<>', 'user')->get()->keyBy('id'),

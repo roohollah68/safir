@@ -96,16 +96,6 @@ class User extends Authenticatable
         return $this->role == 'user';
     }
 
-//    public function counter()
-//    {
-//        return $this->role == 'counter';
-//    }
-
-//    public function account()
-//    {
-//        return $this->role == 'account';
-//    }
-
     public function meta($name)
     {
         if (is_string($name)) {
@@ -129,6 +119,11 @@ class User extends Authenticatable
     public function couponLinks()
     {
         return $this->hasMany(CouponLink::class);
+    }
+
+    public function warehouses()
+    {
+        return $this->hasMany(Warehouse::class);
     }
 
     public function withdrawals()

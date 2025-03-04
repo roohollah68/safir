@@ -42,7 +42,6 @@
 
 @section('files')
     <script>
-        let token = '{{csrf_token()}}';
         let suppliers = {!! json_encode($suppliers) !!};
         $(function () {
             $('#supplier-table').DataTable({

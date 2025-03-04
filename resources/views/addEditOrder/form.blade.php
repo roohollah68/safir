@@ -44,14 +44,6 @@
                     onkeypress="return event.charCode >= 48 && event.charCode <= 57"
                     oninput="this.setCustomValidity('')" placeholder="مانند 09123456789">شماره تماس:
         </x-col-md-6>
-
-        {{--        @if($creatorIsAdmin)--}}
-        {{--            <x-col-md-6 :name="'city'" value="{{old('city')?:$order->customer->city->name}}">شهر:</x-col-md-6>--}}
-        {{--            <input type="hidden" id="city_id" name="city_id" value="{{old('city_id')?:$order->customer->city->id}}">--}}
-        {{--        @else--}}
-        {{--            <input type="hidden" name="city_id" value="0">--}}
-        {{--        @endif--}}
-
         <x-col-md-6 :name="'zip_code'" value="{{old('zip_code')?:$order->zip_code}}"
                     minlength="10"
                     maxlength="10" pattern="^[۰-۹0-9]*$"
@@ -60,8 +52,6 @@
         <x-col-md-6 :name="'address'" :content="old('address')?:$order->address" :required="true"
                     rows="2" :tag="'textarea'">آدرس:
         </x-col-md-6>
-
-
         <x-col-md-6 :name="'desc'" :content="old('desc')?:$order->desc"
                     rows="2" :tag="'textarea'">توضیحات:
         </x-col-md-6>
@@ -95,8 +85,6 @@
                 </div>
             @endif
         </div>
-
-
 
         <div class="p-3 m-2 border">
             <h4>شیوه ارسال</h4>
@@ -135,12 +123,6 @@
         </div>
 
     @endif
-
-    {{--    <input type="checkbox" name="addToCustomers" id="addToCustomers"--}}
-    {{--           class="checkboxradio" onclick="$('#city, #category').prop('disabled', (i, v) => !v);">--}}
-    {{--    <label for="addToCustomers">افزودن/ ویرایش مشتری</label>--}}
-
-
     <input type="submit" class="btn btn-success mx-4" style="width: 200px;" value="{{$edit?'ویرایش':'ثبت'}}">&nbsp;
     <a class="btn btn-danger"
        onclick="confirm('آیا از ثبت سفارش منصرف شدید؟')?(window.location.href = '{{route('listOrders')}}'):''">بازگشت</a>
@@ -162,7 +144,6 @@
         </tr>
         </thead>
         <tbody id="product-form">
-
         </tbody>
     </table>
 

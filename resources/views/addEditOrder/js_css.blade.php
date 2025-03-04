@@ -226,9 +226,7 @@
     }
 
     function beforeSubmit() {
-
         let number = Object.keys(cart).length;
-        console.log('hi');
         if (!number) {
             alert('محصولی انتخاب نشده است');
             return false;
@@ -238,7 +236,7 @@
             alert('تعداد همگی باید مثبت یا منفی باشند');
             return false;
         }
-        //$('input[type=submit]').attr('disabled','disabled');
+        $('input[type=submit]').attr('disabled','disabled');
         return true;
     }
 

@@ -21,30 +21,30 @@
                 </select>
             </div>
         </div>
-{{--        <div class="col-md-6 m-1">--}}
-{{--            <div class="form-group input-group ">--}}
-{{--                <label for="all">مشاهده همه شامل معوقه ها</label>--}}
-{{--                <input type="checkbox" id="all" class="checkboxradio" name="all" @checked($_GET['all']??false)>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-        <div class="col-md-6 m-1">
-            <div class="form-group input-group ">
-                <div class="input-group-append" style="min-width: 160px">
-                    <label for="number" class="input-group-text w-100">تعداد رکورد:</label>
-                </div>
-                <input type="number" min="1" step="1" id="number" name="number" value="{{old('number')?:$_GET['number']??100}}">
-            <input type="submit" class="btn btn-primary" value="اعمال تغییرات">
-            </div>
-        </div>
+        <label for="payInDate">پرداخت در تاریخ</label>
+        <input type="checkbox" name="payInDate" id="payInDate" class="checkboxradio" checked>
 
+        <label for="cod">پرداخت در محل</label>
+        <input type="checkbox" name="cod" id="cod" class="checkboxradio" checked>
+
+        <label for="else">باقی موارد</label>
+        <input type="checkbox" name="else" id="else" class="checkboxradio" checked>
+        <br>
+        <br>
+        <input type="submit" class="btn btn-success" value="فیلتر">
 
     </form>
+    <br>
+    <span>مجموع:</span><span class="btn btn-info"> {{number_format($orders->sum('total'))}} ریال</span><br>
+    <span>تعداد:</span><span class="btn btn-primary"> {{$orders->count()}} </span><br>
     <br>
     <table class="table table-striped" id="orders-table">
         <thead>
         <tr>
             <th>شماره</th>
-            <th>تاریخ ثبت</th>
+            <th>تاریخ تایید سفارش</th>
+            <th>تاریخ ارسال</th>
+            <th>تاریخ سر رسید پرداخت</th>
             <th>نام مشتری</th>
             <th>نوع پرداخت</th>
             <th>کاربر مرتبط</th>
@@ -57,7 +57,17 @@
         @foreach($orders as $id => $order)
             <tr>
                 <td>{{$id}}</td>
-                <td>{{verta($order->created_at)->formatJalaliDate()}}</td>
+                <td dir="ltr">{{$order->confirmed_at?verta($order->confirmed_at)->formatJalaliDate():'-'}}</td>
+                <td dir="ltr">{{$order->sent_at?verta($order->sent_at)->formatJalaliDate():'-'}}</td>
+                <td dir="ltr">
+                    @if($order->payInDate == '5' || $order->payInDate == 'payInDate')
+                        {{$order->payInDate?verta($order->payInDate)->formatJalaliDate():''}}
+                    @else
+                        {{$order->sent_at?verta($order->sent_at)->addWeeks(2)->formatJalaliDate():''}}
+                    @endif
+                    {{$order->postponeDate?'->'.verta($order->postponeDate)->formatJalaliDate():''}}
+
+                </td>
                 <td><a href="/customer/transaction/{{$order->customer_id}}">{{$order->name}}</a></td>
                 <td>{{$order->payMethod()}}</td>
                 <td><a href="/customers?user={{$order->user->id}}">{{$order->user->name}}</a></td>
@@ -72,7 +82,8 @@
                 </td>
                 <td>
                     <a class="btn btn-info fa fa-eye" onclick="view_order({{$id}})" title="مشاهده سفارش"></a>
-                    <a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice({{$id}})" title=" فاکتور"></a>
+                    <a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice({{$id}})"
+                       title=" فاکتور"></a>
                     <a class="fa fa-comment btn btn-info" onclick="view_comment({{$id}})"></a>
                     <span class="btn btn-primary fa fa-chain" onclick="showOrderLink({{$id}})"></span>
                     @if($User->meta('allCustomers'))

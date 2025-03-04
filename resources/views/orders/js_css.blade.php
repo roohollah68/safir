@@ -120,11 +120,13 @@
             order.zip_code,
         ];
     }
+
     function NotSent(order) {
         const lastUpdate = new Date(order.processed_at).getTime();
         const processingTime = Date.now() - lastUpdate;
         return (order.state === 1 || order.state === 2) && processingTime > 172800000;
     }
+
     function create_table(data) {
         if (table) {
             table.clear();
@@ -219,7 +221,7 @@
         res = `<span class="btn btn-${color}" onclick="selectSendMethod(${order.id})">
             ${text}<i class="fas fa-${icon}"></i></span>`;
         }
-        console.log('Order:', order.id, 'State:', order.state, 'Updated:', order.updated_at);
+
         return timestamp + res;
     }
 

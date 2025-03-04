@@ -69,14 +69,18 @@ class Helper
     {
         $user = auth()->user();
         $orders = Order::withTrashed();
-        if ((!$edit && $user->meta(['showAllOrders','counter'])) || $user->meta('editAllOrders'))
+        if ((!$edit && $user->meta('showAllOrders')) || $user->meta(['editAllOrders','counter']))
             return $orders;
         else
-            return $orders->where(function ($query) {
-                $user = auth()->user();
-                $warehouses = Warehouse::where('user_id', $user->id)->get()->keyBy('id')->keys();
+            return $orders->where(function ($query) use ($user) {
+                $warehouses = $user->warehouses->pluck('id');
                 $query->orWhere('user_id', $user->id)->orWhereIn('warehouse_id', $warehouses);
             });
+    }
+
+    public static function ِdate($datetime): string
+    {
+        return $datetime?verta($datetime)->formatJalaliDate():'';
     }
 }
 

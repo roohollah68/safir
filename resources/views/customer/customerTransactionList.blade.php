@@ -94,11 +94,9 @@
                 @foreach($orders as $id => $order)
                     <tr>
                         <td>{{$order->id}}</td>
-                        <td dir="ltr">{{$order->confirmed_at?verta($order->confirmed_at)->timezone('Asia/tehran')->format('Y/m/d h:i'):'-'}}</td>
-                        <td dir="ltr">{{$order->sent_at?verta($order->sent_at)->timezone('Asia/tehran')->format('Y/m/d h:i'):'-'}}</td>
-                        <td>
-                            {!! $order->orderCondition() !!}
-                        </td>
+                        <td dir="ltr">{{$order->confirmed_at?verta($order->confirmed_at)->formatJalaliDate():''}}</td>
+                        <td dir="ltr">{{$order->sent_at?verta($order->sent_at)->formatJalaliDate():''}}</td>
+                        <td>{!! $order->orderCondition() !!}</td>
                         <td dir="ltr">{{number_format($order->total)}}</td>
                         <td>
                             <x-pay-percent :percent="$order->payPercentApproved()"
