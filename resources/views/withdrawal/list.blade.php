@@ -148,11 +148,11 @@
                 $(`input[value=${withdrawal.counter_confirm}]`).click();
                 $('select[name=bank_id]').val(withdrawal.bank_id).change();
                 $(`input[value=${withdrawal.expense_type}]`).click();
-                $('select[name=expense_desc]').select2();
-                $('#expense_desc').select2({
-                    dropdownParent: $('.dialogs'),
-                    placeholder: "انتخاب"
-                });
+                // $('select[name=expense_desc]').select2();
+                // $('#expense_desc').select2({
+                //     dropdownParent: $('.dialogs'),
+                //     placeholder: "انتخاب"
+                // });
                 $('select[name=expense_desc]').val(withdrawal.expense_desc).change()
                 $(`input[name=official][value=${withdrawal.official}]`).click();
                 $(`input[name=vat][value=${withdrawal.vat}]`).click();
