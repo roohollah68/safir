@@ -283,6 +283,7 @@
     let token = "{{ csrf_token() }}";
     $(function () {
         $('form').submit( async e => {
+            $('input[type=submit]').attr('disabled','disabled');
             const form = e.target;
             if (!form.querySelectorAll('input.compress-image[type="file"]').length)
                 return;
@@ -310,7 +311,8 @@
                     dt.items.add(processed);
                     input.files = dt.files;
                 }));
-                form.submit();
+                $(form).append('<input type="submit">').find('input[type=submit]').click();
+
             } catch (error) {
                 alert(`خطا در آپلود: ${error.message}`);
             }
