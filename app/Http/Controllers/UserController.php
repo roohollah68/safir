@@ -99,7 +99,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255|unique:users,name,'.$id,
             'username' => 'required|string|max:255|min:5|unique:users,username,'.$id,
             'phone' => 'required|string|max:11|min:11',
-            'NuRecords' => 'integer|min:1|max:3000',
+            'NuRecords' => 'integer|min:1',
             'credit' =>'numeric',
         ]);
         $request->phone = Helper::number_Fa_En($request->phone);

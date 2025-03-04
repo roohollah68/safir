@@ -333,7 +333,7 @@ class OrderController extends Controller
         $text = null;
         if ($order->state == 0) {
             $order->processed_at = null;
-            $order->sent_at = Carbon::now();
+            $order->sent_at = null;
             $text = 'سفارش به حالت در انتظار پرینت بازگشت';
             foreach ($order->productChange()->get() as $productChange) {
                 $productChange->update(['isDeleted' => true]);
