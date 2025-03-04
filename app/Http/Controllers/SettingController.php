@@ -63,13 +63,13 @@ class SettingController extends Controller
 
     public function command()
     {
-//        foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {
-//            if ($customer->balance() != $customer->balance) {
-//                echo $customer->name. $customer->balance() . '=>'.  $customer->balance . '<br>';
-//                $customer->balance = $customer->balance();
-////                $customer->save();
-//            }
-//        }
+        foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {
+            if ($customer->balance() != $customer->balance) {
+                echo $customer->name. $customer->balance() . '=>'.  $customer->balance . '<br>';
+                $customer->balance = $customer->balance();
+//                $customer->save();
+            }
+        }
 
 //        $comments = Comment::with('order')
 //            ->whereHas('order', function ($order) {
