@@ -147,19 +147,33 @@
                     >{{old('description')?:$deposit->description}}</textarea>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group input-group ">
+            <div class="col-md-6 my-2">
+                <div class="form-group input-group required">
                     <div class="input-group-append" style="width: 160px">
                         <label for="photo" class="input-group-text cash">تصویر رسید بانکی:</label>
                         <label for="photo" class="input-group-text cheque">تصویر چک بانکی:</label>
                     </div>
-                    <input type="file" id="photo" class="compress-image" name="photo">
+                    <input type="file" id="photo" class="compress-image ms-2" name="photo">
                     <input type="hidden" name="old_Photo" value="{{$deposit->photo}}">
                 </div>
             </div>
             @if($deposit->photo)
                 <a href="/deposit/{{$deposit->photo}}" target="_blank">
                     <img style="height: 300px" src="/deposit/{{$deposit->photo}}">
+                </a>
+            @endif
+            
+            <div class="col-md-6 my-2 cheque required">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="width: 190px">
+                        <label for="cheque_registration" class="input-group-text cheque">تصویر ثبت چک در بانک:</label>
+                    </div>
+                <input type="file" id="cheque_registration" class="compress-image ms-2" name="cheque_registration">
+                </div>
+            </div>
+            @if($deposit->cheque_registration)
+                <a href="/deposit/{{$deposit->cheque_registration}}" target="_blank">
+                    <img style="height: 300px" src="/deposit/{{$deposit->cheque_registration}}">
                 </a>
             @endif
         </div>

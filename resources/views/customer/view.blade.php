@@ -3,6 +3,10 @@
         <img style="width: 300px" src="/deposit/{{$deposit->photo}}">
     </a>
     <br>
+    <a href="/deposit/{{$deposit->cheque_registration}}" target="_blank">
+        <img style="width: 300px" src="/deposit/{{$deposit->cheque_registration}}">
+    </a>
+    <br>
     <span>کاربر مرتبط:</span> <b>{{$deposit->customer->user->name}}</b> <br>
     <span>نام مشتری:</span> <b>{{$deposit->customer->name}}</b> <br>
     <span>شماره مشتری:</span> <b>{{$deposit->customer_id}}</b> <br>

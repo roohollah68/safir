@@ -212,11 +212,14 @@ class CustomerController extends Controller
         $user = auth()->user();
         request()->validate([
             'photo' => 'required_without:old_Photo|mimes:jpeg,jpg,png,bmp|max:2048',
+            'cheque_registration' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:2048',
             'old_Photo' => 'required_without:photo',
         ], [
             'photo.required_without' => 'ارائه تصویر الزامی است!',
             'old_Photo.required_without' => '',
             'photo.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
+            'cheque_registration.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
+            'cheque_registration.required' => 'ارائه تصویر الزامی است!'
         ]);
 
         if ($user->meta('editAllCustomers'))
@@ -228,6 +231,9 @@ class CustomerController extends Controller
         if ($req->file("photo")) {
             $photo = $req->file("photo")->store("", 'deposit');
         }
+        if ($req->file('cheque_registration')) {
+            $cheque_registration = $req->file('cheque_registration')->store("", 'deposit');
+        }
 
         $transaction = $customer->transactions()->findOrNew($depositId)->fill([
             'bank_id' => $req->bank_id,
@@ -238,6 +244,7 @@ class CustomerController extends Controller
             'description' => $req->description,
             'amount' => +str_replace(",", "", $req->amount),
             'photo' => $photo,
+            'cheque_registration' => $cheque_registration
         ]);
         $transaction->save();
         if (+$orderId) {

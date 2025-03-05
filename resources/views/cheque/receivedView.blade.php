@@ -25,18 +25,19 @@
     <span>زمان ثبت:</span><b>{{ verta($viewCheque->created_at)->formatJalaliDate() }}</b><br>
     <span>زمان ویرایش:</span><b>{{ verta($viewCheque->updated_at)->formatJalaliDate() }}</b><br>
 
-    @if ($viewCheque->cheque_receipt)
+    @if ($viewCheque->cheque_registration)
         <span>رسید چک:</span>
-        <a class="btn btn-secondary text-light mb-2" href="/deposit/{{ $viewCheque->cheque_receipt }}"
+        <a class="btn btn-secondary text-light mb-2" href="/deposit/{{ $viewCheque->cheque_registration }}"
             target="_blank">مشاهده
             فایل</a>
         <br>
     @else
         <form action="{{ route('cheque.view2', $viewCheque->id) }}" method="post" enctype="multipart/form-data">
             @csrf
-            <div class="form-group d-flex align-items-center">
-                <label for="cheque_receipt">آپلود رسید چک: </label>
-                <input type="file" id="cheque_receipt" name="cheque_receipt" required>
+            <div class="form-group">
+                <label for="cheque_registration">بارگزاری تصویر ثبت چک در بانک:</label>
+                <br>
+                <input type="file" id="cheque_registration" name="cheque_registration" class="me-5" required>
                 <button type="submit" class="btn btn-success" style="font-family: inherit">ذخیره</button>
             </div>
         </form>
