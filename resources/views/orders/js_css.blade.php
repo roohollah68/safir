@@ -215,7 +215,7 @@
         }
         else if ([1, 2].includes(+order.state)) {
         const isExpired = NotSent(order);
-        const color = isExpired ? 'danger' : 'warning';
+        const color = isExpired ? 'notsent' : 'warning';
         const icon = isExpired ? 'clock' : 'check';
 
         res = `<span class="btn btn-${color}" onclick="selectSendMethod(${order.id})">

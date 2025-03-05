@@ -84,6 +84,12 @@
         background-color: deeppink;
         border-color: deeppink;
     }
+
+    .btn-notsent{
+        color: black;
+        background-color: #FF8C00;
+        border-color: #FF8C00;
+    }
 </style>
 
 <style>
