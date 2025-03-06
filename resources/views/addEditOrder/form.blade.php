@@ -153,8 +153,8 @@
             <span>هزینه حمل: </span> <span id="deliveryCost"></span><span>  ریال </span> ||
         @endif
         <span>مجموع تخفیف: </span><span id="total-discount" dir="ltr"></span><span>  ریال </span> ||
-
-        <b>مبلغ کل: </b><b id="total" dir="ltr"></b><b> ریال </b>
+            <b>مجموع تعداد اقلام: </b><b id="total-num"></b> <b>عدد</b>||
+            <b>مبلغ کل: </b><b id="total" dir="ltr"></b><b> ریال </b>
         <br/>
 
         <span id="onDeliveryMode">

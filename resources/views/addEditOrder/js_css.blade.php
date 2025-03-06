@@ -110,7 +110,7 @@
     }
 
     function refreshProducts() {
-        let total = 0, Total = 0;
+        let total = 0, Total = 0, totalNum = 0;
         let hasProduct = false;
         $.each(cart, (id, number) => {
             if (number) {
@@ -119,6 +119,7 @@
                 let price_discount = +$('#price_discount_' + id).html().replaceAll(',', '');
                 total += price_discount * number; //جمع قیمت با تخفیف;
                 Total += price * number;  //قیمت بدون تخفیف;
+                totalNum += number;
                 hasProduct = true;
             }
         })
@@ -134,6 +135,7 @@
         $('#deliveryCost').html(num(deliveryCost));
         $('#cartSum').html(num(total));
         $('#total').html(num(total + deliveryCost));
+        $('#total-num').html(totalNum);
         $('#total-discount').html(num(Total - total));
 
         if (paymentMethod === 'onDelivery') {
