@@ -21,15 +21,14 @@ class StatisticController extends Controller
     public function showStatistic(Request $request)
     {
         $user = auth()->user();
-        $statistic = $user->meta('statistic');
-        $users = User::withTrashed()->with('customers');
-        if (!$statistic)
-            $users = $users->where('id', $user->id);
-        $users = $users->get()->keyBy("id");
 
-        foreach ($users as $id => $user) {
-            $users[$id]->customer = $user->customers->keyby('name');
-        }
+        $users = User::withTrashed()->with('customers');
+        if (!$user->meta('statistic'))
+            $users = $users->where('id', $user->id);
+        $users = $users->get()->keyBy("id")->map(function ($user) {
+            $user->customer = $user->customers->keyby('name');
+        });
+
         if (isset($request->city)) {
             $request->base = 'customerBase';
         }
@@ -39,7 +38,7 @@ class StatisticController extends Controller
                 'request' => (object)[
                     'from' => verta()->addMonths(-1)->toCarbon(),
                     'to' => verta()->toCarbon(),
-                    'user' => $statistic ? '' : $user->id,
+                    'user' => $user->meta('statistic') ? '' : $user->id,
                     'base' => 'productBase',
                     'safirOrders' => true,
                     'siteOrders' => true,
@@ -51,7 +50,7 @@ class StatisticController extends Controller
         $request->from = Verta::parse($request->from)->toCarbon();
         $request->to = Verta::parse($request->to)->addDay()->addSeconds(-1)->toCarbon();
         $orders = Order::where([
-            ['state', '>' , 0],
+            ['state', '>', 0],
             ['created_at', '>', $request->from],
             ['created_at', '<', $request->to],
         ])->where('total', '>', 0);
@@ -150,7 +149,7 @@ class StatisticController extends Controller
         }
         if ($request->base == 'customerBase') {
             $customers = Customer::query();
-            if (!$statistic)
+            if (!$user->meta('statistic'))
                 $customers = $customers->where('user_id', $user->id);
             if ($request->city)
                 $customers = $customers->where('city_id', $request->city);
@@ -281,6 +280,7 @@ class StatisticController extends Controller
             ]);
         }
     }
+
     public function productChart($id)
     {
         $good = Good::findOrFail($id);
@@ -304,7 +304,7 @@ class StatisticController extends Controller
         $pricesData = $orderProducts->groupBy(
             fn($op) => Verta::instance($op->order->created_at)->format('Y-m')
         )->map(
-            fn($productsInMonth) => (int) round($productsInMonth->avg('price') ?? 0)
+            fn($productsInMonth) => (int)round($productsInMonth->avg('price') ?? 0)
         );
 
         $monthData = collect(range(11, 0, -1))->map(function ($monthsAgo) {
@@ -322,5 +322,5 @@ class StatisticController extends Controller
         $priceValues = $month->map(fn($key) => $pricesData->get($key, 0));
 
         return view('productChart', compact('labels', 'data', 'priceValues'));
-}
+    }
 }

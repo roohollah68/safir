@@ -212,14 +212,14 @@ class CustomerController extends Controller
         $user = auth()->user();
         request()->validate([
             'photo' => 'required_without:old_Photo|mimes:jpeg,jpg,png,bmp|max:2048',
-            'cheque_registration' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:2048',
+//            'cheque_registration' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:2048',
             'old_Photo' => 'required_without:photo',
         ], [
             'photo.required_without' => 'ارائه تصویر الزامی است!',
             'old_Photo.required_without' => '',
             'photo.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
-            'cheque_registration.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
-            'cheque_registration.required' => 'ارائه تصویر الزامی است!'
+//            'cheque_registration.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
+//            'cheque_registration.required' => 'ارائه تصویر الزامی است!'
         ]);
 
         if ($user->meta('editAllCustomers'))
@@ -244,7 +244,7 @@ class CustomerController extends Controller
             'description' => $req->description,
             'amount' => +str_replace(",", "", $req->amount),
             'photo' => $photo,
-            'cheque_registration' => $cheque_registration
+            'cheque_registration' => $cheque_registration??null
         ]);
         $transaction->save();
         if (+$orderId) {
@@ -566,6 +566,9 @@ class CustomerController extends Controller
     public function blockList()
     {
         Helper::access('usersEdit');
+        $user = auth()->user();
+        if($user->id != 130)
+            return abort(405, 'شما مجاز نیستید.');
         $customers = Customer::with(['orders', 'transactions'])->get()->keyBy('id');
         return view('customer.blockList', [
             'customers' => $customers,
