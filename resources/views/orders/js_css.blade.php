@@ -118,6 +118,8 @@
             order.phone,
 
             order.zip_code,
+
+            order.total + num(order.total),
         ];
     }
 
@@ -133,7 +135,7 @@
             table.rows.add(data);
             table.draw();
         } else {
-            let hideCols = (changeOrdersPermit) ? [8, 9, 10, 11, 12] : [0, 3, 8, 9, 10, 11, 12]
+            let hideCols = (changeOrdersPermit) ? [8, 9, 10, 11, 12, 13] : [0, 3, 8, 9, 10, 11, 12, 13]
             table = $('#main-table').DataTable({
                 columns: [
                     {title: " "},
