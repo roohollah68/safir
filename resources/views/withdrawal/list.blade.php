@@ -5,6 +5,12 @@
 @endsection
 
 @section('content')
+    <span class="alert-info p-2 rounded">
+        <i class="fa fa-info-circle me-1"></i>
+        توجه: تمام واریزی‌ها در روز فرد بعدی واریز می‌شوند.
+        در صورت ثبت درخواست در روز فرد، واریزی در روز فرد بعدی انجام می‌شود.
+    </span>
+    <br><br>
     <a class="btn btn-outline-success" href="{{route('addWithdrawal')}}"><i class="fa fa-plus"></i> ثبت درخواست وجه جدید</a>
     <a class="btn btn-outline-info" href="/Supplier/list"><i class="fa fa-user"></i> مشاهده لیست تامین کنندگان</a>
     <a class="btn btn-outline-primary" href="/Withdrawal/tankhah/add"><i class="fa fa-plus"></i>ثبت فاکتور تنخواه</a>
@@ -67,32 +73,37 @@
         </tr>
         </thead>
         <tbody>
-
-        @foreach($withdrawals as $id => $withdrawal)
-
-            <tr>
-                <td>{{$id}}</td>
-                <td>{{verta($withdrawal->created_at)->formatJalaliDate()}}</td>
-                <td>{{$withdrawal->user->name}}</td>
-                <td>{{number_format($withdrawal->amount)}}</td>
-                <td>{{$withdrawal->expense}}{{$withdrawal->tankhah?' (تنخواه) ':''}}</td>
-                <td><a href="?Supplier={{$withdrawal->supplier_id}}">{{$withdrawal->account_name}}</a></td>
-                <td>{!! $withdrawal->counter_status() !!}</td>
-                <td>{!! $withdrawal->manager_status() !!}</td>
-                <td>{!! $withdrawal->payment_status() !!}</td>
-                <td>{!! $withdrawal->recipient_status() !!}</td>
-                <td>
-                    <span class="fa fa-eye btn btn-info" onclick="view_withdrawal({{$id}})"
-                          title="مشاهده"></span>
-                    @if($withdrawal->manager_confirm != 1)
-                        <a class="fa fa-edit btn btn-primary" href="/Withdrawal/edit/{{$id}}" title="ویرایش"></a>
-                    @endif
-                    @if( $withdrawal->tankhah)
-                        <a class="fa fa-edit btn btn-primary" href="/Withdrawal/tankhah/edit/{{$id}}" title="ویرایش"></a>
-                    @endif
-                </td>
-            </tr>
-        @endforeach
+            @foreach($withdrawals as $id => $withdrawal)
+                @if($withdrawal->user_id === auth()->id() || (
+                    ($withdrawal->counter_confirm != 2 || 
+                    ($withdrawal->counter_confirm == 2 && $withdrawal->postpone_date && verta($withdrawal->postpone_date)->isToday())) 
+                    &&
+                    (in_array(verta($withdrawal->created_at)->dayOfWeek, [0,2,4,6]) || 
+                    (in_array(verta()->dayOfWeek, [1,3,5]) && verta()->gt(verta($withdrawal->created_at))) ) 
+                ))
+                <tr>
+                    <td>{{ $id }}</td>
+                    <td>{{ verta($withdrawal->created_at)->formatJalaliDate() }}</td>
+                    <td>{{ $withdrawal->user->name }}</td>
+                    <td>{{ number_format($withdrawal->amount) }}</td>
+                    <td>{{ $withdrawal->expense }}{{ $withdrawal->tankhah ? ' (تنخواه) ' : '' }}</td>
+                    <td><a href="?Supplier={{ $withdrawal->supplier_id }}">{{ $withdrawal->account_name }}</a></td>
+                    <td>{!! $withdrawal->counter_status() !!}</td>
+                    <td>{!! $withdrawal->manager_status() !!}</td>
+                    <td>{!! $withdrawal->payment_status() !!}</td>
+                    <td>{!! $withdrawal->recipient_status() !!}</td>
+                    <td>
+                        <span class="fa fa-eye btn btn-info" onclick="view_withdrawal({{ $id }})" title="مشاهده"></span>
+                        @if($withdrawal->manager_confirm != 1)
+                            <a class="fa fa-edit btn btn-primary" href="/Withdrawal/edit/{{ $id }}" title="ویرایش"></a>
+                        @endif
+                        @if($withdrawal->tankhah)
+                            <a class="fa fa-edit btn btn-primary" href="/Withdrawal/tankhah/edit/{{ $id }}" title="ویرایش"></a>
+                        @endif
+                    </td>
+                </tr>
+                @endif
+            @endforeach
         </tbody>
     </table>
 

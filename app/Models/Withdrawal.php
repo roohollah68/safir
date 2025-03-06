@@ -33,6 +33,8 @@ class Withdrawal extends Model
             return "<span class='btn btn-info' {$action}>بررسی</span>";
         elseif ($this->counter_confirm == 1)
             return "<span class='btn btn-success' {$action}>تایید</span>";
+        elseif ($this->counter_confirm == 2)
+            return "<span class='btn btn-secondary' {$action}>تعویق</span>";
         return '<span class="btn btn-warning">خطا</span>';
     }
 

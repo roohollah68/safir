@@ -318,4 +318,25 @@
             }
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        $(function() {
+            $(document).on('change', 'input[name="counter_confirm"]', function() {
+                const selectedValue = $('input[name="counter_confirm"]:checked').val();
+                if (selectedValue === '2') {
+                    $('#postpone-section').show();
+                    $('#postpone').prop('required', true);
+                        new mds.MdsPersianDateTimePicker(document.getElementById('postpone'), {
+                            targetTextSelector: '#postpone',
+                            targetDateSelector: '#postpone_date',
+                            enableTimePicker: false
+                        });
+                } else {
+                    $('#postpone-section').hide();
+                    $('#postpone').prop('required', false);
+                }
+            });
+            $('input[name="counter_confirm"]:checked').trigger('change');
+        });
+    });
 </script>
