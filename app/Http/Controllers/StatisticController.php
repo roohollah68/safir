@@ -25,10 +25,12 @@ class StatisticController extends Controller
         $users = User::withTrashed()->with('customers');
         if (!$user->meta('statistic'))
             $users = $users->where('id', $user->id);
-        $users = $users->get()->keyBy("id")->map(function ($user) {
-            $user->customer = $user->customers->keyby('name');
-        });
-
+        $users = $users->get()->keyBy("id")
+            ->map(function ($user) {
+                $user->customers = $user->customers->keyby('name');
+                return $user;
+            });
+//        dd($users->first());
         if (isset($request->city)) {
             $request->base = 'customerBase';
         }
