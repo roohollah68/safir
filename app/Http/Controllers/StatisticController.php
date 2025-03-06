@@ -51,7 +51,7 @@ class StatisticController extends Controller
         $request->from = Verta::parse($request->from)->toCarbon();
         $request->to = Verta::parse($request->to)->addDay()->addSeconds(-1)->toCarbon();
         $orders = Order::where([
-            ['state', 10],
+            ['state', '>' , 0],
             ['created_at', '>', $request->from],
             ['created_at', '<', $request->to],
         ])->where('total', '>', 0);
