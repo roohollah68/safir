@@ -7,7 +7,8 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let showDeleted, printWait, confirmWait, counterWait, proccessWait, notsent, sent, delivered, COD, refund, user = 'all',
+    let showDeleted, printWait, confirmWait, counterWait, proccessWait, notsent, sent, delivered, COD, refund,
+        user = 'all',
         warehouseId = 'all';
     let changeOrdersPermit = !!'{{$User->meta('showAllOrders')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
@@ -101,9 +102,11 @@
 
             order.user.name + ((isWebsite && order.website) ? `(${order.website.website_id})` : ''),
 
-            `<span title="${order.orders}">` + ((order.orders.length > 30) ? order.orders.substr(0, 30) + ' ...' : order.orders) +`</span>`,
+            `<span title="${order.orders}">` + ((order.orders.length > 30) ? order.orders.substr(0, 30) + ' ...' : order.orders) + `</span>`,
 
             createdTime(order),
+
+            confirmedTime(order),
 
             operations(order),
 
@@ -135,7 +138,9 @@
             table.rows.add(data);
             table.draw();
         } else {
-            let hideCols = (changeOrdersPermit) ? [8, 9, 10, 11, 12, 13] : [0, 3, 8, 9, 10, 11, 12, 13]
+            let hideCols = [9, 10, 11, 12, 13, 14];
+            hideCols = !changeOrdersPermit ? hideCols.concat([0, 3]) : hideCols;
+            hideCols = safir ? hideCols.concat([6]) : hideCols;
             table = $('#main-table').DataTable({
                 columns: [
                     {title: " "},
@@ -144,6 +149,7 @@
                     {title: "سفیر"},
                     {title: "سفارش"},
                     {title: "زمان ثبت"},
+                    {title: "تائید کاربر"},
                     {title: "عملیات"},
                     {title: "وضعیت"},
                     {title: "آدرس"},
@@ -205,8 +211,8 @@
             let btn = order.confirm ? (order.counter === 'waiting' ? 'info' : 'secondary') : 'primary';
             res = `<span class="btn btn-${btn}" onclick="change_state(${order.id}, 1)">${text}</span>`
         }
-        //else if (order.state < 3) {
-        //     res = `<span class="btn btn-warning" onclick="selectSendMethod(${order.id})">${text}<i class="fas fa-check"></i></span>`
+            //else if (order.state < 3) {
+            //     res = `<span class="btn btn-warning" onclick="selectSendMethod(${order.id})">${text}<i class="fas fa-check"></i></span>`
         // }
         else if (+order.state === 4) {
             res = `<span class="btn btn-danger" onclick="change_state(${order.id}, 0)">${text}<i class="fas fa-question"></i></span>`
@@ -214,17 +220,23 @@
             res = `<span class="btn btn-success" onclick="confirm('آیا وضعیت سفارش به در انتظار پرینت تغییر کند؟')&&change_state(${order.id}, 0)">${text}<i class="fas fa-check-double"></i></span>`
         } else if (+order.state === 11) {
             res = `<span class="btn btn-delivered" onclick="confirm('آیا وضعیت سفارش به در انتظار پرینت تغییر کند؟')&&confirm(change_state(${order.id}, 0))">${text}<i class="fas fa-check-double"></i></span>`
-        }
-        else if ([1, 2].includes(+order.state)) {
-        const isExpired = NotSent(order);
-        const color = isExpired ? 'notsent' : 'warning';
-        const icon = isExpired ? 'clock' : 'check';
+        } else if ([1, 2].includes(+order.state)) {
+            const isExpired = NotSent(order);
+            const color = isExpired ? 'notsent' : 'warning';
+            const icon = isExpired ? 'clock' : 'check';
 
-        res = `<span class="btn btn-${color}" onclick="selectSendMethod(${order.id})">
+            res = `<span class="btn btn-${color}" onclick="selectSendMethod(${order.id})">
             ${text}<i class="fas fa-${icon}"></i></span>`;
         }
 
         return timestamp + res;
+    }
+
+    function confirmedTime(order) {
+        if (!order.confirmed_at)
+            return "";
+        let timestamp = new Date(order.confirmed_at);
+        return timestamp.toLocaleDateString('fa-IR');
     }
 
     function operations(order) {
@@ -420,20 +432,20 @@
             $.notify('ابتدا باید سفارشات مورد نظر را انتخاب کنید', 'error')
             return
         }
-        groupedIds = ids.reduce((r, e, i) =>(i % 3 ? r[r.length - 1].push(e) : r.push([e])) && r, []);
+        groupedIds = ids.reduce((r, e, i) => (i % 3 ? r[r.length - 1].push(e) : r.push([e])) && r, []);
         $.each(groupedIds, function (index, ids) {
-            $.post('/orders/excel',{
-                _token : token,
-                ids : ids,
+            $.post('/orders/excel', {
+                _token: token,
+                ids: ids,
             })
-                .done(res=>{
+                .done(res => {
                     let table1 = document.createElement('table');
-                    $(table1).html(res[0]).attr('data-excel-name' , 'صورتحساب');
+                    $(table1).html(res[0]).attr('data-excel-name', 'صورتحساب');
                     let table2 = document.createElement('table');
-                    $(table2).html(res[1]).attr('data-excel-name' , 'اقلام صورتحساب');
+                    $(table2).html(res[1]).attr('data-excel-name', 'اقلام صورتحساب');
                     // console.log(res);
                     let table2excel = new Table2Excel();
-                    table2excel.export([table1,table2] , 'excel' + index);
+                    table2excel.export([table1, table2], 'excel' + index);
                     // let div = document.createElement('div');
                     // $(div).html(res[0] + res[1])
                     // $(div).find('table').table2excel();

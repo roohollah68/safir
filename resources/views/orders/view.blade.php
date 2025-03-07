@@ -38,13 +38,25 @@
         <span>توضیحات:</span> <b>{{$order->desc}}</b> <br>
     @endif
     <span>ثبت کننده:</span> <b>{{$order->user()->first()->name}}</b> <br>
-    <span>زمان ثبت:</span> <b>{{verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</b>
+    <span>زمان ثبت:</span> <b dir="ltr">{{verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</b>
     <br>
     <span>زمان آخرین ویرایش:</span>
-    <b>{{verta($order->updated_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</b> <br>
+    <b dir="ltr">{{verta($order->updated_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</b> <br>
 
     @if($order->deleted_at)
-        <span>زمان حذف:</span> <b>{{verta($order->deleted_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</b>
-        <br>
+        <span>زمان حذف:</span>
+        <b dir="ltr">{{verta($order->deleted_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</b><br>
+    @endif
+    @if($order->confirmed_at)
+        <span>زمان تائید کاربر:</span>
+        <b dir="ltr">{{verta($order->confirmed_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</b><br>
+    @endif
+    @if($order->processed_at)
+        <span>زمان آغاز پردازش:</span>
+        <b dir="ltr">{{verta($order->processed_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</b><br>
+    @endif
+    @if($order->sent_at)
+        <span>زمان ارسال:</span>
+        <b dir="ltr">{{verta($order->sent_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</b><br>
     @endif
 </div>
