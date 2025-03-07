@@ -90,6 +90,11 @@
         background-color: #FF8C00;
         border-color: #FF8C00;
     }
+
+    .ui-datepicker {
+    z-index: 10000 !important;
+    }
+
 </style>
 
 <style>

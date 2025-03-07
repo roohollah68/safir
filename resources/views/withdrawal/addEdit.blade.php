@@ -38,6 +38,12 @@
 
 @section('content')
     <x-auth-validation-errors class="mb-4" :errors="$errors" />
+    <span class="alert-info p-2 rounded">
+        <i class="fa fa-info-circle me-1"></i>
+        توجه: تمام واریزی‌ها در روز فرد بعدی واریز می‌شود.
+        در صورت ثبت درخواست در روز فرد، واریزی در روز فرد بعدی انجام می‌شود.
+    </span>
+    <br>
     <form action="/Withdrawal/add{{ $edit ? '/' . $withdrawal->id : '' }}" method="post" enctype="multipart/form-data">
         @csrf
         <div class="row my-4">

@@ -26,6 +26,11 @@
         <span>زمان حذف:</span><b>{{verta($withdrawal->deleted_at)->formatJalaliDate()}}</b><br>
     @endif
     <span>تایید حسابداری:</span> <b>{!! $withdrawal->counter_status() !!}</b> <br>
+    @if ($withdrawal->counter_confirm == 2 && $withdrawal->postpone_date)
+    <span>تاریخ پرداخت:</span> <b>{{verta($withdrawal->postpone_date)->formatJalaliDate()}}</b><b> ({{ abs(Verta::now()->diff(verta($withdrawal->postpone_date))->days) }}
+  روز)</b>
+    <br>
+    @endif
     <span>توضیحات حسابداری:</span> <b>{{$withdrawal->counter_desc}}</b> <br>
     <span>بانک پرداخت کننده:</span> <b>{{(isset($withdrawal->bank))?$withdrawal->bank->name:'نامشخص'}}</b>
     <hr>
