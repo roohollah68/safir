@@ -559,7 +559,7 @@ class OrderController extends Controller
 
     public function viewOrder($id)
     {
-        $order = Helper::Order(false)->findOrFail($id);
+        $order = Helper::Order(false)->with('customer')->findOrFail($id);
         $order = $this->addCityToAddress($order);
         return view('orders.view', ['order' => $order]);
     }

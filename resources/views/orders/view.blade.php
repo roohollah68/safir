@@ -1,7 +1,7 @@
 <div title="مشاهده سفارش" class="dialogs">
     @if($order->receipt)
         <a href="receipt/{{$order->receipt}}" target="_blank">
-            <img style="width: 300px"src="receipt/{{$order->receipt}}">
+            <img style="width: 300px" src="receipt/{{$order->receipt}}">
         </a>
     @endif
     <br>
@@ -27,6 +27,9 @@
         <span>توضیح پرداخت:</span> <b>{{$order->paymentNote}}</b> <br>
     @endif
     <span>درصد پرداخت شده: </span><b>{{$order->payPercent()}} %</b> <br>
+    @if(isset($order->customer) && $order->customer->agreement)
+        <span>تفاهم: </span><b>{{$order->customer->agreement}}</b><br>
+    @endif
     @if($order->sendMethod())
         <span>نحوه ارسال:</span> <b>{{$order->sendMethod()}}</b> <br>
     @endif
@@ -34,7 +37,7 @@
     @if($order->desc)
         <span>توضیحات:</span> <b>{{$order->desc}}</b> <br>
     @endif
-        <span>ثبت کننده:</span> <b>{{$order->user()->first()->name}}</b> <br>
+    <span>ثبت کننده:</span> <b>{{$order->user()->first()->name}}</b> <br>
     <span>زمان ثبت:</span> <b>{{verta($order->created_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</b>
     <br>
     <span>زمان آخرین ویرایش:</span>
