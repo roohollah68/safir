@@ -4,26 +4,26 @@
         <span>تغییر وضعیت:</span>
 
         <label class="btn btn-success" for="approved">تائید</label>
-        <input type="radio" name="counter_confirm" value="1" id="approved" class="checkboxradio">
+        <input type="radio" name="counter_confirm" value="1" id="approved" class="checkboxradio" onclick="toggleRequired(true)">
 
         <label class="btn btn-info" for="waiting">بررسی</label>
-        <input type="radio" name="counter_confirm" value="0" id="waiting" class="checkboxradio">
+        <input type="radio" name="counter_confirm" value="0" id="waiting" class="checkboxradio" onclick="toggleRequired(false)">
 
         <label class="btn btn-danger" for="reject">عدم تائید</label>
-        <input type="radio" name="counter_confirm" value="-1" id="reject" class="checkboxradio">
+        <input type="radio" name="counter_confirm" value="-1" id="reject" class="checkboxradio" onclick="toggleRequired(false)">
 
         <label class="btn btn-secondary" for="postpone_radio">تعویق</label>
-        <input type="radio" name="counter_confirm" value="2" id="postpone_radio" class="checkboxradio">
+        <input type="radio" name="counter_confirm" value="2" id="postpone_radio" class="checkboxradio" onclick="toggleRequired(false)">
 
         <br><br>
 
         <div id="postpone-section" style="display: none;">
-            <div class="form-group input-group required">
+            <div class="form-group input-group">
                 <div class="input-group-append" id="postpone-trigger">
                     <label class="input-group-text"><i class="fas fa-calendar-alt me-2"></i>تاریخ پرداخت:</label>
                 </div>
                 <input type="text" name="postpone" id="postpone" class="form-control rounded"
-                       style="cursor: pointer;" required>
+                       style="cursor: pointer;">
                 <input type="hidden" name="postpone_date" id="postpone_date">
             </div>
         </div>
@@ -38,7 +38,7 @@
         <div class="row">
             {{--            دسته هزینه--}}
             <div class="col-md-12 my-2">
-                <div class="form-group input-group required">
+                <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
                         <label class="input-group-text ">دسته هزینه:</label>
                     </div>
@@ -56,11 +56,11 @@
 
             {{--            نوع هزینه--}}
             <div class="col-md-12 my-2">
-                <div class="form-group input-group required">
+                <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="expense_desc" class="input-group-text w-100">نوع هزینه:</label>
                     </div>
-                    <select class="form-control" name="expense_desc" id="expense_desc" style="min-width: 300px;" required></select>
+                    <select class="form-control" name="expense_desc" id="expense_desc" style="min-width: 300px;"></select>
                 </div>
             </div>
 
@@ -96,7 +96,7 @@
 
 
             <label for="bank_id">انتخاب بانک</label>
-            <select id="bank_id" name="bank_id" class="form-control w-50" required>
+            <select id="bank_id" name="bank_id" class="form-control w-50">
                 <option value="">لطفا انتخاب کنید</option>
                 @foreach($banks as $id => $bank)
                     <option value="{{$id}}">{{$bank->name}}</option>

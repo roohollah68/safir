@@ -138,7 +138,7 @@ class WithdrawalController extends Controller
     {
         Helper::access('counter');
         request()->validate([
-            'expense_desc' => 'required',
+            'expense_desc' => $req->counter_confirm == 1 ? 'required' : 'nullable',
         ], [
             'expense_desc.required' => 'نوع هزینه باید مشخص شود!'
         ]);

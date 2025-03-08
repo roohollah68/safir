@@ -319,8 +319,7 @@
         });
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        $(function() {
+    $(function() {
             $(document).on('change', 'input[name="counter_confirm"]', function() {
                 const selectedValue = $('input[name="counter_confirm"]:checked').val();
                 if (selectedValue === '2') {
@@ -337,6 +336,10 @@
                 }
             });
             $('input[name="counter_confirm"]:checked').trigger('change');
-        });
-    });
+        });    
+    
+    function toggleRequired(isRequired) {
+        document.getElementById('expense_desc').required = isRequired;
+        document.getElementById('bank_id').required = isRequired;
+    }
 </script>
