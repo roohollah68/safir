@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 
 use App\Helper\Helper;
-use App\Models\Comment;
 use App\Models\Customer;
 use App\Models\CustomerTransaction;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Setting;
+use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 
 class SettingController extends Controller
 {
@@ -63,28 +63,19 @@ class SettingController extends Controller
 
     public function command()
     {
-        foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {
-            if ($customer->balance() != $customer->balance) {
-                echo $customer->name. $customer->balance() . '=>'.  $customer->balance . '<br>';
-                $customer->balance = $customer->balance();
-//                $customer->save();
-            }
+//        foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {
+//            if ($customer->balance() != $customer->balance) {
+//                echo $customer->name. $customer->balance() . '=>'.  $customer->balance . '<br>';
+//                $customer->balance = $customer->balance();
+////                $customer->save();
+//            }
+//        }
+
+        $orders = Order::with('orderProducts')->where('user_id', 132)->get();
+        foreach ($orders as $order) {
+            (new WoocommerceController())->dorateashop($order);
         }
 
-//        $comments = Comment::with('order')
-//            ->whereHas('order', function ($order) {
-//                $order->where('confirm', true)->whereNull('confirmed_at');
-//            })
-//            ->where('text', 'LIKE', '%سفارش تایید شد. %')
-//            ->get();
-//        foreach ($comments as $comment) {
-//            $comment->order->update([
-//                'confirmed_at' => $comment->created_at,
-//            ]);
-//        }
-//        Order::where('state','>=',10)->whereNull('sent_at')->update([
-//            'sent_at' => DB::raw('`updated_at`'),
-//        ]);
     }
 
     public function combineCustomers()

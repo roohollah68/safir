@@ -1,9 +1,8 @@
 @csrf
-@if(!$edit)
+@if(!$edit && $creatorIsAdmin)
     <div class="mb-2">
         <span>انتخاب انبار:</span>
         @foreach($warehouses as $warehouse)
-            @continue($warehouse->id == 2)
             <a class="btn btn{{($warehouseId == $warehouse->id)?'':'-outline'}}-info"
                href="/add_order?warehouseId={{$warehouse->id}}">{{$warehouse->name}}</a>
         @endforeach

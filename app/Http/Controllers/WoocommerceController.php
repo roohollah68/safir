@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Websites;
@@ -75,7 +76,6 @@ class WoocommerceController extends Controller
             'deliveryMethod' => $request->shipping_lines[0]->method_title . ' _ ' . $deliveryTime,
             'counter' => 'approved',
             'confirm' => true,
-//            'warehouse_id' => ($request->billing->city == 'تهران') ? 1 : 2,
             'warehouse_id' => 1,
         ];
         if ($web) {
@@ -103,6 +103,8 @@ class WoocommerceController extends Controller
                         ]);
                     }
                 }
+                if ($website == 'dorateashop')
+                    $this->dorateashop($order);
             } else {
                 $order = $web->order()->first();
                 $order->update($orderData);
@@ -137,9 +139,9 @@ class WoocommerceController extends Controller
                 ]);
             }
             app('Telegram')->sendOrderToBale($order, env('GroupId'));
+            if ($website == 'dorateashop')
+                $this->dorateashop($order);
         }
-
-
         DB::commit();
         return 'order saved!';
     }
@@ -149,5 +151,72 @@ class WoocommerceController extends Controller
         $file = '1403-12-8_23-52-04 _ peptina _ هلیا ضیغمی';
         $data = json_decode(file_get_contents("woo/{$file}.txt"));
         dd($data);
+    }
+
+    public function dorateashop($order)
+    {
+        $website_id = $order->website->website_id;
+        $website = Websites::where('website_id', $website_id)->where('website', 'moosavi')->first();
+        if ($website) {
+            $order->delete();
+            return;
+        }
+        $user = User::find(10);
+        $products = Product::with('good')
+            ->find($order->orderProducts->pluck('product_id'))
+            ->keyBy('id');
+        $products = (new OrderController())->calculateDiscount($products, $user);
+        $newOrder = $order->replicate();
+        echo $order->name . ' ( ' . $order->id . ' )<br>';
+        echo 'جمع فاکتور سایت: ' . number_format($order->total) . ' ریال ' . '<br>';
+        $newOrder->fill([
+            'user_id' => 10,
+            'paymentMethod' => 'credit',
+            'desc' => $newOrder->desc . " (دوراتی شاپ)",
+            'total' => 0,
+        ])->save();
+        foreach ($order->orderProducts->keyBy('product_id') as $id => $orderProduct) {
+            $product = $products[$id];
+            $discount = +$product->discount;
+            $price = round((100 - $discount) * $product->good->price / 100);
+            $newOrder->total += $price * (+$orderProduct->number);
+            $newOrder->orderProducts()->create([
+                'name' => $product->good->name,
+                'price' => $price,
+                'product_id' => $id,
+                'number' => $orderProduct->number,
+                'discount' => $discount,
+            ]);
+            echo 'سایت: ' . $orderProduct->name . ' تعداد: ' . +$orderProduct->number . ' تخفیف: ' . +$orderProduct->discount . ' قیمت واحد: ' .
+                number_format($orderProduct->price) . ' کل: ' . number_format($orderProduct->price * $orderProduct->number) . '<br>';
+
+            echo 'سفیر: ' . $product->good->name . ' تعداد: ' . +$orderProduct->number . ' تخفیف: ' . $discount . ' قیمت واحد: ' .
+                number_format($price) . ' کل: ' . number_format($price * $orderProduct->number) . '<br>';
+        }
+        echo 'سفیر: هزینه ارسال:' . number_format(Helper::settings()->{'peykeShahri'}) . '<br>';
+        $newOrder->total += Helper::settings()->{'peykeShahri'};
+        echo $newOrder->name . ' ( ' . $newOrder->id . ' )<br>';
+        echo 'جمع فاکتور سفیر: ' . number_format($newOrder->total) . ' ریال ' . '<br>';
+        echo '=============================<br><br>';
+        $user->update([
+            'balance' => $user->balance - $newOrder->total
+        ]);
+        $newOrder->transactions()->create([
+            'user_id' => 10,
+            'amount' => $newOrder->total,
+            'balance' => $user->balance,
+            'type' => false,
+            'description' => 'ثبت سفارش (دوراتی شاپ)',
+        ]);
+        (new TelegramController())->sendOrderToBale($newOrder, env('GroupId'));
+        $newOrder->save();
+        $newOrder->website()->create([
+            'website' => 'moosavi',
+            'website_id' => $website_id,
+            'status' => $order->website->status,
+        ]);
+        (new CommentController)->create($newOrder, $user, 'سفارش ایجاد شد');
+        (new CommentController)->create($newOrder, $user, 'شماره سفارش سایت: ' . $website_id);
+        $order->delete();
     }
 }
