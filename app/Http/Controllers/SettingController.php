@@ -71,7 +71,7 @@ class SettingController extends Controller
             }
         }
 
-        $this->combineCustomers();
+//        $this->combineCustomers();
 
 //        $orders = Order::with('orderProducts')->where('user_id', 132)->get();
 //        foreach ($orders as $order) {
