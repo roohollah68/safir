@@ -34,7 +34,7 @@ class CustomerController extends Controller
         $customers = $customers->get()->keyBy("id");
         $total = 0;
         foreach ($customers as $customer) {
-            $customer->balance = $customer->balance();
+            //$customer->balance = $customer->balance();
             $total += $customer->balance;
         }
         return view('customer.customerList', [
