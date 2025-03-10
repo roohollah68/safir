@@ -71,6 +71,8 @@ class SettingController extends Controller
             }
         }
 
+        $this->combineCustomers();
+
 //        $orders = Order::with('orderProducts')->where('user_id', 132)->get();
 //        foreach ($orders as $order) {
 //            (new WoocommerceController())->dorateashop($order);
@@ -80,8 +82,8 @@ class SettingController extends Controller
 
     public function combineCustomers()
     {
-        $froms = [4894, 4895, 4896];
-        $to = 13;
+        $froms = [5098];
+        $to = 4670;
         foreach ($froms as $from) {
             Order::where('customer_id', $from)->update(['customer_id' => $to]);
             CustomerTransaction::where('customer_id', $from)->update(['customer_id' => $to]);
