@@ -33,7 +33,7 @@
     @if($order->sendMethod())
         <span>نحوه ارسال:</span> <b>{{$order->sendMethod()}}</b> <br>
     @endif
-    <span>انبار:</span> <b>{{$order->warehouse->name}}</b> <br>
+    <span>انبار:</span> <b>{{$order->warehouse?$order->warehouse->name:'نامشخص'}}</b> <br>
     @if($order->desc)
         <span>توضیحات:</span> <b>{{$order->desc}}</b> <br>
     @endif
