@@ -489,9 +489,10 @@ class OrderController extends Controller
             (new CommentController)->create($order, auth()->user(), 'سفارش بعد از تایید ویرایش شد');
         }
         $order->confirm = false;
-        $order->customer->update([
-            'balance' => $order->customer->balance + $order->total,
-        ]);
+        if ($order->total > 0)
+            $order->customer->update([
+                'balance' => $order->customer->balance + $order->total,
+            ]);
         $order->counter = 'waiting';
         $order->paymentMethod = null;
         $order->payInDate = null;
