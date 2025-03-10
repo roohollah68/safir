@@ -63,18 +63,18 @@ class SettingController extends Controller
 
     public function command()
     {
-//        foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {
-//            if ($customer->balance() != $customer->balance) {
-//                echo $customer->name. $customer->balance() . '=>'.  $customer->balance . '<br>';
-//                $customer->balance = $customer->balance();
-////                $customer->save();
-//            }
-//        }
-
-        $orders = Order::with('orderProducts')->where('user_id', 132)->get();
-        foreach ($orders as $order) {
-            (new WoocommerceController())->dorateashop($order);
+        foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {
+            if ($customer->balance() != $customer->balance) {
+                echo $customer->name. $customer->balance() . '=>'.  $customer->balance . '<br>';
+                $customer->balance = $customer->balance();
+//                $customer->save();
+            }
         }
+
+//        $orders = Order::with('orderProducts')->where('user_id', 132)->get();
+//        foreach ($orders as $order) {
+//            (new WoocommerceController())->dorateashop($order);
+//        }
 
     }
 
