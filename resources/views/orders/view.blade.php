@@ -52,7 +52,7 @@
         <b dir="ltr">{{verta($order->confirmed_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</b><br>
     @endif
     @if($order->processed_at)
-        <span>زمان آغاز پردازش:</span>
+        <span>زمان شروع پردازش:</span>
         <b dir="ltr">{{verta($order->processed_at)->timezone('Asia/tehran')->formatJalaliDatetime()}}</b><br>
     @endif
     @if($order->sent_at)
