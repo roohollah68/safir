@@ -19,19 +19,15 @@
         </tr>
         </thead>
         <tbody>
-
         @foreach($suppliers as $id => $supplier)
-
             <tr>
                 <td>{{$id}}</td>
                 <td><a href="{{route('WithdrawalList')}}?Supplier={{$id}}">{{$supplier->name}}</a></td>
                 <td>{{$supplier->withdrawals->where('payment_confirm', 1)->count()}}</td>
                 <td>{{number_format($supplier->withdrawals->where('payment_confirm', 1)->sum('amount'))}}</td>
                 <td>
-                    <a class="fa fa-edit btn btn-primary" href="/Supplier/edit/{{$id}}"
-                       title="ویرایش"></a>
-                    <span class="fa fa-eye btn btn-info" onclick="view_supplier({{$id}})"
-                          title="مشاهده"></span>
+                    <a class="fa fa-edit btn btn-primary" href="/Supplier/edit/{{$id}}" title="ویرایش"></a>
+                    <span class="fa fa-eye btn btn-info" onclick="view_supplier({{$id}})" title="مشاهده"></span>
                 </td>
             </tr>
         @endforeach

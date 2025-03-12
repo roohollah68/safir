@@ -565,10 +565,8 @@ class CustomerController extends Controller
 
     public function blockList()
     {
-        Helper::access('usersEdit');
+        Helper::access('blockList');
         $user = auth()->user();
-        if($user->id != 130)
-            return abort(405, 'شما مجاز نیستید.');
         $customers = Customer::with(['orders', 'transactions'])->get()->keyBy('id');
         return view('customer.blockList', [
             'customers' => $customers,
