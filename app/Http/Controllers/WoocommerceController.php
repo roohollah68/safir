@@ -86,14 +86,8 @@ class WoocommerceController extends Controller
                 $order = $web->order()->withTrashed()->first();
                 $order->update($orderData);
                 if ($order->deleted_at) {
-                    app('Telegram')->deleteOrderFromBale($order, '5742084958');
                     $order->restore();
-                    $baleReq = app('Telegram')->sendOrderToBale($order, env('GroupId'));
-                    if ($baleReq) {
-                        $order->bale_id = $baleReq->result->message_id;
-                    }
-                    $order->save();
-                    foreach ($products as $id => $data) {
+                    foreach ($products as $data) {
                         $product = $data[1];
                         $order->orderProducts()->create([
                             'product_id' => $product->id,
@@ -102,16 +96,24 @@ class WoocommerceController extends Controller
                             'price' => $product->price,
                         ]);
                     }
+                    (new TelegramController())->deleteOrderFromBale($order, '5742084958');
+                    if ($website == 'dorateashop')
+                        $this->dorateashop($order);
+                    else {
+                        $baleReq = (new TelegramController())->sendOrderToBale($order, env('GroupId'));
+                        if ($baleReq) {
+                            $order->bale_id = $baleReq->result->message_id;
+                        }
+                        $order->save();
+                    }
                 }
-                if ($website == 'dorateashop')
-                    $this->dorateashop($order);
             } else {
                 $order = $web->order()->first();
                 $order->update($orderData);
                 if (!$order->deleted_at) {
-                    app('Telegram')->deleteOrderFromBale($order, env('GroupId'));
+                    (new TelegramController())->deleteOrderFromBale($order, env('GroupId'));
                     $order->delete();
-                    app('Telegram')->sendOrderToBale($order, '5742084958');
+                    (new TelegramController())->sendOrderToBale($order, '5742084958');
                     $order->save();
                     if ($order->state) {
                         (new OrderController)->changeState($order->id, 0);
@@ -138,9 +140,11 @@ class WoocommerceController extends Controller
                     'price' => $product->price,
                 ]);
             }
-            app('Telegram')->sendOrderToBale($order, env('GroupId'));
+
             if ($website == 'dorateashop')
                 $this->dorateashop($order);
+            else
+                (new TelegramController())->sendOrderToBale($order, env('GroupId'));
         }
         DB::commit();
         return 'order saved!';
