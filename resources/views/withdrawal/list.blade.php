@@ -74,13 +74,13 @@
         </thead>
         <tbody>
             @foreach($withdrawals as $id => $withdrawal)
-                @if($withdrawal->user_id === auth()->id() || (
-                    ($withdrawal->counter_confirm != 2 ||
-                    ($withdrawal->counter_confirm == 2 && $withdrawal->postpone_date && verta($withdrawal->postpone_date)->isToday()))
-                    &&
-                    (in_array(verta($withdrawal->created_at)->dayOfWeek, [0,2,4,6]) ||
-                    (in_array(verta()->dayOfWeek, [1,3,5]) && verta()->gt(verta($withdrawal->created_at))) )
-                ))
+{{--                @if($withdrawal->user_id === auth()->id() || (--}}
+{{--                    ($withdrawal->counter_confirm != 2 ||--}}
+{{--                    ($withdrawal->counter_confirm == 2 && $withdrawal->postpone_date && verta($withdrawal->postpone_date)->isToday()))--}}
+{{--                    &&--}}
+{{--                    (in_array(verta($withdrawal->created_at)->dayOfWeek, [0,2,4,6]) ||--}}
+{{--                    (in_array(verta()->dayOfWeek, [1,3,5]) && verta()->gt(verta($withdrawal->created_at))) )--}}
+{{--                ))--}}
                 <tr>
                     <td>{{ $id }}</td>
                     <td>{{ verta($withdrawal->created_at)->formatJalaliDate() }}</td>
