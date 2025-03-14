@@ -39,17 +39,12 @@
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                @if (Route::has('password.request'))
-                                        &nbsp;&nbsp;&nbsp;
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('register') }}">
-                        {{ __('حساب کاربری ندارید؟') }}
-                    </a>
-                    &nbsp;&nbsp;&nbsp;
-{{--                    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="https://t.me/Safir_sefaresh_bot">--}}
-{{--                        {{ __('ورود با تلگرام') }}--}}
+{{--                @if (Route::has('password.request'))--}}
+{{--                                        &nbsp;&nbsp;&nbsp;--}}
+{{--                    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('register') }}">--}}
+{{--                        {{ __('حساب کاربری ندارید؟') }}--}}
 {{--                    </a>--}}
-                    &nbsp;&nbsp;&nbsp;
-                @endif
+{{--                @endif--}}
                 <x-button class="ml-3">
                     {{ __('ورود') }}
                 </x-button>

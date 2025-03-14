@@ -22,7 +22,7 @@ class CustomerController extends Controller
     public function customersList(Request $req)
     {
         $user = auth()->user();
-        $viewAllAuth = $user->meta(['allCustomers', 'editAllCustomers']);
+        $viewAllAuth = $user->meta(['allCustomers', 'editAllCustomers', 'counter']);
         $customers = Customer::with(['user', 'orders', 'transactions']);
         if ($viewAllAuth) {
             if ($req->user)
@@ -89,7 +89,7 @@ class CustomerController extends Controller
             'national_id' => 'nullable|string|max:11|min:11',
             'economic_code' => 'nullable|string|max:12|min:12',
             'customer_type' => 'required|in:Individual,LegalEntity',
-        ],[
+        ], [
             'agreement.required' => 'پر کردن فیلد تفاهم اجباری است.',
             'name.required' => 'پر کردن فیلد نام اجباری است.',
         ]);
@@ -515,7 +515,7 @@ class CustomerController extends Controller
 
     public function paymentTracking(Request $req)
     {
-        Helper::access('editAllCustomers');
+        Helper::access('allCustomers');
 
         $orders = Order::with(['user', 'paymentLinks'])
             ->where([
@@ -523,31 +523,29 @@ class CustomerController extends Controller
                 ['confirm', true],
                 ['total', '>', 0],
                 ['customer_id', '>', 0],
+                ['state', '>=', 10],
             ])
             ->with(['user', 'paymentLinks'])
             ->where(function ($query) {
                 $query->orWhereDate('payInDate', '<', today())->orWhere(function ($query) {
-                    $query->whereDate('sent_at', '<', today()->addWeeks(-2))->whereNull('payInDate');
+                    $query->whereNull('payInDate')->whereDate('sent_at', '<', today()->addWeeks(-2));
                 });
             });
         if (!$req->noPostpone)
             $orders = $orders->where(function ($query) {
-                $query->orWhere('postponeDate', '<', Carbon::now()->toDateString())->orWhereNull('postponeDate');
+                $query->orWhereDate('postponeDate', '<', today())->orWhereNull('postponeDate');
             });
-
-        if (isset($req->user) && $req->user != 'all')
+        if ($req->user)
             $orders = $orders->where('user_id', $req->user);
 
-        $orders = $orders->get()->keyBy('id')->reverse();
+        if ($req->paymethods)
+            $orders = $orders->whereIn('paymentMethod', array_keys($req->paymethods));
+
+        $orders = $orders->get()->keyBy('id');
 
         $orders = $orders->filter(fn($order) => $order->unpaid() > 0);
 
-        $payMethods = $orders->groupBy('paymentMethod')->map(fn($p) => 'on');
-        $selectedPayMethod = $req->paymethods ?? $payMethods;
-        $orders = $orders->filter(fn($order) => isset($selectedPayMethod[$order->paymentMethod]));
         return view('customer.paymentTracking', [
-            'payMethods' => $payMethods->keys(),
-            'selectedPayMethod' => $selectedPayMethod,
             'orders' => $orders,
             'users' => User::where('role', '<>', 'user')->get()->keyBy('id'),
         ]);
@@ -555,7 +553,7 @@ class CustomerController extends Controller
 
     public function postponedDay($id, $days)
     {
-        Helper::access('editAllCustomers');
+        Helper::access('counter');
         $order = Order::findOrFail($id);
         $date = Carbon::now();
         $date->addDays(+$days);

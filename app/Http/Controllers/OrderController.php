@@ -305,7 +305,7 @@ class OrderController extends Controller
         if (+$state == 1 && $order->payPercentApproved() < 100 && ($order->paymentMethod == 'cash' || $order->paymentMethod == 'cheque')) {
             return abort(405, 'ابتدا پرداخت فاکتور باید تایید شود.');
         }
-        if (+$state == 1 && !$order->confirm) {
+        if (+$state != 4 && !$order->confirm) {
             return abort(405, 'ابتدا فاکتور باید تایید شود.');
         }
         $order->state = +$state;
@@ -386,7 +386,7 @@ class OrderController extends Controller
         $order->save();
         $user->save();
         DB::commit();
-        return [+$order->state, $text];
+        return [$order, $text];
     }
 
     public function pdfs($ids)

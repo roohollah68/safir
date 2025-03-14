@@ -211,9 +211,6 @@
             let btn = order.confirm ? (order.counter === 'waiting' ? 'info' : 'secondary') : 'primary';
             res = `<span class="btn btn-${btn}" onclick="change_state(${order.id}, 1)">${text}</span>`
         }
-            //else if (order.state < 3) {
-            //     res = `<span class="btn btn-warning" onclick="selectSendMethod(${order.id})">${text}<i class="fas fa-check"></i></span>`
-        // }
         else if (+order.state === 4) {
             res = `<span class="btn btn-danger" onclick="change_state(${order.id}, 0)">${text}<i class="fas fa-question"></i></span>`
         } else if (+order.state === 10) {
@@ -344,9 +341,8 @@
         }
         if (order.total < 0) {
             $.post('/set_send_method/' + id, {_token: token}
-            ).done(function (res) {
+            ).done(function (order) {
                 $.notify("با موفقیت ذخیره شد.", "success");
-                order = res;
                 change_state(id, 10)
             })
             return;
@@ -386,9 +382,9 @@
             _token: token,
         })
             .done(res => {
-                order.state = +res[0];
+                orders[id] = res[0];
                 $.notify(res[1], 'info');
-                updateRow(order);
+                updateRow(res[0]);
             });
     }
 
@@ -460,16 +456,13 @@
     @if($admin)
 
     function selectPayment(id) {
-        let applyChanges = function (order) {
-            $.notify("با موفقیت تائید شد.", "success");
-            updateRow(order);
-        }
 
         $.post('/confirmAuthorize/' + id, {_token: token})
             .done((order) => {
-                console.log(order.total);
                 if (order.total <= 0) {
-                    applyChanges(order);
+                    orders[id] = order;
+                    $.notify("با موفقیت تائید شد.", "success");
+                    updateRow(order);
                     return;
                 }
                 dialog = Dialog(`@include('orders.paymentMethods')`);
@@ -488,7 +481,9 @@
                     })
                     $.post('/orders/paymentMethod/' + id, data)
                         .done((order) => {
-                            applyChanges(order);
+                            orders[id] = order;
+                            $.notify("با موفقیت تائید شد.", "success");
+                            updateRow(order);
                             dialog.remove();
                         });
                 })

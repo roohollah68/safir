@@ -12,7 +12,7 @@
                     <label for="user" class="input-group-text w-100">کاربر مرتبط:</label>
                 </div>
                 <select class="form-control" name="user" id="user">
-                    <option value="all" selected>همه</option>
+                    <option value="" selected>همه</option>
                     @foreach($users as $id=>$user)
                         <option value="{{$id}}" @selected(isset($_GET['user']) &&  $id == $_GET['user'])>
                             {{$user->name}}
@@ -22,15 +22,17 @@
             </div>
         </div>
 
-        @foreach($payMethods as $payMethod)
+        @foreach(["payInDate", "cod", "cash", "cheque", "cash2"] as $payMethod)
             <label for="{{$payMethod}}">{{config('payMethods')[$payMethod]}}</label>
-            <input type="checkbox" name="paymethods[{{$payMethod}}]" id="{{$payMethod}}" class="checkboxradio" @checked($selectedPayMethod[$payMethod]??0)>
+            <input type="checkbox" name="paymethods[{{$payMethod}}]" id="{{$payMethod}}"
+                   class="checkboxradio" @checked(!request('paymethods')) @checked(request('paymethods')[$payMethod]??0)>
         @endforeach
 
         <br>
         <br>
         <label for="noPostpone">بدون در نظر گرفتن تعویق ها</label>
-        <input type="checkbox" name="noPostpone" id="noPostpone" class="checkboxradio" @checked(request('noPostpone')??0)>
+        <input type="checkbox" name="noPostpone" id="noPostpone"
+               class="checkboxradio" @checked(request('noPostpone')?:0)>
         <br>
         <br>
         <input type="submit" class="btn btn-success" value="فیلتر">
@@ -62,13 +64,12 @@
                 <td dir="ltr">{{$order->confirmed_at?verta($order->confirmed_at)->formatJalaliDate():'-'}}</td>
                 <td dir="ltr">{{$order->sent_at?verta($order->sent_at)->formatJalaliDate():'-'}}</td>
                 <td dir="ltr">
-                    @if($order->payInDate == '5' || $order->payInDate == 'payInDate')
+                    @if($order->paymentMethod == 'payInDate')
                         {{$order->payInDate?verta($order->payInDate)->formatJalaliDate():''}}
                     @else
                         {{$order->sent_at?verta($order->sent_at)->addWeeks(2)->formatJalaliDate():''}}
                     @endif
                     {{$order->postponeDate?'->'.verta($order->postponeDate)->formatJalaliDate():''}}
-
                 </td>
                 <td><a href="/customer/transaction/{{$order->customer_id}}">{{$order->name}}</a></td>
                 <td>{{$order->payMethod()}}</td>
@@ -88,7 +89,7 @@
                        title=" فاکتور"></a>
                     <a class="fa fa-comment btn btn-info" onclick="view_comment({{$id}})"></a>
                     <span class="btn btn-primary fa fa-chain" onclick="showOrderLink({{$id}})"></span>
-                    @if($User->meta('allCustomers'))
+                    @if($User->meta('counter'))
                         <span class="btn btn-secondary fa fa-clock" onclick="postponed({{$id}})"></span>
                     @endif
                 </td>
@@ -149,7 +150,7 @@
                 location.reload();
             })
         }
-        @if(auth()->user()->meta('editAllCustomers'))
+        @if(auth()->user()->meta('counter'))
 
         function postponed(id) {
             postponedId = id;
