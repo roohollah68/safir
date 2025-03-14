@@ -20,6 +20,9 @@
             @if($pay_method!='cheque')
             $('.cheque').hide().prop('required', false);
             @endif
+            @if($pay_method!='cash2')
+            $('.cash2').hide().prop('required', false);
+            @endif
 
             const chequeDate = new mds.MdsPersianDateTimePicker($('#cheque_date_farsi')[0], {
                 targetTextSelector: '#cheque_date_farsi',
@@ -68,15 +71,15 @@
                     </div>
                     <label for="cash" class="">نقدی</label>
                     <input type="radio" class="checkboxradio" name="pay_method" id="cash" value="cash" checked
-                           onclick="$('.cash').show().prop('required',true); $('.cheque').hide().prop('required',false)">
+                           onclick="$('.cash').show().prop('required',true); $('.cheque, .cash2').hide().prop('required',false)">
 
                     <label for="cheque" class="">چکی</label>
                     <input type="radio" class="checkboxradio" name="pay_method" id="cheque" value="cheque" @checked($pay_method=='cheque')
-                           onclick="$('.cash').hide().prop('required',false); $('.cheque').show().prop('required',true)">
+                           onclick="$('.cash, .cash2').hide().prop('required',false); $('.cheque').show().prop('required',true)">
 
                     <label for="cash2" class="">پول نقد</label>
                     <input type="radio" class="checkboxradio" name="pay_method" id="cash2" value="cash2"
-                           @checked($pay_method=='cash2') onclick="$('.cash,.cheque').hide().prop('required',false);">
+                           @checked($pay_method=='cash2') onclick="$('.cash,.cheque').hide().prop('required',false); $('.cash2').show().prop('required',true)">
                 </div>
             </div>
 
@@ -152,6 +155,7 @@
                     <div class="input-group-append" style="width: 160px">
                         <label for="photo" class="input-group-text cash">تصویر رسید بانکی:</label>
                         <label for="photo" class="input-group-text cheque">تصویر چک بانکی:</label>
+                        <label for="photo" class="input-group-text cash2">تصویر پول نقد:</label>
                     </div>
                     <input type="file" id="photo" class="compress-image ms-2" name="photo">
                     <input type="hidden" name="old_Photo" value="{{$deposit->photo}}">
