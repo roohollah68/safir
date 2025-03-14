@@ -19,7 +19,8 @@
 @section('content')
 
     @if(auth()->user()->meta('usersEdit'))
-        <a href="/user/add" class="btn btn-outline-info fa fa-plus mb-4">افزودن کاربر</a>
+        <a href="/user/add" class="btn btn-outline-info fa fa-plus mb-4 p-2" style="font: inherit">&nbsp;افزودن کاربر</a>
+        <a href="/user/accesslist" class="btn btn-outline-primary mb-4 p-2"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;ویرایش دسترسی کاربران</a>
     @endif
     <br>
     <h3>لیست کاربران تایید شده:</h3>

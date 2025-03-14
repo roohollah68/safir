@@ -42,6 +42,8 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/add', 'insertUser');
         Route::get('/edit/{id?}', 'edit')->name('editUser');
         Route::post('/edit/{id?}', 'update');
+        Route::get('/accesslist', 'accesslist')->name('accessList');
+        Route::post('/update-permission', 'accesslist')->name('updateUserPermission');
     });
 
     Route::controller(OrderController::class)->group(function () {
