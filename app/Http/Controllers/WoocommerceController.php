@@ -17,7 +17,7 @@ class WoocommerceController extends Controller
         //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
         $request = json_decode(file_get_contents('php://input'));
         if (env('APP_ENV') == 'local') {
-            $request = json_decode(file_get_contents('woo/1403-12-8_23-52-04 _ peptina _ هلیا ضیغمی.txt'));
+            $request = json_decode(file_get_contents('woo/1403-12-25_15-36-04 _ matchashop _ صدف ترکمنی.txt'));
 //            dd($request);
         }
         if (!isset($request->billing))
@@ -60,6 +60,7 @@ class WoocommerceController extends Controller
         $web = Websites::where('website_id', $request->id)->where('website', $website)->first();
         $metaData = (object)collect($request->meta_data)->keyBy('key')->map(fn($data) => $data->value)->all();
         $deliveryTime = $metaData->_delivery_time_novin ?? '';
+        $deliveryMethod = ($request->shipping_lines[0]??(object)[])->method_title??'';
         $house_num = isset($metaData->_billing_house_num) ? ' پلاک: ' . $metaData->_billing_house_num : '';
         $unit_num = isset($metaData->_billing_unit_num) ? ' واحد: ' . $metaData->_billing_unit_num : '';
         $orderData = [
@@ -73,7 +74,7 @@ class WoocommerceController extends Controller
             'total' => $request->total,
             'customerCost' => 0,
             'paymentMethod' => $request->payment_method_title,
-            'deliveryMethod' => $request->shipping_lines[0]->method_title . ' _ ' . $deliveryTime,
+            'deliveryMethod' => $deliveryMethod . ' _ ' . $deliveryTime,
             'counter' => 'approved',
             'confirm' => true,
             'warehouse_id' => 1,
@@ -152,7 +153,7 @@ class WoocommerceController extends Controller
 
     public function viewFile()
     {
-        $file = '1403-12-8_23-52-04 _ peptina _ هلیا ضیغمی';
+        $file = '1403-12-25_15-36-04 _ matchashop _ صدف ترکمنی';
         $data = json_decode(file_get_contents("woo/{$file}.txt"));
         dd($data);
     }
