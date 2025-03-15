@@ -226,33 +226,47 @@
         }
 
         function showDepositLink(id) {
-            $.get('/customer/depositLink/' + id).done((res) => {
-                let dialog = Dialog(res);
-            })
+            const url = `/customer/depositLink/${id}`;
+            $.get(url).done(res => {
+                const dialog = Dialog(res);
+                dialog.data('url', url); 
+            });
         }
 
         function showOrderLink(id) {
-            $.get('/customer/orderLink/' + id).done((res) => {
-                let dialog = Dialog(res);
-            })
+            const url = `/customer/orderLink/${id}`;
+            $.get(url).done(res => {
+                const dialog = Dialog(res);
+                dialog.data('url', url);
+            });
         }
 
-        function removePayLink(id) {
-            $.post('/payLink/delete/' + id, {
-                _token: token,
-            }).done(() => {
-                location.reload();
-            })
+        async function removePayLink(id) {
+            await $.post('/payLink/delete/' + id, {_token: token});
+            refreshDialog();
+            refreshTable();
         }
 
-        function addPayLink(transaction_id, order_id) {
-            $.post('/payLink/add/' + transaction_id + '/' + order_id, {
-                _token: token,
-            }).done(() => {
-                location.reload();
-            })
+        async function addPayLink(transactionId, orderId) {
+            await $.post('/payLink/add/' + transactionId + '/' + orderId, {_token: token});
+            refreshDialog();
+            refreshTable(); 
         }
 
+        function refreshTable() {
+            const table = $('#orders-table').DataTable();            
+            $.get(window.location.href + '?refresh=', function(data) {
+                $('#orders-table tbody').html(
+                    $(data).find('#orders-table tbody').html()
+                );
+            });
+        }
+        
+        function refreshDialog() {
+            const dialog = $(".ui-dialog-content:visible");
+            const url = dialog.data('url');
+            $.get(url).done(res => dialog.html(res));
+        }
     </script>
     <style>
         .deleted {
