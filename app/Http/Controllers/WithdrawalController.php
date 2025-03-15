@@ -152,7 +152,7 @@ class WithdrawalController extends Controller
     public function manager($id, Request $req)
     {
         $user = auth()->user();
-        if ($user->id != 122)
+        if ($user->id != 122 && $user->id != 107 && $user->id != 110)
             abort(401);
         $withdrawal = Withdrawal::findOrFail($id);
         if ($withdrawal->counter_confirm != 1)
