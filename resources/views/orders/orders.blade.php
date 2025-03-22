@@ -59,9 +59,19 @@
         @endforeach
 
     @endif
+    <br><br>
+    <div class="col-md-4">
+        <div class="form-group input-group">
+            <div class="input-group-append">
+                <label for="NuRecords" class="input-group-text">تعداد سفارشات قابل نمایش:</label>
+            </div>
+            <input type="number" min="1" step="5" value="{{ isset($nuRecords) ? $nuRecords : '' }}"
+                   onchange="updateNuRecords(this.value, {{ auth()->user()->id }})" id="NuRecords" class="form-control">
+        </div>
+    </div>
     <br>
     @if($User->meta('showAllOrders'))
-        <div class="my-3">
+        <div class="mb-3">
             <div class="form-group col-md-4 d-flex">
 
                 <label for="user" class="input-group-text">سفیر:</label>

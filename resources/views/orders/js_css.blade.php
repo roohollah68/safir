@@ -132,6 +132,29 @@
         return (order.state === 1 || order.state === 2) && processingTime > 172800000;
     }
 
+    function updateNuRecords(value, id) {
+        $.ajax({
+            url: '/update-nu-records',
+            method: 'POST',
+            data: {
+                _token: token,
+                NuRecords: value,
+                user_id: id
+            },
+            success: function(response) {
+                $.post('/orders/reload', { _token: token })
+                    .done(res => {
+                        orders = res;
+                        prepare_data();
+                        table.page.len(value).draw();
+                    });
+            },
+            error: function(xhr) {
+                console.error('Error:', xhr.responseText);
+            }
+        });
+    }
+
     function create_table(data) {
         if (table) {
             table.clear();

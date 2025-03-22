@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
+use App\Models\UserMeta;
 
 
 class OrderController extends Controller
@@ -25,6 +26,7 @@ class OrderController extends Controller
             'users' => $users,
             'orders' => $this->getOrders(),
             'warehouses' => Warehouse::all(),
+            'nuRecords' => auth()->user()->meta('NuRecords'),
         ]);
     }
 
@@ -708,6 +710,22 @@ class OrderController extends Controller
             'customerId' => $customerId
         ]);
 
+    }
+    public function updateNuRecords(Request $request)
+    {
+        $request->validate([
+            'NuRecords' => 'required|integer|min:1',
+            'user_id' => 'required|exists:users,id'
+        ]);
+
+        UserMeta::updateOrCreate(
+            ['user_id' => $request->user_id, 'name' => 'NuRecords'],
+            ['value' => $request->NuRecords]
+        );
+
+        $orders = $this->getOrders();
+
+        return response()->json(['message' => 'NuRecords updated successfully.']);
     }
 }
 

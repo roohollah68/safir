@@ -66,6 +66,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('change_state/{id}/{state}', 'changeState');
         Route::post('/set_send_method/{id}', 'setSendMethod');
         Route::get('/history', 'orderHistory')->name('history');
+        Route::post('/update-nu-records', 'updateNuRecords')->name('updateNuRecords');
     });
 
     Route::controller(SettingController::class)->group(function () {
