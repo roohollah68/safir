@@ -14,6 +14,8 @@
 <span id="customer-agreement"></span>
 <div id="formElements" class="bg-white">
     <div class="row">
+
+{{--        نام و نام خانوادگی--}}
         <div class="col-md-6 mb-2">
             <div class="form-group input-group required">
                 <div class="input-group-append" style="min-width: 160px">
@@ -37,21 +39,47 @@
             </div>
         </div>
 
+{{--        شماره تماس--}}
         <x-col-md-6 :name="'phone'" value="{{old('phone')?:$order->phone}}" :required="true"
                     minlength="11" maxlength="11" pattern="^[۰-۹0-9]*$"
                     oninvalid="this.setCustomValidity('لطفا شماره 11 رقمی تلفن را وارد کنید.')"
                     onkeypress="return event.charCode >= 48 && event.charCode <= 57"
                     oninput="this.setCustomValidity('')" placeholder="مانند 09123456789">شماره تماس:
         </x-col-md-6>
+
+{{--        کد پستی--}}
         <x-col-md-6 :name="'zip_code'" value="{{old('zip_code')?:$order->zip_code}}"
                     minlength="10"
                     maxlength="10" pattern="^[۰-۹0-9]*$"
                     onkeypress="return event.charCode >= 48 && event.charCode <= 57">کد پستی:
         </x-col-md-6>
+
+{{--        آدرس--}}
         <x-col-md-6 :name="'address'" :content="old('address')?:$order->address" :required="true"
                     rows="2" :tag="'textarea'">آدرس:
         </x-col-md-6>
-        <x-col-md-6 :name="'desc'" :content="old('desc')?:$order->desc"
+
+{{--        نوع فاکتور--}}
+        <div class="col-md-6 my-1">
+            <div class="form-group">
+                <div class="d-flex">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label class="input-group-text w-100">نوع فاکتور:</label>
+                    </div>
+                    <div>
+                        <input class="checkboxradio" type="radio" name="invoice_type" id="unofficial" value="unofficial"
+                               onclick="">
+                        <label class="form-check-label" for="unofficial">رسمی</label>
+                        <input class="checkboxradio" type="radio" name="invoice_type" id="official" value="official"
+                               onclick="">
+                        <label class="form-check-label" for="official">غیر رسمی</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+{{--        توضیحات--}}
+         <x-col-md-6 :name="'desc'" :content="old('desc')?:$order->desc"
                     rows="2" :tag="'textarea'">توضیحات:
         </x-col-md-6>
     </div>

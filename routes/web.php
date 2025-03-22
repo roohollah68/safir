@@ -58,7 +58,6 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/viewOrder/{id}', 'viewOrder');
         Route::post('/confirmAuthorize/{id}', 'confirmAuthorize');
         Route::post('/invoice/{id}', 'invoice');
-        Route::post('/orders/excel', 'excelData');
         Route::post('/orders/dateFilter', 'dateFilter');
         Route::get('/pdfs/{ids}', 'pdfs');
         Route::post('/orders/paymentMethod/{id}', 'paymentMethod');
@@ -248,6 +247,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
     ///Keysun
     Route::controller(KeysunController::class)->prefix('keysun')->group(function () {
         Route::get('/good','good');
+        Route::get('/orders/excel', 'excelData');
     });
 
 });

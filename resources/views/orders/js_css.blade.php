@@ -428,9 +428,10 @@
             $.notify('ابتدا باید سفارشات مورد نظر را انتخاب کنید', 'error')
             return
         }
-        groupedIds = ids.reduce((r, e, i) => (i % 3 ? r[r.length - 1].push(e) : r.push([e])) && r, []);
+        let groupSize = 10;
+        groupedIds = ids.reduce((r, e, i) => (i % groupSize ? r[r.length - 1].push(e) : r.push([e])) && r, []);
         $.each(groupedIds, function (index, ids) {
-            $.post('/orders/excel', {
+            $.get('/keysun/orders/excel', {
                 _token: token,
                 ids: ids,
             })
@@ -439,12 +440,8 @@
                     $(table1).html(res[0]).attr('data-excel-name', 'صورتحساب');
                     let table2 = document.createElement('table');
                     $(table2).html(res[1]).attr('data-excel-name', 'اقلام صورتحساب');
-                    // console.log(res);
                     let table2excel = new Table2Excel();
                     table2excel.export([table1, table2], 'excel' + index);
-                    // let div = document.createElement('div');
-                    // $(div).html(res[0] + res[1])
-                    // $(div).find('table').table2excel();
                     $(table1).remove();
                     $(table2).remove();
                 })

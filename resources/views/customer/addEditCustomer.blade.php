@@ -37,6 +37,11 @@
                 $('#province').html('<sapn class="fa fa-arrow-rotate-back"></span>');
             });
 
+            @if(old('customer_type', $customer->customer_type ?? 'Individual') === 'Individual')
+                $('#Individual').click();
+            @else
+                $('#LegalEntity').click();
+            @endif
         });
 
     </script>
@@ -58,7 +63,7 @@
             <div class="col-md-6 mt-1 mb-1">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
-                        <label for="name" class="input-group-text w-100">نام:</label>
+                        <label for="name" class="input-group-text w-100">نام و نام خانوادگی:</label>
                     </div>
                     <input value="{{old('name') ?: $customer->name}}" type="text" id="name" class="form-control"
                            name="name" required="">
@@ -82,12 +87,12 @@
                         </div>
                         <div class="form-check me-3 ms-3">
                             <input class="form-check-input" type="radio" name="customer_type" id="Individual" value="Individual"
-                                @checked(old('customer_type', $customer->customer_type ?? 'Individual') === 'Individual')>
+                                onclick="$('#national_id').prop('disabled',true);$('#national_code').prop('disabled',false)">
                             <label class="form-check-label" for="Individual">حقیقی</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="customer_type" id="LegalEntity" value="LegalEntity"
-                                @checked(old('customer_type', $customer->customer_type ?? 'Individual') === 'LegalEntity')>
+                                onclick="$('#national_id').prop('disabled',false);$('#national_code').prop('disabled',true)">
                             <label class="form-check-label" for="LegalEntity">حقوقی</label>
                         </div>
                     </div>
@@ -96,7 +101,7 @@
             <div class="col-md-6 mt-1 mb-1">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
-                        <label for="name" class="input-group-text w-100">کد ملی:</label>
+                        <label for="name" class="input-group-text w-100">کد ملی(حقیقی):</label>
                     </div>
                     <input value="{{old('national_code ') ?: $customer->national_code}}" type="text" id="national_code" class="form-control"
                            name="national_code" minlength="10" maxlength="10" pattern="^[۰-۹0-9]*$">
@@ -105,7 +110,7 @@
             <div class="col-md-6 mt-1 mb-1">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
-                        <label for="name" class="input-group-text w-100">شناسه‌ی ملی:</label>
+                        <label for="name" class="input-group-text w-100">شناسه‌ی ملی(حقوقی):</label>
                     </div>
                     <input value="{{old('national_id') ?: $customer->national_id}}" type="text" id="national_id" class="form-control"
                            name="national_id" minlength="11" maxlength="11" pattern="^[۰-۹0-9]*$">
@@ -117,7 +122,7 @@
                         <label for="economic_code" class="input-group-text w-100">کد اقتصادی:</label>
                     </div>
                     <input value="{{old('economic_code') ?: $customer->economic_code}}" type="text" id="economic_code" class="form-control"
-                           name="economic_code" minlength="12" maxlength="12" pattern="^[۰-۹0-9]*$">
+                           name="economic_code" minlength="11" maxlength="14" pattern="^[۰-۹0-9]*$">
                 </div>
             </div>
             <div class="col-md-6 mt-1 mb-1">

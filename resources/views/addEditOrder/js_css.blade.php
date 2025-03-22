@@ -4,7 +4,6 @@
     let deliveryMethod = "peyk";
     let products = {!!json_encode($products)!!};
     let cart = {!!json_encode($cart)!!};
-    {{--let cities = {!!json_encode($cities)!!};--}}
     let creatorIsAdmin = !!'{{$creatorIsAdmin}}';
     let edit = !!'{{$edit}}';
     let changeDiscountPermit = !!'{{$user->meta('changeDiscount')}}';

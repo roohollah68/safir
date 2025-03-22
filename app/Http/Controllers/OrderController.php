@@ -667,18 +667,6 @@ class OrderController extends Controller
         return $order;
     }
 
-    public function excelData(Request $request)
-    {
-        $orders = Helper::Order(false)
-            ->whereIn('id', $request->ids)
-            ->with('orderProducts')
-            ->get()->keyBy('id');
-        return [
-            view('keysun.invoice1', compact('orders'))->render(),
-            view('keysun.invoice2', compact('orders'))->render()
-        ];
-    }
-
     public function orderHistory(Request $request)
     {
         $request->validate([

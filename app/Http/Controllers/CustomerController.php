@@ -87,7 +87,7 @@ class CustomerController extends Controller
             'agreement' => 'required',
             'national_code' => 'nullable|string|max:10|min:10',
             'national_id' => 'nullable|string|max:11|min:11',
-            'economic_code' => 'nullable|string|max:12|min:12',
+            'economic_code' => 'nullable|string|max:14|min:11',
             'customer_type' => 'required|in:Individual,LegalEntity',
         ], [
             'agreement.required' => 'پر کردن فیلد تفاهم اجباری است.',
