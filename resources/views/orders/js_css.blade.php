@@ -161,7 +161,7 @@
             table.rows.add(data);
             table.draw();
         } else {
-            let hideCols = [9, 10, 11, 12, 13, 14];
+            let hideCols = [9, 10, 11, 12, 13];
             hideCols = !changeOrdersPermit ? hideCols.concat([0, 3]) : hideCols;
             hideCols = safir ? hideCols.concat([6]) : hideCols;
             table = $('#main-table').DataTable({
@@ -577,5 +577,26 @@
         $('#orderCondition_' + order.id).html(orderCondition(order));
     }
 
+    function columns() {
+        hideCols = [3, 5, 6, 8, 9, 10, 11, 12, 13].filter(i => !$('#toggle-column-' + i).prop('checked'));
+    }
+
+    $(document).on('change', '[id^="toggle-column-"]', function() {
+        columns();
+        if (table) {
+            table.columns().visible(true);
+            table.columns(hideCols).visible(false);
+            table.draw();
+        }
+    });
+
+    $(document).ready(function() {
+        columns();
+        if (table) {
+            table.columns().visible(true);
+            table.columns(hideCols).visible(false);
+            table.draw();
+        }
+    });
 </script>
 
