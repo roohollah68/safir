@@ -515,7 +515,6 @@ class CustomerController extends Controller
 
     public function paymentTracking(Request $req)
     {
-        Helper::access('allCustomers');
 
         $orders = Order::with(['user', 'paymentLinks'])
             ->where([
@@ -537,6 +536,9 @@ class CustomerController extends Controller
             });
         if ($req->user)
             $orders = $orders->where('user_id', $req->user);
+
+        if(!auth()->user()->meta('allCustomers'))
+            $orders = $orders->where('user_id', auth()->user()->id);
 
         if ($req->paymethods)
             $orders = $orders->whereIn('paymentMethod', array_keys($req->paymethods));

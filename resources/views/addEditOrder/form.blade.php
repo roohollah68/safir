@@ -60,25 +60,25 @@
         </x-col-md-6>
 
         {{--        نوع فاکتور--}}
-        @if(!$user->safir())
-            <div class="col-md-6 my-1">
-                <div class="form-group">
-                    <div class="d-flex">
-                        <div class="input-group-append" style="min-width: 160px">
-                            <label class="input-group-text w-100">نوع فاکتور:</label>
-                        </div>
-                        <div>
-                            <input class="checkboxradio" type="radio" name="official" id="unofficial" value="0"
-                                @checked(!old('official',$order->official))>
-                            <label for="unofficial">غیر رسمی</label>
-                            <input class="checkboxradio" type="radio" name="official" id="official" value="1"
-                                @checked(old('official',$order->official))>
-                            <label for="official">رسمی</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
+{{--        @if(!$user->safir())--}}
+{{--            <div class="col-md-6 my-1">--}}
+{{--                <div class="form-group">--}}
+{{--                    <div class="d-flex">--}}
+{{--                        <div class="input-group-append" style="min-width: 160px">--}}
+{{--                            <label class="input-group-text w-100">نوع فاکتور:</label>--}}
+{{--                        </div>--}}
+{{--                        <div>--}}
+{{--                            <input class="checkboxradio" type="radio" name="official" id="unofficial" value="0"--}}
+{{--                                @checked(!old('official',$order->official)) onclick="$('.official').hide()">--}}
+{{--                            <label for="unofficial">غیر رسمی</label>--}}
+{{--                            <input class="checkboxradio" type="radio" name="official" id="official" value="1"--}}
+{{--                                @checked(old('official',$order->official)) onclick="$('.official').show()">--}}
+{{--                            <label for="official">رسمی</label>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        @endif--}}
         {{--        توضیحات--}}
         <x-col-md-6 :name="'desc'" :content="old('desc')?:$order->desc"
                     rows="2" :tag="'textarea'">توضیحات:

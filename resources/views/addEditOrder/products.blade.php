@@ -19,13 +19,13 @@
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item">
             <a class="nav-link active" id="products-tab" data-bs-toggle="tab" href="#tabs-1" role="tab"
-                aria-controls="products" aria-selected="true">
+               aria-controls="products" aria-selected="true">
                 محصولات
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" id="history-tab" data-bs-toggle="tab" href="#tabs-2" role="tab"
-                aria-controls="history" aria-selected="false">
+               aria-controls="history" aria-selected="false">
                 تاریخچه‌ی سفارشات
             </a>
         </li>
@@ -36,24 +36,28 @@
         <div id="products" class="my-4">
             <table class="table table-striped" id="product-table">
                 <thead>
-                    <tr>
-                        <th>نام محصول</th>
-                        <th>قیمت(ریال)</th>
-                        <th>تعداد موجودی انبار</th>
-                        <th>افزودن</th>
-                    </tr>
+                <tr>
+                    <th>نام محصول</th>
+                    <th>قیمت(ریال)</th>
+                    <th>تعداد موجودی انبار</th>
+                    <th>افزودن</th>
+                </tr>
                 </thead>
                 <tbody>
-                    @foreach ($products as $id => $product)
-                        <tr>
-                            <td>{{ $product->good->name }}</td>
-                            <td>{{ number_format($product->priceWithDiscount) . ($product->discount > 0 ? "($product->discount%)" : '') }}
-                            </td>
-                            <td>{{ +$product->quantity }}</td>
-                            <td><span class="btn btn-primary fa fa-add"
-                                    onclick="addProduct({{ $id }});refreshProducts();"></span></td>
-                        </tr>
-                    @endforeach
+                @foreach ($products as $id => $product)
+                    <tr>
+                        <td>{{ $product->good->name }}
+                            @if($product->good->vat)
+                                <span class="official">(10%)</span>
+                            @endif
+                        </td>
+                        <td>{{ number_format($product->priceWithDiscount) . ($product->discount > 0 ? "($product->discount%)" : '') }}
+                        </td>
+                        <td>{{ +$product->quantity }}</td>
+                        <td><span class="btn btn-primary fa fa-add"
+                                  onclick="addProduct({{ $id }});refreshProducts();"></span></td>
+                    </tr>
+                @endforeach
                 </tbody>
             </table>
         </div>
@@ -65,7 +69,7 @@
 </div>
 
 <script>
-    $(function() {
+    $(function () {
         $("#tabs").tabs();
     });
 </script>

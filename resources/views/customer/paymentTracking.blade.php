@@ -5,39 +5,41 @@
 @endsection
 
 @section('content')
-    <form method="get" action="">
-        <div class="col-md-6 m-1">
-            <div class="form-group input-group ">
-                <div class="input-group-append" style="min-width: 160px">
-                    <label for="user" class="input-group-text w-100">کاربر مرتبط:</label>
+    @if($User->meta('allCustomers'))
+        <form method="get" action="">
+            <div class="col-md-6 m-1">
+                <div class="form-group input-group ">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="user" class="input-group-text w-100">کاربر مرتبط:</label>
+                    </div>
+                    <select class="form-control" name="user" id="user">
+                        <option value="" selected>همه</option>
+                        @foreach($users as $id=>$user)
+                            <option value="{{$id}}" @selected(isset($_GET['user']) &&  $id == $_GET['user'])>
+                                {{$user->name}}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
-                <select class="form-control" name="user" id="user">
-                    <option value="" selected>همه</option>
-                    @foreach($users as $id=>$user)
-                        <option value="{{$id}}" @selected(isset($_GET['user']) &&  $id == $_GET['user'])>
-                            {{$user->name}}
-                        </option>
-                    @endforeach
-                </select>
             </div>
-        </div>
 
-        @foreach(["payInDate", "cod", "cash", "cheque", "cash2"] as $payMethod)
-            <label for="{{$payMethod}}">{{config('payMethods')[$payMethod]}}</label>
-            <input type="checkbox" name="paymethods[{{$payMethod}}]" id="{{$payMethod}}"
-                   class="checkboxradio" @checked(!request('paymethods')) @checked(request('paymethods')[$payMethod]??0)>
-        @endforeach
+            @foreach(["payInDate", "cod", "cash", "cheque", "cash2"] as $payMethod)
+                <label for="{{$payMethod}}">{{config('payMethods')[$payMethod]}}</label>
+                <input type="checkbox" name="paymethods[{{$payMethod}}]" id="{{$payMethod}}"
+                       class="checkboxradio" @checked(!request('paymethods')) @checked(request('paymethods')[$payMethod]??0)>
+            @endforeach
 
-        <br>
-        <br>
-        <label for="noPostpone">بدون در نظر گرفتن تعویق ها</label>
-        <input type="checkbox" name="noPostpone" id="noPostpone"
-               class="checkboxradio" @checked(request('noPostpone')?:0)>
-        <br>
-        <br>
-        <input type="submit" class="btn btn-success" value="فیلتر">
+            <br>
+            <br>
+            <label for="noPostpone">بدون در نظر گرفتن تعویق ها</label>
+            <input type="checkbox" name="noPostpone" id="noPostpone"
+                   class="checkboxradio" @checked(request('noPostpone')?:0)>
+            <br>
+            <br>
+            <input type="submit" class="btn btn-success" value="فیلتر">
 
-    </form>
+        </form>
+    @endif
     <br>
     <span>مجموع:</span><span class="btn btn-info"> {{number_format($orders->sum('total'))}} ریال</span><br>
     <span>تعداد:</span><span class="btn btn-primary"> {{$orders->count()}} </span><br>

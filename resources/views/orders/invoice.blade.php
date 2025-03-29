@@ -6,12 +6,10 @@
             </span>
             <span id="invoice-title" style="width: 50%">
                 <p style="font-size: 45px;text-align: center;margin: 30px;font-weight: bold;">
-                @if(!$order->confirm)
-                        پیش
-                    @endif فاکتور فروش کالا و خدمات
-            </p>
+                    {{$order->confirm?'':'پیش'}} فاکتور فروش کالا و خدمات
+                </p>
                 <p style="font-size: 85px;text-align: center;margin: 20px;font-weight: bold;">
-                {{$setting->invoice_title}}
+                    {{$setting->invoice_title}}
                 </p>
                 <p style="font-size: 45px; text-align: center;padding: 0; border:3px solid; border-radius: 30px; margin: 0 250px;background: #ddd;">
                     @if(!$firstPage)
@@ -22,12 +20,14 @@
                 </p>
             </span>
             <span style="width: 25%">
-                <p style="font-size: 35px; text-align: center;margin: 50px 0 20px 0;">&nbsp; صفحه&nbsp;
+                <p class="fs-35" style="text-align: center;margin: 50px 0 20px 0;">&nbsp; صفحه&nbsp;
                     {{$page}}  &nbsp;از&nbsp; {{$pages}}</p>
-                <p style="font-size: 35px; text-align: center;margin: 20px; border:3px solid;padding: 10px;border-radius: 20px;">شماره:
+                <p class="fs-35"
+                   style="text-align: center;margin: 20px; border:3px solid;padding: 10px;border-radius: 20px;">شماره:
                     {{$order->id}}
                 </p>
-                <p style="font-size: 35px; text-align: center;margin: 20px; border:3px solid;padding: 10px;border-radius: 20px;">تاریخ:
+                <p class="fs-35"
+                   style="text-align: center;margin: 20px; border:3px solid;padding: 10px;border-radius: 20px;">تاریخ:
                     {{verta($order->created_at)->formatJalaliDate()}}
                 </p>
             </span>
@@ -35,57 +35,49 @@
         <div style="border:3px solid;border-bottom:0;height: 315px;z-index: 4;position: relative;"
              class="{{$firstPage}}">
             <div style="margin: 40px 40px 10px 0">
-                <span style="font-size: 40px; padding: 0;">{{$setting->invoice_address}}</span>
+                <span class="fs-40 p-0">{{$setting->invoice_address}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px">
-                <span
-                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">تلفن: {{$setting->invoice_phone}}</span>
-                <span
-                    style="font-size: 40px; padding: 0;display: inline-block;width: 24%;">ثبت / کدملی: {{$setting->invoice_code}}</span>
-                <span
-                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شناسه ملی: {{$setting->invoice_id}}</span>
-                <span
-                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: {{$setting->invoice_province}}</span>
+                <span class="fs-40 p-0 d-inline-block w-25">تلفن: {{$setting->invoice_phone}}</span>
+                <span class="fs-40 p-0 d-inline-block w-24">ثبت / کدملی: {{$setting->invoice_code}}</span>
+                <span class="fs-40 p-0 d-inline-block w-25">شناسه ملی: {{$setting->invoice_id}}</span>
+                <span class="fs-40 p-0 d-inline-block w-25">استان: {{$setting->invoice_province}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px 20px 0">
-                <span
-                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">موبایل: {{$order->warehouse->user->phone??''}}</span>
-                <span
-                    style="font-size: 35px; padding: 0;display: inline-block;width: 24%;">کد اقتصادی: {{$setting->invoice_e_code}}</span>
-                <span
-                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">کدپستی: {{$setting->invoice_zip_code}}</span>
-                <span
-                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شهر: {{$setting->invoice_city}}</span>
+                <span class="fs-40 p-0 d-inline-block w-25">موبایل: {{$order->warehouse->user->phone??''}}</span>
+                <span class="p-0 d-inline-block w-24 fs-35">کد اقتصادی: {{$setting->invoice_e_code}}</span>
+                <span class="fs-40 p-0 d-inline-block w-25">کدپستی: {{$setting->invoice_zip_code}}</span>
+                <span class="fs-40 p-0 d-inline-block w-25">شهر: {{$setting->invoice_city}}</span>
             </div>
-            <p style="font-size: 45px; text-align: center;padding: 0; border:3px solid; border-radius: 30px; margin: 0 750px;background: #ddd;">
+            <p class="p-0"
+               style="font-size: 45px; text-align: center; border:3px solid; border-radius: 30px; margin: 0 750px;background: #ddd;">
                 مشخصات خریدار</p>
         </div>
 
         <div style="border:3px solid;border-bottom:0;height: 450px;z-index: 3;position: relative;"
              class="{{$firstPage}}">
             <div style="margin: 30px 40px 10px 0">
-                <span style="font-size: 40px; padding: 0;">عنوان: {{$order->name}}</span>
+                <span class="fs-40 p-0">عنوان: {{$order->name}}</span>
             </div>
             <div style="margin: 10px 40px 10px 0; height: 130px;">
-                <span style="font-size: 40px; padding: 0;">آدرس: {{$order->address}}</span>
+                <span class="fs-40 p-0">آدرس: {{$order->address}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px">
-                <span style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">تلفن: </span>
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 24%;">ثبت / کدملی:</span>
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شناسه ملی: </span>
+                <span class="fs-40 p-0 d-inline-block w-25" style=" ">تلفن: </span>
+                <span class="fs-40 p-0 d-inline-block w-24" style="">ثبت / کدملی:</span>
+                <span class="fs-40 p-0 d-inline-block w-25">شناسه ملی: </span>
                 <span
-                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: {{$order->customer?$order->customer->city->province->name:''}}</span>
+                    class="fs-40 p-0 d-inline-block w-25">استان: {{$order->customer?$order->customer->city->province->name:''}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px 20px 0">
+                <span class="fs-40 p-0 d-inline-block w-25" style=" ">موبایل: {{$order->phone}}</span>
+                <span class="p-0 w-24 fs-35">کد اقتصادی: </span>
+                <span class="fs-40 p-0 d-inline-block w-25">کدپستی: {{$order->zip_code}}</span>
                 <span
-                    style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">موبایل: {{$order->phone}}</span>
-                <span style="font-size: 35px; padding: 0;display: inline-block;width: 24%;">کد اقتصادی: </span>
-                <span
-                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">کدپستی: {{$order->zip_code}}</span>
-                <span
-                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شهر: {{$order->customer?$order->customer->city->name:''}}</span>
+                    class="fs-40 p-0 d-inline-block w-25">شهر: {{$order->customer?$order->customer->city->name:''}}</span>
             </div>
-            <p style="font-size: 45px; text-align: center;padding: 0; border:3px solid; border-radius: 30px; margin: 0 750px;background: #ddd;">
+            <p class="p-0"
+               style="font-size: 45px; text-align: center; border:3px solid; border-radius: 30px; margin: 0 750px;background: #ddd;">
                 اطلاعات فاکتور</p>
         </div>
         <div id="main" style="border: 3px solid;border-bottom:0; padding-top: 40px">
@@ -229,6 +221,19 @@
 
             .w-100 {
                 width: 100%;
-            }</style>
+            }
+
+            .w-24 {
+                width: 24% !important;
+            }
+
+            .fs-40 {
+                font-size: 40px;
+            }
+
+            .fs-35 {
+                font-size: 35px;
+            }
+        </style>
     </div>
 </div>

@@ -10,7 +10,7 @@
         <span class="h3 btn btn-danger" dir="ltr">
             {{number_format($total)}}
         </span><span class="h5">ریال</span><br><br>
-        @if($User->meta('allCustomers'))
+        @if(!$User->safir())
             <a class="btn btn-warning m-3" href="/customerPaymentTracking">پیگیری پرداختی مشتریان</a>
         @endif
         @if($User->meta('blockList'))
