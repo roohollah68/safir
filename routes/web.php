@@ -50,9 +50,11 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('/orders', 'showOrders')->name('listOrders');
         Route::post('/orders/reload', 'getOrders');
         Route::get('add_order', 'newOrder')->name('newOrder');
-        Route::post('add_order', 'insertOrder');
+//        Route::post('add_order', 'insertOrder');
+        Route::post('add_order/{id?}', 'insert');
         Route::get('edit_order/{id}', 'editOrder');
-        Route::post('edit_order/{id}', 'updateOrder');
+//        Route::post('edit_order/{id}', 'updateOrder');
+        Route::post('edit_order/{id}', 'insert');
         Route::post('delete_order/{id}', 'deleteOrder');
         Route::get('changeWarehouse/{orderId}/{warehouseId}', 'changeWarehose');
         Route::post('/viewOrder/{id}', 'viewOrder');

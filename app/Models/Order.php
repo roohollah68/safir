@@ -35,7 +35,8 @@ class Order extends Model
         'postponeDate',
         'paymentNote',
         'counter',
-        'user_id'
+        'user_id',
+        'official',
     ];
 
     public static function boot()

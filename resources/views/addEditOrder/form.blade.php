@@ -15,7 +15,7 @@
 <div id="formElements" class="bg-white">
     <div class="row">
 
-{{--        نام و نام خانوادگی--}}
+        {{--        نام و نام خانوادگی--}}
         <div class="col-md-6 mb-2">
             <div class="form-group input-group required">
                 <div class="input-group-append" style="min-width: 160px">
@@ -39,7 +39,7 @@
             </div>
         </div>
 
-{{--        شماره تماس--}}
+        {{--        شماره تماس--}}
         <x-col-md-6 :name="'phone'" value="{{old('phone')?:$order->phone}}" :required="true"
                     minlength="11" maxlength="11" pattern="^[۰-۹0-9]*$"
                     oninvalid="this.setCustomValidity('لطفا شماره 11 رقمی تلفن را وارد کنید.')"
@@ -47,39 +47,40 @@
                     oninput="this.setCustomValidity('')" placeholder="مانند 09123456789">شماره تماس:
         </x-col-md-6>
 
-{{--        کد پستی--}}
+        {{--        کد پستی--}}
         <x-col-md-6 :name="'zip_code'" value="{{old('zip_code')?:$order->zip_code}}"
                     minlength="10"
                     maxlength="10" pattern="^[۰-۹0-9]*$"
                     onkeypress="return event.charCode >= 48 && event.charCode <= 57">کد پستی:
         </x-col-md-6>
 
-{{--        آدرس--}}
+        {{--        آدرس--}}
         <x-col-md-6 :name="'address'" :content="old('address')?:$order->address" :required="true"
                     rows="2" :tag="'textarea'">آدرس:
         </x-col-md-6>
 
-{{--        نوع فاکتور--}}
-        <div class="col-md-6 my-1">
-            <div class="form-group">
-                <div class="d-flex">
-                    <div class="input-group-append" style="min-width: 160px">
-                        <label class="input-group-text w-100">نوع فاکتور:</label>
-                    </div>
-                    <div>
-                        <input class="checkboxradio" type="radio" name="invoice_type" id="unofficial" value="unofficial"
-                               onclick="">
-                        <label class="form-check-label" for="unofficial">رسمی</label>
-                        <input class="checkboxradio" type="radio" name="invoice_type" id="official" value="official"
-                               onclick="">
-                        <label class="form-check-label" for="official">غیر رسمی</label>
+        {{--        نوع فاکتور--}}
+        @if(!$user->safir())
+            <div class="col-md-6 my-1">
+                <div class="form-group">
+                    <div class="d-flex">
+                        <div class="input-group-append" style="min-width: 160px">
+                            <label class="input-group-text w-100">نوع فاکتور:</label>
+                        </div>
+                        <div>
+                            <input class="checkboxradio" type="radio" name="official" id="unofficial" value="0"
+                                @checked(!old('official',$order->official))>
+                            <label for="unofficial">غیر رسمی</label>
+                            <input class="checkboxradio" type="radio" name="official" id="official" value="1"
+                                @checked(old('official',$order->official))>
+                            <label for="official">رسمی</label>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-{{--        توضیحات--}}
-         <x-col-md-6 :name="'desc'" :content="old('desc')?:$order->desc"
+        @endif
+        {{--        توضیحات--}}
+        <x-col-md-6 :name="'desc'" :content="old('desc')?:$order->desc"
                     rows="2" :tag="'textarea'">توضیحات:
         </x-col-md-6>
     </div>
@@ -180,8 +181,8 @@
             <span>هزینه حمل: </span> <span id="deliveryCost"></span><span>  ریال </span> ||
         @endif
         <span>مجموع تخفیف: </span><span id="total-discount" dir="ltr"></span><span>  ریال </span> ||
-            <b>مجموع تعداد اقلام: </b><b id="total-num"></b> <b>عدد</b>||
-            <b>مبلغ کل: </b><b id="total" dir="ltr"></b><b> ریال </b>
+        <b>مجموع تعداد اقلام: </b><b id="total-num"></b> <b>عدد</b>||
+        <b>مبلغ کل: </b><b id="total" dir="ltr"></b><b> ریال </b>
         <br/>
 
         <span id="onDeliveryMode">

@@ -14,11 +14,9 @@ class WoocommerceController extends Controller
     {
         DB::beginTransaction();
 
-        //$this->sendMessageToBale(["text" =>file_get_contents('php://input')],'1444566712');
         $request = json_decode(file_get_contents('php://input'));
         if (env('APP_ENV') == 'local') {
             $request = json_decode(file_get_contents('woo/1403-12-25_15-36-04 _ matchashop _ صدف ترکمنی.txt'));
-//            dd($request);
         }
         if (!isset($request->billing))
             return 'not used';
@@ -26,41 +24,17 @@ class WoocommerceController extends Controller
             format('Y-n-j_H-i-s') . ' _ ' . $website . ' _ ' . $request->billing->first_name .
             ' ' . $request->billing->last_name . '.txt', file_get_contents('php://input'));
 
-        $websiteTitle = config('websites')[$website];
-
-        $orders = '';
-        $products = array();
-        $text = 'بررسی مطابقت محصولات: ' . $websiteTitle . ' ' . $request->billing->first_name . ' ' . $request->billing->last_name . '
-';
-        $hasInconsistent = false;
-        foreach ($request->line_items as $item) {
-            $product_id = (int)filter_var($item->sku, FILTER_SANITIZE_NUMBER_INT);
-            $product = Product::find($product_id);
-            if ($product && substr($item->sku, 0, 1) == 's') {
-                $products[$product->id] = [$item->quantity, $product];
-            } else {
-                $orders .= ' ' . $item->name . ' ' . $item->quantity . 'عدد' . '،';
-                $hasInconsistent = true;
-                $text .= '❌ آیدی نامنطبق: ' . $item->name . ' -> ' . $item->sku . ' ' . $product_id . '* *';
-            }
-        }
-        if ($hasInconsistent)
-            $this->sendTextToBale($text, '5742084958');
-
+        $currency = ['IRHT' => 10000, 'IRT' => 10][$request->currency];
         $desc = '';
-        if ($website == 'matchano')
-            $request->total = $request->total * 10000;
-        else
-            $request->total = $request->total * 10;
 
         if ($request->payment_method == 'cod')
-            $desc = $request->payment_method_title . ' - ' . number_format($request->total, 0, '.', '/') . ' ریال';
+            $desc = $request->payment_method_title . ' - ' . number_format($request->total * $currency, 0, '.', '/') . ' ریال';
         $user = User::where('username', $website)->first();
 
         $web = Websites::where('website_id', $request->id)->where('website', $website)->first();
         $metaData = (object)collect($request->meta_data)->keyBy('key')->map(fn($data) => $data->value)->all();
         $deliveryTime = $metaData->_delivery_time_novin ?? '';
-        $deliveryMethod = ($request->shipping_lines[0]??(object)[])->method_title??'';
+        $deliveryMethod = ($request->shipping_lines[0] ?? (object)[])->method_title ?? '';
         $house_num = isset($metaData->_billing_house_num) ? ' پلاک: ' . $metaData->_billing_house_num : '';
         $unit_num = isset($metaData->_billing_unit_num) ? ' واحد: ' . $metaData->_billing_unit_num : '';
         $orderData = [
@@ -69,9 +43,9 @@ class WoocommerceController extends Controller
             'address' => $request->billing->state . '، ' . $request->billing->city . '، '
                 . $request->billing->address_1 . '، ' . $unit_num . $house_num,
             'zip_code' => $request->billing->postcode,
-            'orders' => $orders,
+//            'orders' => $orders,
             'desc' => $request->customer_note . ($desc ? ' - ' . $desc : ''),
-            'total' => $request->total,
+            'total' => $request->total * $currency,
             'customerCost' => 0,
             'paymentMethod' => $request->payment_method_title,
             'deliveryMethod' => $deliveryMethod . ' _ ' . $deliveryTime,
@@ -88,15 +62,7 @@ class WoocommerceController extends Controller
                 $order->update($orderData);
                 if ($order->deleted_at) {
                     $order->restore();
-                    foreach ($products as $data) {
-                        $product = $data[1];
-                        $order->orderProducts()->create([
-                            'product_id' => $product->id,
-                            'name' => $product->name,
-                            'number' => $data[0],
-                            'price' => $product->price,
-                        ]);
-                    }
+                    $this->orderProducts($order,$request,$website,$currency);
                     (new TelegramController())->deleteOrderFromBale($order, '5742084958');
                     if ($website == 'dorateashop')
                         $this->dorateashop($order);
@@ -122,7 +88,6 @@ class WoocommerceController extends Controller
                     $order->orderProducts()->delete();
                 }
             }
-//            (new CommentController)->create($order, $user, 'سفارش دوباره ارسال شد');
         } else if ($request->status == 'processing' || $request->status == 'completed') {
             $order = $user->orders()->create($orderData);
             $web = $order->website()->create([
@@ -132,16 +97,7 @@ class WoocommerceController extends Controller
             ]);
             (new CommentController)->create($order, $user, 'سفارش ایجاد شد');
             $order->save();
-            foreach ($products as $id => $data) {
-                $product = $data[1];
-                $order->orderProducts()->create([
-                    'product_id' => $product->id,
-                    'name' => $product->name,
-                    'number' => $data[0],
-                    'price' => $product->price,
-                ]);
-            }
-
+            $this->orderProducts($order,$request,$website,$currency);
             if ($website == 'dorateashop')
                 $this->dorateashop($order);
             else
@@ -156,6 +112,29 @@ class WoocommerceController extends Controller
         $file = '1403-12-25_15-36-04 _ matchashop _ صدف ترکمنی';
         $data = json_decode(file_get_contents("woo/{$file}.txt"));
         dd($data);
+    }
+
+    public function orderProducts($order, $request, $website)
+    {
+        $text = '';
+        foreach ($request->line_items as $item) {
+            $product_id = (int)filter_var($item->sku, FILTER_SANITIZE_NUMBER_INT);
+            $product = Product::find($product_id);
+            if (!$product || substr($item->sku, 0, 1) != 's') {
+                $text .= '❌ آیدی نامنطبق: ' . $item->name . ' -> ' . $item->sku . ' ' . $product_id . '* *';
+            }
+            $order->orderProducts()->create([
+                'product_id' => $product ? $product_id : 9531,
+                'name' => $item->name,
+                'number' => $item->quantity,
+                'price' => round(+$item->total / $item->quantity * ),
+            ]);
+        }
+        if ($text) {
+            $websiteTitle = config('websites')[$website];
+            $text = 'بررسی مطابقت محصولات: ' . $websiteTitle . ' ' . $request->billing->first_name . ' ' . $request->billing->last_name . "\r\n" . $text;
+            $this->sendTextToBale($text, '5742084958');
+        }
     }
 
     public function dorateashop($order)

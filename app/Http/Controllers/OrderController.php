@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
+use function Laravel\Prompts\error;
 
 
 class OrderController extends Controller
@@ -86,104 +87,232 @@ class OrderController extends Controller
         ]);
     }
 
-    public function insertOrder(Request $request)
+//    public function insertOrder(Request $request)
+//    {
+//        Helper::access('addOrder');
+//        DB::beginTransaction();
+//        request()->validate([
+//            'receipt' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
+//            'name' => 'required|string|min:3',
+//            'address' => 'required|string|min:3',
+//            'phone' => 'required|string|min:11,max:11',
+//            'cart' => 'required|array|min:1',
+////            'test' => 'required',
+//        ]);
+//        $user = auth()->user();
+//        $order = $user->orders()->create([
+//            'name' => $request->name,
+//            'address' => $request->address,
+//            'warehouse_id' => $request->warehouse_id,
+//            'paymentMethod' => $request->paymentMethod,
+//            'deliveryMethod' => $request->deliveryMethod,
+//            'official' => $request->official,
+//            'desc' => $request->desc,
+//            'customer_id' => $request->customer_id,
+//            'phone' => Helper::number_Fa_En($request->phone),
+//            'zip_code' => Helper::number_Fa_En($request->zip_code),
+//            'total' => 0, // جمع با احتساب تخفیف
+//            'confirm' => $this->safir(),
+//            'counter' => $this->safir() ? 'approved' : 'waiting',
+//            'orders' => ''
+//        ]);
+//        $Total = 0;     //جمع بدون احتساب تخفیف
+//        $products = Product::with('good')->find(array_keys($request->cart))->keyBy('id');
+//        $products = $this->calculateDiscount($products, $user);
+//        foreach ($request->cart as $id => $item) {
+//            $product = $products[$id];
+//            $discount = +$product->discount;
+//            if ($user->meta('changeDiscount'))
+//                $discount = +$item['discount'];
+//            $price = round((100 - $discount) * $product->good->price / 100);
+//            $editPrice = false;
+//            if ($user->meta('changePrice')) {
+//                $price = +str_replace(",", "", $item['price']);
+//                $editPrice = $price != $product->good->price;
+//                $price = round((100 - $discount) * $price / 100);
+//            }
+//            $order->total += $price * (+$item['number']);
+//            $Total += $product->good->price * (+$item['number']);
+//            $order->orderProducts()->create([
+//                'name' => $product->good->name,
+//                'price' => $price,
+//                'product_id' => $id,
+//                'number' => $item['number'],
+//                'discount' => $discount,
+//                'editPrice' => $editPrice
+//            ]);
+//        }
+//        if ($order->total < 0) {
+//            $order->desc .= ' (فاکتور برگشت به انبار)';
+//        }
+//        if ($user->safir()) {
+//            $deliveryCost = Helper::settings()->{$request->deliveryMethod};
+//            if ($Total < Helper::settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
+//                $order->total += $deliveryCost;
+//            if ($request->paymentMethod == 'credit') {
+//                if ($user->credit > 0) {
+//                    if ($order->total > ($user->balance + $user->credit))
+//                        return $this->errorBack('اعتبار شما کافی نیست!');
+//                } else {
+//                    if ($order->total > ($user->balance + Helper::settings()->negative))
+//                        return $this->errorBack('اعتبار شما کافی نیست!');
+//                }
+//                $user->update([
+//                    'balance' => $user->balance - $order->total
+//                ]);
+//                $order->transactions()->create([
+//                    'user_id' => auth()->user()->id,
+//                    'amount' => $order->total,
+//                    'balance' => auth()->user()->balance,
+//                    'type' => false,
+//                    'description' => 'ثبت سفارش',
+//                ]);
+//
+//            } elseif ($request->paymentMethod == 'receipt') {
+//                if ($request->file("receipt"))
+//                    $order->receipt = $request->file("receipt")->store("", 'receipt');
+//                else
+//                    return $this->errorBack('باید عکس رسید بانکی بارگذاری شود!');
+//
+//            } elseif ($request->paymentMethod == 'onDelivery') {
+//                $request->desc .= '- پرداخت در محل';
+//                $order->customerCost = round($Total * (100 - $request->customerDiscount) / 100 + $deliveryCost);
+//            } else
+//                return $this->errorBack('روش پرداخت به درستی انتخاب نشده است!');
+//            app('Telegram')->sendOrderToBale($order, env('GroupId'));
+//        }
+//
+//        $order->save();
+//        (new CommentController)->create($order, $user, 'سفارش ایجاد شد');
+//
+//        DB::commit();
+//
+//        return redirect()->route('listOrders');
+//    }
+
+    public function insert(Request $request, $id = null)
     {
-        Helper::access('addOrder');
         DB::beginTransaction();
         request()->validate([
             'receipt' => 'mimes:jpeg,jpg,png,bmp,pdf|max:3048',
             'name' => 'required|string|min:3',
             'address' => 'required|string|min:3',
             'phone' => 'required|string|min:11,max:11',
-            'cart' => 'required|array|min:1'
+            'cart' => 'required|array|min:1',
+//            'test' => 'required',
         ]);
-        $user = auth()->user();
-        $order = $user->orders()->create([
-            'name' => $request->name,
-            'address' => $request->address,
-            'warehouse_id' => $request->warehouse_id,
-            'paymentMethod' => $request->paymentMethod,
-            'deliveryMethod' => $request->deliveryMethod,
-            'desc' => $request->desc,
-            'customer_id' => $request->customer_id,
-            'phone' => Helper::number_Fa_En($request->phone),
-            'zip_code' => Helper::number_Fa_En($request->zip_code),
-            'total' => 0, // جمع با احتساب تخفیف
-            'confirm' => $this->safir(),
-            'counter' => $this->safir() ? 'approved' : 'waiting',
-            'orders' => ''
-        ]);
-        $Total = 0;     //جمع بدون احتساب تخفیف
-        $products = Product::with('good')->find(array_keys($request->cart))->keyBy('id');
-        $products = $this->calculateDiscount($products, $user);
-        foreach ($request->cart as $id => $item) {
-            $product = $products[$id];
-            $discount = +$product->discount;
-            if ($user->meta('changeDiscount'))
-                $discount = +$item['discount'];
-            $price = round((100 - $discount) * $product->good->price / 100);
-            $editPrice = false;
-            if ($user->meta('changePrice')) {
-                $price = +str_replace(",", "", $item['price']);
-                $editPrice = $price != $product->good->price;
-                $price = round((100 - $discount) * $price / 100);
-            }
-            $order->total += $price * (+$item['number']);
-            $Total += $product->good->price * (+$item['number']);
-            $order->orderProducts()->create([
-                'name' => $product->good->name,
-                'price' => $price,
-                'product_id' => $id,
-                'number' => $item['number'],
-                'discount' => $discount,
-                'editPrice' => $editPrice
+        $edit = !!$id;
+        if ($edit) {
+            $order = Helper::Order(true)->with(['user', 'orderProducts'])->findOrFail($id);
+            $user = $order->user;
+            if (($order->state && $user->safir()) || ($order->confirm && $user->admin()))
+                return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
+        } else {
+            $user = auth()->user();
+            $order = $user->orders()->make([
+                'name' => $request->name,
+                'customer_id' => $request->customer_id,
+                'warehouse_id' => $request->warehouse_id,
+                'paymentMethod' => $request->paymentMethod,
+                'deliveryMethod' => $request->deliveryMethod,
+                'total' => 0, // جمع با احتساب تخفیف
+                'orders' => ''
             ]);
+        }
+        if ($user->safir())
+            $order->fill([
+                'name' => $request->name,
+                'address' => $request->address,
+                'desc' => $request->desc,
+                'phone' => Helper::number_Fa_En($request->phone),
+                'zip_code' => Helper::number_Fa_En($request->zip_code),
+                'confirm' => true,
+                'counter' => 'approved',
+            ]);
+        else
+            $order->fill([
+                'address' => $request->address,
+                'official' => $request->official,
+                'desc' => $request->desc,
+                'phone' => Helper::number_Fa_En($request->phone),
+                'zip_code' => Helper::number_Fa_En($request->zip_code),
+                'total' => 0, // جمع با احتساب تخفیف
+                'confirm' => false,
+                'counter' => 'waiting',
+                'orders' => ''
+            ]);
+        $order->save();
+
+        $Total = 0;     //جمع بدون احتساب تخفیف
+        if (!$edit || !$user->safir()) {
+            $products = Product::with('good')->find(array_keys($request->cart))->keyBy('id');
+            $products = $this->calculateDiscount($products, $user);
+            $order->orderProducts()->delete();
+            foreach ($request->cart as $id => $item) {
+                $product = $products[$id];
+                $discount = +$product->discount;
+                if ($user->meta('changeDiscount'))
+                    $discount = +$item['discount'];
+                $price = round((100 - $discount) * $product->good->price / 100);
+                $editPrice = false;
+                if ($user->meta('changePrice')) {
+                    $price = +str_replace(",", "", $item['price']);
+                    $editPrice = $price != $product->good->price;
+                    $price = round((100 - $discount) * $price / 100);
+                }
+                $order->total += $price * (+$item['number']);
+                $Total += $product->good->price * (+$item['number']);
+                $order->orderProducts()->create([
+                    'name' => $product->good->name,
+                    'price' => $price,
+                    'product_id' => $id,
+                    'number' => $item['number'],
+                    'discount' => $discount,
+                    'editPrice' => $editPrice
+                ]);
+            }
         }
         if ($order->total < 0) {
             $order->desc .= ' (فاکتور برگشت به انبار)';
         }
-        if ($user->safir()) {
+        if ($user->safir() && !$edit) {
             $deliveryCost = Helper::settings()->{$request->deliveryMethod};
             if ($Total < Helper::settings()->freeDelivery || $user->id == 10) // استثنا خانوم موسوی
                 $order->total += $deliveryCost;
             if ($request->paymentMethod == 'credit') {
-                if ($user->credit > 0) {
-                    if ($order->total > ($user->balance + $user->credit))
-                        return $this->errorBack('اعتبار شما کافی نیست!');
-                } else {
-                    if ($order->total > ($user->balance + Helper::settings()->negative))
-                        return $this->errorBack('اعتبار شما کافی نیست!');
-                }
+                $credit = $user->credit ?: Helper::settings()->negative;
+                if ($order->total > ($user->balance + $credit))
+                    return $this->errorBack('اعتبار شما کافی نیست!');
                 $user->update([
                     'balance' => $user->balance - $order->total
                 ]);
                 $order->transactions()->create([
-                    'user_id' => auth()->user()->id,
+                    'user_id' => $user->id,
                     'amount' => $order->total,
-                    'balance' => auth()->user()->balance,
+                    'balance' => $user->balance,
                     'type' => false,
                     'description' => 'ثبت سفارش',
                 ]);
-
-            } elseif ($request->paymentMethod == 'receipt') {
+            } elseif ($order->paymentMethod == 'receipt') {
                 if ($request->file("receipt"))
                     $order->receipt = $request->file("receipt")->store("", 'receipt');
                 else
                     return $this->errorBack('باید عکس رسید بانکی بارگذاری شود!');
 
-            } elseif ($request->paymentMethod == 'onDelivery') {
-                $request->desc .= '- پرداخت در محل';
+            } elseif ($order->paymentMethod == 'onDelivery') {
+                $order->desc .= '- پرداخت در محل';
                 $order->customerCost = round($Total * (100 - $request->customerDiscount) / 100 + $deliveryCost);
             } else
                 return $this->errorBack('روش پرداخت به درستی انتخاب نشده است!');
             app('Telegram')->sendOrderToBale($order, env('GroupId'));
         }
-
         $order->save();
-        (new CommentController)->create($order, $user, 'سفارش ایجاد شد');
-
+        $order->paymentLinks()->delete();
+        if ($edit)
+            (new CommentController)->create($order, auth()->user(), 'سفارش ویرایش شد');
+        else
+            (new CommentController)->create($order, $user, 'سفارش ایجاد شد');
         DB::commit();
-
         return redirect()->route('listOrders');
     }
 
@@ -230,68 +359,68 @@ class OrderController extends Controller
         ]);
     }
 
-    public function updateOrder($id, Request $request)
-    {
-        DB::beginTransaction();
-        $order = Helper::Order(true)->with('user')->with('orderProducts')->findOrFail($id);
-        $user = $order->user;
-        if (($order->state && $user->safir()) || ($order->confirm && $user->admin()))
-            return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
-        request()->validate([
-            'receipt' => 'mimes:jpeg,jpg,png,bmp|max:2048',
-            'name' => 'required|string|min:3',
-            'address' => 'required|string|min:3',
-            'phone' => 'required|string|min:11,max:11',
-            'cart' => 'required|array|min:1',
-        ]);
-
-        if (!$user->safir()) {
-            $products = Product::with('good')->find(array_keys($request->cart))->keyBy('id');
-            $products = $this->calculateDiscount($products, $user);
-            $order->orderProducts()->delete();
-            $order->total = 0;
-            foreach ($request->cart as $id => $item) {
-                $product = $products[$id];
-                $discount = +$product->discount;
-                if ($user->meta('changeDiscount'))
-                    $discount = +$item['discount'];
-                $price = round((100 - $discount) * $product->good->price / 100);
-                $editPrice = false;
-                if ($user->meta('changePrice')) {
-                    $price = +str_replace(",", "", $item['price']);
-                    $editPrice = $price != $product->good->price;
-                    $price = round((100 - $discount) * $price / 100);
-                }
-                $order->total += $price * (+$item['number']);
-                $order->orderProducts()->create([
-                    'name' => $product->good->name,
-                    'price' => $price,
-                    'product_id' => $id,
-                    'number' => $item['number'],
-                    'discount' => $discount,
-                    'editPrice' => $editPrice
-                ]);
-            }
-        }
-
-        $order->save();
-        $order->update([
-            'name' => $order->user->safir() ? $request->name : $order->name,
-            'phone' => Helper::number_Fa_En($request->phone),
-            'address' => $request->address,
-            'zip_code' => Helper::number_Fa_En($request->zip_code),
-            'desc' => $request->desc,
-        ]);
-
-        $order->paymentLinks()->delete();
-        (new CommentController)->create($order, auth()->user(), 'سفارش ویرایش شد');
-
-//        $this->addToCustomers($request, $order);
-        app('Telegram')->editOrderInBale($order, env('GroupId'));
-        DB::commit();
-
-        return redirect()->route('listOrders');
-    }
+//    public function updateOrder($id, Request $request)
+//    {
+//        DB::beginTransaction();
+//        $order = Helper::Order(true)->with('user')->with('orderProducts')->findOrFail($id);
+//        $user = $order->user;
+//        if (($order->state && $user->safir()) || ($order->confirm && $user->admin()))
+//            return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
+//        request()->validate([
+//            'receipt' => 'mimes:jpeg,jpg,png,bmp|max:2048',
+//            'name' => 'required|string|min:3',
+//            'address' => 'required|string|min:3',
+//            'phone' => 'required|string|min:11,max:11',
+//            'cart' => 'required|array|min:1',
+//        ]);
+//
+//        if (!$user->safir()) {
+//            $products = Product::with('good')->find(array_keys($request->cart))->keyBy('id');
+//            $products = $this->calculateDiscount($products, $user);
+//            $order->orderProducts()->delete();
+//            $order->total = 0;
+//            foreach ($request->cart as $id => $item) {
+//                $product = $products[$id];
+//                $discount = +$product->discount;
+//                if ($user->meta('changeDiscount'))
+//                    $discount = +$item['discount'];
+//                $price = round((100 - $discount) * $product->good->price / 100);
+//                $editPrice = false;
+//                if ($user->meta('changePrice')) {
+//                    $price = +str_replace(",", "", $item['price']);
+//                    $editPrice = $price != $product->good->price;
+//                    $price = round((100 - $discount) * $price / 100);
+//                }
+//                $order->total += $price * (+$item['number']);
+//                $order->orderProducts()->create([
+//                    'name' => $product->good->name,
+//                    'price' => $price,
+//                    'product_id' => $id,
+//                    'number' => $item['number'],
+//                    'discount' => $discount,
+//                    'editPrice' => $editPrice
+//                ]);
+//            }
+//        }
+//
+//        $order->save();
+//        $order->update([
+//            'name' => $order->user->safir() ? $request->name : $order->name,
+//            'phone' => Helper::number_Fa_En($request->phone),
+//            'address' => $request->address,
+//            'zip_code' => Helper::number_Fa_En($request->zip_code),
+//            'desc' => $request->desc,
+//            'official' => $request->official,
+//        ]);
+//
+//        $order->paymentLinks()->delete();
+//        (new CommentController)->create($order, auth()->user(), 'سفارش ویرایش شد');
+//
+//        app('Telegram')->editOrderInBale($order, env('GroupId'));
+//        DB::commit();
+//
+//        return redirect()->route('listOrders');
+//    }
 
     public function changeState($id, $state)
     {
@@ -441,6 +570,13 @@ class OrderController extends Controller
             $total_dis = $total_dis + ($orderProduct->price * $orderProduct->number);
             $totalProducts += $orderProduct->number;
         }
+        if(!$order->user->safir() && $order->total != $total_dis)
+            return abort(500, 'مجموع اقلام با مبلغ فاکتور همخوانی ندارد.');
+//        dd([$order->total , $total_dis]);
+        $deliveryCost = $order->total - $total_dis;
+        $total_dis += $deliveryCost;
+        $total_no_dis += $deliveryCost;
+
         $number = $order->orderProducts->count();
         if ($request->pageContent == 'all')
             $pageContents = [$number];
@@ -468,6 +604,7 @@ class OrderController extends Controller
                 'total_dis' => $total_dis,
                 'totalProducts' => $totalProducts,
                 'setting' => $this->settings(),
+                'deliveryCost' => $deliveryCost,
             ])->render();
             $start += $pageContent;
             array_push($res, $page);

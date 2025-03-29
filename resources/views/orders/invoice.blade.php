@@ -38,16 +38,24 @@
                 <span style="font-size: 40px; padding: 0;">{{$setting->invoice_address}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px">
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">تلفن: {{$setting->invoice_phone}}</span>
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 24%;">ثبت / کدملی: {{$setting->invoice_code}}</span>
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شناسه ملی: {{$setting->invoice_id}}</span>
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: {{$setting->invoice_province}}</span>
+                <span
+                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">تلفن: {{$setting->invoice_phone}}</span>
+                <span
+                    style="font-size: 40px; padding: 0;display: inline-block;width: 24%;">ثبت / کدملی: {{$setting->invoice_code}}</span>
+                <span
+                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شناسه ملی: {{$setting->invoice_id}}</span>
+                <span
+                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: {{$setting->invoice_province}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px 20px 0">
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">موبایل: {{$order->warehouse->user->phone??''}}</span>
-                <span style="font-size: 35px; padding: 0;display: inline-block;width: 24%;">کد اقتصادی: {{$setting->invoice_e_code}}</span>
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">کدپستی: {{$setting->invoice_zip_code}}</span>
-                <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شهر: {{$setting->invoice_city}}</span>
+                <span
+                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">موبایل: {{$order->warehouse->user->phone??''}}</span>
+                <span
+                    style="font-size: 35px; padding: 0;display: inline-block;width: 24%;">کد اقتصادی: {{$setting->invoice_e_code}}</span>
+                <span
+                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">کدپستی: {{$setting->invoice_zip_code}}</span>
+                <span
+                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شهر: {{$setting->invoice_city}}</span>
             </div>
             <p style="font-size: 45px; text-align: center;padding: 0; border:3px solid; border-radius: 30px; margin: 0 750px;background: #ddd;">
                 مشخصات خریدار</p>
@@ -66,16 +74,16 @@
                 <span style="font-size: 40px; padding: 0;display: inline-block;width: 24%;">ثبت / کدملی:</span>
                 <span style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شناسه ملی: </span>
                 <span
-                        style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: {{$order->customer?$order->customer->city->province->name:''}}</span>
+                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">استان: {{$order->customer?$order->customer->city->province->name:''}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px 20px 0">
                 <span
-                        style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">موبایل: {{$order->phone}}</span>
+                    style="font-size: 40px; padding: 0;display: inline-block; width: 25%;">موبایل: {{$order->phone}}</span>
                 <span style="font-size: 35px; padding: 0;display: inline-block;width: 24%;">کد اقتصادی: </span>
                 <span
-                        style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">کدپستی: {{$order->zip_code}}</span>
+                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">کدپستی: {{$order->zip_code}}</span>
                 <span
-                        style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شهر: {{$order->customer?$order->customer->city->name:''}}</span>
+                    style="font-size: 40px; padding: 0;display: inline-block;width: 25%;">شهر: {{$order->customer?$order->customer->city->name:''}}</span>
             </div>
             <p style="font-size: 45px; text-align: center;padding: 0; border:3px solid; border-radius: 30px; margin: 0 750px;background: #ddd;">
                 اطلاعات فاکتور</p>
@@ -107,6 +115,16 @@
                         <td dir="ltr">{{number_format($orderProduct->price*(+$orderProduct->number))}}</td>
                     </tr>
                 @endforeach
+                @if($order->user->safir())
+                    <tr class="{{$lastPage}}">
+                        <td>{{$end+1}}</td>
+                        <td>هزینه ارسال</td>
+                        <td dir="ltr"></td>
+                        <td>{{number_format($deliveryCost)}}</td>
+                        <td colspan="2"></td>
+                        <td></td>
+                    </tr>
+                @endif
                 <tr class="{{$lastPage}}">
                     <td colspan="2">مجموع تعداد اقلام</td>
                     <td dir="ltr">{{$totalProducts}}</td>
@@ -157,16 +175,16 @@
                     توضیحات: {{$order->desc}}
                     *
                 @endif
-                     انبار: {{$order->warehouse->name}}
-                    *
+                انبار: {{$order->warehouse->name}}
+                *
                 @if($order->user->admin())
                     بدهی: <span dir="ltr">{{-$order->customer->balance()}}</span>
                     *
                 @endif
                 @if(!$order->confirm)
-                        <span style="white-space: pre-wrap;">{{$setting->invoice_note1}}</span>
+                    <span style="white-space: pre-wrap;">{{$setting->invoice_note1}}</span>
                 @endif
-                    <sapn style="font-weight: bold;white-space: pre-wrap;">{{$setting->invoice_note2}}</sapn>
+                <sapn style="font-weight: bold;white-space: pre-wrap;">{{$setting->invoice_note2}}</sapn>
             </div>
         </div>
 
