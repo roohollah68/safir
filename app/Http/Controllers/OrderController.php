@@ -129,7 +129,7 @@ class OrderController extends Controller
         else
             $order->fill([
                 'address' => $request->address,
-                'official' => $request->official,
+                'official' => !!$request->official,
                 'desc' => $request->desc,
                 'phone' => Helper::number_Fa_En($request->phone),
                 'zip_code' => Helper::number_Fa_En($request->zip_code),
