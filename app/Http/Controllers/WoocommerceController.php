@@ -117,6 +117,7 @@ class WoocommerceController extends Controller
     public function orderProducts($order, $request, $website)
     {
         $text = '';
+        $currency = ['IRHT' => 10000, 'IRT' => 10][$request->currency];
         foreach ($request->line_items as $item) {
             $product_id = (int)filter_var($item->sku, FILTER_SANITIZE_NUMBER_INT);
             $product = Product::find($product_id);
@@ -127,7 +128,7 @@ class WoocommerceController extends Controller
                 'product_id' => $product ? $product_id : 9531,
                 'name' => $item->name,
                 'number' => $item->quantity,
-                'price' => round(+$item->total / $item->quantity * ),
+                'price' => round(+$item->total / $item->quantity * $currency),
             ]);
         }
         if ($text) {
