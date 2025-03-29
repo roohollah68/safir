@@ -59,9 +59,19 @@
         @endforeach
 
     @endif
+    <br><br>
+    <div class="col-md-4">
+        <div class="form-group input-group">
+            <div class="input-group-append">
+                <label for="NuRecords" class="input-group-text">تعداد سفارشات قابل نمایش:</label>
+            </div>
+            <input type="number" min="1" step="5" value="{{ isset($nuRecords) ? $nuRecords : '' }}"
+                   onchange="updateNuRecords(this.value, {{ auth()->user()->id }})" id="NuRecords" class="form-control">
+        </div>
+    </div>
     <br>
     @if($User->meta('showAllOrders'))
-        <div class="my-3">
+        <div class="mb-3">
             <div class="form-group col-md-4 d-flex">
 
                 <label for="user" class="input-group-text">سفیر:</label>
@@ -74,6 +84,18 @@
                     @endforeach
                 </select>
             </div>
+        </div>
+
+        <div class="mb-3">
+            <span>نمایش ستون‌ها:</span>
+            <x-checkbox :id="'toggle-column-3'" checked>سفیر</x-checkbox>
+            <x-checkbox :id="'toggle-column-5'" checked>زمان ثبت</x-checkbox>
+            <x-checkbox :id="'toggle-column-6'" checked>تائید کاربر</x-checkbox>
+            <x-checkbox :id="'toggle-column-8'" checked>وضعیت</x-checkbox>
+            <x-checkbox :id="'toggle-column-9'">آدرس</x-checkbox>
+            <x-checkbox :id="'toggle-column-10'">توضیحات</x-checkbox>
+            <x-checkbox :id="'toggle-column-12'">همراه</x-checkbox>
+            <x-checkbox :id="'toggle-column-13'">کدپستی</x-checkbox>
         </div>
 
         <button class="btn btn-secondary my-2" onclick="generatePDFs()"> دانلود PDF لیبل</button>

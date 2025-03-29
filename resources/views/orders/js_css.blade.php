@@ -132,13 +132,36 @@
         return (order.state === 1 || order.state === 2) && processingTime > 172800000;
     }
 
+    function updateNuRecords(value, id) {
+        $.ajax({
+            url: '/update-nu-records',
+            method: 'POST',
+            data: {
+                _token: token,
+                NuRecords: value,
+                user_id: id
+            },
+            success: function(response) {
+                $.post('/orders/reload', { _token: token })
+                    .done(res => {
+                        orders = res;
+                        prepare_data();
+                        table.page.len(value).draw();
+                    });
+            },
+            error: function(xhr) {
+                console.error('Error:', xhr.responseText);
+            }
+        });
+    }
+
     function create_table(data) {
         if (table) {
             table.clear();
             table.rows.add(data);
             table.draw();
         } else {
-            let hideCols = [9, 10, 11, 12, 13, 14];
+            let hideCols = [9, 10, 11, 12, 13];
             hideCols = !changeOrdersPermit ? hideCols.concat([0, 3]) : hideCols;
             hideCols = safir ? hideCols.concat([6]) : hideCols;
             table = $('#main-table').DataTable({
@@ -551,5 +574,26 @@
         $('#orderCondition_' + order.id).html(orderCondition(order));
     }
 
+    function columns() {
+        hideCols = [3, 5, 6, 8, 9, 10, 11, 12, 13].filter(i => !$('#toggle-column-' + i).prop('checked'));
+    }
+
+    $(document).on('change', '[id^="toggle-column-"]', function() {
+        columns();
+        if (table) {
+            table.columns().visible(true);
+            table.columns(hideCols).visible(false);
+            table.draw();
+        }
+    });
+
+    $(document).ready(function() {
+        columns();
+        if (table) {
+            table.columns().visible(true);
+            table.columns(hideCols).visible(false);
+            table.draw();
+        }
+    });
 </script>
 
