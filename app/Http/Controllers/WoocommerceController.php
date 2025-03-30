@@ -16,7 +16,7 @@ class WoocommerceController extends Controller
 
         $request = json_decode(file_get_contents('php://input'));
         if (env('APP_ENV') == 'local') {
-            $request = json_decode(file_get_contents('woo/1403-12-25_15-36-04 _ matchashop _ صدف ترکمنی.txt'));
+            $request = json_decode(file_get_contents('woo/1404-1-10_22-05-57 _ peptina _ سایه اسماعیل پور.txt'));
         }
         if (!isset($request->billing))
             return 'not used';
@@ -43,7 +43,7 @@ class WoocommerceController extends Controller
             'address' => $request->billing->state . '، ' . $request->billing->city . '، '
                 . $request->billing->address_1 . '، ' . $unit_num . $house_num,
             'zip_code' => $request->billing->postcode,
-//            'orders' => $orders,
+            'orders' => '',
             'desc' => $request->customer_note . ($desc ? ' - ' . $desc : ''),
             'total' => $request->total * $currency,
             'customerCost' => 0,
