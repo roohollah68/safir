@@ -27,7 +27,8 @@
         <span class=" fa fa-list"></span>
         مدیریت کالاها
     </a>
-    <a class="btn btn-secondary mb-3" id="production_schedule" onclick="window.location.href = `production/schedule/${warehouseId}`">
+    <a class="btn btn-secondary mb-3" id="production_schedule"
+       onclick="window.location.href = `production/schedule/${warehouseId}`">
         <span class=" fa fa-industry"></span>
         برنامه تولید
     </a>
@@ -41,6 +42,10 @@
     </a>
     <a class="btn btn-primary mb-3" href="/keysun/good">
         دریافت اکسل کیسان
+    </a>
+    <a class="btn btn-success mb-3" href="/formulation/list">
+        <span class=" fa fa-flask"></span>
+        فرمول تولید
     </a>
     <br>
     <div class="container border input-box">
@@ -72,11 +77,11 @@
                 @endforeach
 
 
-{{--                <input type="checkbox" id="raw">--}}
-{{--                <label class="btn btn-secondary mb-1" for="raw">مواد اولیه</label><br>--}}
+                {{--                <input type="checkbox" id="raw">--}}
+                {{--                <label class="btn btn-secondary mb-1" for="raw">مواد اولیه</label><br>--}}
 
-{{--                <input type="checkbox" id="pack">--}}
-{{--                <label class="btn btn-secondary" for="pack">ملزومات بسته بندی</label>--}}
+                {{--                <input type="checkbox" id="pack">--}}
+                {{--                <label class="btn btn-secondary" for="pack">ملزومات بسته بندی</label>--}}
             </div>
         </div>
     </div>
@@ -125,7 +130,6 @@
         </thead>
     </table>
 
-
 @endsection
 
 
@@ -141,6 +145,9 @@
 
         let edit = (id) => {
             return `<a class="fa fa-edit btn btn-primary" href="/product/edit/${id}" title="ویرایش محصول"></a>`
+        }
+        let formulation = (id, hasFormulation) => {
+            return `<a class="fa fa-flask btn btn-${hasFormulation ? 'success' : 'info'}" href="/formulation/edit/${id}" title="فرمول تولید"></a>`
         }
         let fastEditFilter = (id) => {
             return `<a class="fa fa-file-edit btn btn-info fast" onclick="fastEdit(${id})" title="ویرایش سریع"></a>`
@@ -208,26 +215,30 @@
                     return;
                 if (!product.available && !unavailableFilter)
                     return;
-                if (product.good.category === 'final' && !final)
+                let good = product.good;
+                if (good.category === 'final' && !final)
                     return;
-                if (product.good.category === 'pack' && !pack)
+                if (good.category === 'pack' && !pack)
                     return;
-                if (product.good.category === 'raw' && !raw)
+                if (good.category === 'raw' && !raw)
                     return;
-                if (product.good.category === 'other' && !other)
+                if (good.category === 'other' && !other)
                     return;
                 data.push([
                     id,
-                    product.good.name,
-                    priceFormat(product.good.price),
-                    priceFormat(product.good.productPrice),
+                    good.name,
+                    priceFormat(good.price),
+                    priceFormat(good.productPrice),
                     quantity(product.alarm, product.high_alarm, product.quantity),
                     alarm(product.alarm, product.quantity),
                     high_alarm(product.high_alarm, product.quantity),
-                    (product.quantity < product.alarm)?product.high_alarm-product.quantity:0,
+                    (product.quantity < product.alarm) ? product.high_alarm - product.quantity : 0,
                     product.available ? available : unavailable,
-                    edit(id) + fastEditFilter(id) + saveFilter(id) + Delete(id),
+                    edit(id) + fastEditFilter(id) + saveFilter(id) + (good.category == 'final' ? formulation(good.id, good.formulations[0]) : '') + Delete(id),
                 ])
+                if(id==8691){
+                    console.log(good);
+                }
             });
             if (undefinedFilter)
                 $.each(goods, (id, good) => {
@@ -259,7 +270,7 @@
                     order: [[3, "desc"]],
                     pageLength: 100,
                     destroy: true,
-                    language:language,
+                    language: language,
                     columnDefs: [
                         {
                             targets: hideCols,
@@ -272,7 +283,7 @@
                                 {
                                     extend: 'excel',
                                     text: 'دریافت فایل اکسل',
-                                    filename:  'محصولات ' + '{{verta()->formatJalaliDate()}}',
+                                    filename: 'محصولات ' + '{{verta()->formatJalaliDate()}}',
                                     title: null,
                                     exportOptions: {
                                         modifier: {

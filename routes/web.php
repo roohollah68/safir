@@ -6,6 +6,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DepositController;
+use App\Http\Controllers\FormulationController;
 use App\Http\Controllers\KeysunController;
 use App\Http\Controllers\OrderProductController;
 use App\Http\Controllers\ProductChangeController;
@@ -251,6 +252,18 @@ Route::middleware(['auth', 'verify'])->group(function () {
     Route::controller(KeysunController::class)->prefix('keysun')->group(function () {
         Route::get('/good','good');
         Route::get('/orders/excel', 'excelData');
+    });
+
+    ///Formulation
+    Route::controller(FormulationController::class)->prefix('formulation')->group(function () {
+        Route::get('/list','list');
+        Route::get('/add', 'add');
+        Route::get('/edit/{id}', 'edit');
+        Route::post('/addEditRow/{id?}', 'addEditRow');
+        Route::get('/deleteAll/{id}', 'deleteAll');
+        Route::get('/deleteRow/{id}', 'deleteRow');
+        Route::get('/view/{id}', 'view');
+        Route::post('/getRawGoods/{id}', 'getRawGoods');
     });
 
 });

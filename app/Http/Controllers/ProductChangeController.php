@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
 use App\Models\Product;
 use App\Models\ProductChange;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ class ProductChangeController extends Controller
 {
     public function addQuantity($id)
     {
+        Helper::access('editWarehouse');
         $product = Product::findOrFail($id);
         $productChanges = $product->productChange()->get()->keyBy('id');
         foreach ($productChanges as $id => $productChange)
@@ -24,6 +26,7 @@ class ProductChangeController extends Controller
 
     public function insertRecord($id, Request $req)
     {
+        Helper::access('editWarehouse');
         DB::beginTransaction();
         $product = Product::findOrFail($id);
         $productChange = new ProductChange();
@@ -50,6 +53,7 @@ class ProductChangeController extends Controller
 
     public function deleteRecord($id)
     {
+        Helper::access('editWarehouse');
         $productChange = ProductChange::findOrFail($id);
         if ($productChange->isDeleted)
             return redirect()->back();

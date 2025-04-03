@@ -24,14 +24,14 @@ class ProductController extends Controller
     public function getData(Request $req)
     {
         Helper::access('warehouse');
-        $products = Product::where('warehouse_id', $req->warehouseId)->with('good')->get()->keyBy('id');
+        $products = Product::where('warehouse_id', $req->warehouseId)->with('good.formulations')->get()->keyBy('id');
         return $products;
 
     }
 
     public function showAddForm()
     {
-        Helper::access('warehouse');
+        Helper::access('editWarehouse');
         $good = new Good();
         return view('product.addEditProduct', [
             'good' => $good,
@@ -54,7 +54,7 @@ class ProductController extends Controller
 
     public function storeNew(Request $req, $id = null)
     {
-        Helper::access('warehouse');
+        Helper::access('editWarehouse');
         DB::beginTransaction();
         $req->merge(['price' => str_replace(",", "", $req->price)]);
         $req->merge(['productPrice' => str_replace(",", "", $req->productPrice)]);
@@ -98,7 +98,7 @@ class ProductController extends Controller
 
     public function deleteProduct($id)
     {
-        Helper::access('warehouse');
+        Helper::access('editWarehouse');
         if (Product::find($id)->delete())
             return 'ok';
         else
@@ -108,7 +108,7 @@ class ProductController extends Controller
 
     public function deletePhoto($id)
     {
-        Helper::access('warehouse');
+        Helper::access('editWarehouse');
         Good::find($id)->update([
             'photo' => ''
         ]);
@@ -116,7 +116,7 @@ class ProductController extends Controller
 
     public function addToProducts($id, Request $req)
     {
-        Helper::access('warehouse');
+        Helper::access('editWarehouse');
         $product = Product::where('good_id', $id)->where('warehouse_id', $req->warehouseId)->first();
         if ($product) {
             abort(403);
@@ -138,7 +138,7 @@ class ProductController extends Controller
 
     public function transfer()
     {
-        Helper::access('warehouse');
+        Helper::access('editWarehouse');
         $products = Product::with('good')->get()->keyby('id');
         return view('product.transfer', [
             'warehouses' => Warehouse::all()->keyBy('id'),
@@ -148,7 +148,7 @@ class ProductController extends Controller
 
     public function transferSave(Request $req)
     {
-        Helper::access('warehouse');
+        Helper::access('editWarehouse');
         DB::beginTransaction();
         $products1 = Product::where('warehouse_id', $req->warehouseId1)->get()->keyBy('id');
         $warehouses = Warehouse::all()->keyBy('id');
@@ -252,7 +252,7 @@ class ProductController extends Controller
 
     public function changeAvailable($id)
     {
-        Helper::access('warehouse');
+        Helper::access('editWarehouse');
         $product = Product::findOrFail($id);
         $product->update([
             'available' => !$product->available,
@@ -262,7 +262,7 @@ class ProductController extends Controller
 
     public function fastEdit($id)
     {
-        Helper::access('warehouse');
+        Helper::access('editWarehouse');
         $product = Product::with('good')->find($id);
         return view('product.productFastEdit', [
             'product' => $product,
@@ -292,7 +292,7 @@ class ProductController extends Controller
 
     public function saveWarehouseManager(Request $req)
     {
-        Helper::access('warehouse');
+        Helper::access('editWarehouse');
         $warehouses = Warehouse::all()->keyBy('id');
         $users = User::where('verified', true)->get()->keyBy('id');
         foreach ($warehouses as $id => $warehouse) {
@@ -318,6 +318,7 @@ class ProductController extends Controller
 
     public function saveTags(Request $req, $id)
     {
+        Helper::access('editWarehouse');
         if (is_string($req->tag) && $req->tag == 0)
             $req->merge(['tag' => '0000000000000']);
 
@@ -337,6 +338,7 @@ class ProductController extends Controller
 
     public function deleteGood($id)
     {
+        Helper::access('editWarehouse');
         DB::beginTransaction();
         Helper::access('warehouse');
         $good = Good::findOrFail($id);

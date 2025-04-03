@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Helper\Helper;
 use App\Models\Customer;
 use App\Models\CustomerTransaction;
+use App\Models\Formulation;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Setting;

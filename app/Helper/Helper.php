@@ -4,7 +4,6 @@ namespace App\Helper;
 
 use App\Models\Order;
 use App\Models\Setting;
-use App\Models\Warehouse;
 
 class Helper
 {
@@ -17,12 +16,12 @@ class Helper
     {
         if (is_string($key))
             if (!auth()->user()->meta($key))
-                abort(401);
+                abort(403, 'این دسترسی را ندارید!');
         if (is_array($key)) {
             foreach ($key as $k)
                 if (auth()->user()->meta($k))
                     return;
-            abort(401);
+            abort(403, 'این دسترسی را ندارید!');
         }
 
     }
@@ -69,7 +68,7 @@ class Helper
     {
         $user = auth()->user();
         $orders = Order::withTrashed();
-        if ((!$edit && $user->meta('showAllOrders')) || $user->meta(['editAllOrders','counter']))
+        if ((!$edit && $user->meta('showAllOrders')) || $user->meta(['editAllOrders', 'counter']))
             return $orders;
         else
             return $orders->where(function ($query) use ($user) {
@@ -80,7 +79,7 @@ class Helper
 
     public static function ِdate($datetime): string
     {
-        return $datetime?verta($datetime)->formatJalaliDate():'';
+        return $datetime ? verta($datetime)->formatJalaliDate() : '';
     }
 }
 

@@ -43,4 +43,9 @@ class Good extends Model
         else
             return null;
     }
+
+    public function formulations()
+    {
+        return $this->hasMany(Formulation::class);
+    }
 }
