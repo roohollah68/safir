@@ -2,22 +2,25 @@
     <div class="container-fluid me-3 ms-3">
         <div class="d-flex align-items-center">
             <a href="{{ route('editUser') }}/{{ $User->id }}">
-                <img src="{{ asset('logo-300x300.webp') }}" alt="Logo" class="logo-placeholder me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                <img src="{{ asset('logo-300x300.webp') }}" alt="Logo" class="logo-placeholder me-3"
+                     style="width: 40px; height: 40px; object-fit: cover;">
             </a>
-            
+
             <a class="navbar-brand fw-bold" style="font-size: 1.25em" href="{{ route('editUser') }}/{{ $User->id }}">
                 {{ $User->name }}
             </a>
-            
+
             @if ($safir)
-            <a class="fw-bold d-none d-lg-block btn btn-balance me-4 outline-none" href="{{ route('DepositList') }}">
-                اعتبار: <span dir="ltr"> {{ number_format($User->balance) }} </span>&nbsp;ریال
-            </a>
+                <a class="fw-bold d-none d-lg-block btn btn-balance me-4 outline-none"
+                   href="{{ route('DepositList') }}">
+                    اعتبار: <span dir="ltr"> {{ number_format($User->balance) }} </span>&nbsp;ریال
+                </a>
             @endif
         </div>
-        
+
         <div class="d-flex align-items-center gap-2">
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" 
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
                     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -29,7 +32,7 @@
 
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle active px-3" href="#" id="navbarDropdown" role="button"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             سفارشات
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -44,23 +47,16 @@
                         <li class="nav-item"><a class="nav-link px-3" href="{{ route('productList') }}">محصولات</a></li>
                     @endif
 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle active px-3" href="#" id="navbarDropdown" role="button"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            مدیریت
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ route('CustomerList') }}">لیست مشتریان</a>
-                            @if ($User->meta('usersEdit'))
-                                <a class="dropdown-item" href="{{ route('usersList') }}">مدیریت کاربران</a>
-                            @endif
-                        </div>
-                    </li>
+                    <li class="nav-item"><a class="nav-link px-3" href="{{ route('CustomerList') }}">مشتریان</a></li>
+
+                    @if ($User->meta('usersEdit'))
+                        <li class="nav-item"><a class="nav-link px-3" href="{{ route('usersList') }}">کاربران</a></li>
+                    @endif
 
                     @if ($User->meta('manageSafir'))
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle active px-3" href="#" id="navbarDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">سفیران</a>
+                               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">سفیران</a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ route('DepositList') }}">واریزی های سفیران</a>
                                 <a class="dropdown-item" href="{{ route('couponList') }}">مدیریت تخفیف‌ها</a>
@@ -70,29 +66,32 @@
                     @endif
 
                     @if ($User->meta('counter'))
-                    <li class="nav-item dropdown">
-                        <a class="nav-link px-3 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            حسابداری
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item py-2" href="{{ route('customersOrderList') }}">بررسی سفارشات</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('customersDepositList') }}">بررسی واریزی‌ها</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('BankTransactionList') }}">مدیریت نقدینگی</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('chequeList') }}">لیست چک‌ها</a></li>
-                        </ul>
-                    </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link px-3 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                حسابداری
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item py-2" href="{{ route('customersOrderList') }}">بررسی
+                                        سفارشات</a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('customersDepositList') }}">بررسی
+                                        واریزی‌ها</a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('BankTransactionList') }}">مدیریت
+                                        نقدینگی</a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('chequeList') }}">لیست چک‌ها</a></li>
+                            </ul>
+                        </li>
                     @endif
-                    
+
                     @if ($safir)
-                    <li class="nav-item dropdown">
-                        <a class="nav-link px-3 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            امور مالی
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item py-2" href="{{ route('DepositList') }}">واریزی‌ها</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('transactions') }}">تراکنش‌ها</a></li>
-                        </ul>
-                    </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link px-3 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                امور مالی
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item py-2" href="{{ route('DepositList') }}">واریزی‌ها</a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('transactions') }}">تراکنش‌ها</a></li>
+                            </ul>
+                        </li>
                     @endif
 
                     @if ($User->meta(['withdrawal', 'allWithdrawal']))
@@ -125,8 +124,8 @@
                     </li>
                 </div>
             </ul>
-        </div>   
-        
+        </div>
+
         <!-- Desktop Logout -->
         <a class="btn btn-logout px-3 d-none d-lg-block" href="{{ route('logout') }}">
             خروج
@@ -136,34 +135,35 @@
 
 <style>
     :root {
-    --color-teal-blue: #336666;
-    --color-turquoise-light: #64D1D2;
-    --color-deep-cyan: #14697B;
-    --color-muted-aqua: #5BB6B7;
-    --color-dark-teal: #205B5C;
-    --color-bg-nav: #6ba17c;
-    --color-rose-red: #821d30;
+        --color-teal-blue: #336666;
+        --color-turquoise-light: #64D1D2;
+        --color-deep-cyan: #14697B;
+        --color-muted-aqua: #5BB6B7;
+        --color-dark-teal: #205B5C;
+        --color-bg-nav: #6ba17c;
+        --color-rose-red: #821d30;
     }
+
     .btn-logout {
         color: white;
         background: var(--color-rose-red);
         transition: transform 0.3s ease;
     }
-    
-    .btn-logout:hover{
+
+    .btn-logout:hover {
         color: white;
         transform: scale(1.09);
     }
 
-    .btn-balance{
+    .btn-balance {
         color: var(--color-dark-teal) !important;
         outline: var(--color-dark-teal) solid 1px;
         padding: 0.35rem 0.6rem;
-        font-size: 0.9rem; 
+        font-size: 0.9rem;
     }
 
     #navbar {
-        height: 70px; 
+        height: 70px;
         position: sticky;
         top: 0;
         z-index: 1030;
@@ -210,7 +210,7 @@
         color: white !important;
     }
 
-    .nav-item.dropdown:hover .dropdown-menu{
+    .nav-item.dropdown:hover .dropdown-menu {
         display: block;
     }
 
@@ -226,16 +226,16 @@
         background: var(--color-bg-nav);
     }
 
-    .nav-item.dropdown .dropdown-menu{
+    .nav-item.dropdown .dropdown-menu {
         left: 50%;
         right: auto;
         transform: translateX(-50%);
         text-align: center;
-        box-shadow: gray 0px 1px 2px 0px ;
+        box-shadow: gray 0px 1px 2px 0px;
     }
 
     @media (max-width: 991px) {
-        
+
         .navbar-collapse {
             margin-top: 70px;
             position: fixed;
@@ -260,19 +260,22 @@
             left: 15px;
             z-index: 1050;
         }
+
         .nav-item.dropdown .dropdown-menu {
             transform: none;
             width: 100%;
             text-align: center;
         }
-        .nav-item{
+
+        .nav-item {
             text-align: center;
             padding-bottom: 0.5em;
         }
+
         .navbar-brand {
             font-size: 1rem !important;
         }
-        
+
         .logo-placeholder {
             width: 35px !important;
             height: 35px !important;
