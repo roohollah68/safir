@@ -126,7 +126,7 @@ class WoocommerceController extends Controller
             }
             $order->orderProducts()->create([
                 'product_id' => $product ? $product_id : 9531,
-                'name' => $item->name,
+                'name' => $product ? $product->name : $item->name,
                 'number' => $item->quantity,
                 'price' => round(+$item->total / $item->quantity * $currency),
             ]);
