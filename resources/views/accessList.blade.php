@@ -5,6 +5,7 @@
 @endsection
 
 @section('content')
+    
     <style>
         input:focus {
             outline: none;
