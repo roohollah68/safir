@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helper\Helper;
 use App\Models\Good;
+use App\Models\Keysungood;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Warehouse;
@@ -311,8 +312,10 @@ class ProductController extends Controller
     {
         Helper::access('warehouse');
         $goods = Good::whereIn('category', ['final', 'other'])->get()->keyBy('id');
+        $keysungoods = Keysungood::all()->keyBy('good_id');
         return view('product.tagManagement', [
             'goods' => $goods,
+            'keysungoods' => $keysungoods,
         ]);
     }
 

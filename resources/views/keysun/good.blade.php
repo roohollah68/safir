@@ -7,18 +7,7 @@
 
 @section('content')
 
-
-{{--    @foreach(config('goodCat') as $category => $desc)--}}
-{{--        <span class="btn btn-info m-1"--}}
-{{--              onclick="$('.{{$category}}').toggle().is(':visible')?--}}
-{{--                  $(this).addClass('btn-info').removeClass('btn-outline-info'):--}}
-{{--                  $(this).addClass('btn-outline-info').removeClass('btn-info')">--}}
-{{--            {{$desc}}--}}
-{{--        </span>--}}
-{{--    @endforeach--}}
     <a class="btn btn-danger m-1" href="{{route('productList')}}">بازگشت</a>
-
-
     <br>
     <div>
         <table class="table table-striped" id="table">

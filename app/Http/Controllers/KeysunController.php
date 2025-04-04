@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helper\Helper;
 use App\Models\Good;
+use App\Models\Keysungood;
 use Illuminate\Http\Request;
 
 class KeysunController extends Controller
@@ -11,9 +12,10 @@ class KeysunController extends Controller
     public function good()
     {
         $goods = Good::where('tag', '>', pow(10, 12))->get()->keyBy('id');
+        $keysungoods = Keysungood::all()->keyBy('good_id');
+        $goods = $goods->filter(fn($good)=>!isset($keysungoods[$good->id]));
         return view('keysun.good', compact('goods'));
     }
-
 
     public function excelData(Request $request)
     {

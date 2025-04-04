@@ -6,11 +6,9 @@ namespace App\Http\Controllers;
 use App\Helper\Helper;
 use App\Models\Customer;
 use App\Models\CustomerTransaction;
-use App\Models\Formulation;
+use App\Models\Keysungood;
 use App\Models\Order;
-use App\Models\Product;
 use App\Models\Setting;
-use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -64,9 +62,21 @@ class SettingController extends Controller
 
     public function command()
     {
+        $rows = $this->csvToArray('export.csv');
+        foreach ($rows as $row) {
+            Keysungood::updateOrCreate([
+                'good_id' => $row["شناسه کالا/خدمت(داخلی)"],
+            ], [
+                'tag' => $row["شناسه کالا/خدمت عمومی/اختصاصی"],
+                'vat' => $row["نرخ مالیات"],
+                'name' => str_replace('...', '', strip_tags($row["شرح تجاری کالا/خدمت"])),
+            ]);
+        }
+        dd();
+
         foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {
             if ($customer->balance() != $customer->balance) {
-                echo $customer->name. $customer->balance() . '=>'.  $customer->balance . '<br>';
+                echo $customer->name . $customer->balance() . '=>' . $customer->balance . '<br>';
                 $customer->balance = $customer->balance();
 //                $customer->save();
             }
@@ -98,6 +108,26 @@ class SettingController extends Controller
 //            CustomerTransaction::where('customer_id', $from)->update(['customer_id' => $to]);
 //            Customer::find($from)->delete();
 //        }
+    }
+
+    public function csvToArray($filename = '', $delimiter = ',')
+    {
+        if (!file_exists($filename) || !is_readable($filename))
+            return false;
+
+        $header = null;
+        $data = array();
+        if (($handle = fopen($filename, 'r')) !== false) {
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
+                if (!$header)
+                    $header = $row;
+                else
+                    $data[] = array_combine($header, $row);
+            }
+            fclose($handle);
+        }
+
+        return $data;
     }
 }
 

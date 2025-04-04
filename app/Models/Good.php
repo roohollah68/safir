@@ -19,6 +19,7 @@ class Good extends Model
         'isic', //اینتا کد
         'vat', //ارزش افزوده دارد یا خیر
         'tag', //شناسه کالا
+        'replace_id', //کالا جایگزین برای سامانه مودیان
     ];
 
     public function products()
@@ -47,5 +48,15 @@ class Good extends Model
     public function formulations()
     {
         return $this->hasMany(Formulation::class);
+    }
+
+    public function keysungood()
+    {
+        return $this->hasOne(Keysungood::class,'id' , 'good_id');
+    }
+
+    public function replace()
+    {
+        return Good::find($this->replace_id);
     }
 }
