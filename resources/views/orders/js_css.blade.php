@@ -469,7 +469,6 @@
                     $(table2).remove();
                 })
         });
-
     }
     @endif
 

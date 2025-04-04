@@ -60,7 +60,7 @@ class ProductController extends Controller
         $req->merge(['price' => str_replace(",", "", $req->price)]);
         $req->merge(['productPrice' => str_replace(",", "", $req->productPrice)]);
         if ($id) {
-            $product = Product::findOrFail($id)->fill([
+            $product = Product::with('good.formulations')->findOrFail($id)->fill([
                 'alarm' => $req->alarm,
                 'high_alarm' => $req->high_alarm,
                 'available' => ($req->available == 'true'),

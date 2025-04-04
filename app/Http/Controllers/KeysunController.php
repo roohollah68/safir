@@ -21,21 +21,10 @@ class KeysunController extends Controller
     {
         $orders = Helper::Order(false)
             ->whereIn('id', $request->ids)
-            ->with(['orderProducts', 'customer'])
+            ->with(['orderProducts.product.good.keysungood', 'customer'])
             ->get()->keyBy('id');
-        foreach ($orders as $order) {
-            $order->customer_type = 1;
-            $order->national_id_code = '';
-            $order->economic_code = '';
-            if ($order->customer) {
-                $order->economic_code = $order->customer->economic_code ?: '';
-                $order->customer_type = $order->customer->customer_type == 'Individual' ? 1 : 2;
-                if ($order->customer_type == 1)
-                    $order->national_id_code = $order->customer->national_code;
-                else
-                    $order->national_id_code = $order->customer->national_id;
-            }
-        }
+
+
         return [
             view('keysun.invoice1', compact('orders'))->render(),
             view('keysun.invoice2', compact('orders'))->render()

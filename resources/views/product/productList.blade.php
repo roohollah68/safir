@@ -234,11 +234,8 @@
                     high_alarm(product.high_alarm, product.quantity),
                     (product.quantity < product.alarm) ? product.high_alarm - product.quantity : 0,
                     product.available ? available : unavailable,
-                    edit(id) + fastEditFilter(id) + saveFilter(id) + (good.category == 'final' ? formulation(good.id, good.formulations[0]) : '') + Delete(id),
+                    edit(id) + fastEditFilter(id) + saveFilter(id) + (good.category == 'final' ? formulation(good.id, good.formulations.length) : '') + Delete(id),
                 ])
-                if(id==8691){
-                    console.log(good);
-                }
             });
             if (undefinedFilter)
                 $.each(goods, (id, good) => {

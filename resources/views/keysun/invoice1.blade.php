@@ -32,10 +32,6 @@
             <td>1</td>
             <td>1</td>
             <td></td>
-{{--            <td>{{$order->customer_type}}</td>--}}
-{{--            <td><input type="text" value="{{$order->economic_code}}"></td>--}}
-{{--            <td><input type="text" value="{{$order->national_id_code}}"></td>--}}
-{{--            <td><input type="text" value="{{$order->zip_code}}"></td>--}}
             <td></td>
             <td></td>
             <td></td>

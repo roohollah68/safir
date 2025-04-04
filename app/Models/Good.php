@@ -52,7 +52,7 @@ class Good extends Model
 
     public function keysungood()
     {
-        return $this->hasOne(Keysungood::class,'id' , 'good_id');
+        return $this->hasone(Keysungood::class);
     }
 
     public function replace()

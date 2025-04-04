@@ -29,29 +29,39 @@
     <tbody>
     @foreach($orders as $id => $order)
         @foreach($order->orderProducts as $orderProduct)
-        <tr>
-            <td>{{$id}}</td>
-            <td><input type="text" value="{!!verta($order->created_at)->format('Y/m/d')!!}"></td>
-            <td>{{$orderProduct->product->good->id}}</td>
-            <td>1627</td>
-            <td>{{$orderProduct->number}}</td>
-            <td>364</td>
-            <td>1</td>
-            <td>{{$orderProduct->originalPrice()}}</td>
-            <td></td>
-            <td>{{$orderProduct->product->good->vat?'10':'0'}}</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
+            @php
+                $good = $orderProduct->product->good;
+                if(!$good->keysungood){
+                    if($good->replace_id){
+                        $good = \App\Models\Good::find($good->replace_id);
+                    }else{
+                        return abort(403, 'کالا: '. $good->name .' '. $good->id.' از سفارش : '. $id .' شناسه کالا ندارد!');
+                    }
+                }
+            @endphp
+            <tr>
+                <td>{{$id}}</td>
+                <td><input type="text" value="{!!verta($order->created_at)->format('Y/m/d')!!}"></td>
+                <td>{{$good->id}}</td>
+                <td>1627</td>
+                <td>{{$orderProduct->number}}</td>
+                <td>364</td>
+                <td>1</td>
+                <td>{{$orderProduct->originalPrice()}}</td>
+                <td></td>
+                <td>{{$good->vat?'10':'0'}}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
         @endforeach
     @endforeach
     </tbody>
