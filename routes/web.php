@@ -44,6 +44,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('/edit/{id?}', 'edit')->name('editUser');
         Route::post('/edit/{id?}', 'update');
         Route::get('/accesslist', 'accesslist')->name('accessList');
+        Route::get('/accesslist2', 'accesslist2')->name('accessList2');
         Route::post('/update-permission', 'accesslist')->name('updateUserPermission');
     });
 

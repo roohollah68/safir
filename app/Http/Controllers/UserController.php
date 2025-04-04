@@ -169,4 +169,25 @@ class UserController extends Controller
         $users = User::all();
         return view('accessList', ['users' => $users]);
     }
+
+    public function accesslist2(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'permission' => 'required|string',
+                'value' => 'required|boolean',
+            ]);
+
+            UserMeta::updateOrCreate(
+                ['user_id' => $request->user_id, 'name' => $request->permission],
+                ['value' => $request->value]
+            );
+
+            return response()->json(['message' => 'Permission updated successfully.']);
+        }
+
+        $users = User::all();
+        return view('accessList2', ['users' => $users]);
+    }
 }

@@ -21,6 +21,7 @@
     @if(auth()->user()->meta('usersEdit'))
         <a href="/user/add" class="btn btn-outline-info fa fa-plus mb-4 p-2" style="font: inherit">&nbsp;افزودن کاربر</a>
         <a href="/user/accesslist" class="btn btn-outline-primary mb-4 p-2"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;ویرایش دسترسی کاربران</a>
+        <a href="/user/accesslist2" class="btn btn-outline-secondary mb-4 p-2"><i class="fa fa-pencil" aria-hidden="true"></i> ویرایش دسترسی کاربران 2</a>
     @endif
     <br>
     <h3>لیست کاربران تایید شده:</h3>
