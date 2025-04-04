@@ -151,7 +151,7 @@ class UserController extends Controller
 
     public function accesslist(Request $request)
     {
-        if ($request->isMethod('post')) { 
+        if ($request->isMethod('post')) {
             $request->validate([
                 'user_id' => 'required|exists:users,id',
                 'permission' => 'required|string',
@@ -167,6 +167,6 @@ class UserController extends Controller
         }
 
         $users = User::all();
-        return view('accesslist', ['users' => $users]);
+        return view('accessList', ['users' => $users]);
     }
 }
