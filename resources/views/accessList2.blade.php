@@ -33,9 +33,10 @@
                 <td>{{ $user->name }} ({{$user->safir()?'سفیر':'کاربر'}})</td>
                 @foreach(config('userMeta.access') as $key => $value)
                     <td class="hide {{$key}}">
+                        <span class="hide">{{$user->meta($key)?1:0}}</span>
                         <input class="form-check-input permission-checkbox" type="checkbox"
                                id="permission{{ $user->id }}{{ $key }}" data-user-id="{{ $user->id }}"
-                               data-permission="{{ $key }}" {{ $user->meta($key) ? 'checked' : '' }}>
+                               data-permission="{{ $key }}" @checked($user->meta($key))>
                     </td>
                 @endforeach
             </tr>
