@@ -3,7 +3,7 @@
     <form method="post" action="/Withdrawal/paymentForm/${id}" enctype="multipart/form-data">
         @csrf
         <span>تغییر وضعیت:</span>
-
+        <input type="hidden" name="recipient_confirm" value="0">
         <label class="btn btn-success" for="approved">تائید</label>
         <input type="radio" name="payment_confirm" value="1" id="approved" class="checkboxradio">
 

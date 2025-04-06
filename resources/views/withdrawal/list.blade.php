@@ -21,9 +21,9 @@
     <hr>
     <a class="btn btn-{{($get!='&')?'outline-':''}}success" href="/Withdrawal/list">همه</a>
     <i class="mx-3"></i>
+    <a class="btn btn-{{$filter=='manager'?'':'outline-'}}primary" href="?{{$get}}filter=manager">منتظر تایید مدیر</a>
     <a class="btn btn-{{$filter=='counter'?'':'outline-'}}primary" href="?{{$get}}filter=counter">منتظر تایید
         حسابدار</a>
-    <a class="btn btn-{{$filter=='manager'?'':'outline-'}}primary" href="?{{$get}}filter=manager">منتظر تایید مدیر</a>
     <a class="btn btn-{{$filter=='payment'?'':'outline-'}}primary" href="?{{$get}}filter=payment">منتظر واریز</a>
     <a class="btn btn-{{$filter=='paid'?'':'outline-'}}primary" href="?{{$get}}filter=paid">واریز شده</a>
     <a class="btn btn-{{$filter=='recipient'?'':'outline-'}}primary" href="?{{$get}}filter=recipient">منتظر دریافت</a>
@@ -65,45 +65,46 @@
             <th>مبلغ (ریال)</th>
             <th>بابت</th>
             <th>صاحب حساب</th>
-            <th>حسابدار</th>
             <th>مدیر</th>
+            <th>حسابدار</th>
             <th>واریز</th>
             <th>دریافت</th>
             <th>عملیات</th>
         </tr>
         </thead>
         <tbody>
-            @foreach($withdrawals as $id => $withdrawal)
-{{--                @if($withdrawal->user_id === auth()->id() || (--}}
-{{--                    ($withdrawal->counter_confirm != 2 ||--}}
-{{--                    ($withdrawal->counter_confirm == 2 && $withdrawal->postpone_date && verta($withdrawal->postpone_date)->isToday()))--}}
-{{--                    &&--}}
-{{--                    (in_array(verta($withdrawal->created_at)->dayOfWeek, [0,2,4,6]) ||--}}
-{{--                    (in_array(verta()->dayOfWeek, [1,3,5]) && verta()->gt(verta($withdrawal->created_at))) )--}}
-{{--                ))--}}
-                <tr>
-                    <td>{{ $id }}</td>
-                    <td>{{ verta($withdrawal->created_at)->formatJalaliDate() }}</td>
-                    <td>{{ $withdrawal->user->name }}</td>
-                    <td>{{ number_format($withdrawal->amount) }}</td>
-                    <td>{{ $withdrawal->expense }}{{ $withdrawal->tankhah ? ' (تنخواه) ' : '' }}</td>
-                    <td><a href="?Supplier={{ $withdrawal->supplier_id }}">{{ $withdrawal->account_name }}</a></td>
-                    <td>{!! $withdrawal->counter_status() !!}</td>
-                    <td>{!! $withdrawal->manager_status() !!}</td>
-                    <td>{!! $withdrawal->payment_status() !!}</td>
-                    <td>{!! $withdrawal->recipient_status() !!}</td>
-                    <td>
-                        <span class="fa fa-eye btn btn-info" onclick="view_withdrawal({{ $id }})" title="مشاهده"></span>
-                        @if($withdrawal->manager_confirm != 1)
-                            <a class="fa fa-edit btn btn-primary" href="/Withdrawal/edit/{{ $id }}" title="ویرایش"></a>
-                        @endif
-                        @if($withdrawal->tankhah)
-                            <a class="fa fa-edit btn btn-primary" href="/Withdrawal/tankhah/edit/{{ $id }}" title="ویرایش"></a>
-                        @endif
-                    </td>
-                </tr>
-{{--                @endif--}}
-            @endforeach
+        @foreach($withdrawals as $id => $withdrawal)
+            {{--                @if($withdrawal->user_id === auth()->id() || (--}}
+            {{--                    ($withdrawal->counter_confirm != 2 ||--}}
+            {{--                    ($withdrawal->counter_confirm == 2 && $withdrawal->postpone_date && verta($withdrawal->postpone_date)->isToday()))--}}
+            {{--                    &&--}}
+            {{--                    (in_array(verta($withdrawal->created_at)->dayOfWeek, [0,2,4,6]) ||--}}
+            {{--                    (in_array(verta()->dayOfWeek, [1,3,5]) && verta()->gt(verta($withdrawal->created_at))) )--}}
+            {{--                ))--}}
+            <tr>
+                <td>{{ $id }}</td>
+                <td>{{ verta($withdrawal->created_at)->formatJalaliDate() }}</td>
+                <td>{{ $withdrawal->user->name }}</td>
+                <td>{{ number_format($withdrawal->amount) }}</td>
+                <td>{{ $withdrawal->expense }}{{ $withdrawal->tankhah ? ' (تنخواه) ' : '' }}</td>
+                <td><a href="?Supplier={{ $withdrawal->supplier_id }}">{{ $withdrawal->account_name }}</a></td>
+                <td>{!! $withdrawal->manager_status() !!}</td>
+                <td>{!! $withdrawal->counter_status() !!}</td>
+                <td>{!! $withdrawal->payment_status() !!}</td>
+                <td>{!! $withdrawal->recipient_status() !!}</td>
+                <td>
+                    <span class="fa fa-eye btn btn-info" onclick="view_withdrawal({{ $id }})" title="مشاهده"></span>
+                    @if($withdrawal->manager_confirm != 1)
+                        <a class="fa fa-edit btn btn-primary" href="/Withdrawal/edit/{{ $id }}" title="ویرایش"></a>
+                    @endif
+                    @if($withdrawal->tankhah)
+                        <a class="fa fa-edit btn btn-primary" href="/Withdrawal/tankhah/edit/{{ $id }}"
+                           title="ویرایش"></a>
+                    @endif
+                </td>
+            </tr>
+            {{--                @endif--}}
+        @endforeach
         </tbody>
     </table>
 
@@ -131,9 +132,9 @@
             const date1 = new mds.MdsPersianDateTimePicker($('#from_date')[0], {
                 targetTextSelector: '#from_date',
                 @if($from)
-                selectedDate : new Date('{{$from}}'),
+                selectedDate: new Date('{{$from}}'),
                 @endif
-                onDayClick: ()=> {
+                onDayClick: () => {
                     window.location.replace("?{!! $get !!}from=" + date1.getText())
                 }
             });
@@ -141,39 +142,18 @@
             const date2 = new mds.MdsPersianDateTimePicker($('#to_date')[0], {
                 targetTextSelector: '#to_date',
                 @if($to)
-                selectedDate : new Date('{{$to}}'),
+                selectedDate: new Date('{{$to}}'),
                 @endif
-                onDayClick: ()=> {
+                onDayClick: () => {
                     window.location.replace("?{!! $get !!}to=" + date2.getText())
                 }
             });
         });
 
-        @if($User->meta('counter'))
-            function counter_form(id) {
-                withdrawal = withdrawals[id]
-                if (withdrawal.manager_confirm == 1)
-                    return;
-                Dialog(`@include('withdrawal.counter')`);
-                $('.checkboxradio').checkboxradio();
-                $(`input[value=${withdrawal.counter_confirm}]`).click();
-                $('select[name=bank_id]').val(withdrawal.bank_id).change();
-                $(`input[value=${withdrawal.expense_type}]`).click();
-                // $('select[name=expense_desc]').select2();
-                // $('#expense_desc').select2({
-                //     dropdownParent: $('.dialogs'),
-                //     placeholder: "انتخاب"
-                // });
-                $('select[name=expense_desc]').val(withdrawal.expense_desc).change()
-                $(`input[name=official][value=${withdrawal.official}]`).click();
-                $(`input[name=vat][value=${withdrawal.vat}]`).click();
-            }
-        @endif
-
         @if($User->id == 122 || $User->id == 107 || $User->id == 110)
         function manager_form(id) {
             withdrawal = withdrawals[id]
-            if (withdrawal.payment_confirm == 1 || withdrawal.counter_confirm != 1)
+            if (withdrawal.counter_confirm == 1)
                 return;
             Dialog(`@include('withdrawal.manager')`);
             $('.checkboxradio').checkboxradio();
@@ -181,10 +161,26 @@
         }
         @endif
 
+        @if($User->meta('counter'))
+        function counter_form(id) {
+            withdrawal = withdrawals[id]
+            if (withdrawal.manager_confirm != 1 || withdrawal.payment_confirm == 1)
+                return;
+            Dialog(`@include('withdrawal.counter')`);
+            $('.checkboxradio').checkboxradio();
+            $(`input[value=${withdrawal.counter_confirm}]`).click();
+            $('select[name=bank_id]').val(withdrawal.bank_id).change();
+            $(`input[value=${withdrawal.expense_type}]`).click();
+            $('select[name=expense_desc]').val(withdrawal.expense_desc).change()
+            $(`input[name=official][value=${withdrawal.official}]`).click();
+            $(`input[name=vat][value=${withdrawal.vat}]`).click();
+        }
+        @endif
+
         @if($User->meta('withdrawalPay'))
         function payment_form(id) {
             withdrawal = withdrawals[id]
-            if (withdrawal.manager_confirm != 1 || withdrawal.recipient_confirm == 1)
+            if (withdrawal.counter_confirm != 1 || withdrawal.recipient_confirm == 1)
                 return;
             Dialog(`@include('withdrawal.payment')`);
             $('.checkboxradio').checkboxradio();

@@ -6,10 +6,8 @@ use App\Helper\Helper;
 use App\Models\Bank;
 use App\Models\Supplier;
 use App\Models\Withdrawal;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Mpdf\Tag\B;
 
 class WithdrawalController extends Controller
 {
@@ -35,18 +33,25 @@ class WithdrawalController extends Controller
             'user_file.max' => 'حجم فایل نباید از 3 mb بیشتر باشد!',
         ]);
         $req->merge(['amount' => +str_replace(",", "", $req->amount)]);
-        $withdrawal = $user->withdrawals()->where('manager_confirm', '<>', 1)->updateOrCreate([
+        $supplier = Supplier::updateOrCreate(
+            [
+                'name' => $req->account_name
+            ],
+            [
+                'account' => $req->account_number,
+                'code' => $req->cheque_id,
+            ]
+        );
+        $withdrawal = $user->withdrawals()->where('manager_confirm', '<', 1)->updateOrCreate([
             'id' => $id
-        ], $req->merge([
-            'counter_confirm' => 0,
-            'manager_confirm' => 0,
-            'payment_confirm' => 0
-        ])->all());
-        $supplier = Supplier::updateOrCreate(['name' => $req->account_name], [
-            'account' => $req->account_number,
-            'code' => $req->cheque_id,
-        ]);
-        $withdrawal->update(['supplier_id' => $supplier->id]);
+        ], $req->merge(
+            [
+                'manager_confirm' => 0,
+                'counter_confirm' => 0,
+                'payment_confirm' => 0,
+                'supplier_id' => $supplier->id
+            ]
+        )->all());
         if ($req->file("user_file")) {
             $withdrawal->user_file = $req->file("user_file")->store("", 'withdrawal');
         } elseif (!$req->old_user_file) {
@@ -81,7 +86,7 @@ class WithdrawalController extends Controller
             $withdrawal = Withdrawal::findOrFail($id);
         else
             $withdrawal = $user->withdrawals()->findOrFail($id);
-        if ($withdrawal->manager_confirm != 1)
+        if ($withdrawal->manager_confirm < 1)
             $withdrawal->delete();
         return redirect(route('WithdrawalList'));
     }
@@ -93,12 +98,12 @@ class WithdrawalController extends Controller
         $withdrawals = Withdrawal::where('id', '>', 0);
         if (!$user->meta('allWithdrawal'))
             $withdrawals = $withdrawals->where('user_id', $user->id);
-        if ($req->filter == 'counter')
-            $withdrawals = $withdrawals->where('counter_confirm', '<>', 1);
         if ($req->filter == 'manager')
-            $withdrawals = $withdrawals->where('manager_confirm', '<>', 1)->where('counter_confirm', 1);
+            $withdrawals = $withdrawals->where('manager_confirm', '<>', 1);
+        if ($req->filter == 'counter')
+            $withdrawals = $withdrawals->where('counter_confirm', '<>', 1)->where('manager_confirm', 1);
         if ($req->filter == 'payment')
-            $withdrawals = $withdrawals->where('payment_confirm', '<>', 1)->where('manager_confirm', 1);
+            $withdrawals = $withdrawals->where('payment_confirm', '<>', 1)->where('counter_confirm', 1);
         if ($req->filter == 'paid')
             $withdrawals = $withdrawals->where('payment_confirm', 1);
         if ($req->filter == 'recipient')
@@ -134,6 +139,16 @@ class WithdrawalController extends Controller
         ]);
     }
 
+    public function manager($id, Request $req)
+    {
+        $user = auth()->user();
+        if ($user->id != 122 && $user->id != 107 && $user->id != 110)
+            abort(403,'شما مجاز نیستید!' );
+        $withdrawal = Withdrawal::findOrFail($id)->update($req->all());
+        $this->bale($id);
+        return redirect()->back();
+    }
+
     public function counter($id, Request $req)
     {
         Helper::access('counter');
@@ -142,28 +157,11 @@ class WithdrawalController extends Controller
         ], [
             'expense_desc.required' => 'نوع هزینه باید مشخص شود!'
         ]);
-        Withdrawal::findOrFail($id)->update($req->merge([
-            'manager_confirm' => 0
-        ])->all());
+        Withdrawal::where('manager_confirm' , 1)->findOrFail($id)->update($req->all());
         $this->bale($id);
         return redirect()->back();
     }
 
-    public function manager($id, Request $req)
-    {
-        $user = auth()->user();
-        if ($user->id != 122 && $user->id != 107 && $user->id != 110)
-            abort(401);
-        $withdrawal = Withdrawal::findOrFail($id);
-        if ($withdrawal->counter_confirm != 1)
-            return redirect()->back();
-        $withdrawal->manager_confirm = $req->manager_confirm;
-        $withdrawal->payment_confirm = 0;
-        $withdrawal->manager_desc = $req->manager_desc;
-        $withdrawal->save();
-        $this->bale($withdrawal->id);
-        return redirect()->back();
-    }
 
     public function payment($id, Request $req)
     {
@@ -173,12 +171,8 @@ class WithdrawalController extends Controller
             'payment_file2' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
             'payment_file3' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
         ]);
-        $withdrawal = Withdrawal::findOrFail($id);
-        if ($withdrawal->manager_confirm != 1)
-            return redirect()->back();
-        $withdrawal->payment_confirm = $req->payment_confirm;
-        $withdrawal->recipient_confirm = 0;
-        $withdrawal->payment_desc = $req->payment_desc;
+        $withdrawal = Withdrawal::where('counter_confirm' , 1)->findOrFail($id);
+        $withdrawal->update($req->all());
         if ($req->file('payment_file'))
             $withdrawal->payment_file = $req->file("payment_file")->store("", 'withdrawal');
         if ($req->file('payment_file2'))
@@ -186,7 +180,7 @@ class WithdrawalController extends Controller
         if ($req->file('payment_file3'))
             $withdrawal->payment_file3 = $req->file("payment_file3")->store("", 'withdrawal');
         $withdrawal->save();
-        $this->bale($withdrawal->id);
+        $this->bale($id);
         return redirect()->back();
     }
 
@@ -196,15 +190,14 @@ class WithdrawalController extends Controller
         request()->validate([
             'recipient_file' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
         ]);
-        $withdrawal = Withdrawal::findOrFail($id);
-        if ($withdrawal->payment_confirm != 1)
-            return redirect()->back();
+        $withdrawal = Withdrawal::where('payment_confirm' , 1)->findOrFail($id);
+
         $withdrawal->recipient_confirm = ($req->recipient_confirm || $withdrawal->tankhah);
         $withdrawal->recipient_desc = $req->recipient_desc;
         if ($req->file('recipient_file'))
             $withdrawal->recipient_file = $req->file("recipient_file")->store("", 'withdrawal');
         $withdrawal->save();
-        $this->bale($withdrawal->id);
+        $this->bale($id);
         return redirect()->back();
     }
 

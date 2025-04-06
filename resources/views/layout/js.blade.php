@@ -320,8 +320,8 @@
     });
 
     $(function() {
-            $(document).on('change', 'input[name="counter_confirm"]', function() {
-                const selectedValue = $('input[name="counter_confirm"]:checked').val();
+            $(document).on('change', 'input[name="manager_confirm"]', function() {
+                const selectedValue = $('input[name="manager_confirm"]:checked').val();
                 if (selectedValue === '2') {
                     $('#postpone-section').show();
                     $('#postpone').prop('required', true);
@@ -335,9 +335,9 @@
                     $('#postpone').prop('required', false);
                 }
             });
-            $('input[name="counter_confirm"]:checked').trigger('change');
-        });    
-    
+            $('input[name="manager_confirm"]:checked').trigger('change');
+        });
+
     function toggleRequired(isRequired) {
         document.getElementById('expense_desc').required = isRequired;
         document.getElementById('bank_id').required = isRequired;

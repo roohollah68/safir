@@ -25,21 +25,21 @@
     @if($withdrawal->deleted_at)
         <span>زمان حذف:</span><b>{{verta($withdrawal->deleted_at)->formatJalaliDate()}}</b><br>
     @endif
-    <span>تایید حسابداری:</span> <b>{!! $withdrawal->counter_status() !!}</b> <br>
-    @if ($withdrawal->counter_confirm == 2 && $withdrawal->postpone_date)
-    <span>تاریخ پرداخت:</span> <b>{{verta($withdrawal->postpone_date)->formatJalaliDate()}}</b><b> ({{ abs(Verta::now()->diff(verta($withdrawal->postpone_date))->days) }}
-  روز)</b>
-    <br>
-    @endif
-    <span>توضیحات حسابداری:</span> <b>{{$withdrawal->counter_desc}}</b> <br>
-    <span>بانک پرداخت کننده:</span> <b>{{(isset($withdrawal->bank))?$withdrawal->bank->name:'نامشخص'}}</b>
-    <hr>
-    @if($withdrawal->counter_confirm != 0)
-        <span>تایید مدیر:</span> <b>{!! $withdrawal->manager_status() !!}</b> <br>
-        <span>توضیحات مدیر:</span> <b>{{$withdrawal->manager_desc}}</b>
+
+    <span>تایید مدیر:</span> <b>{!! $withdrawal->manager_status() !!}</b> <br>
+    <span>توضیحات مدیر:</span> <b>{{$withdrawal->manager_desc}}</b><br>
+
+    @if ($withdrawal->manager_confirm == 2 && $withdrawal->postpone_date)
+        <span>تاریخ پرداخت:</span> <b>{{verta($withdrawal->postpone_date)->formatJalaliDate()}}</b>
         <hr>
     @endif
-    @if($withdrawal->counter_confirm != 0 && $withdrawal->manager_confirm != 0)
+    @if($withdrawal->manager_confirm == 1)
+        <span>تایید حسابداری:</span> <b>{!! $withdrawal->counter_status() !!}</b> <br>
+        <span>توضیحات حسابداری:</span> <b>{{$withdrawal->counter_desc}}</b> <br>
+        <span>بانک پرداخت کننده:</span> <b>{{(isset($withdrawal->bank))?$withdrawal->bank->name:'نامشخص'}}</b>
+        <hr>
+    @endif
+    @if($withdrawal->counter_confirm == 1)
         <span>تایید پرداخت:</span> <b>{!! $withdrawal->payment_status() !!}</b> <br>
         <span>توضیحات پرداخت:</span> <b>{{$withdrawal->payment_desc}}</b> <br>
         @if($withdrawal->payment_file)
@@ -59,7 +59,7 @@
         @endif
         <hr>
     @endif
-    @if($withdrawal->counter_confirm != 0 && $withdrawal->manager_confirm != 0 && $withdrawal->payment_confirm != 0)
+    @if( $withdrawal->payment_confirm == 1)
         <span>تایید دریافت کالا یا خدمات:</span> <b>{!! $withdrawal->recipient_status() !!}</b> <br>
         <span>توضیحات دریافت:</span> <b>{{$withdrawal->recipient_desc}}</b> <br>
         @if($withdrawal->recipient_file)

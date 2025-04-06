@@ -47,8 +47,8 @@
                 <td>{{$orderProduct->number}}</td>
                 <td>364</td>
                 <td>1</td>
-                <td>{{$orderProduct->originalPrice()}}</td>
-                <td></td>
+                <td>{{$orderProduct->originalPrice()*(10/11+$orderProduct->discount/1100)}}</td>
+                <td>{{($orderProduct->originalPrice()*$orderProduct->number)*($orderProduct->discount/100)}}</td>
                 <td>{{$good->vat?'10':'0'}}</td>
                 <td></td>
                 <td></td>

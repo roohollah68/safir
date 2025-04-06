@@ -11,6 +11,7 @@ use App\Models\Keysungood;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Warehouse;
+use App\Models\Withdrawal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 
@@ -63,6 +64,14 @@ class SettingController extends Controller
 
     public function command()
     {
+        Withdrawal::where('counter_confirm',1)->where('manager_confirm' , '<>' , 1)->update([
+            'counter_confirm'=>0,
+        ]);
+        Withdrawal::where('counter_confirm',2)->update([
+            'manager_confirm'=>2,
+        ]);
+
+
 
         foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {
             if ($customer->balance() != $customer->balance) {
