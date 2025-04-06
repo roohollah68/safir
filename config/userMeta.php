@@ -4,6 +4,7 @@ return [
     'city' => 't',
     'NuRecords' => '500', // number of orders to show
     'warehouseId' => 1,
+    'discount' => 0,
     'access'=>[
         'usersEdit' => 'ویرایش اطلاعات و دسترسی کاربران',
         'addOrder' => 'ثبت سفارش',

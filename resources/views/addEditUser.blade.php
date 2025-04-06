@@ -50,17 +50,17 @@
                             <label for="role" class="input-group-text" style="min-width: 160px">نوع حساب کاربری:</label>
                         </div>
                         <select name="role" id="role" class="form-control">
-{{--                            <option value="superAdmin">سوپر ادمین</option>--}}
                             <option value="admin">فروشنده با فاکتور</option>
                             <option value="user">سفیر</option>
-{{--                            <option value="warehouse">انبار دار</option>--}}
-{{--                            <option value="counter">حسابدار</option>--}}
-{{--                            <option value="account">صاحب حساب بانکی</option>--}}
                         </select>
                     </div>
                 </div>
                 <x-col-md-6 :name="'credit'" value="{{$user->credit}}"
                             class="price-input form-control">اعتبار (ریال):
+                </x-col-md-6>
+
+                <x-col-md-6 :name="'discount'" type="number" min="0" max="100" step="0.01" value="{{$user->meta('discount')}}"
+                            class="form-control" required>تخفیف (%):
                 </x-col-md-6>
 
             @endif

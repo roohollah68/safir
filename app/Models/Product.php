@@ -78,6 +78,7 @@ class Product extends Model
             $couponLinks = $this->good->couponLinks->where('user_id' , $user->id)->all();
             foreach ($couponLinks as $couponLink)
                 $discount = max(+$couponLink->coupon->percent, $discount);
+//            $discount = $user->meta('discount');
         }
         return $discount;
     }

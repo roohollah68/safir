@@ -133,6 +133,11 @@ class UserController extends Controller
             );
         }
 
+        UserMeta::updateOrCreate(
+            ['user_id' => $id, 'name' => 'discount'],
+            ['value' => $request->discount]
+        );
+
         if (auth()->user()->meta('usersEdit')) {
             User::find($id)->update([
                 'username' => $request->username,
