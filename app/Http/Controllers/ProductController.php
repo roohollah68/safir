@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helper\Helper;
 use App\Models\Good;
+use App\Models\GoodMeta;
 use App\Models\Keysungood;
 use App\Models\Product;
 use App\Models\User;
@@ -86,7 +87,9 @@ class ProductController extends Controller
             'productPrice' => 'integer',
         ]);
         $good->fill($req->all())->save();
-        $good->goodMeta()->firstOrNew([
+        GoodMeta::updateOrCreate([
+            'good_id' => $good->id,
+        ],[
             'supplier_inf' => $req->supplier_inf,
         ]);
 
