@@ -20,7 +20,7 @@
     <i>تا تاریخ: </i><input type="text" value="" style="width: 120px" id="to_date">
     <hr>
     <a class="btn btn-{{($get!='&')?'outline-':''}}success" href="/Withdrawal/list">همه</a>
-    <i class="mx-3"></i>
+    <i class="mx-1"></i>
     <a class="btn btn-{{$filter=='manager'?'':'outline-'}}primary" href="?{{$get}}filter=manager">منتظر تایید مدیر</a>
     <a class="btn btn-{{$filter=='counter'?'':'outline-'}}primary" href="?{{$get}}filter=counter">منتظر تایید
         حسابدار</a>
@@ -29,9 +29,12 @@
     <a class="btn btn-{{$filter=='recipient'?'':'outline-'}}primary" href="?{{$get}}filter=recipient">منتظر دریافت</a>
     <a class="btn btn-{{$filter=='complete'?'':'outline-'}}primary" href="?{{$get}}filter=complete">تکمیل شده</a>
     <a class="btn btn-{{$filter=='tankhah'?'':'outline-'}}primary" href="?{{$get}}filter=tankhah">تنخواه</a>
-    <i class="mx-3"></i>
+    <i class="mx-1"></i>
     <a class="btn btn-{{$payMethod=='cash'?'':'outline-'}}warning" href="?{{$get}}payMethod=cash">نقدی</a>
     <a class="btn btn-{{$payMethod=='cheque'?'':'outline-'}}warning" href="?{{$get}}payMethod=cheque">چکی</a>
+    <i class="mx-1"></i>
+    <a class="btn btn-{{$postpone=='postpone'?'':'outline-'}}secondary" href="?{{$get}}postpone=postpone">تعویقی</a>
+    <a class="btn btn-{{$dateFilter=='dateFilter'?'':'outline-'}}secondary" href="?{{$get}}dateFilter=dateFilter">اخیر</a>
     <hr>
     <a class="btn btn-{{$official=='1'?'':'outline-'}}info" href="?{{$get}}official=1">رسمی</a>
     <a class="btn btn-{{$official=='0'?'':'outline-'}}info" href="?{{$get}}official=0">غیر رسمی</a>
@@ -74,13 +77,6 @@
         </thead>
         <tbody>
         @foreach($withdrawals as $id => $withdrawal)
-            {{--                @if($withdrawal->user_id === auth()->id() || (--}}
-            {{--                    ($withdrawal->counter_confirm != 2 ||--}}
-            {{--                    ($withdrawal->counter_confirm == 2 && $withdrawal->postpone_date && verta($withdrawal->postpone_date)->isToday()))--}}
-            {{--                    &&--}}
-            {{--                    (in_array(verta($withdrawal->created_at)->dayOfWeek, [0,2,4,6]) ||--}}
-            {{--                    (in_array(verta()->dayOfWeek, [1,3,5]) && verta()->gt(verta($withdrawal->created_at))) )--}}
-            {{--                ))--}}
             <tr>
                 <td>{{ $id }}</td>
                 <td>{{ verta($withdrawal->created_at)->formatJalaliDate() }}</td>
@@ -103,7 +99,6 @@
                     @endif
                 </td>
             </tr>
-            {{--                @endif--}}
         @endforeach
         </tbody>
     </table>

@@ -8,6 +8,7 @@ use App\Models\Supplier;
 use App\Models\Withdrawal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Hekmatinasser\Verta\Verta;
 
 class WithdrawalController extends Controller
 {
@@ -124,6 +125,25 @@ class WithdrawalController extends Controller
             $withdrawals = $withdrawals->whereDate('created_at', '>=', $req->from);
         if (isset($req->to))
             $withdrawals = $withdrawals->whereDate('created_at', '<=', $req->to);
+        if(isset($req->postpone))
+            $withdrawals = $withdrawals->where('counter_confirm', 2);
+        if (isset($req->dateFilter)) {
+            $today = verta();
+            $isEvenDay = $today->dayOfWeek % 2 === 0;
+            $dates = $isEvenDay 
+            ? [$today->format('Y-m-d'), $today->subDay()->format('Y-m-d')] 
+            : [$today->format('Y-m-d')];
+
+            $excludedRanges = collect($dates)->map(fn($d) => [
+            Verta::parse($d)->startDay()->toCarbon(),
+            Verta::parse($d)->endDay()->toCarbon()
+            ]);
+
+            $withdrawals->where(fn($q) => $q->where('user_id', $user->id)
+            ->orWhere(fn($q) => $excludedRanges->each(
+                fn($range) => $q->whereNotBetween('created_at', $range)
+            )));
+        }
         return view('withdrawal.list', [
             'withdrawals' => $withdrawals->with('user')->get()->keyBy('id'),
             'suppliers' => Supplier::all()->keyBy('id')->sortBy('name'),
@@ -136,6 +156,8 @@ class WithdrawalController extends Controller
             'payMethod' => $req->payMethod,
             'from' => $req->from,
             'to' => $req->to,
+            'postpone' => $req->postpone,
+            'dateFilter' => $req->dateFilter
         ]);
     }
 
