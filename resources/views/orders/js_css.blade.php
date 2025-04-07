@@ -13,7 +13,7 @@
     let changeOrdersPermit = !!'{{$User->meta('showAllOrders')}}';
     let safirOrders = true, siteOrders = true, adminOrders = true;
     let dtp1Instance;
-    let websites = {!!json_encode(config('websites'))!!};
+    let websites = {!! json_encode(config('websites')) !!};
     let dialog, reloadId;
     $(() => {
         $(".checkboxradio").checkboxradio();
@@ -122,7 +122,7 @@
 
             order.zip_code,
 
-            order.total + num(order.total),
+            num(order.total),
         ];
     }
 
@@ -161,7 +161,7 @@
             table.rows.add(data);
             table.draw();
         } else {
-            let hideCols = [9, 10, 11, 12, 13];
+            let hideCols = [9, 10, 11, 12, 13, 14];
             hideCols = !changeOrdersPermit ? hideCols.concat([0, 3]) : hideCols;
             hideCols = safir ? hideCols.concat([6]) : hideCols;
             table = $('#main-table').DataTable({
@@ -180,6 +180,7 @@
                     {title: "سفارشات"},
                     {title: "همراه"},
                     {title: "کدپستی"},
+                    {title: "مبلغ"}
                 ],
                 columnDefs: [
                     {
@@ -201,6 +202,7 @@
                 order: [[1, "desc"]],
                 language: language,
             });
+            hideCols.forEach((col)=>{$(`#toggle-column-${col}`).click()})
         }
 
     }
@@ -572,27 +574,5 @@
         $('#state_' + order.id).parent().html(createdTime(order));
         $('#orderCondition_' + order.id).html(orderCondition(order));
     }
-
-    function columns() {
-        hideCols = [3, 5, 6, 8, 9, 10, 11, 12, 13].filter(i => !$('#toggle-column-' + i).prop('checked'));
-    }
-
-    $(document).on('change', '[id^="toggle-column-"]', function() {
-        columns();
-        if (table) {
-            table.columns().visible(true);
-            table.columns(hideCols).visible(false);
-            table.draw();
-        }
-    });
-
-    $(document).ready(function() {
-        columns();
-        if (table) {
-            table.columns().visible(true);
-            table.columns(hideCols).visible(false);
-            table.draw();
-        }
-    });
 </script>
 

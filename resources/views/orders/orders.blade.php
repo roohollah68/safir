@@ -21,11 +21,11 @@
         </div>
         <div class="col-md-3 d-flex">
             <label for="fromId" class="input-group-text">از شماره:</label>
-            <input type="number" step="1" id="fromId" class="form-control" >
+            <input type="number" step="1" id="fromId" class="form-control">
         </div>
         <div class=" col-md-3 d-flex">
             <label for="toId" class="input-group-text">تا شماره:</label>
-            <input type="number" step="1" id="toId" class="form-control" >
+            <input type="number" step="1" id="toId" class="form-control">
             <button class="btn btn-success fa fa-search"></button>
         </div>
     </form>
@@ -53,9 +53,11 @@
         @endif
         <br>
         <br>
-        <x-radio :id="'warehouse-all'"  onclick="warehouseId = 'all';prepare_data()" name="warehouse" checked>همه</x-radio>
+        <x-radio :id="'warehouse-all'" onclick="warehouseId = 'all';prepare_data()" name="warehouse" checked>همه
+        </x-radio>
         @foreach($warehouses as $warehouse)
-            <x-radio :id="'warehouse-'.$warehouse->id"  onclick="warehouseId = {{$warehouse->id}};prepare_data()" name="warehouse">{{$warehouse->name}}</x-radio>
+            <x-radio :id="'warehouse-'.$warehouse->id" onclick="warehouseId = {{$warehouse->id}};prepare_data()"
+                     name="warehouse">{{$warehouse->name}}</x-radio>
         @endforeach
 
     @endif
@@ -88,14 +90,15 @@
 
         <div class="mb-3">
             <span>نمایش ستون‌ها:</span>
-            <x-checkbox :id="'toggle-column-3'" checked>سفیر</x-checkbox>
-            <x-checkbox :id="'toggle-column-5'" checked>زمان ثبت</x-checkbox>
-            <x-checkbox :id="'toggle-column-6'" checked>تائید کاربر</x-checkbox>
-            <x-checkbox :id="'toggle-column-8'" checked>وضعیت</x-checkbox>
-            <x-checkbox :id="'toggle-column-9'">آدرس</x-checkbox>
-            <x-checkbox :id="'toggle-column-10'">توضیحات</x-checkbox>
-            <x-checkbox :id="'toggle-column-12'">همراه</x-checkbox>
-            <x-checkbox :id="'toggle-column-13'">کدپستی</x-checkbox>
+            <x-checkbox :id="'toggle-column-3'" checked onclick="table.columns(3).visible(this.checked);">سفیر</x-checkbox>
+            <x-checkbox :id="'toggle-column-5'" checked onclick="table.columns(5).visible(this.checked);">زمان ثبت</x-checkbox>
+            <x-checkbox :id="'toggle-column-6'" checked onclick="table.columns(6).visible(this.checked);">تائید کاربر</x-checkbox>
+            <x-checkbox :id="'toggle-column-8'" checked onclick="table.columns(8).visible(this.checked);">وضعیت</x-checkbox>
+            <x-checkbox :id="'toggle-column-9'" checked onclick="table.columns(9).visible(this.checked);">آدرس</x-checkbox>
+            <x-checkbox :id="'toggle-column-10'" checked onclick="table.columns(10).visible(this.checked);">توضیحات</x-checkbox>
+            <x-checkbox :id="'toggle-column-12'" checked onclick="table.columns(12).visible(this.checked);">همراه</x-checkbox>
+            <x-checkbox :id="'toggle-column-13'" checked onclick="table.columns(13).visible(this.checked);">کدپستی</x-checkbox>
+            <x-checkbox :id="'toggle-column-14'" checked onclick="table.columns(14).visible(this.checked);">مبلغ</x-checkbox>
         </div>
 
         <button class="btn btn-secondary my-2" onclick="generatePDFs()"> دانلود PDF لیبل</button>

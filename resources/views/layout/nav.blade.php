@@ -140,7 +140,7 @@
         --color-deep-cyan: #14697B;
         --color-muted-aqua: #5BB6B7;
         --color-dark-teal: #205B5C;
-        --color-bg-nav: #6ba17c;
+        --color-bg-nav: #40b6f5;
         --color-rose-red: #821d30;
     }
 
