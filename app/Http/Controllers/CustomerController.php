@@ -543,6 +543,14 @@ class CustomerController extends Controller
         if ($req->paymethods)
             $orders = $orders->whereIn('paymentMethod', array_keys($req->paymethods));
 
+        if ($req->from) {
+            $orders = $orders->whereDate('sent_at', '>=', Verta::parse($req->from)->DateTime());
+        }
+
+        if ($req->to) {
+            $orders = $orders->whereDate('sent_at', '<=', Verta::parse($req->to)->DateTime());
+        }
+
         $orders = $orders->get()->keyBy('id');
 
         $orders = $orders->filter(fn($order) => $order->unpaid() > 0);
