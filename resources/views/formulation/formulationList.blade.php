@@ -24,12 +24,13 @@
                 <td>{{$formulation[0]->good->name}}</td>
                 <td>
                     @foreach($formulation as $formule)
-                    {{$formule->rawGood->name}} -> {{+$formule->amount}} <br>
+                        {{$formule->rawGood->name}} -> {{+$formule->amount}} {{$formule->rawGood->unit->name}}<br>
                     @endforeach
                 </td>
                 <td>
                     <a class="fa fa-edit btn btn-primary" href="/formulation/edit/{{$id}}" title="ویرایش"></a>
-                    <a class="fa fa-trash btn btn-danger" href="/formulation/deleteAll/{{$formulation[0]->good_id}}" title="حذف"></a>
+                    <a class="fa fa-trash btn btn-danger" href="/formulation/deleteAll/{{$formulation[0]->good_id}}"
+                       title="حذف"></a>
                 </td>
             </tr>
         @endforeach

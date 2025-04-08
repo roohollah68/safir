@@ -12,8 +12,8 @@ class FormulationController extends Controller
     public function list()
     {
         Helper::access('warehouse');
-        $formulations = Formulation::all()->groupBy('good_id');
-        return view('formulation/formulationList', compact('formulations'));
+        $formulations = Formulation::with(['good' , 'rawGood.unit'])->get()->groupBy('good_id');
+        echo view('formulation/formulationList', compact('formulations'));
     }
 
     public function add()
@@ -42,7 +42,8 @@ class FormulationController extends Controller
         Helper::access('editWarehouse');
         if ($id) {
             $formulation = Formulation::findOrFail($id);
-            $formulation->update($req->all());
+            $formulation->update(['amount'=>$req->amount]);
+            $formulation->rawGood->update(['unit_id'=>$req->unit_id]);
         } else {
             $formulation = Formulation::create($req->all());
         }

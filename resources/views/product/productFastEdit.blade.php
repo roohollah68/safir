@@ -102,6 +102,26 @@
                 </select>
             </div>
         </div>
+
+
+
+        {{--واحد--}}
+        <div class="col-md-6">
+            <div class="form-group input-group">
+                <div class="input-group-append" style="min-width: 160px">
+                    <label for="unit" class="input-group-text w-100">واحد:</label>
+                </div>
+                <select id="unit" class="form-control" name="unit_id">
+                    @foreach(\App\Models\Unit::all() as $unit)
+                        <option value="{{$unit->id}}" @selected(($product->good->unit_id??1 )== $unit->id)>
+                            {{$unit->name}}
+                        </option>
+                    @endforeach
+                </select>
+
+            </div>
+        </div>
+
         {{--وضعیت موجودی--}}
         <br>
         <input type="radio" class="checkboxradio" id="available-dialog" name="available" value="true"

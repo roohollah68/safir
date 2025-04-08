@@ -20,12 +20,21 @@
     <div id="rawGoods"></div>
     <hr>
     <div class="hide" id="add-formulation">
-        <label for="component_name">نام ترکیب</label>
+        <label for="component_name">نام ترکیب:</label>
         <input type="text" style="width: 350px" id="component_name">
         <input type="text" style="width: 60px" id="rawGood_id" readonly>
         |
-        <label for="amount">مقدار</label>
+        <label for="amount">:</label>
         <input type="number" style="width: 200px" id="amount" min="0" step="0.0001">
+        |
+        <label for="unit_id">واحد:</label>
+        <select id="unit_id" name="unit_id">
+            @foreach(\App\Models\Unit::all() as $unit)
+                <option value="{{$unit->id}}")>
+                    {{$unit->name}}
+                </option>
+            @endforeach
+        </select>
         |
         <span class="btn btn-success fa fa-save" onclick="addFormulation()"></span>
     </div>
@@ -33,7 +42,7 @@
 
 @section('files')
     <script>
-        let goods = {!! json_encode($goods) !!};
+        let goods = {!! json_encode($goods->keyBy('id')) !!};
         let finals = {!! json_encode($finals) !!};
         let raws = {!! json_encode($raws) !!};
         let good_id;
@@ -52,6 +61,8 @@
                 select: function (event, ui) {
                     let id = raws[ui.item.value];
                     $('#rawGood_id').val(id);
+                    console.log([id , goods[id].unit_id]);
+                    $('#unit_id').val(goods[id].unit_id).change();
                 }
             });
             @if($edit)
@@ -75,6 +86,7 @@
             $.post('/formulation/addEditRow/' + id, {
                 _token: token,
                 amount: $('#formulation-' + id).val(),
+                unit_id: $('#unit-' + id ).find(":selected").val(),
             }).done(res => {
                 $('#rawGoods').html(res);
             });
@@ -86,6 +98,7 @@
                 amount: $('#amount').val(),
                 good_id: good_id,
                 rawGood_id: $('#rawGood_id').val(),
+                // unit_id: $('#rawGood_id').val(),
             }).done(res => {
                 $('#rawGoods').html(res);
             });
