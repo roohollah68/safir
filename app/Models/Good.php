@@ -15,6 +15,7 @@ class Good extends Model
         'price',  //قیمت فروش
         'photo', //تصویر محصول
         'category', //دسته بندی محصول نهایی، مواد اولیه، ملزومات بسته بندی
+        'unit_id', //واحد
         'productPrice', //قیمت تولید
         'isic', //اینتا کد
         'vat', //ارزش افزوده دارد یا خیر
@@ -58,5 +59,10 @@ class Good extends Model
     public function replace()
     {
         return Good::find($this->replace_id);
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
     }
 }

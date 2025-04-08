@@ -79,6 +79,23 @@
                 </div>
             </div>
 
+            {{--واحد--}}
+            <div class="col-md-6">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="unit" class="input-group-text w-100">واحد:</label>
+                    </div>
+                    <select id="unit" class="form-control" name="unit_id">
+                        @foreach(\App\Models\Unit::all() as $unit)
+                            <option value="{{$unit->id}}" @selected(($good->unit_id??1 )== $unit->id)>
+                                {{$unit->name}}
+                            </option>
+                        @endforeach
+                    </select>
+
+                </div>
+            </div>
+
             {{--شناسه کالا--}}
             <div class="col-md-6">
                 <div class="form-group input-group">
@@ -114,7 +131,8 @@
                     </div>
                     <select id="category" class="form-control" name="category">
                         @foreach(config('goodCat') as $cat => $desc)
-                            <option value="{{$cat}}" @selected(old('category')?:$good->category == $cat)>{{$desc}}</option>
+                            <option
+                                value="{{$cat}}" @selected(old('category')?:$good->category == $cat)>{{$desc}}</option>
                         @endforeach
                     </select>
 
