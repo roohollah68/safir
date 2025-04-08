@@ -449,6 +449,46 @@ class OrderController extends Controller
         return $res;
     }
 
+    public function invoiceView($id)
+    {
+        $order = Helper::Order(false)->findOrFail($id);
+        $total_no_dis = 0;
+        $total_dis = 0;
+        $totalProducts = 0;
+        foreach ($order->orderProducts as $id => $orderProduct) {
+            if ($orderProduct->discount != 100)
+                $orderProduct->price_no_dis = round((100 / (100 - $orderProduct->discount)) * $orderProduct->price);
+            else
+                $orderProduct->price_no_dis = $orderProduct->product()->withTrashed()->first()->good->price;
+            $orderProduct->sub_total_no_dis = $orderProduct->price_no_dis * $orderProduct->number;
+            $total_no_dis = $total_no_dis + $orderProduct->sub_total_no_dis;
+            $total_dis = $total_dis + ($orderProduct->price * $orderProduct->number);
+            $totalProducts += $orderProduct->number;
+        }
+        if(!$order->user->safir() && $order->total != $total_dis)
+            return abort(500, 'مجموع اقلام با مبلغ فاکتور همخوانی ندارد.');
+        $deliveryCost = $order->total - $total_dis;
+        $total_dis += $deliveryCost;
+        $total_no_dis += $deliveryCost;
+        $number = $order->orderProducts->count();
+        $pageContents = [$number];
+
+        return view('orders.invoiceView', [
+            'firstPage' => '',
+            'lastPage' => '',
+            'page' => 1,
+            'pages' => count($pageContents),
+            'order' => $order,
+            'start' => 0,
+            'end' => $number,
+            'total_no_dis' => $total_no_dis,
+            'total_dis' => $total_dis,
+            'totalProducts' => $totalProducts,
+            'setting' => $this->settings(),
+            'deliveryCost' => $deliveryCost,
+        ]);
+    }
+
     public function cancelInvoice($id, Request $req)
     {
         DB::beginTransaction();

@@ -62,6 +62,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/viewOrder/{id}', 'viewOrder');
         Route::post('/confirmAuthorize/{id}', 'confirmAuthorize');
         Route::post('/invoice/{id}', 'invoice');
+        Route::get('/invoiceView/{id}', 'invoiceView');
         Route::post('/orders/dateFilter', 'dateFilter');
         Route::get('/pdfs/{ids}', 'pdfs');
         Route::post('/orders/paymentMethod/{id}', 'paymentMethod');

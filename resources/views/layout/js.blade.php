@@ -1,39 +1,44 @@
 <script>
-    function invoice(id) {
-        let randSTR = makeid(3);
-        let printInvoice = (page, index) => {
-            $('#invoice-wrapper' + index).html(page);
-            domtoimage.toJpeg($('#invoice' + index)[0], {
-                width: 2100,
-                height: 2970
-            })
-                .then(function (dataUrl) {
-                    let link = document.createElement('a');
-                    link.download = id + `_` + index + `_` + randSTR + '.jpg';
-                    link.href = dataUrl;
-                    link.click();
-                    $('#invoice-wrapper' + index).html('');
-                })
-        }
+    function invoice(id, e = {}) {
+        if (e.ctrlKey) {
+            window.open('/invoiceView/' + id, '_blank');
+        } else {
 
-        $.post('/invoice/' + id, {
-            _token: token,
-            totalPages: 1,
-            pageContent: 'all',
-        }).done(res => {
-            $('#invoice-wrapper1').html(res[0]);
-            if ($('#invoice-content')[0].offsetHeight < 2900) {
-                printInvoice(res[0], 1);
-            } else {
-                $.post('/invoice/' + id, {
-                    _token: token,
-                }).done(res => {
-                    $.each(res, (index, page) => {
-                        printInvoice(page, index + 1, randSTR)
-                    })
+            let randSTR = makeid(3);
+            let printInvoice = (page, index) => {
+                $('#invoice-wrapper' + index).html(page);
+                domtoimage.toJpeg($('#invoice' + index)[0], {
+                    width: 2100,
+                    height: 2970
                 })
+                    .then(function (dataUrl) {
+                        let link = document.createElement('a');
+                        link.download = id + `_` + index + `_` + randSTR + '.jpg';
+                        link.href = dataUrl;
+                        link.click();
+                        $('#invoice-wrapper' + index).html('');
+                    })
             }
-        })
+
+            $.post('/invoice/' + id, {
+                _token: token,
+                totalPages: 1,
+                pageContent: 'all',
+            }).done(res => {
+                $('#invoice-wrapper1').html(res[0]);
+                if ($('#invoice-content')[0].offsetHeight < 2900) {
+                    printInvoice(res[0], 1);
+                } else {
+                    $.post('/invoice/' + id, {
+                        _token: token,
+                    }).done(res => {
+                        $.each(res, (index, page) => {
+                            printInvoice(page, index + 1, randSTR)
+                        })
+                    })
+                }
+            })
+        }
     }
 
     function view_order(id) {
@@ -282,8 +287,8 @@
 
     let token = "{{ csrf_token() }}";
     $(function () {
-        $('form').submit( async e => {
-            $('input[type=submit]').attr('disabled','disabled');
+        $('form').submit(async e => {
+            $('input[type=submit]').attr('disabled', 'disabled');
             const form = e.target;
             if (!form.querySelectorAll('input.compress-image[type="file"]').length)
                 return;
@@ -319,24 +324,24 @@
         });
     });
 
-    $(function() {
-            $(document).on('change', 'input[name="manager_confirm"]', function() {
-                const selectedValue = $('input[name="manager_confirm"]:checked').val();
-                if (selectedValue === '2') {
-                    $('#postpone-section').show();
-                    $('#postpone').prop('required', true);
-                        new mds.MdsPersianDateTimePicker(document.getElementById('postpone'), {
-                            targetTextSelector: '#postpone',
-                            targetDateSelector: '#postpone_date',
-                            enableTimePicker: false
-                        });
-                } else {
-                    $('#postpone-section').hide();
-                    $('#postpone').prop('required', false);
-                }
-            });
-            $('input[name="manager_confirm"]:checked').trigger('change');
+    $(function () {
+        $(document).on('change', 'input[name="manager_confirm"]', function () {
+            const selectedValue = $('input[name="manager_confirm"]:checked').val();
+            if (selectedValue === '2') {
+                $('#postpone-section').show();
+                $('#postpone').prop('required', true);
+                new mds.MdsPersianDateTimePicker(document.getElementById('postpone'), {
+                    targetTextSelector: '#postpone',
+                    targetDateSelector: '#postpone_date',
+                    enableTimePicker: false
+                });
+            } else {
+                $('#postpone-section').hide();
+                $('#postpone').prop('required', false);
+            }
         });
+        $('input[name="manager_confirm"]:checked').trigger('change');
+    });
 
     function toggleRequired(isRequired) {
         document.getElementById('expense_desc').required = isRequired;

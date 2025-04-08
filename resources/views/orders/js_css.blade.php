@@ -141,15 +141,15 @@
                 NuRecords: value,
                 user_id: id
             },
-            success: function(response) {
-                $.post('/orders/reload', { _token: token })
+            success: function (response) {
+                $.post('/orders/reload', {_token: token})
                     .done(res => {
                         orders = res;
                         prepare_data();
                         table.page.len(value).draw();
                     });
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 console.error('Error:', xhr.responseText);
             }
         });
@@ -202,9 +202,17 @@
                 order: [[1, "desc"]],
                 language: language,
             });
-            hideCols.forEach((col)=>{$(`#toggle-column-${col}`).click()})
+            hideCols.forEach((col) => {
+                $(`#toggle-column-${col}`).click()
+            })
         }
 
+        // // مشاهده فاکتور در برگه جدید با راست کلیک
+        // $('.invoice').mousedown(function (event) {
+        //     if(event.which == 3 ){
+        //         window.open('/invoiceView/34123', '_blank');
+        //     }
+        // });
     }
 
     function createdTime(order) {
@@ -235,8 +243,7 @@
         } else if (!order.state) {
             let btn = order.confirm ? (order.counter === 'waiting' ? 'info' : 'secondary') : 'primary';
             res = `<span class="btn btn-${btn}" onclick="change_state(${order.id}, 1)">${text}</span>`
-        }
-        else if (+order.state === 4) {
+        } else if (+order.state === 4) {
             res = `<span class="btn btn-danger" onclick="change_state(${order.id}, 0)">${text}<i class="fas fa-question"></i></span>`
         } else if (+order.state === 10) {
             res = `<span class="btn btn-success" onclick="confirm('آیا وضعیت سفارش به در انتظار پرینت تغییر کند؟')&&change_state(${order.id}, 0)">${text}<i class="fas fa-check-double"></i></span>`
@@ -283,8 +290,8 @@
         let cancelInvoice = `<a class="fa-regular fa-xmark btn btn-danger" onclick="cancelInvoice(${id})" title=" رد فاکتور"> </a> `;
         let generatePDF = `<i class="fa fa-file-pdf btn btn-${+order.state > 1 ? 'success' : 'secondary'}" onclick="generatePDF([${id}])" title="دانلود لیبل"></i> `;
         let confirmInvoice = `<a class="fa fa-check btn btn-success" onclick="selectPayment(${id})" title=" تایید فاکتور"></a> `;
-        let invoice = `<a class="fa fa-file-invoice-dollar btn btn-info text-success" onclick="invoice(${id})" title=" فاکتور"></a> `;
-        let preInvoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id})" title="پیش فاکتور"></a> `;
+        let invoice = `<a class="fa fa-file-invoice-dollar btn btn-info text-success" onclick="invoice(${id},event)" title=" فاکتور"></a> `;
+        let preInvoice = `<a class="fa fa-file-invoice-dollar btn btn-secondary" onclick="invoice(${id},event)" title="پیش فاکتور"></a> `;
         // let excel = `<a class="fa fa-file-excel btn btn-outline-info" href="/orderExcel/${id}" title="خروجی اکسل"></a> `;
 
         if (!order.state && (!order.confirm || creatorRole === 'user'))
