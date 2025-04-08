@@ -35,6 +35,14 @@
             <input type="checkbox" name="noPostpone" id="noPostpone"
                    class="checkboxradio" @checked(request('noPostpone')?:0)>
             <br>
+            <div class="d-flex align-items-center mt-4">
+                <label for="from" class="me-2">از تاریخ ارسال: </label>
+                <input type="text" class="form-control mr-3" style="width: 120px;cursor: pointer;" id="from" name="from"
+                    value="{{ $from ?? '' }}" >
+                <label for="to" class="mx-2">تا تاریخ ارسال: </label>
+                <input type="text" class="form-control" style="width: 120px; cursor: pointer;" id="to" name="to"
+                    value="{{ $to ?? '' }}">
+            </div>
             <br>
             <input type="submit" class="btn btn-success" value="فیلتر">
 
@@ -166,6 +174,18 @@
             })
         }
         @endif
+
+        $(function () {
+            new mds.MdsPersianDateTimePicker($('#from')[0], {
+                targetTextSelector: '#from',
+                selectedDate: '{{ $from ?? '' }}',
+            });
+
+            new mds.MdsPersianDateTimePicker($('#to')[0], {
+                targetTextSelector: '#to',
+                selectedDate: '{{ $to ?? '' }}',
+            });
+        });
 
     </script>
 @endsection
