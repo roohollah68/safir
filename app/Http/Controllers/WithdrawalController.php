@@ -130,8 +130,8 @@ class WithdrawalController extends Controller
         if (isset($req->dateFilter)) {
             $today = verta();
             $isEvenDay = $today->dayOfWeek % 2 === 0;
-            $dates = $isEvenDay 
-            ? [$today->format('Y-m-d'), $today->subDay()->format('Y-m-d')] 
+            $dates = $isEvenDay
+            ? [$today->format('Y-m-d'), $today->subDay()->format('Y-m-d')]
             : [$today->format('Y-m-d')];
 
             $excludedRanges = collect($dates)->map(fn($d) => [
@@ -164,7 +164,7 @@ class WithdrawalController extends Controller
     public function manager($id, Request $req)
     {
         $user = auth()->user();
-        if ($user->id != 122 && $user->id != 107 && $user->id != 110)
+        if ($user->id != 122 && $user->id != 107 && $user->id != 110 && $user->id != 130)
             abort(403,'شما مجاز نیستید!' );
         $withdrawal = Withdrawal::findOrFail($id)->update($req->all());
         $this->bale($id);

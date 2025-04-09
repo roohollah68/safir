@@ -145,7 +145,7 @@
             });
         });
 
-        @if($User->id == 122 || $User->id == 107 || $User->id == 110)
+        @if($User->id == 122 || $User->id == 107 || $User->id == 110 || $User->id == 130)
         function manager_form(id) {
             withdrawal = withdrawals[id]
             if (withdrawal.counter_confirm == 1)
