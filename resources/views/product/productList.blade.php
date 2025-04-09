@@ -158,6 +158,9 @@
         let Delete = (id) => {
             return `<i class="fa fa-trash-alt btn btn-danger" onclick="delete_product(${id},this)" title="حذف محصول"></i>`
         }
+        let Delete_good = (id) =>{
+            return `<span class="btn btn-danger fa fa-trash" onclick="deleteGood(${id})"></span>`
+        }
         let add = (id) => {
             return `<a class="fa fa-plus btn btn-success" onclick="addToProducts(${id})" title="اضافه کردن"></a>`
         }
@@ -251,7 +254,7 @@
                         '',
                         '',
                         undefined,
-                        add(id,),
+                        add(id) + Delete_good(id),
                     ])
                 });
 
@@ -398,6 +401,17 @@
                     });
                 });
             })
+        }
+
+        function deleteGood(id) {
+            if (confirm(' آیا ' + goods[id].name + ' حذف شود؟ '))
+                $.post('/good/delete/' + id, {
+                    _token: token,
+                }).done(res => {
+                    delete goods[id];
+                    $.notify('با موفقیت حذف شد.', 'success');
+                    dataTable();
+                });
         }
 
     </script>
