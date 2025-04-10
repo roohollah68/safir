@@ -7,7 +7,8 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let showDeleted, printWait, confirmWait, counterWait, proccessWait, editAfterProccess, notsent, sent, delivered, COD, refund,
+    let showDeleted, printWait, confirmWait, counterWait, proccessWait, editAfterProccess, notsent, sent, delivered,
+        COD, refund,
         user = 'all',
         warehouseId = 'all';
     let changeOrdersPermit = !!'{{$User->meta('showAllOrders')}}';
@@ -25,9 +26,13 @@
             targetTextSelector: '#toDate',
         });
         reloadId = setInterval(reload, 30000)
+        warnNURecords({{$User->meta('NuRecords')}});
     });
 
     function reload() {
+        let NURecords = $('#NuRecords').val() || {{$User->meta('NuRecords')}};
+        if (NURecords > 3000)
+            return;
         $.ajax('/orders/reload', {
             method: "POST",
             global: false,
@@ -134,7 +139,16 @@
         return (order.state === 1 || order.state === 2) && processingTime > 172800000;
     }
 
+    function warnNURecords (value){
+        if (value > 3000) {
+            $('#NuRecords').addClass('bg-warning').attr('title', 'بهتر است برای افزایش سرعت تعداد نمایش سفارشات کمتر از 3000 وارد شود.');
+            $.notify('بهتر است برای افزایش سرعت تعداد نمایش سفارشات کمتر از 3000 وارد شود.', 'info')
+        } else
+            $('#NuRecords').removeClass('bg-warning').attr('title', '');
+    }
+
     function updateNuRecords(value, id) {
+        warnNURecords(value);
         $.ajax({
             url: '/update-nu-records',
             method: 'POST',

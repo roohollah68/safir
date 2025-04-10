@@ -66,10 +66,10 @@
     <div class="col-md-4">
         <div class="form-group input-group">
             <div class="input-group-append">
-                <label for="NuRecords" class="input-group-text">تعداد سفارشات قابل نمایش:</label>
+                <label for="NuRecords" class="input-group-text">تعداد نمایش سفارشات:</label>
             </div>
-            <input type="number" min="1" step="5" value="{{ isset($nuRecords) ? $nuRecords : '' }}"
-                   onchange="updateNuRecords(this.value, {{ auth()->user()->id }})" id="NuRecords" class="form-control">
+            <input type="number" min="1" max="10000" value="{{$nuRecords ?? '' }}"
+                   onchange="updateNuRecords(this.value, {{ auth()->user()->id }}) " id="NuRecords" class="form-control">
         </div>
     </div>
     <br>

@@ -68,7 +68,7 @@
             <hr>
             @if($edit)
                 <x-col-md-6 :name="'NuRecords'" value="{{$user->meta('NuRecords')}}" :type="'number'"
-                            min="1"  step="1">تعداد سفارشات قابل نمایش:
+                            min="1"  step="1">تعداد نمایش سفارشات:
                 </x-col-md-6>
 
                 <div class="col-md-6 mb-2">
