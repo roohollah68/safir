@@ -38,7 +38,7 @@
         <x-checkbox :id="'counterWait'" :class="'bg-info'">در انتظار تایید حسابدار</x-checkbox>
         <x-checkbox :id="'printWait'" :class="'bg-secondary'"> در انتظار پرینت</x-checkbox>
         <x-checkbox :id="'proccessWait'" :class="'bg-warning'"> در حال پردازش</x-checkbox>
-        <x-checkbox :id="'editAfterProccess'" :class="'bg-danger'"> ویرایش بعد پردازش</x-checkbox>
+        <x-checkbox :id="'editAfterPrint'" :class="'bg-danger'"> ویرایش بعد پرینت</x-checkbox>
         <x-checkbox :id="'notsent'" :class="'bg-notsent'">ارسال نشده</x-checkbox>
         <x-checkbox :id="'sent'" :class="'bg-success'">ارسال شده</x-checkbox>
         <x-checkbox :id="'delivered'" :class="'bg-delivered'">تحویل داده شده</x-checkbox>
