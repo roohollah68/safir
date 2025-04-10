@@ -11,14 +11,14 @@ class FormulationController extends Controller
 {
     public function list()
     {
-        Helper::access('warehouse');
+        Helper::access('formulation');
         $formulations = Formulation::with(['good' , 'rawGood.unit'])->get()->groupBy('good_id');
         echo view('formulation/formulationList', compact('formulations'));
     }
 
     public function add()
     {
-        Helper::access('warehouse');
+        Helper::access('formulation');
         $goods = Good::all();
         $finals = $goods->keyBy('name')->filter(fn($good) => $good->category == 'final')->map(fn($good) => $good->id);
         $raws = $goods->keyBy('name')->filter(fn($good) => $good->category != 'final')->map(fn($good) => $good->id);
@@ -28,7 +28,7 @@ class FormulationController extends Controller
 
     public function edit($id)
     {
-        Helper::access('warehouse');
+        Helper::access('formulation');
         $good = Good::with('formulations')->findOrFail($id);
         $goods = Good::all();
         $finals = $goods->keyBy('name')->filter(fn($good) => $good->category == 'final')->map(fn($good) => $good->id);
@@ -39,7 +39,7 @@ class FormulationController extends Controller
 
     public function addEditRow(Request $req, $id = null)
     {
-        Helper::access('editWarehouse');
+        Helper::access('formulation');
         if ($id) {
             $formulation = Formulation::findOrFail($id);
             $formulation->update(['amount'=>$req->amount]);
@@ -52,14 +52,14 @@ class FormulationController extends Controller
 
     public function deleteAll($id)
     {
-        Helper::access('editWarehouse');
+        Helper::access('formulation');
         $formulations = Formulation::where('good_id' , $id)->delete();
         return redirect('/formulation/list');
     }
 
     public function deleteRow($id)
     {
-        Helper::access('editWarehouse');
+        Helper::access('formulation');
         $formulation = Formulation::findOrFail($id);
         $formulation->delete();
         return $this->getRawGoods($formulation->good_id);
@@ -67,6 +67,7 @@ class FormulationController extends Controller
 
     public function getRawGoods($id)
     {
+        Helper::access('formulation');
         $good = Good::with('formulations.rawGood')->findOrFail($id);
         return view('formulation/rawGoods', compact('good'));
     }

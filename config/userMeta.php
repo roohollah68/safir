@@ -21,6 +21,7 @@ return [
         'counter' => 'حسابداری',
         'statistic' => 'مشاهده آمار',
         'warehouse' => 'مشاهده اطلاعات انبار',
+        'formulation' => 'مشاهده و ویرایش فرمولاسیون',
         'editWarehouse' => 'ویرایش اطلاعات انبار',
         'manageSafir' => 'کنترل امور سفیران',
         'addWorkReport' => 'ثبت گزارش کار',
