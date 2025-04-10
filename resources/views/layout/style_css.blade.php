@@ -85,10 +85,20 @@
         border-color: deeppink;
     }
 
+    .bg-delivered {
+        --bs-bg-opacity: 1;
+        background-color: deeppink !important;
+    }
+
     .btn-notsent{
         color: black;
         background-color: #FF8C00;
         border-color: #FF8C00;
+    }
+
+    .bg-notsent{
+        --bs-bg-opacity: 1;
+        background-color: #FF8C00 !important;
     }
 
     .ui-datepicker {

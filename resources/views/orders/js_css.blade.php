@@ -7,7 +7,7 @@
     let users = {!!json_encode($users)!!};
     let orders = {!!json_encode($orders)!!};
     let ids;
-    let showDeleted, printWait, confirmWait, counterWait, proccessWait, notsent, sent, delivered, COD, refund,
+    let showDeleted, printWait, confirmWait, counterWait, proccessWait, editAfterProccess, notsent, sent, delivered, COD, refund,
         user = 'all',
         warehouseId = 'all';
     let changeOrdersPermit = !!'{{$User->meta('showAllOrders')}}';
@@ -76,6 +76,8 @@
         if (printWait && (!order.confirm || order.state || order.counter !== 'approved'))
             return
         if (proccessWait && (order.state > 4 || order.state < 1))
+            return
+        if (editAfterProccess && order.state != 4)
             return
         if (notsent && !NotSent(order))
             return;

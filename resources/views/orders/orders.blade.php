@@ -31,16 +31,17 @@
     </form>
 
 
-    <x-checkbox :id="'showDeleted'"> سفارشات حذف شده</x-checkbox>
+    <x-checkbox :id="'showDeleted'" :class="'bg-secondary'"> سفارشات حذف شده</x-checkbox>
 
     @if(!$safir)
-        <x-checkbox :id="'confirmWait'">در انتظار تایید کاربر</x-checkbox>
-        <x-checkbox :id="'counterWait'">در انتظار تایید حسابدار</x-checkbox>
-        <x-checkbox :id="'printWait'"> در انتظار پرینت</x-checkbox>
-        <x-checkbox :id="'proccessWait'"> در حال پردازش</x-checkbox>
-        <x-checkbox :id="'notsent'">ارسال نشده</x-checkbox>
-        <x-checkbox :id="'sent'">ارسال شده</x-checkbox>
-        <x-checkbox :id="'delivered'">تحویل داده شده</x-checkbox>
+        <x-checkbox :id="'confirmWait'" :class="'bg-primary'">در انتظار تایید کاربر</x-checkbox>
+        <x-checkbox :id="'counterWait'" :class="'bg-info'">در انتظار تایید حسابدار</x-checkbox>
+        <x-checkbox :id="'printWait'" :class="'bg-secondary'"> در انتظار پرینت</x-checkbox>
+        <x-checkbox :id="'proccessWait'" :class="'bg-warning'"> در حال پردازش</x-checkbox>
+        <x-checkbox :id="'editAfterProccess'" :class="'bg-danger'"> ویرایش بعد پردازش</x-checkbox>
+        <x-checkbox :id="'notsent'" :class="'bg-notsent'">ارسال نشده</x-checkbox>
+        <x-checkbox :id="'sent'" :class="'bg-success'">ارسال شده</x-checkbox>
+        <x-checkbox :id="'delivered'" :class="'bg-delivered'">تحویل داده شده</x-checkbox>
 
         @if($User->meta('showAllOrders'))
             <br>
