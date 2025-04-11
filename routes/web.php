@@ -21,6 +21,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TelegramController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\ChequeController;
+use App\Http\Controllers\ProductionController;
 use App\Livewire\Counter;
 use App\Models\Order;
 use App\Models\Product;
@@ -28,6 +29,7 @@ use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WoocommerceController;
+
 
 
 Route::middleware(['auth', 'verify'])->group(function () {
@@ -266,6 +268,17 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('/deleteRow/{id}', 'deleteRow');
         Route::get('/view/{id}', 'view');
         Route::post('/getRawGoods/{id}', 'getRawGoods');
+    });
+
+    //PRODUCTION
+    Route::controller(ProductionController::class)->prefix('production')->group(function () {
+        Route::get('/create', 'create')->name('addEdit');
+        Route::post('/store', 'store')->name('production.store');
+        Route::get('/list', 'index')->name('productionList');
+        Route::get('/edit/{id}', 'edit')->name('production.edit');
+        Route::post('/update/{id}', 'update')->name('production.update'); 
+        Route::post('/updateQuantity/{id}', 'updateQuantity')->name('production.updateQuantity');
+        Route::delete('/{id}', 'delete')->name('production.delete');
     });
 
 });

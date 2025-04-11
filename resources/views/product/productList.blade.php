@@ -47,6 +47,14 @@
         <span class=" fa fa-flask"></span>
         فرمول تولید
     </a>
+    <a class="btn btn-warning mb-3" href="{{ route('productionList') }}">
+        <span class="fa fa-list"></span>
+        لیست تولید
+    </a>
+    <a class="btn btn-primary mb-3" href="{{ route('addEdit') }}">
+        <span class="fa fa-edit"></span>
+        افزودن درخواست تولید
+    </a>
     <br>
     <div class="container border input-box">
         <div class="row">
