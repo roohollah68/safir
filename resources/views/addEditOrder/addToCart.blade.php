@@ -25,8 +25,11 @@
             <i class="fa fa-percent"></i></span>
         @endif
     </td>
+    <td class="hide official">
+        <span class="text-success" id="tax_${id}">${priceFormat(product.priceWithDiscount * ((official && product.good.vat)?0.1:0))}</span>
+    </td>
     <td>
-        <span class="text-success" id="price_discount_${id}">${priceFormat(product.priceWithDiscount)}</span>
+        <span class="text-success" id="price_discount_tax_${id}">${priceFormat(product.priceWithDiscount * ((official && product.good.vat)?1.1:1))}</span>
     </td>
     <td>
         <span class="btn btn-danger fa fa-trash" onclick="deleteProduct(${id})"></span>

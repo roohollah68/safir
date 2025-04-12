@@ -40,9 +40,6 @@
         <span class=" fa fa-tag"></span>
         ثبت شناسه کالا
     </a>
-    <a class="btn btn-primary mb-3" href="/keysun/good">
-        دریافت اکسل کیسان
-    </a>
     <a class="btn btn-success mb-3" href="/formulation/list">
         <span class=" fa fa-flask"></span>
         فرمول تولید

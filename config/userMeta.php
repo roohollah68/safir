@@ -15,6 +15,7 @@ return [
         'changeDiscount' => 'تغییر تخفیف هنگام ثبت سفارش',
         'changePrice' => 'تغییر قیمت هنگام ثبت سفارش',
         'sellRawProduct' => 'فروش محصولات از دسته ماده اولیه',
+        'warehouseTransfer' => 'انتقال بین انبارها',
         'allCustomers' => 'مشاهده اطلاعات همه مشتربان',
         'editAllCustomers' => 'ویرایش اطلاعات همه مشتربان',
         'blockList' => 'مسدود کردن دسترسی مشتریان',

@@ -64,17 +64,15 @@
             </div>
             <div class="w-100" style="padding: 10px 40px">
                 <span class="fs-40 p-0 d-inline-block w-25" style=" ">تلفن: </span>
-                <span class="fs-40 p-0 d-inline-block w-24" style="">ثبت / کدملی:</span>
-                <span class="fs-40 p-0 d-inline-block w-25">شناسه ملی: </span>
-                <span
-                    class="fs-40 p-0 d-inline-block w-25">استان: {{$order->customer?$order->customer->city->province->name:''}}</span>
+                <span class="fs-40 p-0 d-inline-block w-24" style="">ثبت / کدملی: {{$order->customer?$order->customer->national_id:''}}</span>
+                <span class="fs-40 p-0 d-inline-block w-25">شناسه ملی: {{$order->customer?$order->customer->national_code:''}}</span>
+                <span class="fs-40 p-0 d-inline-block w-25">استان: {{$order->customer?$order->customer->city->province->name:''}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px 20px 0">
                 <span class="fs-40 p-0 d-inline-block w-25" style=" ">موبایل: {{$order->phone}}</span>
-                <span class="p-0 w-24 fs-35">کد اقتصادی: </span>
+                <span class="fs-35 p-0 d-inline-block w-24 ">کد اقتصادی: {{$order->customer?$order->customer->economic_code:''}}</span>
                 <span class="fs-40 p-0 d-inline-block w-25">کدپستی: {{$order->zip_code}}</span>
-                <span
-                    class="fs-40 p-0 d-inline-block w-25">شهر: {{$order->customer?$order->customer->city->name:''}}</span>
+                <span class="fs-40 p-0 d-inline-block w-25">شهر: {{$order->customer?$order->customer->city->name:''}}</span>
             </div>
             <p class="p-0"
                style="font-size: 45px; text-align: center; border:3px solid; border-radius: 30px; margin: 0 750px;background: #ddd;">
@@ -86,9 +84,9 @@
                     <th style="width: 5%" class="border-left smaller">ردیف</th>
                     <th style="width: 43%" class="border-left ">شرح کالا/خدمات</th>
                     <th style="width: 5%" class="border-left">مقدار</th>
-                    <th style="width: 12%" class="border-left">قیمت (ریال)</th>
+                    <th style="width: 12%" class="border-left">قیمت کالا (ریال)</th>
                     <th style="width: 8%" class="border-left">درصد تخفیف</th>
-                    <th style="width: 9%" class="border-left smaller">قیمت بعد تخفیف</th>
+                    <th style="width: 9%" class="border-left smaller">{{$order->official? 'درصد مالیات' : 'قیمت بعد تخفیف'}}</th>
                     <th style="width: 18%" class="border-left">جمع (ریال)</th>
                 </tr>
                 @props(['total_dis'=>0,'total_no_dis'=>0,'totalProducts'=>0])
@@ -103,8 +101,8 @@
                         <td dir="ltr">{{+$orderProduct->number}}</td>
                         <td>{{number_format($orderProduct->price_no_dis)}}</td>
                         <td>{{+$orderProduct->discount}}</td>
-                        <td>{{number_format($orderProduct->price)}}</td>
-                        <td dir="ltr">{{number_format($orderProduct->price*(+$orderProduct->number))}}</td>
+                        <td>{{$order->official? $orderProduct->product->good->vat * 10 : number_format($orderProduct->price)}}</td>
+                        <td dir="ltr">{{number_format($orderProduct->price_dis_tax * (+$orderProduct->number))}}</td>
                     </tr>
                 @endforeach
                 @if($order->user->safir())
@@ -130,14 +128,14 @@
                 <tr class="{{$lastPage}}">
                     <td colspan="4" style="border: none;"></td>
                     <td colspan="2" style="font-size: 35px;">مبلغ کل بدون تخفیف</td>
-                    <td dir="ltr">{{number_format($total_no_dis)}}</td>
+                    <td dir="ltr">{{number_format($total_dis_tax - $total_dis + $total_no_dis)}}</td>
                 </tr>
                 <tr class="{{$lastPage}}">
                     <th colspan="4"> شما از این خرید {{number_format(abs($total_no_dis-$total_dis))}} ریال تخفیف
                         گرفتید
                     </th>
                     <th colspan="2">مبلغ قابل پرداخت</th>
-                    <th dir="ltr">{{number_format($total_dis)}}</th>
+                    <th dir="ltr">{{number_format($total_dis_tax)}}</th>
                 </tr>
             </table>
             <div class="d-flex {{$lastPage}}" id="acount" style="padding: 20px 30px">

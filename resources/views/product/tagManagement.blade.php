@@ -11,6 +11,10 @@
 
     <label for="inta-code">نمایش اینتا کد</label>
     <input type="checkbox" id="inta-code" class="checkboxradio" onclick="$('.intacode').toggle(this.checked);$('.replace').toggle(!this.checked);">
+
+    <a class="btn btn-primary mb-1" href="/keysun/good">
+        دریافت اکسل کیسان
+    </a>
     <a class="btn btn-danger m-1" href="{{route('productList')}}">بازگشت</a>
 
 
@@ -99,10 +103,8 @@
 
             $(".replace_name").autocomplete({
                 source: Object.keys(keysungoods),
-                select: function (event, ui) {
-                    good_id = keysungoods[ui.item.value].good_id;
-                    $(this).next().val(good_id);
-                }
+            }).change((e)=>{
+                $(e.target).next().val(keysungoods[e.target.value].id ||  '');
             });
         })
 

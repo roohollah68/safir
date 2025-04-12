@@ -13,6 +13,6 @@ class Keysungood extends Model
 
     public function good()
     {
-        return $this->belongsTo(Good::class,'good_id' , 'id');
+        return $this->belongsTo(Good::class,'id' , 'id');
     }
 }

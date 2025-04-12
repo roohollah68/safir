@@ -9,6 +9,7 @@ use App\Models\CustomerTransaction;
 use App\Models\Good;
 use App\Models\Keysungood;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Warehouse;
 use App\Models\Withdrawal;
@@ -70,7 +71,6 @@ class SettingController extends Controller
 //        Withdrawal::where('counter_confirm',2)->update([
 //            'manager_confirm'=>2,
 //        ]);
-
 
 
         foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {

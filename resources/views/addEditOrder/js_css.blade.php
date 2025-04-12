@@ -10,6 +10,7 @@
     let changePricePermit = !!'{{$user->meta('changePrice')}}';
     let table;
     let submitStatus = false;
+    let official = !!'{{$order->official}}';
 
     $(function () {
         setTimeout(function () {
@@ -51,23 +52,23 @@
         });
 
         function fetchOrderData(customerId) {
-        let warehouseId = $('input[name="warehouse_id"]').val();
-        $.ajax({
-            url: '{{ route('history') }}',
-            method: 'GET',
-            data: {
-                customer_id: customerId,
-                warehouse_id: warehouseId,
-                _token: '{{ csrf_token() }}'
-            },
-            success: function(response) {
-            $('#history').html(response);
-            },
-            error: function(xhr) {
-            console.error('خطا در دریافت اطلاعات:', xhr.responseText);
-            }
-        });
-    }
+            let warehouseId = $('input[name="warehouse_id"]').val();
+            $.ajax({
+                url: '{{ route('history') }}',
+                method: 'GET',
+                data: {
+                    customer_id: customerId,
+                    warehouse_id: warehouseId,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function (response) {
+                    $('#history').html(response);
+                },
+                error: function (xhr) {
+                    console.error('خطا در دریافت اطلاعات:', xhr.responseText);
+                }
+            });
+        }
     });
 
     @endif
@@ -86,6 +87,7 @@
             product.price = product.good.price;
         $('#product-form').append(`@include('addEditOrder.addToCart')`);
         priceInput();
+        chaneOfficial();
     }
 
     function deleteProduct(id) {
@@ -109,15 +111,20 @@
     }
 
     function refreshProducts() {
-        let total = 0, Total = 0, totalNum = 0;
+        let total = 0, Total = 0, total_tax = 0, totalNum = 0;
         let hasProduct = false;
         $.each(cart, (id, number) => {
             if (number) {
-                $(`input[name='cart[${id}][name]']`).val(number);
+                $(`input[name='cart[${id}][number]']`).val(number);
                 let price = +$(`input[name='cart[${id}][price]']`).val().replaceAll(',', '');
-                let price_discount = +$('#price_discount_' + id).html().replaceAll(',', '');
+                let discount = +$(`input[name='cart[${id}][discount]']`).val()
+                let price_discount = price * (1 - discount / 100);
+                let price_discount_tax = price_discount * ((official && products[id].good.vat) ? 1.1 : 1)
+                $('#price_discount_tax_' + id).html(priceFormat(price_discount_tax ));
+                $('#tax_' + id).html(priceFormat(price_discount_tax - price_discount));
                 total += price_discount * number; //جمع قیمت با تخفیف;
                 Total += price * number;  //قیمت بدون تخفیف;
+                total_tax += price_discount_tax * number;
                 totalNum += number;
                 hasProduct = true;
             }
@@ -132,8 +139,8 @@
             else if (deliveryMethod === 'peykeShahri')
                 deliveryCost = {{$settings->peykeShahri}};
         $('#deliveryCost').html(num(deliveryCost));
-        $('#cartSum').html(num(total));
-        $('#total').html(num(total + deliveryCost));
+        $('#cartSum').html(num(total_tax));
+        $('#total').html(num(total_tax + deliveryCost));
         $('#total-num').html(totalNum);
         $('#total-discount').html(num(Total - total));
 
@@ -142,7 +149,7 @@
             $('#onDeliveryMode').show();
             let customerTotal = Math.round(Total * (100 - customerDiscount) / 100 + deliveryCost)
             $('#customerTotal').html(num(customerTotal));
-            let safirShare = customerTotal - total - deliveryCost;
+            let safirShare = customerTotal - total_tax - deliveryCost;
             $('#safirShare').html(num(safirShare));
         } else
             $('#onDeliveryMode').hide();
@@ -212,9 +219,9 @@
         discount = Math.max(0, +discount);
         discount = Math.round(discount * 4) / 4;
         $('#discount_' + id).val(discount);
-        let price = $(`#price_${id}`).val().replaceAll(',', '');
-        let price_discount = Math.round(price * (100 - discount) / 100);
-        $(`#price_discount_${id}`).html(priceFormat(price_discount));
+        // let price = $(`#price_${id}`).val().replaceAll(',', '');
+        // let price_discount = Math.round(price * (100 - discount) / 100);
+        // $(`#price_discount_${id}`).html(priceFormat(price_discount));
         refreshProducts();
     }
 
@@ -237,7 +244,7 @@
             alert('تعداد همگی باید مثبت یا منفی باشند');
             return false;
         }
-        $('input[type=submit]').attr('disabled','disabled');
+        $('input[type=submit]').attr('disabled', 'disabled');
         return true;
     }
 
@@ -251,10 +258,15 @@
         refreshProducts();
     }
 
+    function chaneOfficial(value = official) {
+        official = value;
+        $('.official').toggle(official);
+    }
+
 </script>
 
 <style>
-    .official{
+    .official {
         display: none;
     }
 </style>

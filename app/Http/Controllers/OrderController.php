@@ -71,10 +71,10 @@ class OrderController extends Controller
                 $query->whereIn('category', ['final', 'other', 'raw']);
             else
                 $query->whereIn('category', ['final', 'other']);
-        })->with('good.couponLinks.coupon')->get()->keyBy('id');
+        })->with('good')->get()->keyBy('id');
         $products = $this->calculateDiscount($products, $user);
         $order->customer = new Customer();
-        return view('addEditOrder.addEditOrder', [
+        echo view('addEditOrder.addEditOrder', [
             'products' => $products,
             'settings' => Helper::settings(),
             'user' => $user,
@@ -85,6 +85,49 @@ class OrderController extends Controller
             'warehouses' => Warehouse::all(),
             'warehouseId' => $warehouseId,
             'edit' => false,
+        ]);
+    }
+
+    public function editOrder($id)
+    {
+        $order = Helper::Order(true)->with(['customer', 'user'])->findOrFail($id);
+        $user = $order->user;
+        if (($order->state && $user->safir()) || ($order->confirm && $user->admin()))
+            return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
+        if ($order->total < 0)
+            return view('error')->with(['message' => 'فاکتور بازگشت به انبار قابل ویرایش نیست، لطفا حذف کنید و مجدد ثبت کنید.']);
+        $products = Product::where('warehouse_id', $order->warehouse_id)->where('available', true)->
+        whereHas('good', function (Builder $query) {
+            if (auth()->user()->meta('sellRawProduct'))
+                $query->whereIn('category', ['final', 'other', 'raw']);
+            else
+                $query->whereIn('category', ['final', 'other']);
+        })->with('good')->get()->keyBy('id');
+        $cart = [];
+
+        $products = $this->calculateDiscount($products, $user);
+
+        $selectedProducts = $order->orderProducts->keyBy('product_id');
+        foreach ($selectedProducts as $id => $orderProduct) {
+            if (isset($products[$id])) {
+                $cart[$id] = (int)$orderProduct->number;
+                $products[$id]->discount = +$orderProduct->discount;
+                $products[$id]->priceWithDiscount = +$orderProduct->price;
+            } else
+                echo $orderProduct->name . ' از محصولات حذف شده است';
+        }
+
+        $cities = City::with('province')->get()->keyBy('id');
+        echo view('addEditOrder.addEditOrder')->with([
+            'cart' => $cart,
+            'creatorIsAdmin' => !$user->safir(),
+            'customers' => $user->customers()->get()->keyBy('id'),
+            'edit' => true,
+            'order' => $order,
+            'products' => $products,
+            'settings' => Helper::settings(),
+            'user' => $user,
+            'warehouseId' => $order->warehouse_id
         ]);
     }
 
@@ -151,16 +194,17 @@ class OrderController extends Controller
                 if ($user->meta('changeDiscount'))
                     $discount = +$item['discount'];
                 $price = round((100 - $discount) * $product->good->price / 100);
-                if($order->official)
-                    if($product->good->vat)
-                        $price *= 1.1;
                 $editPrice = false;
                 if ($user->meta('changePrice')) {
                     $price = +str_replace(",", "", $item['price']);
                     $editPrice = $price != $product->good->price;
                     $price = round((100 - $discount) * $price / 100);
                 }
-                $order->total += $price * (+$item['number']);
+                $price_tax = $price;
+                if($order->official)
+                    if($product->good->vat)
+                         $price_tax *= 1.1;
+                $order->total += $price_tax * (+$item['number']);
                 $Total += $product->good->price * (+$item['number']);
                 $order->orderProducts()->create([
                     'name' => $product->good->name,
@@ -214,49 +258,6 @@ class OrderController extends Controller
             (new CommentController)->create($order, $user, 'سفارش ایجاد شد');
         DB::commit();
         return redirect()->route('listOrders');
-    }
-
-    public function editOrder($id)
-    {
-        $order = Helper::Order(true)->with(['customer', 'user'])->findOrFail($id);
-        $user = $order->user;
-        if (($order->state && $user->safir()) || ($order->confirm && $user->admin()))
-            return view('error')->with(['message' => 'سفارش قابل ویرایش نیست چون پردازش شده است.']);
-        if ($order->total < 0)
-            return view('error')->with(['message' => 'فاکتور بازگشت به انبار قابل ویرایش نیست، لطفا حذف کنید و مجدد ثبت کنید.']);
-        $products = Product::where('warehouse_id', $order->warehouse_id)->where('available', true)->
-        whereHas('good', function (Builder $query) {
-            if (auth()->user()->meta('sellRawProduct'))
-                $query->whereIn('category', ['final', 'other', 'raw']);
-            else
-                $query->whereIn('category', ['final', 'other']);
-        })->get()->keyBy('id');
-        $cart = [];
-
-        $products = $this->calculateDiscount($products, $user);
-
-        $selectedProducts = $order->orderProducts->keyBy('product_id');
-        foreach ($selectedProducts as $id => $orderProduct) {
-            if (isset($products[$id])) {
-                $cart[$id] = (int)$orderProduct->number;
-                $products[$id]->discount = +$orderProduct->discount;
-                $products[$id]->priceWithDiscount = +$orderProduct->price;
-            } else
-                echo $orderProduct->name . ' از محصولات حذف شده است';
-        }
-
-        $cities = City::with('province')->get()->keyBy('id');
-        return view('addEditOrder.addEditOrder')->with([
-            'cart' => $cart,
-            'creatorIsAdmin' => !$user->safir(),
-            'customers' => $user->customers()->get()->keyBy('id'),
-            'edit' => true,
-            'order' => $order,
-            'products' => $products,
-            'settings' => Helper::settings(),
-            'user' => $user,
-            'warehouseId' => $order->warehouse_id
-        ]);
     }
 
     public function changeState($id, $state)
@@ -397,19 +398,24 @@ class OrderController extends Controller
         $total_no_dis = 0;
         $total_dis = 0;
         $totalProducts = 0;
+        $total_dis_tax = 0;
         foreach ($order->orderProducts as $id => $orderProduct) {
             if ($orderProduct->discount != 100)
                 $orderProduct->price_no_dis = round((100 / (100 - $orderProduct->discount)) * $orderProduct->price);
             else
-                $orderProduct->price_no_dis = $orderProduct->product()->withTrashed()->first()->good->price;
+                $orderProduct->price_no_dis = $orderProduct->product->good->price;
+            $orderProduct->price_dis_tax = $orderProduct->price;
+            if($order->official)
+                if($orderProduct->product->good->vat)
+                    $orderProduct->price_dis_tax = $orderProduct->price * 1.1;
             $orderProduct->sub_total_no_dis = $orderProduct->price_no_dis * $orderProduct->number;
-            $total_no_dis = $total_no_dis + $orderProduct->sub_total_no_dis;
-            $total_dis = $total_dis + ($orderProduct->price * $orderProduct->number);
+            $total_no_dis += $orderProduct->sub_total_no_dis;
+            $total_dis += ($orderProduct->price * $orderProduct->number);
+            $total_dis_tax += ($orderProduct->price_dis_tax * $orderProduct->number);
             $totalProducts += $orderProduct->number;
         }
-        if(!$order->user->safir() && $order->total != $total_dis)
+        if(!$order->user->safir() && $order->total != $total_dis_tax)
             return abort(500, 'مجموع اقلام با مبلغ فاکتور همخوانی ندارد.');
-//        dd([$order->total , $total_dis]);
         $deliveryCost = $order->total - $total_dis;
         $total_dis += $deliveryCost;
         $total_no_dis += $deliveryCost;
@@ -439,6 +445,7 @@ class OrderController extends Controller
                 'end' => $start + $pageContent,
                 'total_no_dis' => $total_no_dis,
                 'total_dis' => $total_dis,
+                'total_dis_tax' => $total_dis_tax,
                 'totalProducts' => $totalProducts,
                 'setting' => $this->settings(),
                 'deliveryCost' => $deliveryCost,
@@ -455,17 +462,23 @@ class OrderController extends Controller
         $total_no_dis = 0;
         $total_dis = 0;
         $totalProducts = 0;
+        $total_dis_tax = 0;
         foreach ($order->orderProducts as $id => $orderProduct) {
             if ($orderProduct->discount != 100)
                 $orderProduct->price_no_dis = round((100 / (100 - $orderProduct->discount)) * $orderProduct->price);
             else
-                $orderProduct->price_no_dis = $orderProduct->product()->withTrashed()->first()->good->price;
+                $orderProduct->price_no_dis = $orderProduct->product->good->price;
+            $orderProduct->price_dis_tax = $orderProduct->price;
+            if($order->official)
+                if($orderProduct->product->good->vat)
+                    $orderProduct->price_dis_tax = $orderProduct->price * 1.1;
             $orderProduct->sub_total_no_dis = $orderProduct->price_no_dis * $orderProduct->number;
-            $total_no_dis = $total_no_dis + $orderProduct->sub_total_no_dis;
-            $total_dis = $total_dis + ($orderProduct->price * $orderProduct->number);
+            $total_no_dis += $orderProduct->sub_total_no_dis;
+            $total_dis += ($orderProduct->price * $orderProduct->number);
+            $total_dis_tax += ($orderProduct->price_dis_tax * $orderProduct->number);
             $totalProducts += $orderProduct->number;
         }
-        if(!$order->user->safir() && $order->total != $total_dis)
+        if(!$order->user->safir() && $order->total != $total_dis_tax)
             return abort(500, 'مجموع اقلام با مبلغ فاکتور همخوانی ندارد.');
         $deliveryCost = $order->total - $total_dis;
         $total_dis += $deliveryCost;
@@ -483,6 +496,7 @@ class OrderController extends Controller
             'end' => $number,
             'total_no_dis' => $total_no_dis,
             'total_dis' => $total_dis,
+            'total_dis_tax' => $total_dis_tax,
             'totalProducts' => $totalProducts,
             'setting' => $this->settings(),
             'deliveryCost' => $deliveryCost,

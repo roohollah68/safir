@@ -142,7 +142,7 @@ class ProductController extends Controller
 
     public function transfer()
     {
-        Helper::access('editWarehouse');
+        Helper::access('warehouseTransfer');
         $products = Product::with('good')->get()->keyby('id');
         return view('product.transfer', [
             'warehouses' => Warehouse::all()->keyBy('id'),
@@ -152,7 +152,7 @@ class ProductController extends Controller
 
     public function transferSave(Request $req)
     {
-        Helper::access('editWarehouse');
+        Helper::access('warehouseTransfer');
         DB::beginTransaction();
         $products1 = Product::where('warehouse_id', $req->warehouseId1)->get()->keyBy('id');
         $warehouses = Warehouse::all()->keyBy('id');
@@ -315,8 +315,8 @@ class ProductController extends Controller
     {
         Helper::access('warehouse');
         $goods = Good::whereIn('category', ['final', 'other'])->get()->keyBy('id');
-        $keysungoods = Keysungood::all()->keyBy('good_id');
-        return view('product.tagManagement', [
+        $keysungoods = Keysungood::all()->keyBy('id');
+        echo view('product.tagManagement', [
             'goods' => $goods,
             'keysungoods' => $keysungoods,
         ]);
