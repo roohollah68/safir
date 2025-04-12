@@ -34,7 +34,7 @@
     <a class="btn btn-{{$payMethod=='cheque'?'':'outline-'}}warning" href="?{{$get}}payMethod=cheque">چکی</a>
     <i class="mx-1"></i>
     <a class="btn btn-{{$postpone=='postpone'?'':'outline-'}}secondary" href="?{{$get}}postpone=postpone">تعویقی</a>
-    <a class="btn btn-{{$dateFilter=='dateFilter'?'':'outline-'}}secondary" href="?{{$get}}dateFilter=dateFilter">اخیر</a>
+    {{-- <a class="btn btn-{{$dateFilter=='dateFilter'?'':'outline-'}}secondary" href="?{{$get}}dateFilter=dateFilter">اخیر</a> --}}
     <hr>
     <a class="btn btn-{{$official=='1'?'':'outline-'}}info" href="?{{$get}}official=1">رسمی</a>
     <a class="btn btn-{{$official=='0'?'':'outline-'}}info" href="?{{$get}}official=0">غیر رسمی</a>
