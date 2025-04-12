@@ -254,11 +254,11 @@
         }
 
         function refreshTable() {
-            const table = $('#orders-table').DataTable();            
-            $.get(window.location.href + '?refresh=', function(data) {
-                $('#orders-table tbody').html(
-                    $(data).find('#orders-table tbody').html()
-                );
+            const table = $('#orders-table').DataTable();
+            table.destroy();
+            $.get(`${window.location.href}?refresh=`, data => {
+            $('#orders-table tbody').html($(data).find('#orders-table tbody').html());
+            $('#orders-table').DataTable({ order: [[0, 'desc']], language, paging: false });
             });
         }
         

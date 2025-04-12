@@ -63,24 +63,22 @@
 
     @endif
     <br><br>
+    <div class="row mb-3">
     <div class="col-md-4">
         <div class="form-group input-group">
             <div class="input-group-append">
                 <label for="NuRecords" class="input-group-text">تعداد نمایش سفارشات:</label>
             </div>
             <input type="number" min="1" max="10000" value="{{$nuRecords ?? '' }}"
-                   onchange="updateNuRecords(this.value, {{ auth()->user()->id }}) " id="NuRecords" class="form-control">
+                   onchange="updateNuRecords(this.value, {{ auth()->user()->id }})" id="NuRecords" class="form-control">
         </div>
     </div>
-    <br>
+    
     @if($User->meta('showAllOrders'))
-        <div class="mb-3">
-            <div class="form-group col-md-4 d-flex">
-
+        <div class="col-md-4">
+            <div class="form-group d-flex">
                 <label for="user" class="input-group-text">سفیر:</label>
-
-                <select class="form-control" id="user"
-                        onchange="user = this.value;prepare_data()">
+                <select class="form-control" id="user" onchange="user = this.value;prepare_data()">
                     <option value="all" selected>همه</option>
                     @foreach($users as $id=>$user)
                         <option value="{{$id}}">{{$user->name}}</option>
@@ -88,6 +86,7 @@
                 </select>
             </div>
         </div>
+    </div>
 
         <div class="mb-3">
             <span>نمایش ستون‌ها:</span>
