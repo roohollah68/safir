@@ -4,24 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Production extends Model
+class ProductionRequest extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'request_id',
         'user_id',
         'good_id',
-        'amount'
+        'amount',
     ];
-
-    public function request()
-    {
-        return $this->belongsTo(ProductionRequest::class, 'request_id');
-    }
 
     public function user()
     {
@@ -32,4 +28,15 @@ class Production extends Model
     {
         return $this->belongsTo(Good::class);
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function productions()
+    {
+        return $this->hasMany(Production::class , 'request_id');
+    }
+    
 }

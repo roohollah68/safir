@@ -1,111 +1,93 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\Good;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use App\Models\ProductionRequest;
 use App\Models\Production;
+use App\Models\Formulation;
+use App\Models\Product;
+use App\Models\ProductChange;
+use App\Models\Good;
 
 class ProductionController extends Controller
 {
-    public function create()
+    public function addProductionForm()
     {
-        $goods = Good::all();
-        return view('production.addEdit', [
-            'goods' => $goods,
-            'edit' => false
-        ]);
+        $requests = ProductionRequest::with(['good', 'productions'])->where('isCompleted', false)->get();
+        $productionHistory = Production::with(['good'])->orderBy('created_at')->get();
+        
+        return view('production.addProduction', compact('requests', 'productionHistory'));
     }
 
-    public function store(Request $request)
+    public function addProduction(Request $request)
     {
         $validated = $request->validate([
-            'good_id' => 'required|exists:goods,id',
-            'requested_quantity' => 'required|numeric|min:1'
+            'request_id' => 'required|exists:production_requests,id',
+            'amount' => 'required|numeric|min:1',
         ]);
 
-        Production::create([
-            ...$validated,
-            'user_id' => auth()->id(),
-            'status' => 'pending'
-        ]);
+        DB::transaction(function () use ($validated) {
+            $productionRequest = ProductionRequest::findOrFail($validated['request_id']);
+            $production = Production::create([
+                'request_id' => $validated['request_id'],
+                'user_id' => Auth::id(),
+                'good_id' => $productionRequest->good_id,
+                'amount' => $validated['amount']
+            ]);
+
+            $formulations = Formulation::where('good_id', $productionRequest->good_id)->get();
+
+            if($formulations->isNotEmpty()) {
+                foreach($formulations as $formulation) {
+                    $rawProduct = Product::where('good_id', $formulation->rawGood_id)
+                        ->where('warehouse_id', 3)
+                        ->firstOrFail();
+
+                    $requiredRaw = $formulation->amount * $validated['amount'];
+                    
+                    if($rawProduct->quantity < $requiredRaw) {
+                        throw new \Exception("مواد اولیه ناکافی برای: {$rawProduct->good->name}");
+                    }
+
+                    $rawProduct->decrement('quantity', $requiredRaw);
+
+                    ProductChange::create([
+                        'product_id' => $rawProduct->id,
+                        'change' => -$requiredRaw,
+                        'quantity' => $rawProduct->quantity,
+                        'desc' => null
+                    ]);
+                }
+            }
+
+            $finalProduct = Product::firstOrCreate(
+                ['good_id' => $productionRequest->good_id, 'warehouse_id' => 3],
+                ['quantity' => 0, 'alarm' => 0, 'high_alarm' => 0]
+            );
+
+            $finalProduct->increment('quantity', $validated['amount']);
+
+            ProductChange::create([
+                'product_id' => $finalProduct->id,
+                'change' => $validated['amount'],
+                'quantity' => $finalProduct->quantity,
+                'desc' => 'اضافه کردن موجودی به اندازه ' . $validated['amount'] . ' عدد'
+            ]);
+
+            $totalProduced = Production::where('request_id', $validated['request_id'])
+                ->sum('amount');
+                
+            if($totalProduced >= $productionRequest->amount) {
+                $productionRequest->update([
+                    'isCompleted' => true,
+                    'amount' => 0
+                ]);
+            }
+        });
 
         return redirect()->route('productionList')
-            ->with('success', 'Production request submitted successfully!');
-    }
-
-    public function index()
-    {      
-        $productions = Production::with(['good', 'user'])
-            ->orderBy('status')
-            ->orderByDesc('created_at')
-            ->paginate(10);
-
-        return view('production.productionList', compact('productions'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $production = Production::findOrFail($id);
-
-        $validated = $request->validate([
-            'requested_quantity' => 'required|numeric|min:1',
-            'good_id' => 'required|exists:goods,id'
-        ]);
-
-        $production->update($validated);
-
-        return redirect()->route('productionList')
-            ->with('success', 'Production request updated!');
-    }
-
-    public function edit($id)
-    {
-        $production = Production::findOrFail($id);
-        $goods = Good::all();
-
-        return view('production.addEdit', [
-            'production' => $production,
-            'goods' => $goods,
-            'edit' => true
-        ]);
-    }
-
-    public function updateQuantity(Request $request, $id)
-    {
-        $production = Production::findOrFail($id);
-
-        $validated = $request->validate([
-            'produced_quantity' => 'required|numeric|min:0'
-        ]);
-
-        $producedQuantity = (float) $validated['produced_quantity'];
-        $requestedQuantity = (float) $production->requested_quantity;
-
-        if ($producedQuantity >= $requestedQuantity) {
-            $production->status = 'completed';
-        } elseif ($producedQuantity > 0) {
-            $production->status = 'in_production';
-        } else {
-            $production->status = 'pending';
-        }
-
-        $production->produced_quantity = $producedQuantity;
-        $production->save();
-
-        return response()->json([
-            'message' => 'تعداد تولید شده با موفقیت به‌روزرسانی شد.',
-            'production' => $production
-        ]);
-    }
-
-    public function delete($id)
-    {
-        $production = Production::findOrFail($id);
-        $production->delete();
-
-        return response()->json([
-            'message' => 'درخواست تولید با موفقیت حذف شد.'
-        ]);
+            ->with('success', 'تولید با موفقیت ثبت شد.');
     }
 }

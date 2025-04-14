@@ -21,6 +21,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TelegramController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\ChequeController;
+use App\Http\Controllers\ProductionRequestController;
 use App\Http\Controllers\ProductionController;
 use App\Livewire\Counter;
 use App\Models\Order;
@@ -270,15 +271,20 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/getRawGoods/{id}', 'getRawGoods');
     });
 
-    //PRODUCTION
-    Route::controller(ProductionController::class)->prefix('production')->group(function () {
+    //PRODUCTION REQUESTS
+    Route::controller(ProductionRequestController::class)->prefix('productionRequest')->group(function () {
         Route::get('/create', 'create')->name('addEdit');
         Route::post('/store', 'store')->name('production.store');
-        Route::get('/list', 'index')->name('productionList');
+        Route::get('/list', 'list')->name('productionList');
         Route::get('/edit/{id}', 'edit')->name('production.edit');
         Route::post('/update/{id}', 'update')->name('production.update'); 
-        Route::post('/updateQuantity/{id}', 'updateQuantity')->name('production.updateQuantity');
         Route::delete('/{id}', 'delete')->name('production.delete');
+    });
+
+    // PRODUCTION
+    Route::controller(ProductionController::class)->prefix('production')->group(function () {
+        Route::get('/add', 'addProductionForm')->name('production.add.form');
+        Route::post('/add', 'addProduction')->name('production.add');
     });
 
 });
