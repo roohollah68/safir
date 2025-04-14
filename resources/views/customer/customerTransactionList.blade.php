@@ -107,7 +107,7 @@
                                title="مشاهده فاکتور"></a>
                             <i class="fa fa-comment btn btn-info" onclick="view_comment({{$id}})"></i>
                             <a class="fa fa-file-invoice-dollar btn btn-secondary"
-                               onclick="invoice({{$id}})" title=" فاکتور"></a>
+                               onclick="invoice({{$id}},event)" title=" فاکتور"></a>
                             @if($order->total > 0)
                                 <span class="btn btn-primary fa fa-chain" onclick="showOrderLink({{$id}})"></span>
                             @endif
@@ -229,7 +229,7 @@
             const url = `/customer/depositLink/${id}`;
             $.get(url).done(res => {
                 const dialog = Dialog(res);
-                dialog.data('url', url); 
+                dialog.data('url', url);
             });
         }
 
@@ -250,7 +250,7 @@
         async function addPayLink(transactionId, orderId) {
             await $.post('/payLink/add/' + transactionId + '/' + orderId, {_token: token});
             refreshDialog();
-            refreshTable(); 
+            refreshTable();
         }
 
         function refreshTable() {
@@ -261,7 +261,7 @@
             $('#orders-table').DataTable({ order: [[0, 'desc']], language, paging: false });
             });
         }
-        
+
         function refreshDialog() {
             const dialog = $(".ui-dialog-content:visible");
             const url = dialog.data('url');

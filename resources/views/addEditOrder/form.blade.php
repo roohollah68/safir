@@ -59,7 +59,7 @@
                     rows="2" :tag="'textarea'">آدرس:
         </x-col-md-6>
 
-                نوع فاکتور
+        {{--                نوع فاکتور--}}
         @if(!$user->safir())
             <div class="col-md-6 my-1">
                 <div class="form-group">
