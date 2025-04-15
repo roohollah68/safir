@@ -42,7 +42,7 @@
                         <select class="form-control" name="user" id="user" onchange="customerList()">
                             <option value="" selected>همه</option>
                             @foreach($users as $id=>$user)
-                                @continue($user->deleted_at)
+                                @continue($user->deleted_at || !$user->verified)
                                 <option value="{{$id}}" @selected($request->user == $id)>{{$user->name}}</option>
                             @endforeach
                         </select>
