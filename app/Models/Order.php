@@ -179,6 +179,7 @@ class Order extends Model
         foreach ($payLinks as $payLink) {
             $Total += $payLink->amount;
         }
+        $this->unpaid = round($this->total - $Total);
         return round($this->total - $Total);
     }
 

@@ -49,7 +49,7 @@
         </form>
     @endif
     <br>
-    <span>مجموع:</span><span class="btn btn-info"> {{number_format($orders->sum('total'))}} ریال</span><br>
+    <span>مجموع:</span><span class="btn btn-info"> {{number_format($orders->sum('unpaid') )}} ریال</span><br>
     <span>تعداد:</span><span class="btn btn-primary"> {{$orders->count()}} </span><br>
     <br>
     <table class="table table-striped" id="orders-table">
@@ -62,7 +62,7 @@
             <th>نام مشتری</th>
             <th>نوع پرداخت</th>
             <th>کاربر مرتبط</th>
-            <th>مبلغ(ریال)</th>
+            <th>مبلغ مانده(ریال)</th>
             <th>درصد پرداخت شده</th>
             <th>عملیات</th>
         </tr>
@@ -84,7 +84,7 @@
                 <td><a href="/customer/transaction/{{$order->customer_id}}">{{$order->name}}</a></td>
                 <td>{{$order->payMethod()}}</td>
                 <td><a href="/customers?user={{$order->user->id}}">{{$order->user->name}}</a></td>
-                <td>{{number_format($order->total)}}</td>
+                <td>{{number_format($order->unpaid)}}</td>
                 <td>@if($order->payPercent() == 0)
                         <i class="btn btn-danger">0 %</i>
                     @elseif($order->payPercent() == 100)

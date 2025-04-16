@@ -554,6 +554,7 @@ class CustomerController extends Controller
         $orders = $orders->get()->keyBy('id');
 
         $orders = $orders->filter(fn($order) => $order->unpaid() > 0);
+//        $orders->each(function ($order)=>{$order->unpaid = })
 
         return view('customer.paymentTracking', [
             'orders' => $orders,
