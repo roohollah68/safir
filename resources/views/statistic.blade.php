@@ -88,7 +88,7 @@
                 <br>
                 <h4>مجموع فروش در این دوره : <span>{{number_format($totalSale)}}</span> ریال </h4>
                 @if($User->meta('statistic'))
-                    <h4>مجموع سود در این دوره : <span>{{number_format($totalProfit)}}</span> ریال </h4>
+{{--                    <h4>مجموع سود در این دوره : <span>{{number_format($totalProfit)}}</span> ریال </h4>--}}
                 @endif
                 <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
                 <h4>تعداد محصولات فروخته شده : <span>{{$productNumber}}</span> عدد </h4>
@@ -102,7 +102,7 @@
                         <th>قیمت میانگین(ریال)</th>
                         @if($User->meta('statistic'))
                             <th>قیمت تولید(ریال)</th>
-                            <th>سود(ریال)</th>
+{{--                            <th>سود(ریال)</th>--}}
                         @endif
                     </tr>
                     </thead>
@@ -116,7 +116,7 @@
                             <td>{{number_format(($good->number>0)?$good->total/$good->number:0)}}</td>
                             @if($User->meta('statistic'))
                                 <td>{{number_format($good->productPrice)}}</td>
-                                <td>{{number_format($good->profit)}}</td>
+{{--                                <td>{{number_format($good->profit)}}</td>--}}
                             @endif
 
                         </tr>
