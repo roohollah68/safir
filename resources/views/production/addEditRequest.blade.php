@@ -25,8 +25,8 @@
                         <div class="input-group-append" style="min-width: 160px">
                             <label for="good_id" class="input-group-text w-100">محصول:</label>
                         </div>
-                        <input type="text" id="good_name" class="form-control" value="{{ old('good_name', $production->good_name ?? null) }}" placeholder="جستجوی محصول..." required>
-                        <input type="hidden" id="good_id" name="good_id" value="{{ old('good_id', $production->good_id ?? null) }}">
+                        <input type="text" id="good_name" name="good_name" class="form-control" value="{{ old('good_name', $production->good->name ?? null) }}" placeholder="جستجوی محصول..." required>
+                        <input type="hidden" id="good_id" name="good_id" value="{{ old('good_id', $production->good->id ?? null) }}">
                     </div>
                 </div>
 
@@ -80,7 +80,7 @@
                                 <td>{{ number_format($product->quantity) }}</td>
                                 <td>{{ $product->alarm }}</td>
                                 <td>{{ $product->high_alarm }}</td>
-                                <td>{{ $product->required_quantity }}</td>
+                                <td>{{ number_format($product->required_quantity) }}</td>
                                 <td>
                                     <button onclick="fillForm({{ $product->good_id }}, {{ $product->required_quantity }})" 
                                             class="btn btn-sm btn-success">
@@ -121,7 +121,7 @@
 <script>
     $(document).ready(function() {
         $("#tabs").tabs({
-            active: 0.
+            active: 0,
         });
         
         $('#alertTable').DataTable({
@@ -154,48 +154,32 @@
         document.getElementById('amount').dispatchEvent(new Event('input'));
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', () => {
         const goods = @json($goods->map(fn($good) => ['id' => $good->id, 'name' => $good->name]));
         const goodInput = document.getElementById('good_name');
         const goodIdInput = document.getElementById('good_id');
-
         const dropdown = document.createElement('ul');
+        Object.assign(dropdown.style, {
+            position: 'absolute', zIndex: '1000', display: 'none', width: `${goodInput.offsetWidth}px`,
+            marginTop: `${goodInput.offsetHeight}px`, left: `${goodInput.offsetLeft}px`
+        });
         dropdown.className = 'dropdown-menu';
-        dropdown.style.position = 'absolute';
-        dropdown.style.zIndex = '1000';
-        dropdown.style.display = 'none';
-        dropdown.style.width = `${goodInput.offsetWidth}px`;
-        dropdown.style.marginTop = `${goodInput.offsetHeight}px`;
-        dropdown.style.left = `${goodInput.offsetLeft}px`; 
-        goodInput.parentNode.style.position = 'relative'; 
+        goodInput.parentNode.style.position = 'relative';
         goodInput.parentNode.appendChild(dropdown);
 
-        goodInput.addEventListener('input', function () {
+        goodInput.addEventListener('input', () => {
             const value = goodInput.value.trim().toLowerCase();
-            dropdown.innerHTML = '';
-            if (value) {
-                const matches = goods.filter(good => good.name.toLowerCase().includes(value));
-                matches.forEach(match => {
-                    const item = document.createElement('li');
-                    item.className = 'dropdown-item';
-                    item.textContent = match.name;
-                    item.style.cursor = 'pointer';
-                    item.addEventListener('click', function () {
-                        goodInput.value = match.name;
-                        goodIdInput.value = match.id;
-                        dropdown.style.display = 'none';
-                    });
-                    dropdown.appendChild(item);
-                });
-                dropdown.style.display = matches.length ? 'block' : 'none';
-            } else {
+            dropdown.innerHTML = goods.filter(good => good.name.toLowerCase().includes(value))
+                .map(good => `<li class="dropdown-item" style="cursor:pointer">${good.name}</li>`).join('');
+            dropdown.style.display = value && dropdown.innerHTML ? 'block' : 'none';
+            dropdown.querySelectorAll('li').forEach((item, i) => item.onclick = () => {
+                goodInput.value = goods[i].name;
+                goodIdInput.value = goods[i].id;
                 dropdown.style.display = 'none';
-            }
+            });
         });
 
-        goodInput.addEventListener('blur', function () {
-            setTimeout(() => dropdown.style.display = 'none', 200);
-        });
+        goodInput.addEventListener('blur', () => setTimeout(() => dropdown.style.display = 'none', 200));
     });
 </script>
 @endsection
