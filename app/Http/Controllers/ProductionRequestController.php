@@ -26,7 +26,10 @@ class ProductionRequestController extends Controller
             ->join('goods', 'warehouse1.good_id', '=', 'goods.id')
             ->where('goods.category', 'final')
             ->whereRaw('(warehouse1.quantity + warehouse3.quantity) < warehouse1.alarm')
-            ->selectRaw('warehouse1.*, goods.name as good_name, (warehouse1.high_alarm - warehouse1.quantity) as required_quantity')
+            ->selectRaw('warehouse1.*, 
+                goods.name as good_name, 
+                (warehouse1.high_alarm - (warehouse1.quantity + warehouse3.quantity)) as required_quantity,
+                (warehouse1.quantity + warehouse3.quantity) as quantity')
             ->get();
 
         $productionHistory = ProductionRequest::with(['good', 'user'])
@@ -99,7 +102,10 @@ class ProductionRequestController extends Controller
             ->join('goods', 'warehouse1.good_id', '=', 'goods.id')
             ->where('goods.category', 'final')
             ->whereRaw('(warehouse1.quantity + warehouse3.quantity) < warehouse1.alarm')
-            ->selectRaw('warehouse1.*, goods.name as good_name, (warehouse1.high_alarm - warehouse1.quantity) as required_quantity')
+            ->selectRaw('warehouse1.*, 
+                goods.name as good_name, 
+                (warehouse1.high_alarm - (warehouse1.quantity + warehouse3.quantity)) as required_quantity,
+                (warehouse1.quantity + warehouse3.quantity) as quantity')
             ->get();
 
         $productionHistory = ProductionRequest::with(['good', 'user'])
