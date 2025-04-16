@@ -14,22 +14,20 @@ class ProductionRequestController extends Controller
     {
         $goods = Good::where('category', 'final')->get();
         
-        $products = Product::from('products as p1')
-            ->withoutGlobalScopes() 
-            ->join('products as p3', function ($join) {
-                $join->on('p1.good_id', '=', 'p3.good_id')
-                    ->where('p1.warehouse_id', 1)
-                    ->where('p3.warehouse_id', 3);
+        $products = Product::from('products as warehouse1')
+            ->withoutGlobalScopes()
+            ->whereNull('warehouse1.deleted_at')
+            ->join('products as warehouse3', function ($join) {
+                $join->on('warehouse1.good_id', '=', 'warehouse3.good_id')
+                    ->where('warehouse1.warehouse_id', 1)
+                    ->where('warehouse3.warehouse_id', 3)
+                    ->whereNull('warehouse3.deleted_at');
             })
-            ->join('goods', 'p1.good_id', '=', 'goods.id')
+            ->join('goods', 'warehouse1.good_id', '=', 'goods.id')
             ->where('goods.category', 'final')
-            ->whereRaw('(p1.quantity + p3.quantity) < p1.alarm')
-            ->select('p1.*', 'goods.name as good_name')
-            ->get()
-            ->map(function ($product) {
-                $product->required_quantity = $product->high_alarm - $product->quantity;
-                return $product;
-            });
+            ->whereRaw('(warehouse1.quantity + warehouse3.quantity) < warehouse1.alarm')
+            ->selectRaw('warehouse1.*, goods.name as good_name, (warehouse1.high_alarm - warehouse1.quantity) as required_quantity')
+            ->get();
 
         $productionHistory = ProductionRequest::with(['good', 'user'])
             ->orderByDesc('created_at')
@@ -86,25 +84,23 @@ class ProductionRequestController extends Controller
 
     public function edit($id)
     {
-        $production = ProductionRequest::findOrFail($id);
+        $production = ProductionRequest::with('good')->findOrFail($id);
         $goods = Good::where('category', 'final')->get();
         
-        $products = Product::from('products as p1')
-            ->withoutGlobalScopes() 
-            ->join('products as p3', function ($join) {
-                $join->on('p1.good_id', '=', 'p3.good_id')
-                    ->where('p1.warehouse_id', 1)
-                    ->where('p3.warehouse_id', 3);
+        $products = Product::from('products as warehouse1')
+            ->withoutGlobalScopes()
+            ->whereNull('warehouse1.deleted_at')
+            ->join('products as warehouse3', function ($join) {
+                $join->on('warehouse1.good_id', '=', 'warehouse3.good_id')
+                    ->where('warehouse1.warehouse_id', 1)
+                    ->where('warehouse3.warehouse_id', 3)
+                    ->whereNull('warehouse3.deleted_at');
             })
-            ->join('goods', 'p1.good_id', '=', 'goods.id')
+            ->join('goods', 'warehouse1.good_id', '=', 'goods.id')
             ->where('goods.category', 'final')
-            ->whereRaw('(p1.quantity + p3.quantity) < p1.alarm')
-            ->select('p1.*', 'goods.name as good_name')
-            ->get()
-            ->map(function ($product) {
-                $product->required_quantity = $product->high_alarm - $product->quantity;
-                return $product;
-            });
+            ->whereRaw('(warehouse1.quantity + warehouse3.quantity) < warehouse1.alarm')
+            ->selectRaw('warehouse1.*, goods.name as good_name, (warehouse1.high_alarm - warehouse1.quantity) as required_quantity')
+            ->get();
 
         $productionHistory = ProductionRequest::with(['good', 'user'])
             ->orderByDesc('created_at')

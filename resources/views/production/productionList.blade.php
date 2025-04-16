@@ -47,7 +47,7 @@
         $('#productionTable').DataTable({
             paging: false,
             order: [
-                [0, "asc"]
+                [0, "desc"]
             ],
             language: language
         });
@@ -56,17 +56,17 @@
             const productionId = $(this).data('id');
             if (confirm('آیا از حذف این درخواست تولید اطمینان دارید؟')) {
                 $.ajax({
-                    url: `/production/${productionId}`,
+                    url: `/productionRequest/${productionId}`,
                     method: 'DELETE',
                     data: {
                         _token: token
                     },
                     success: function(response) {
                         alert('درخواست تولید با موفقیت حذف شد.');
-                        location.reload();
+                        $('#productionTable').DataTable().row($(`button[data-id="${productionId}"]`).parents('tr')).remove().draw();
                     },
-                    error: function() {
-                        alert('خطا در حذف درخواست تولید.');
+                    error: function(xhr) {
+                        alert('خطا در حذف درخواست تولید. ' + xhr.responseJSON.message);
                     }
                 });
             }
