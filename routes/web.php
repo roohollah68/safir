@@ -23,6 +23,7 @@ use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\ChequeController;
 use App\Http\Controllers\ProductionRequestController;
 use App\Http\Controllers\ProductionController;
+use App\Http\Controllers\ProjectController;
 use App\Livewire\Counter;
 use App\Models\Order;
 use App\Models\Product;
@@ -285,6 +286,15 @@ Route::middleware(['auth', 'verify'])->group(function () {
     Route::controller(ProductionController::class)->prefix('production')->group(function () {
         Route::get('/add', 'addProductionForm')->name('production.add.form');
         Route::post('/add', 'addProduction')->name('production.add');
+    });
+
+    // PROJECTS
+    Route::controller(ProjectController::class)->prefix('projects')->group(function () {
+        Route::get('/', 'index')->name('projects.list');
+        Route::get('/add', 'create')->name('projects.add.form');
+        Route::post('/add', 'store')->name('projects.add');
+        Route::get('/edit/{id}', 'edit')->name('projects.edit');
+        Route::post('/update/{id}', 'update')->name('projects.update');
     });
 
 });

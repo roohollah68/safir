@@ -116,6 +116,16 @@
                         </li>
                     @endif
 
+                    <li class="nav-item dropdown">
+                            <a class="nav-link px-3 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                اتوماسیون
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item py-2" href="#">فرآیند‌ها</a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('projects.list') }}">پروژه‌ها</a></li>
+                            </ul>
+                    </li>
+
                     <!-- Mobile Logout -->
                     <li class="nav-item d-lg-none mt-3">
                         <a class="nav-link px-3 text-center" href="{{ route('logout') }}">
