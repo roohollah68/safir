@@ -11,7 +11,7 @@
                 <p style="font-size: 85px;text-align: center;margin: 20px;font-weight: bold;">
                     {{$setting->invoice_title}}
                 </p>
-                <p style="font-size: 45px; text-align: center;padding: 0; border:3px solid; border-radius: 30px; margin: 0 250px;background: #ddd;">
+                <p id="title1" style="font-size: 45px; text-align: center;padding: 0; border:3px solid; border-radius: 30px; margin: 0 250px;background: #ddd;">
                     @if(!$firstPage)
                         مشخصات فروشنده
                     @else
@@ -32,49 +32,49 @@
                 </p>
             </span>
         </div>
-        <div style="border:3px solid;border-bottom:0;height: 315px;z-index: 4;position: relative;"
+        <div id="section2" style="border:3px solid;border-bottom:0;height: 315px;z-index: 4;position: relative;"
              class="{{$firstPage}}">
             <div style="margin: 40px 40px 10px 0">
                 <span class="fs-40 p-0">{{$setting->invoice_address}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px">
-                <span class="fs-40 p-0 d-inline-block w-25">تلفن: {{$setting->invoice_phone}}</span>
+                <span class="fs-40 p-0 d-inline-block w-24">تلفن: {{$setting->invoice_phone}}</span>
                 <span class="fs-40 p-0 d-inline-block w-24">ثبت / کدملی: {{$setting->invoice_code}}</span>
-                <span class="fs-40 p-0 d-inline-block w-25">شناسه ملی: {{$setting->invoice_id}}</span>
-                <span class="fs-40 p-0 d-inline-block w-25">استان: {{$setting->invoice_province}}</span>
+                <span class="fs-40 p-0 d-inline-block w-24">شناسه ملی: {{$setting->invoice_id}}</span>
+                <span class="fs-40 p-0 d-inline-block w-24">استان: {{$setting->invoice_province}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px 20px 0">
-                <span class="fs-40 p-0 d-inline-block w-25">موبایل: {{$order->warehouse->user->phone??''}}</span>
-                <span class="p-0 d-inline-block w-24 fs-35">کد اقتصادی: {{$setting->invoice_e_code}}</span>
-                <span class="fs-40 p-0 d-inline-block w-25">کدپستی: {{$setting->invoice_zip_code}}</span>
-                <span class="fs-40 p-0 d-inline-block w-25">شهر: {{$setting->invoice_city}}</span>
+                <span class="fs-40 p-0 d-inline-block w-24">موبایل: {{$order->warehouse->user->phone??''}}</span>
+                <span class="p-0 d-inline-block fs-35 w-24">کد اقتصادی: {{$setting->invoice_e_code}}</span>
+                <span class="fs-40 p-0 d-inline-block w-24">کدپستی: {{$setting->invoice_zip_code}}</span>
+                <span class="fs-40 p-0 d-inline-block w-24">شهر: {{$setting->invoice_city}}</span>
             </div>
-            <p class="p-0"
+            <p class="p-0" id="title2"
                style="font-size: 45px; text-align: center; border:3px solid; border-radius: 30px; margin: 0 750px;background: #ddd;">
                 مشخصات خریدار</p>
         </div>
 
-        <div style="border:3px solid;border-bottom:0;height: 450px;z-index: 3;position: relative;"
+        <div id="section3" style="border:3px solid;border-bottom:0;height: 450px;z-index: 3;position: relative;"
              class="{{$firstPage}}">
             <div style="margin: 30px 40px 10px 0">
                 <span class="fs-40 p-0">عنوان: {{$order->name}}</span>
             </div>
-            <div style="margin: 10px 40px 10px 0; height: 130px;">
+            <div id="address1" style="margin: 10px 40px 10px 0; height: 130px;">
                 <span class="fs-40 p-0">آدرس: {{$order->address}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px">
-                <span class="fs-40 p-0 d-inline-block w-25" style=" ">تلفن: </span>
+                <span class="fs-40 p-0 d-inline-block w-24" style=" ">تلفن: </span>
                 <span class="fs-40 p-0 d-inline-block w-24" style="">ثبت / کدملی: {{$order->customer?$order->customer->national_id:''}}</span>
-                <span class="fs-40 p-0 d-inline-block w-25">شناسه ملی: {{$order->customer?$order->customer->national_code:''}}</span>
-                <span class="fs-40 p-0 d-inline-block w-25">استان: {{$order->customer?$order->customer->city->province->name:''}}</span>
+                <span class="fs-40 p-0 d-inline-block w-24">شناسه ملی: {{$order->customer?$order->customer->national_code:''}}</span>
+                <span class="fs-40 p-0 d-inline-block w-24">استان: {{$order->customer?$order->customer->city->province->name:''}}</span>
             </div>
             <div class="w-100" style="padding: 10px 40px 20px 0">
-                <span class="fs-40 p-0 d-inline-block w-25" style=" ">موبایل: {{$order->phone}}</span>
+                <span class="fs-40 p-0 d-inline-block w-24" style=" ">موبایل: {{$order->phone}}</span>
                 <span class="fs-35 p-0 d-inline-block w-24 ">کد اقتصادی: {{$order->customer?$order->customer->economic_code:''}}</span>
-                <span class="fs-40 p-0 d-inline-block w-25">کدپستی: {{$order->zip_code}}</span>
-                <span class="fs-40 p-0 d-inline-block w-25">شهر: {{$order->customer?$order->customer->city->name:''}}</span>
+                <span class="fs-40 p-0 d-inline-block w-24">کدپستی: {{$order->zip_code}}</span>
+                <span class="fs-40 p-0 d-inline-block w-24">شهر: {{$order->customer?$order->customer->city->name:''}}</span>
             </div>
-            <p class="p-0"
+            <p class="p-0" id="title3"
                style="font-size: 45px; text-align: center; border:3px solid; border-radius: 30px; margin: 0 750px;background: #ddd;">
                 اطلاعات فاکتور</p>
         </div>
