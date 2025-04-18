@@ -15,29 +15,31 @@ class ProductionController extends Controller
 {
     public function addProductionForm()
     {
-        $requests = ProductionRequest::with(['good', 'productions'])->where('isCompleted', false)->get();
-        $productionHistory = Production::with(['good'])->orderBy('created_at')->get();
+        $requests = ProductionRequest::with(['good'])->get();
+        foreach ($requests as $request) {
+            $request->remaining_requests = $request->good->remainingRequests();
+        }
+        $productionHistory = Production::with(['good'])->get();
+        $goods = Good::where('category', 'final')->get();
         
-        return view('production.addProduction', compact('requests', 'productionHistory'));
+        return view('production.addProduction', compact('requests', 'productionHistory', 'goods'));
     }
 
     public function addProduction(Request $request)
     {
         $validated = $request->validate([
-            'request_id' => 'required|exists:production_requests,id',
             'amount' => 'required|numeric|min:1',
+            'good_id' => 'required|numeric|exists:goods,id',
         ]);
 
         DB::transaction(function () use ($validated) {
-            $productionRequest = ProductionRequest::findOrFail($validated['request_id']);
             $production = Production::create([
-                'request_id' => $validated['request_id'],
                 'user_id' => Auth::id(),
-                'good_id' => $productionRequest->good_id,
+                'good_id' => $validated['good_id'],
                 'amount' => $validated['amount']
             ]);
 
-            $formulations = Formulation::where('good_id', $productionRequest->good_id)->get();
+            $formulations = Formulation::where('good_id', $validated['good_id'])->get();
 
             if($formulations->isNotEmpty()) {
                 foreach($formulations as $formulation) {
@@ -45,28 +47,24 @@ class ProductionController extends Controller
                         ->where('warehouse_id', 3)
                         ->firstOrFail();
 
-                    $requiredRaw = $formulation->amount * $validated['amount'];
-                    
-                    if($rawProduct->quantity < $requiredRaw) {
-                        throw new \Exception("مواد اولیه ناکافی برای: {$rawProduct->good->name}");
-                    }
+                $requiredRaw = $formulation->amount * $validated['amount'];
 
-                    $rawProduct->decrement('quantity', $requiredRaw);
+                $rawProduct->decrement('quantity', $requiredRaw);
 
-                    ProductChange::create([
-                        'product_id' => $rawProduct->id,
-                        'change' => -$requiredRaw,
-                        'quantity' => $rawProduct->quantity,
-                        'desc' => null
-                    ]);
-                }
-            }
+                ProductChange::create([
+                    'product_id' => $rawProduct->id,
+                    'change' => -$requiredRaw,
+                    'quantity' => $rawProduct->quantity,
+                    'desc' => 'تولید محصول ' . $formulation->good->name,
+                ]);
+            }}
 
-            $finalProduct = Product::firstOrCreate(
-                ['good_id' => $productionRequest->good_id, 'warehouse_id' => 3],
-                ['quantity' => 0, 'alarm' => 0, 'high_alarm' => 0]
+            $finalProduct = Product::withTrashed()->firstOrCreate(
+                ['good_id' => $validated['good_id'], 'warehouse_id' => 3]
             );
-
+            if ($finalProduct->trashed()) {
+                $finalProduct->restore();
+            }
             $finalProduct->increment('quantity', $validated['amount']);
 
             ProductChange::create([
@@ -75,16 +73,6 @@ class ProductionController extends Controller
                 'quantity' => $finalProduct->quantity,
                 'desc' => 'اضافه کردن موجودی به اندازه ' . $validated['amount'] . ' عدد'
             ]);
-
-            $totalProduced = Production::where('request_id', $validated['request_id'])
-                ->sum('amount');
-                
-            if($totalProduced >= $productionRequest->amount) {
-                $productionRequest->update([
-                    'isCompleted' => true,
-                    'amount' => 0
-                ]);
-            }
         });
 
         return redirect()->route('productionList')

@@ -55,7 +55,7 @@
 
     <div id="tabs" class="mt-5">
         <ul class="nav nav-tabs">
-            <li class="text-dark custom-tab"><a class="custom-link active" href="#productionTable">لیست تولید</a></li>
+            <li class="text-dark custom-tab"><a class="custom-link active" href="#productionTable">پیشنهاد تولید</a></li>
             <li class="text-dark custom-tab"><a class="custom-link" href="#history">تاریخچه</a></li>
         </ul>
 
@@ -65,8 +65,9 @@
                 <table id="alertTable" class="table table-striped" style="width:100%; text-align: center;">
                     <thead>
                         <tr>
-                            <th>نام کالا</th>
-                            <th>موجودی</th>
+                            <th>شناسه محصول</th>
+                            <th>محصول</th>
+                            <th>جمع موجودی</th>
                             <th>حد پایین</th>
                             <th>حد بالا</th>
                             <th>تعداد مورد نیاز</th>
@@ -76,7 +77,8 @@
                     <tbody>
                         @foreach ($products as $product)
                             <tr>
-                                <td>{{ $product->good->name ?? 'نامشخص' }}</td>
+                                <td>{{ $product->good_id }}</td>
+                                <td>{{ $product->good->name }}</td>
                                 <td>{{ number_format($product->quantity) }}</td>
                                 <td>{{ $product->alarm }}</td>
                                 <td>{{ $product->high_alarm }}</td>
@@ -99,16 +101,29 @@
                     <thead>
                         <tr>
                             <th>تاریخ درخواست</th>
+                            <th>شناسه محصول</th>
                             <th>محصول</th>
+                            <th>کاربر</th>
                             <th>تعداد درخواستی</th>
+                            <th>عملیات</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($productionHistory as $request)
                             <tr>
                                 <td>{{ verta($request->created_at)->formatJalaliDate() }}</td>
+                                <td>{{ $request->good_id }}</td>
                                 <td>{{ $request->good->name }}</td>
+                                <td>{{ $request->user->name }}</td>
                                 <td>{{ number_format($request->amount)}}</td>
+                                <td>
+                                    <a href="{{ route('production.edit', $request->id) }}">
+                                        <i class="btn btn-primary fas fa-edit" title="ویرایش"></i>
+                                    </a>
+                                    <button class="btn btn-danger delete-production-btn" data-id="{{ $request->id }}" title="حذف">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -127,7 +142,7 @@
         $('#alertTable').DataTable({
             paging: false,
             order: [
-                [0, "asc"]
+                [5, "desc"]
             ],
             language: language,
             search: true
@@ -139,6 +154,26 @@
                 [0, "desc"]
             ],
             language: language
+        });
+
+        $('.delete-production-btn').on('click', function() {
+            const productionId = $(this).data('id');
+            if (confirm('آیا از حذف این درخواست تولید اطمینان دارید؟')) {
+                $.ajax({
+                    url: `/productionRequest/${productionId}`,
+                    method: 'DELETE',
+                    data: {
+                        _token: token
+                    },
+                    success: function(response) {
+                        // $('#historyTable').DataTable().row($(`button[data-id="${productionId}"]`).parents('tr')).remove().draw();
+                        location.reload();
+                    },
+                    error: function(xhr) {
+                        alert('خطا در حذف درخواست تولید. ' + xhr.responseJSON.message);
+                    }
+                });
+            }
         });
 
     });
@@ -169,13 +204,25 @@
 
         goodInput.addEventListener('input', () => {
             const value = goodInput.value.trim().toLowerCase();
-            dropdown.innerHTML = goods.filter(good => good.name.toLowerCase().includes(value))
-                .map(good => `<li class="dropdown-item" style="cursor:pointer">${good.name}</li>`).join('');
+            const filteredGoods = goods.filter(good => good.name.toLowerCase().includes(value));
+            
+            dropdown.innerHTML = filteredGoods.map(good => `
+                <li class="dropdown-item" 
+                    style="cursor:pointer" 
+                    data-id="${good.id}" 
+                    data-name="${good.name}">
+                    ${good.name}
+                </li>
+            `).join('');
+
             dropdown.style.display = value && dropdown.innerHTML ? 'block' : 'none';
-            dropdown.querySelectorAll('li').forEach((item, i) => item.onclick = () => {
-                goodInput.value = goods[i].name;
-                goodIdInput.value = goods[i].id;
-                dropdown.style.display = 'none';
+            
+            dropdown.querySelectorAll('li').forEach(item => {
+                item.onclick = () => {
+                    goodInput.value = item.dataset.name;
+                    goodIdInput.value = item.dataset.id;
+                    dropdown.style.display = 'none';
+                };
             });
         });
 

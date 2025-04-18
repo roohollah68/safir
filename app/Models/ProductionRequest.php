@@ -11,8 +11,6 @@ class ProductionRequest extends Model
     use HasFactory;
     use SoftDeletes;
 
-    const UPDATED_AT = null;
-
     protected $fillable = [
         'user_id',
         'good_id',
@@ -32,11 +30,6 @@ class ProductionRequest extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
-    }
-
-    public function productions()
-    {
-        return $this->hasMany(Production::class , 'request_id');
     }
     
 }

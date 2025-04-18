@@ -4,24 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Production extends Model
 {
     use HasFactory;
-
-    const UPDATED_AT = null;
+    use SoftDeletes;
 
     protected $fillable = [
-        'request_id',
         'user_id',
         'good_id',
         'amount'
     ];
-
-    public function request()
-    {
-        return $this->belongsTo(ProductionRequest::class, 'request_id');
-    }
 
     public function user()
     {

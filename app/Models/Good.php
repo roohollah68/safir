@@ -65,4 +65,21 @@ class Good extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+
+    public function productionRequests()
+    {
+        return $this->hasMany(ProductionRequest::class);
+    }
+
+    public function productions()
+    {
+        return $this->hasMany(Production::class);
+    }
+
+    public function remainingRequests()
+    {
+        $requestedAmount = $this->productionRequests()->sum('amount');
+        $producedAmount = $this->productions()->sum('amount');
+        return $requestedAmount - $producedAmount;
+    }
 }

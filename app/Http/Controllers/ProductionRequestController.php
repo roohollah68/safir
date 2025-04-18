@@ -13,28 +13,42 @@ class ProductionRequestController extends Controller
     public function create()
     {
         $goods = Good::where('category', 'final')->get();
-        
-        $products = Product::from('products as warehouse1')
-            ->withoutGlobalScopes()
-            ->whereNull('warehouse1.deleted_at')
+        $products = Product::withTrashed()->from('products as warehouse1')
             ->join('products as warehouse3', function ($join) {
                 $join->on('warehouse1.good_id', '=', 'warehouse3.good_id')
                     ->where('warehouse1.warehouse_id', 1)
-                    ->where('warehouse3.warehouse_id', 3)
-                    ->whereNull('warehouse3.deleted_at');
+                    ->where('warehouse3.warehouse_id', 3);
             })
             ->join('goods', 'warehouse1.good_id', '=', 'goods.id')
+            ->leftJoinSub(
+                ProductionRequest::selectRaw('
+                    good_id,
+                    SUM(amount) - COALESCE((
+                        SELECT SUM(amount) 
+                        FROM productions 
+                        WHERE productions.good_id = production_requests.good_id
+                    ), 0) as remaining_requests
+                ')
+                ->groupBy('good_id'),
+                'remaining_requests',
+                'goods.id',
+                '=',
+                'remaining_requests.good_id'
+            )
             ->where('goods.category', 'final')
-            ->whereRaw('(warehouse1.quantity + warehouse3.quantity) < warehouse1.alarm')
-            ->selectRaw('warehouse1.*, 
-                goods.name as good_name, 
-                (warehouse1.high_alarm - (warehouse1.quantity + warehouse3.quantity)) as required_quantity,
-                (warehouse1.quantity + warehouse3.quantity) as quantity')
+            ->whereRaw('
+                (warehouse1.quantity + warehouse3.quantity + COALESCE(remaining_requests.remaining_requests, 0)) 
+                < warehouse1.alarm
+            ')
+            ->selectRaw('
+                warehouse1.*,
+                goods.name as good_name,
+                (warehouse1.high_alarm - (warehouse1.quantity + warehouse3.quantity + COALESCE(remaining_requests.remaining_requests, 0))) as required_quantity,
+                (warehouse1.quantity + warehouse3.quantity + COALESCE(remaining_requests.remaining_requests, 0)) as quantity
+            ')
             ->get();
 
-        $productionHistory = ProductionRequest::with(['good', 'user'])
-            ->orderByDesc('created_at')
-            ->get();
+        $productionHistory = ProductionRequest::with(['good', 'user'])->get();
 
         return view('production.addEditRequest', [
             'goods' => $goods,
@@ -78,9 +92,13 @@ class ProductionRequestController extends Controller
 
     public function list()
     {      
-        $productions = ProductionRequest::with(['good', 'user', 'productions'])
+        $productions = ProductionRequest::with(['good', 'user'])
             ->orderByDesc('created_at')
             ->get();
+
+        foreach ($productions as $production) {
+            $production->remaining_requests = $production->good->remainingRequests();
+        }
 
         return view('production.productionList', compact('productions'));
     }
@@ -90,22 +108,39 @@ class ProductionRequestController extends Controller
         $production = ProductionRequest::with('good')->findOrFail($id);
         $goods = Good::where('category', 'final')->get();
         
-        $products = Product::from('products as warehouse1')
-            ->withoutGlobalScopes()
-            ->whereNull('warehouse1.deleted_at')
+        $products = Product::withTrashed()->from('products as warehouse1')
             ->join('products as warehouse3', function ($join) {
                 $join->on('warehouse1.good_id', '=', 'warehouse3.good_id')
                     ->where('warehouse1.warehouse_id', 1)
-                    ->where('warehouse3.warehouse_id', 3)
-                    ->whereNull('warehouse3.deleted_at');
+                    ->where('warehouse3.warehouse_id', 3);
             })
             ->join('goods', 'warehouse1.good_id', '=', 'goods.id')
+            ->leftJoinSub(
+                ProductionRequest::selectRaw('
+                    good_id,
+                    SUM(amount) - COALESCE((
+                        SELECT SUM(amount) 
+                        FROM productions 
+                        WHERE productions.good_id = production_requests.good_id
+                    ), 0) as remaining_requests
+                ')
+                ->groupBy('good_id'),
+                'remaining_requests',
+                'goods.id',
+                '=',
+                'remaining_requests.good_id'
+            )
             ->where('goods.category', 'final')
-            ->whereRaw('(warehouse1.quantity + warehouse3.quantity) < warehouse1.alarm')
-            ->selectRaw('warehouse1.*, 
-                goods.name as good_name, 
-                (warehouse1.high_alarm - (warehouse1.quantity + warehouse3.quantity)) as required_quantity,
-                (warehouse1.quantity + warehouse3.quantity) as quantity')
+            ->whereRaw('
+                (warehouse1.quantity + warehouse3.quantity + COALESCE(remaining_requests.remaining_requests, 0)) 
+                < warehouse1.alarm
+            ')
+            ->selectRaw('
+                warehouse1.*,
+                goods.name as good_name,
+                (warehouse1.high_alarm - (warehouse1.quantity + warehouse3.quantity + COALESCE(remaining_requests.remaining_requests, 0))) as required_quantity,
+                (warehouse1.quantity + warehouse3.quantity + COALESCE(remaining_requests.remaining_requests, 0)) as quantity
+            ')
             ->get();
 
         $productionHistory = ProductionRequest::with(['good', 'user'])

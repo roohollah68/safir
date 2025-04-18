@@ -1,6 +1,6 @@
 @extends('layout.main')
 
-@section('title', 'لیست درخواست‌ تولید')
+@section('title', 'لیست تولید')
 
 @section('content')
 <a class="btn btn-outline-success mb-5" href="{{ route('addEdit') }}">
@@ -13,31 +13,20 @@
         <tr>
             <th>شماره</th>
             <th>شناسه محصول</th>
-            <th>تاریخ ثبت</th>
             <th>محصول</th>
-            <th>کاربر</th>
-            <th>تعداد درخواستی</th>
-            <th>عملیات</th>
+            <th>تعداد مورد نیاز</th>
         </tr>
     </thead>
     <tbody>
-        @foreach ($productions as $production)
+        @foreach ($productions->unique('good_id') as $production)
+            @if ($production->remaining_requests > 0)
             <tr>
                 <td>{{ $production->id }}</td>
                 <td>{{ $production->good_id }}</td>
-                <td>{{ verta($production->created_at)->formatJalaliDate() }}</td>
                 <td>{{ $production->good->name }}</td>
-                <td>{{ $production->user->name }}</td>
-                <td>{{ number_format($production->amount) }}</td>
-                <td>
-                    <a href="{{ route('production.edit', $production->id) }}">
-                        <i class="btn btn-primary fas fa-edit" title="ویرایش"></i>
-                    </a>
-                    <button class="btn btn-danger delete-production-btn" data-id="{{ $production->id }}" title="حذف">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </td>
+                <td>{{ number_format($production->remaining_requests) }}</td>
             </tr>
+            @endif
         @endforeach
     </tbody>
 </table>
@@ -47,29 +36,18 @@
         $('#productionTable').DataTable({
             paging: false,
             order: [
-                [0, "desc"]
+            [0, "desc"]
             ],
-            language: language
-        });
-
-        $('.delete-production-btn').on('click', function() {
-            const productionId = $(this).data('id');
-            if (confirm('آیا از حذف این درخواست تولید اطمینان دارید؟')) {
-                $.ajax({
-                    url: `/productionRequest/${productionId}`,
-                    method: 'DELETE',
-                    data: {
-                        _token: token
-                    },
-                    success: function(response) {
-                        alert('درخواست تولید با موفقیت حذف شد.');
-                        $('#productionTable').DataTable().row($(`button[data-id="${productionId}"]`).parents('tr')).remove().draw();
-                    },
-                    error: function(xhr) {
-                        alert('خطا در حذف درخواست تولید. ' + xhr.responseJSON.message);
-                    }
-                });
+            language: language,
+            dom: 'Bfrtip',
+            buttons: [
+            {
+            extend: 'excelHtml5',
+            text: '<i class="fas fa-file-excel me-1"></i> فایل اکسل',
+            className: 'btn btn-success mb-3',
             }
+            ],
+            searching: true,
         });
     });
 </script>

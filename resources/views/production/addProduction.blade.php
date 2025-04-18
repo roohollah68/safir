@@ -7,19 +7,14 @@
     <form action="{{ route('production.add') }}" method="POST">
         @csrf
         <div class="row my-4">
-            {{-- انتخاب درخواست --}}
+            {{-- انتخاب درخواست  --}}
             <div class="col-md-6 my-2">
-                <div class="form-group input-group required" style="position: relative;">
+                <div class="form-group input-group required">
                     <div class="input-group-append" style="min-width: 160px">
-                        <label for="request_search" class="input-group-text w-100">درخواست:</label>
+                        <label for="good_id" class="input-group-text w-100">محصول:</label>
                     </div>
-                    <input type="text" id="request_search" 
-                        class="form-control" placeholder="جستجوی درخواست..." 
-                        autocomplete="off">
-                    <input type="hidden" id="request_id" name="request_id">
-                    <ul id="requestDropdown" class="dropdown-menu" 
-                        style="position: absolute; z-index: 1000; display: none; width: 70%; top: 100%; left: 0;">
-                    </ul>
+                    <input type="text" id="good_name" name="good_name" class="form-control" placeholder="جستجوی محصول..." required>
+                    <input type="hidden" id="good_id" name="good_id">
                 </div>
             </div>
 
@@ -57,25 +52,27 @@
                 <table id="currentRequestsTable" class="table table-striped" style="width:100%; text-align: center;">
                     <thead>
                         <tr>
+                            <th>شناسه محصول</th>
                             <th>نام کالا</th>
-                            <th>تعداد درخواست</th>
                             <th>تعداد باقی‌مانده</th>
                             <th>عملیات</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($requests as $request)
-                            <tr>
-                                <td>{{ $request->good->name }}</td>
-                                <td>{{ number_format($request->amount) }}</td>
-                                <td>{{ number_format($request->amount - ($request->productions->sum('amount') ?? 0)) }}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-primary" 
-                                        onclick="addRequest('{{ $request->id }}', '{{ $request->good->name }}')">
-                                        <i class="fas fa-plus"></i> 
-                                    </button>
-                                </td>
-                            </tr>
+                        @foreach ($requests->unique('good_id') as $request)
+                            @if ($request->good->remainingRequests() > 0)
+                                <tr>
+                                    <td>{{ $request->good->id }}</td>
+                                    <td>{{ $request->good->name }}</td>
+                                    <td>{{ number_format($request->good->remainingRequests()) }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary" 
+                                            onclick="addRequest('{{ $request->good->id }}', '{{ $request->good->name }}')">
+                                            <i class="fas fa-plus"></i> 
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endif
                         @endforeach
                     </tbody>
                 </table>
@@ -87,7 +84,9 @@
                     <thead>
                         <tr>
                             <th>تاریخ تولید</th>
+                            <th>شناسه محصول</th>
                             <th>محصول</th>
+                            <th>کاربر</th>
                             <th>تعداد تولید شده</th>
                         </tr>
                     </thead>
@@ -95,7 +94,9 @@
                         @foreach ($productionHistory as $production)
                             <tr>
                                 <td>{{ verta($production->created_at)->formatJalaliDate() }}</td>
+                                <td>{{ $production->good->id }}</td>
                                 <td>{{ $production->good->name }}</td>
+                                <td>{{ $production->user->name }}</td>
                                 <td>{{ number_format($production->amount) }}</td>
                             </tr>
                         @endforeach
@@ -130,54 +131,49 @@
         });
     });
 
-    function addRequest(requestId, requestName) {
-        const requestSearch = document.getElementById('request_search');
-        const requestIdInput = document.getElementById('request_id');
-        requestSearch.value = requestName;
-        requestIdInput.value = requestId;
-        requestSearch.dispatchEvent(new Event('input'));
+    function addRequest(goodId, goodName) {
+        document.getElementById('good_name').value = goodName;
+        document.getElementById('good_id').value = goodId;
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const requests = @json($requests->map(fn($request) => [
-            'id' => $request->id,
-            'name' => $request->good->name,
-            'remaining' => $request->amount - $request->productions->sum('amount')
-        ]));
-        
-        const requestSearch = document.getElementById('request_search');
-        const requestIdInput = document.getElementById('request_id');
-        const dropdown = document.getElementById('requestDropdown');
+    document.addEventListener('DOMContentLoaded', () => {
+        const goods = @json($goods->map(fn($good) => ['id' => $good->id, 'name' => $good->name]));
+        const goodInput = document.getElementById('good_name');
+        const goodIdInput = document.getElementById('good_id');
+        const dropdown = document.createElement('ul');
+        Object.assign(dropdown.style, {
+            position: 'absolute', zIndex: '1000', display: 'none', width: `${goodInput.offsetWidth}px`,
+            marginTop: `${goodInput.offsetHeight}px`, left: `${goodInput.offsetLeft}px`
+        });
+        dropdown.className = 'dropdown-menu';
+        goodInput.parentNode.style.position = 'relative';
+        goodInput.parentNode.appendChild(dropdown);
 
-        requestSearch.addEventListener('input', function () {
-            const value = requestSearch.value.trim().toLowerCase();
-            dropdown.innerHTML = '';
-            if (value) {
-                const matches = requests.filter(request => 
-                    request.name.toLowerCase().includes(value) && 
-                    request.remaining > 0
-                );
-                matches.forEach(match => {
-                    const item = document.createElement('li');
-                    item.className = 'dropdown-item';
-                    item.textContent = `${match.name} - باقیمانده: ${match.remaining}`;
-                    item.style.cursor = 'pointer';
-                    item.addEventListener('click', function () {
-                        requestSearch.value = match.name;
-                        requestIdInput.value = match.id;  
-                        dropdown.style.display = 'none';
-                    });
-                    dropdown.appendChild(item);
-                });
-                dropdown.style.display = matches.length ? 'block' : 'none';
-            } else {
-                dropdown.style.display = 'none';
-            }
+        goodInput.addEventListener('input', () => {
+            const value = goodInput.value.trim().toLowerCase();
+            const filteredGoods = goods.filter(good => good.name.toLowerCase().includes(value));
+            
+            dropdown.innerHTML = filteredGoods.map(good => `
+                <li class="dropdown-item" 
+                    style="cursor:pointer" 
+                    data-id="${good.id}" 
+                    data-name="${good.name}">
+                    ${good.name}
+                </li>
+            `).join('');
+
+            dropdown.style.display = value && dropdown.innerHTML ? 'block' : 'none';
+            
+            dropdown.querySelectorAll('li').forEach(item => {
+                item.onclick = () => {
+                    goodInput.value = item.dataset.name;
+                    goodIdInput.value = item.dataset.id;
+                    dropdown.style.display = 'none';
+                };
+            });
         });
 
-        requestSearch.addEventListener('blur', function () {
-            setTimeout(() => dropdown.style.display = 'none', 200);
-        });
+        goodInput.addEventListener('blur', () => setTimeout(() => dropdown.style.display = 'none', 200));
     });
 </script>
 @endsection
