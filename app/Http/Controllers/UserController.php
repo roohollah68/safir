@@ -196,7 +196,7 @@ class UserController extends Controller
         return view('accessList2', ['users' => $users]);
     }
 
-    public function changeAcount($id)
+    public function changeAccount($id)
     {
         Helper::access('usersEdit');
         auth()->logout();

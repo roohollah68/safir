@@ -65,7 +65,7 @@
                 </x-col-md-6>
                 @if($edit)
                     <div class="col-md-6">
-                        <a class="btn btn-info" href="/user/changeAcount/{{$user->id}}">انتقال به حساب کاربری {{$user->name}}</a>
+                        <a class="btn btn-info" href="/user/changeAccount/{{$user->id}}">انتقال به حساب کاربری {{$user->name}}</a>
                     </div>
                 @endif
             @endif

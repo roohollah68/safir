@@ -50,7 +50,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/edit/{id?}', 'update');
         Route::get('/accesslist', 'accesslist')->name('accessList');
         Route::get('/accesslist2', 'accesslist2')->name('accessList2');
-        Route::get('/changeAcount/{id}', function ($id){auth()->logout();auth()->login(User::find($id));return redirect()->route('listOrders');});
+        Route::get('/changeAccount/{id}', 'changeAccount');
         Route::post('/update-permission', 'accesslist')->name('updateUserPermission');
     });
 
