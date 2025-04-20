@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\Helper;
 use App\Models\CustomerTransaction;
 use App\Models\Withdrawal;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ class ChequeController extends Controller
 {
     public function cheque(Request $request)
     {
+        Helper::access('cheque');
         $receivedCheque = CustomerTransaction::where('pay_method', 'cheque')->where('verified', 'approved');
         $givenCheque = Withdrawal::where('pay_method', 'cheque')->where('payment_confirm', 1);
 
@@ -45,6 +47,7 @@ class ChequeController extends Controller
 
     public function view($id)
     {
+        Helper::access('cheque');
         $viewCheque = Withdrawal::with('user', 'bank')
             ->where('id', $id)
             ->first();
@@ -53,12 +56,13 @@ class ChequeController extends Controller
 
     public function receivedView(Request $request, $id)
     {
+        Helper::access('cheque');
         $viewCheque = CustomerTransaction::with('customer.user')
             ->where('id', $id)
             ->first();
 
         if ($request->isMethod('post')) {
-            
+
             $request->validate([
             'cheque_registration' => 'required|mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
             ]);
@@ -70,12 +74,13 @@ class ChequeController extends Controller
             return redirect()->back();
             }
         }
-        
+
         return view('cheque.receivedView', compact('viewCheque'))->render();
     }
 
     public function passCheque(Request $request)
     {
+        Helper::access('cheque');
         if ($request->type == 'received') {
             $cheque = CustomerTransaction::find($request->cheque_id);
         } else {

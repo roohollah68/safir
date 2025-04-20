@@ -77,7 +77,10 @@
                                         واریزی‌ها</a></li>
                                 <li><a class="dropdown-item py-2" href="{{ route('BankTransactionList') }}">مدیریت
                                         نقدینگی</a></li>
-                                <li><a class="dropdown-item py-2" href="{{ route('chequeList') }}">لیست چک‌ها</a></li>
+                                @if($User->meta('cheque'))
+                                    <li><a class="dropdown-item py-2" href="{{ route('chequeList') }}">لیست چک‌ها</a>
+                                    </li>
+                                @endif
                             </ul>
                         </li>
                     @endif
@@ -117,13 +120,13 @@
                     @endif
 
                     <li class="nav-item dropdown">
-                            <a class="nav-link px-3 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                اتوماسیون
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item py-2" href="#">فرآیند‌ها</a></li>
-                                <li><a class="dropdown-item py-2" href="{{ route('projects.list') }}">پروژه‌ها</a></li>
-                            </ul>
+                        <a class="nav-link px-3 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            اتوماسیون
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item py-2" href="#">فرآیند‌ها</a></li>
+                            <li><a class="dropdown-item py-2" href="{{ route('projects.list') }}">پروژه‌ها</a></li>
+                        </ul>
                     </li>
 
                     <!-- Mobile Logout -->
