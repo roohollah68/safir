@@ -292,11 +292,11 @@ Route::middleware(['auth', 'verify'])->group(function () {
 
     // PROJECTS
     Route::controller(ProjectController::class)->prefix('projects')->group(function () {
-        Route::get('/', 'index')->name('projects.list');
-        Route::get('/add', 'create')->name('projects.add.form');
-        Route::post('/add', 'store')->name('projects.add');
-        Route::get('/edit/{id}', 'edit')->name('projects.edit');
-        Route::post('/update/{id}', 'update')->name('projects.update');
+        Route::get('/', 'index')->name('list');
+        Route::get('/add', 'create')->name('add.form');
+        Route::post('/add', 'store')->name('add');
+        Route::get('/edit/{id}', 'edit')->name('edit');
+        Route::post('/update/{id}', 'update')->name('update');
     });
 
 });

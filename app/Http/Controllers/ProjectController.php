@@ -23,8 +23,8 @@ class ProjectController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'desc' => 'string',
-            'image' => 'required|mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
+            'desc' => 'nullable|string',
+            'image' => 'nullable|mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
             'location' => 'required|string|max:255',
         ],[
             'image.mimes' => 'فایل با این پسوند قابل قبول نیست!',
@@ -39,7 +39,7 @@ class ProjectController extends Controller
 
         Project::create($validated);
 
-        return redirect()->route('projects.list')->with('success', 'Project added successfully.');
+        return redirect()->route('list')->with('success', 'Project added successfully.');
     }
 
     public function edit($id)
@@ -52,12 +52,12 @@ class ProjectController extends Controller
 
     public function update(Request $request, $id)
     {
-        $project = Projects::findOrFail($id);
+        $project = Project::findOrFail($id);
         
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'desc' => 'required|string',
-            'image' => 'required|mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
+            'desc' => 'nullable|string',
+            'image' => 'nullable|mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
             'location' => 'required|string|max:255',
         ]);
 
@@ -69,6 +69,6 @@ class ProjectController extends Controller
 
         $project->update($validated);
 
-        return redirect()->route('projects.list')->with('success', 'Project updated successfully.');
+        return redirect()->route('list')->with('success', 'Project updated successfully.');
     }
 }

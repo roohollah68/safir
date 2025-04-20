@@ -125,7 +125,7 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item py-2" href="#">فرآیند‌ها</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('projects.list') }}">پروژه‌ها</a></li>
+                            <li><a class="dropdown-item py-2" href="{{ route('list') }}">پروژه‌ها</a></li>
                         </ul>
                     </li>
 
