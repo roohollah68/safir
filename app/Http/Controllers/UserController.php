@@ -201,6 +201,6 @@ class UserController extends Controller
         Helper::access('usersEdit');
         auth()->logout();
         auth()->login(User::find($id));
-        return redirect()->route('');
+        return redirect()->route('listOrders');
     }
 }
