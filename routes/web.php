@@ -27,6 +27,7 @@ use App\Http\Controllers\ProjectController;
 use App\Livewire\Counter;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +50,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/edit/{id?}', 'update');
         Route::get('/accesslist', 'accesslist')->name('accessList');
         Route::get('/accesslist2', 'accesslist2')->name('accessList2');
+        Route::get('/changeAcount/{id}', function ($id){auth()->logout();auth()->login(User::find($id));return redirect()->route('listOrders');});
         Route::post('/update-permission', 'accesslist')->name('updateUserPermission');
     });
 
@@ -278,7 +280,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/store', 'store')->name('production.store');
         Route::get('/list', 'list')->name('productionList');
         Route::get('/edit/{id}', 'edit')->name('production.edit');
-        Route::post('/update/{id}', 'update')->name('production.update'); 
+        Route::post('/update/{id}', 'update')->name('production.update');
         Route::delete('/{id}', 'delete')->name('production.delete');
     });
 

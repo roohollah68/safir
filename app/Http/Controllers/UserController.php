@@ -16,7 +16,7 @@ class UserController extends Controller
     public function list()
     {
         Helper::access('usersEdit');
-        return view('userList', ['users' => User::where('id' , '<>' , 122)->get()]);
+        return view('userList', ['users' => User::where('id', '<>', 122)->get()]);
     }
 
     public function confirm($id)
@@ -38,10 +38,10 @@ class UserController extends Controller
     {
         Helper::access('usersEdit');
         User::where('id', $id)->delete();
-        Customer::where('user_id' , $id)->update([
+        Customer::where('user_id', $id)->update([
             'user_id' => 6,
         ]);
-        Order::where('user_id' , $id)->update([
+        Order::where('user_id', $id)->update([
             'user_id' => 6,
         ]);
         return redirect()->route('usersList');
@@ -62,7 +62,7 @@ class UserController extends Controller
     {
         $user = auth()->user();
         if ($user->meta('usersEdit'))
-            $user =User::find($id);
+            $user = User::find($id);
         return view('addEditUser', [
             'user' => $user,
             'edit' => true,
@@ -85,7 +85,7 @@ class UserController extends Controller
         User::create($req->merge([
             'password' => Hash::make($req->password),
             'verified' => true,
-            ])->all());
+        ])->all());
         return redirect()->route('listOrders');
     }
 
@@ -96,11 +96,11 @@ class UserController extends Controller
         if (!$user->meta('usersEdit'))
             $id = $user->id;
         $request->validate([
-            'name' => 'required|string|max:255|unique:users,name,'.$id,
-            'username' => 'required|string|max:255|min:5|unique:users,username,'.$id,
+            'name' => 'required|string|max:255|unique:users,name,' . $id,
+            'username' => 'required|string|max:255|min:5|unique:users,username,' . $id,
             'phone' => 'required|string|max:11|min:11',
             'NuRecords' => 'integer|min:1',
-            'credit' =>'numeric',
+            'credit' => 'numeric',
         ]);
         $request->phone = Helper::number_Fa_En($request->phone);
 
@@ -194,5 +194,13 @@ class UserController extends Controller
 
         $users = User::all();
         return view('accessList2', ['users' => $users]);
+    }
+
+    public function changeAcount($id)
+    {
+        Helper::access('usersEdit');
+        auth()->logout();
+        auth()->login(User::find($id));
+        return redirect()->route('');
     }
 }

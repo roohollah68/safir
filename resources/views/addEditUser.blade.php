@@ -59,16 +59,21 @@
                             class="price-input form-control">اعتبار (ریال):
                 </x-col-md-6>
 
-                <x-col-md-6 :name="'discount'" type="number" min="0" max="100" step="0.01" value="{{$user->meta('discount')}}"
+                <x-col-md-6 :name="'discount'" type="number" min="0" max="100" step="0.01"
+                            value="{{$user->meta('discount')}}"
                             class="form-control" required>تخفیف (%):
                 </x-col-md-6>
-
+                @if($edit)
+                    <div class="col-md-6">
+                        <a class="btn btn-info" href="/user/changeAcount/{{$user->id}}">انتقال به حساب کاربری {{$user->name}}</a>
+                    </div>
+                @endif
             @endif
 
             <hr>
             @if($edit)
                 <x-col-md-6 :name="'NuRecords'" value="{{$user->meta('NuRecords')}}" :type="'number'"
-                            min="1"  step="1">تعداد نمایش سفارشات:
+                            min="1" step="1">تعداد نمایش سفارشات:
                 </x-col-md-6>
 
                 <div class="col-md-6 mb-2">
