@@ -71,7 +71,7 @@ class ProductionRequestController extends Controller
             'user_id' => auth()->id()
         ]);
 
-        return redirect()->route('productionList')
+        return redirect()->route('addEdit')
             ->with('success', 'Production request submitted successfully!');
     }
 

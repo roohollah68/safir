@@ -7,8 +7,6 @@
 @section('files')
     <script>
         $(function() {
-            $('#tabs').tabs();
-
             $('#tabs').tabs({
                 active: 0
             });
