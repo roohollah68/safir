@@ -92,6 +92,7 @@
                 @endif
                 <h4>تعداد سفارشات در این دوره : <span>{{$orderNumber}}</span> عدد </h4>
                 <h4>تعداد محصولات فروخته شده : <span>{{$productNumber}}</span> عدد </h4>
+                <h4>میانگین تخفیف : <span>{{$avgDiscount}}</span> درصد </h4>
                 <br>
                 <table class="table table-striped" id="statistic-table">
                     <thead>
@@ -104,6 +105,7 @@
                             <th>قیمت تولید(ریال)</th>
 {{--                            <th>سود(ریال)</th>--}}
                         @endif
+                        <th>میانگین درصد تخفیف</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -118,7 +120,7 @@
                                 <td>{{number_format($good->productPrice)}}</td>
 {{--                                <td>{{number_format($good->profit)}}</td>--}}
                             @endif
-
+                            <td>{{$good->discount}}</td>
                         </tr>
                     @endforeach
                     </tbody>

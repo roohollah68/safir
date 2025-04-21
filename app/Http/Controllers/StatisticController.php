@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Helper\Helper;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\CustomerTransaction;
@@ -11,9 +10,7 @@ use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
 use App\Models\User;
-use Carbon\Carbon;
 use Hekmatinasser\Verta\Verta;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class StatisticController extends Controller
@@ -63,6 +60,8 @@ class StatisticController extends Controller
         $totalProfit = 0;
         $orderNumber = 0;
         $productNumber = 0;
+        $totalDiscount = 0;
+        $totalOriginal = 0;
 
         if ($request->base == 'productBase') {
             $orders = $orders->with('orderProducts', 'website')->get();
@@ -72,6 +71,7 @@ class StatisticController extends Controller
                 $good->number = 0;
                 $good->total = 0;
                 $good->profit = 0;
+                $good->discount = 0;
             }
 
             foreach ($orders as $order) {
@@ -96,15 +96,20 @@ class StatisticController extends Controller
                         else
                             continue;
                         $good->number += $orderProduct->number;
+                        $good->discount += $orderProduct->number * $orderProduct->discount;
                         $productNumber += $orderProduct->number;
                         $good->total += $orderProduct->number * $orderProduct->price;
                         $good->profit += $orderProduct->number * ($orderProduct->price - $good->productPrice);
                         $totalSale += $orderProduct->number * $orderProduct->price;
                         $totalProfit += $orderProduct->number * ($orderProduct->price - $good->productPrice);
+                        $totalDiscount += $orderProduct->originalPrice() * ($orderProduct->discount / 100);
+                        $totalOriginal += $orderProduct->originalPrice();
                     }
                 }
             }
-
+            $goods->each(function ($good) {
+                $good->discount = round($good->number ? $good->discount / $good->number : 0);
+            });
             return view('statistic', [
                 'goods' => $goods,
                 'totalSale' => $totalSale,
@@ -113,6 +118,7 @@ class StatisticController extends Controller
                 'users' => $users,
                 'orderNumber' => $orderNumber,
                 'productNumber' => $productNumber,
+                'avgDiscount' => round($totalOriginal ? $totalDiscount / $totalOriginal * 100 : 0),
             ]);
 
         }
