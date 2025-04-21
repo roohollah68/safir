@@ -16,8 +16,7 @@ class Project extends Model
         'title',
         'desc',
         'image',
-        'location',
-        'created_at'
+        'location'
     ];
 }
 
