@@ -101,6 +101,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'process' => [
+            'driver' => 'local',
+            'root' => public_path('process'),
+            'url' => env('APP_URL').'',
+            'visibility' => 'public',
+        ],
+
     ],
 
     /*

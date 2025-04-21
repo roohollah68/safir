@@ -8,6 +8,7 @@
 /public/report
 /public/withdrawal
 /public/project
+/public/process
 /storage/*.key
 .idea
 .git

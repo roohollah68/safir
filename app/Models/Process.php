@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Project extends Model
+class Process extends Model
 {
     use HasFactory;
     const UPDATED_AT = null;
@@ -14,7 +14,6 @@ class Project extends Model
         'title',
         'desc',
         'image',
-        'location'
+        'location',
     ];
 }
-

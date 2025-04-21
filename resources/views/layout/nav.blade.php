@@ -124,8 +124,8 @@
                             اتوماسیون
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item py-2" href="#">فرآیند‌ها</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('list') }}">پروژه‌ها</a></li>
+                            <li><a class="dropdown-item py-2" href="{{ route('processList') }}">فرآیند‌ها</a></li>
+                            <li><a class="dropdown-item py-2" href="{{ route('projectList') }}">پروژه‌ها</a></li>
                         </ul>
                     </li>
 

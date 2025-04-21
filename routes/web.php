@@ -24,6 +24,7 @@ use App\Http\Controllers\ChequeController;
 use App\Http\Controllers\ProductionRequestController;
 use App\Http\Controllers\ProductionController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProcessController;
 use App\Livewire\Counter;
 use App\Models\Order;
 use App\Models\Product;
@@ -292,7 +293,16 @@ Route::middleware(['auth', 'verify'])->group(function () {
 
     // PROJECTS
     Route::controller(ProjectController::class)->prefix('projects')->group(function () {
-        Route::get('/', 'index')->name('list');
+        Route::get('/', 'index')->name('projectList');
+        Route::get('/add', 'create')->name('add.form');
+        Route::post('/add', 'store')->name('add');
+        Route::get('/edit/{id}', 'edit')->name('edit');
+        Route::post('/update/{id}', 'update')->name('update');
+    });
+
+    // PROCESSES
+    Route::controller(ProcessController::class)->prefix('processes')->group(function () {
+        Route::get('/', 'index')->name('processList');
         Route::get('/add', 'create')->name('add.form');
         Route::post('/add', 'store')->name('add');
         Route::get('/edit/{id}', 'edit')->name('edit');
