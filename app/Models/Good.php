@@ -87,4 +87,9 @@ class Good extends Model
     {
         return $this->keysungood ?? $this->replace()->keysungood ?? null;
     }
+
+    public function category()
+    {
+        return $this->hasOne(GoodCategory::class);
+    }
 }

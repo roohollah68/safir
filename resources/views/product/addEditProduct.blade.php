@@ -22,7 +22,7 @@
         @csrf
         <div class="row">
             {{--نام محصول--}}
-            <div class="col-md-6">
+            <div class="col-md-6 my-1">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="name" class="input-group-text w-100">نام محصول:</label>
@@ -32,7 +32,7 @@
                 </div>
             </div>
             {{--قیمت محصول--}}
-            <div class="col-md-6">
+            <div class="col-md-6 my-1">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="price" class="input-group-text w-100">قیمت:</label>
@@ -45,7 +45,7 @@
                 </div>
             </div>
             {{--قیمت تولید محصول--}}
-            <div class="col-md-6">
+            <div class="col-md-6 my-1">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="productPrice" class="input-group-text w-100">قیمت تولید:</label>
@@ -59,7 +59,7 @@
             </div>
 
             {{--اینتا کد--}}
-            <div class="col-md-6">
+            <div class="col-md-6 my-1">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="isic" class="input-group-text w-100">اینتا کد:</label>
@@ -80,7 +80,7 @@
             </div>
 
             {{--واحد--}}
-            <div class="col-md-6">
+            <div class="col-md-6 my-1">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="unit" class="input-group-text w-100">واحد:</label>
@@ -97,7 +97,7 @@
             </div>
 
             {{--شناسه کالا--}}
-            <div class="col-md-6">
+            <div class="col-md-6 my-1">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="tag" class="input-group-text w-100">شناسه کالا:</label>
@@ -109,7 +109,7 @@
             </div>
 
             {{-- ارزش افزوده(10%)--}}
-            <div class="col-md-6 my-2 VAT">
+            <div class="col-md-6 my-1 VAT">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
                         <label class="input-group-text ">ارزش افزوده(10%):</label>
@@ -124,7 +124,7 @@
             </div>
 
             {{--دسته بندی محصول--}}
-            <div class="col-md-6">
+            <div class="col-md-6 my-1">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="category" class="input-group-text w-100">دسته بندی:</label>
@@ -139,8 +139,62 @@
                 </div>
             </div>
 
+            {{-- نوع شیرین کنندگی --}}
+            <div class="col-md-6 my-1">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="sweetener" class="input-group-text w-100">نوع شیرین کنندگی:</label>
+                    </div>
+                    <select id="sweetener" class="form-control" name="sweetener">
+                        <option value="" disabled selected>انتخاب کنید</option>
+                        @foreach(config('productCat.sweetener') as $key => $value)
+                            @continue ($key == 0)
+                            <option value="{{ $key }}" @selected(old('sweetener', $good->sweetener ?? 0) == $key)>
+                                {{ $value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            {{-- نوع بسته بندی --}}
+            <div class="col-md-6 my-1">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="packaging" class="input-group-text w-100">نوع بسته بندی:</label>
+                    </div>
+                    <select id="packaging" class="form-control" name="packaging">
+                        <option value="" disabled selected>انتخاب کنید</option>
+                        @foreach(config('productCat.packaging') as $key => $value)
+                            @continue ($key == 0)
+                            <option value="{{ $key }}" @selected(old('packaging', $good->packaging ?? 0) == $key)>
+                                {{ $value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            {{-- نوع محصول --}}
+            <div class="col-md-6 my-1">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="type" class="input-group-text w-100">نوع محصول:</label>
+                    </div>
+                    <select id="type" class="form-control" name="type">
+                        <option value="" disabled selected>انتخاب کنید</option>
+                        @foreach(config('productCat.type') as $key => $value)
+                            @continue ($key == 0)
+                            <option value="{{ $key }}" @selected(old('type', $good->type ?? 0) == $key)>
+                                {{ $value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
             {{--اطلاعات تامین کننده--}}
-            <div class="col-md-6 bg-light">
+            <div class="col-md-6 bg-light my-1">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="supplier_inf">اطلاعات تامین کننده:</label>
@@ -153,7 +207,7 @@
             @if($edit)
                 <input type="hidden" name="productId" value="{{$product->id}}">
                 {{--مکان انبار--}}
-                <div class="col-md-6">
+                <div class="col-md-6 my-1">
                     <div class="form-group input-group">
                         <div class="input-group-append" style="min-width: 160px">
                             <label for="warehouse" class="input-group-text w-100">مکان انبار:</label>
@@ -169,7 +223,7 @@
                 </div>
 
                 {{--اصلاح موجودی--}}
-                <div class="col-md-6 my-2">
+                <div class="col-md-6 my-1">
                     <div class="form-group input-group">
                         <div class="input-group-text">
                             <input type="radio" name="changeType" checked
@@ -194,7 +248,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-6 my-2">
+                <div class="col-md-6 my-1">
                     <div class="form-group input-group">
                         <div class="input-group-append" style="min-width: 160px">
                             <label for="alarm" class="input-group-text w-100">حد پایین:</label>

@@ -62,9 +62,9 @@
                                 <a class="dropdown-item" href="/goods/management">
                                     مدیریت کالاها
                                 </a>
-                                <a class="dropdown-item" id="production_schedule" onclick="window.location.href = `production/schedule/${warehouseId}`">
+                                {{-- <a class="dropdown-item" href="production/schedule/${warehouseId}">
                                     برنامه تولید
-                                </a>
+                                </a> --}}
                                 <a class="dropdown-item" href="/warehouse/manager">
                                     تعیین مسئول انبار
                                 </a>
