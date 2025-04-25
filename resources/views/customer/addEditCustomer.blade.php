@@ -83,7 +83,7 @@
                 <div class="form-group">
                     <div class="d-flex align-items-center">
                         <div class="input-group-append" style="min-width: 160px">
-                            <label for="customer_type" class="input-group-text w-100">نوع مشتری:</label>
+                            <label for="customer_type" class="input-group-text w-100">نوع:</label>
                         </div>
                         <div class="form-check me-3 ms-3">
                             <input class="form-check-input" type="radio" name="customer_type" id="Individual" value="Individual"
@@ -96,6 +96,25 @@
                             <label class="form-check-label" for="LegalEntity">حقوقی</label>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="col-md-6 mt-1 mb-1">
+                <div class="form-group input-group required">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="customer_category" class="input-group-text w-100">دسته‌بندی:</label>
+                    </div>
+                    <select class="form-control" name="customer_category" id="customer_category" required>
+                        <option value="" disabled selected>انتخاب کنید</option>
+                        @foreach(config('customerCat') as $key => $value)
+                            @continue ($key == 0)
+                            <option value="{{$key}}" 
+                                @if(old('customer_category', $customer->customer_category ?? '') == $key) 
+                                    selected 
+                                @endif>
+                                {{$value}}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
             <div class="col-md-6 mt-1 mb-1">
