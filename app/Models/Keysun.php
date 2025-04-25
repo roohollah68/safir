@@ -28,7 +28,7 @@ class Keysun extends Model
 
     public function conversion()
     {
-        if($this->conv<0.4){
+        if($this->conv == 0){
             return "<span class='btn btn-danger' onclick='changeKeysun(". $this->id .")'>$this->conv</span>";
         }elseif ($this->conv>1.5){
             return "<span class='btn btn-warning' onclick='changeKeysun(". $this->id .")'>$this->conv</span>";

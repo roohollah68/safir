@@ -109,8 +109,8 @@
 
     <script>
         {{--let orders = {!! json_encode($orders) !!};--}}
-        let ids = {!! json_encode($orders->filter(fn($order)=>($order->keysun->conv>0.4 && $order->keysun->conv<1.5))->pluck('keysun.id')) !!};
-        let ids2 = {!! json_encode($transactions->filter(fn($transaction)=>($transaction->keysun->conv>0.4 && $transaction->keysun->conv<1.5))->pluck('keysun.id')) !!}
+        let ids = {!! json_encode($orders->filter(fn($order)=>($order->keysun->conv > 0 && $order->keysun->conv<1.5))->pluck('keysun.id')) !!};
+        let ids2 = {!! json_encode($transactions->filter(fn($transaction)=>($transaction->keysun->conv > 0 && $transaction->keysun->conv<1.5))->pluck('keysun.id')) !!}
         $(function () {
             $('.checkboxradio').checkboxradio();
             $('#main-tabs').tabs();

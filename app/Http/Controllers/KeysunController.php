@@ -22,7 +22,7 @@ class KeysunController extends Controller
             ->with(['orderProducts.product.good', 'keysun.keysunMetas'])
             ->get();
         $orders->each(function ($order) {
-            if (!$order->keysun || $order->keysun->conv < 0.4 || $order->keysun->conv > 1.5)
+            if (!$order->keysun || $order->keysun->conv == 0 || $order->keysun->conv > 1.5)
                 $order->keysun = $this->createKeysunInvoice($order);
         });
         if (!$request->sent) {
@@ -37,7 +37,7 @@ class KeysunController extends Controller
             ->get();
 
         $transactions->each(function ($transaction) {
-            if (!$transaction->keysun || $transaction->keysun->conv < 0.4 || $transaction->keysun->conv > 1.5)
+            if (!$transaction->keysun || $transaction->keysun->conv == 0 || $transaction->keysun->conv > 1.5)
                 $transaction->keysun = $this->createKeysunInvoice(null, $transaction);
         });
         if (!$request->sent) {
@@ -153,8 +153,6 @@ class KeysunController extends Controller
     public function excelData(Request $request)
     {
         $sql = Keysun::whereIn('id', $request->ids)
-            ->where('conv', '<=', '1.5')
-            ->where('conv', '>=', '0.4')
             ->with(['keysunMetas.keysungood']);
         $keysuns = $sql->get();
         $sql->update(['sent' => true]);
