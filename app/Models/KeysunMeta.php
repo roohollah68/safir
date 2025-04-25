@@ -5,19 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Keysungood extends Model
+class KeysunMeta extends Model
 {
     use HasFactory;
     public $timestamps = false;
     public $guarded = [];
 
-    public function good()
+    public function keysun()
     {
-        return $this->belongsTo(Good::class,'id' , 'id');
+        return $this->belongsTo(Keysun::class);
     }
 
-    public function keysunMetas()
+    public function keysungood()
     {
-        return $this->hasMany(KeysunMeta::class);
+        return $this->belongsTo(Keysungood::class);
     }
 }

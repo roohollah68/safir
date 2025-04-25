@@ -82,4 +82,9 @@ class Good extends Model
         $producedAmount = $this->productions()->sum('amount');
         return $requestedAmount - $producedAmount;
     }
+
+    public function isKeysun()
+    {
+        return $this->keysungood ?? $this->replace()->keysungood ?? null;
+    }
 }

@@ -471,30 +471,30 @@
         }
     }
 
-    function generateExcels() {
-        if (ids.length === 0) {
-            $.notify('ابتدا باید سفارشات مورد نظر را انتخاب کنید', 'error')
-            return
-        }
-        let groupSize = 10;
-        groupedIds = ids.reduce((r, e, i) => (i % groupSize ? r[r.length - 1].push(e) : r.push([e])) && r, []);
-        $.each(groupedIds, function (index, ids) {
-            $.get('/keysun/orders/excel', {
-                _token: token,
-                ids: ids,
-            })
-                .done(res => {
-                    let table1 = document.createElement('table');
-                    $(table1).html(res[0]).attr('data-excel-name', 'صورتحساب');
-                    let table2 = document.createElement('table');
-                    $(table2).html(res[1]).attr('data-excel-name', 'اقلام صورتحساب');
-                    let table2excel = new Table2Excel();
-                    table2excel.export([table1, table2], 'excel' + index);
-                    $(table1).remove();
-                    $(table2).remove();
-                })
-        });
-    }
+    // function generateExcels() {
+    //     if (ids.length === 0) {
+    //         $.notify('ابتدا باید سفارشات مورد نظر را انتخاب کنید', 'error')
+    //         return
+    //     }
+    //     let groupSize = 10;
+    //     groupedIds = ids.reduce((r, e, i) => (i % groupSize ? r[r.length - 1].push(e) : r.push([e])) && r, []);
+    //     $.each(groupedIds, function (index, ids) {
+    //         $.get('/keysun/orders/excel', {
+    //             _token: token,
+    //             ids: ids,
+    //         })
+    //             .done(res => {
+    //                 let table1 = document.createElement('table');
+    //                 $(table1).html(res[0]).attr('data-excel-name', 'صورتحساب');
+    //                 let table2 = document.createElement('table');
+    //                 $(table2).html(res[1]).attr('data-excel-name', 'اقلام صورتحساب');
+    //                 let table2excel = new Table2Excel();
+    //                 table2excel.export([table1, table2], 'excel' + index);
+    //                 $(table1).remove();
+    //                 $(table2).remove();
+    //             })
+    //     });
+    // }
     @endif
 
     @if($admin)

@@ -7,7 +7,7 @@
         <span class="fa fa-plus"></span>
         افزودن درخواست تولید
     </a>
-<a class="btn btn-outline-primary mb-5" href="{{ route('production.add.form') }}"><span class="fa fa-plus"></span> افزودن تولید</a>
+<a class="btn btn-outline-primary mb-5" href="{{ route('production.add.form') }}"><span class="fa fa-plus"></span> افزودن تولید انجام شده</a>
 <table id="productionTable" class="table table-striped" style="width:100%; text-align: center;">
     <thead>
         <tr>

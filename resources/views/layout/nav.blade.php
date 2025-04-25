@@ -81,6 +81,8 @@
                                     <li><a class="dropdown-item py-2" href="{{ route('chequeList') }}">لیست چک‌ها</a>
                                     </li>
                                 @endif
+                                <li><a class="dropdown-item py-2" href="{{ route('TaxList') }}">سامانه
+                                        مودیان</a></li>
                             </ul>
                         </li>
                     @endif

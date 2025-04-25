@@ -221,5 +221,9 @@ class Order extends Model
             return '<span class="btn btn-danger">سفارش در مرحله در حال پردازش ادیت شده.</span>';
     }
 
+    public function keysun()
+    {
+        return $this->hasOne(Keysun::class);
+    }
 
 }

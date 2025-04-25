@@ -65,13 +65,6 @@ class SettingController extends Controller
 
     public function command()
     {
-//        Withdrawal::where('counter_confirm',1)->where('manager_confirm' , '<>' , 1)->update([
-//            'counter_confirm'=>0,
-//        ]);
-//        Withdrawal::where('counter_confirm',2)->update([
-//            'manager_confirm'=>2,
-//        ]);
-
 
         foreach (Customer::with(['orders', 'transactions'])->get() as $customer) {
             if ($customer->balance() != $customer->balance) {

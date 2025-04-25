@@ -219,7 +219,7 @@ class CustomerController extends Controller
             'old_Photo.required_without' => '',
             'photo.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
             'cheque_registration.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
-            'cheque_registration.required_if' => 'ارائه تصویر الزامی است!'
+            'cheque_registration.required_if' => 'ارائه تصویر ثبت چک الزامی است!'
         ]);
 
         if ($user->meta('editAllCustomers'))
@@ -246,6 +246,7 @@ class CustomerController extends Controller
             'photo' => $photo,
             'cheque_registration' => $req->pay_method == 'cheque' ? $cheque_registration : null,
         ]);
+        $transaction->official = ($req->pay_method == 'cash') ? $transaction->bank->official : $req->official ;
         $transaction->save();
         if (+$orderId) {
             $transaction->paymentLinks()->create([
@@ -537,7 +538,7 @@ class CustomerController extends Controller
         if ($req->user)
             $orders = $orders->where('user_id', $req->user);
 
-        if(!auth()->user()->meta('allCustomers'))
+        if (!auth()->user()->meta('allCustomers'))
             $orders = $orders->where('user_id', auth()->user()->id);
 
         if ($req->paymethods)

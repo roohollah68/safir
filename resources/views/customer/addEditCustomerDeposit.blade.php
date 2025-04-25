@@ -136,7 +136,21 @@
                             چک:</label>
                     </div>
                     <input type="text" class="form-control" name="cheque_code" id="cheque_code"
-                           value="{{old('cheque_code')?:$deposit->cheque_code}}">
+                           value="{{old('cheque_code',$deposit->cheque_code)}}">
+                </div>
+            </div>
+
+            {{--            نوع گیرنده چک--}}
+            <div class="col-md-6 my-2 cheque">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label class="input-group-text w-100">نوع گیرنده چک:</label>
+                    </div>
+                    <label for="company" class="">شرکتی</label>
+                    <input type="radio" class="checkboxradio" name="official" id="company" value="1" @checked(old('official',$deposit->official)) >
+
+                    <label for="person" class="">شخصی</label>
+                    <input type="radio" class="checkboxradio" name="official" id="person" value="0" @checked(!old('official',$deposit->official)) >
                 </div>
             </div>
 
@@ -166,7 +180,7 @@
                     <img style="height: 300px" src="/deposit/{{$deposit->photo}}">
                 </a>
             @endif
-            
+
             <div class="col-md-6 my-2 cheque required">
                 <div class="form-group input-group required">
                     <div class="input-group-append" style="width: 190px">

@@ -23,10 +23,10 @@
     </tr>
     </thead>
     <tbody>
-    @foreach($orders as $id => $order)
+    @foreach($keysuns as $keysun)
         <tr>
-            <td>{{$id}}</td>
-            <td><input type="text" value="{!!verta($order->created_at)->format('Y/m/d')!!}"></td>
+            <td>{{$keysun->id + 1000000}}</td>
+            <td><input type="text" value="{!!verta()->format('Y/m/d')!!}"></td>
             <td>2</td>
             <td>1</td>
             <td>1</td>
@@ -38,11 +38,11 @@
             <td></td>
             <td></td>
             <td></td>
-            <td><input type="text" value="000{{$order->warehouse_id}}"></td>
             <td></td>
             <td></td>
             <td></td>
-            <td>{{$order->name. ': '.$order->desc}}</td>
+            <td></td>
+            <td></td>
         </tr>
     @endforeach
     </tbody>

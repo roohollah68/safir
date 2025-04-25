@@ -73,7 +73,7 @@
                    onchange="updateNuRecords(this.value, {{ auth()->user()->id }})" id="NuRecords" class="form-control">
         </div>
     </div>
-    
+
     @if($User->meta('showAllOrders'))
         <div class="col-md-4">
             <div class="form-group d-flex">
@@ -103,7 +103,7 @@
 
         <button class="btn btn-secondary my-2" onclick="generatePDFs()"> دانلود PDF لیبل</button>
         <a id="pdf-link" target="_blank"></a>
-        <button class="btn btn-success my-2" onclick="generateExcels()"> دانلود Excel کیسان</button>
+{{--        <button class="btn btn-success my-2" onclick="generateExcels()"> دانلود Excel کیسان</button>--}}
 
     @endif
 

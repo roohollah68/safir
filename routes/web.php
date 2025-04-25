@@ -1,39 +1,31 @@
 <?php
 
-use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\BankTransactionController;
+use App\Http\Controllers\ChequeController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DepositController;
 use App\Http\Controllers\FormulationController;
 use App\Http\Controllers\KeysunController;
-use App\Http\Controllers\OrderProductController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProcessController;
 use App\Http\Controllers\ProductChangeController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductionController;
+use App\Http\Controllers\ProductionRequestController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StatisticController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\TelegramController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\TelegramController;
 use App\Http\Controllers\WithdrawalController;
-use App\Http\Controllers\ChequeController;
-use App\Http\Controllers\ProductionRequestController;
-use App\Http\Controllers\ProductionController;
-use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\ProcessController;
-use App\Livewire\Counter;
-use App\Models\Order;
-use App\Models\Product;
-use App\Models\User;
-use App\Models\Warehouse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WoocommerceController;
-
+use App\Livewire\Counter;
+use Illuminate\Support\Facades\Route;
 
 
 Route::middleware(['auth', 'verify'])->group(function () {
@@ -59,10 +51,8 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('/orders', 'showOrders')->name('listOrders');
         Route::post('/orders/reload', 'getOrders');
         Route::get('add_order', 'newOrder')->name('newOrder');
-//        Route::post('add_order', 'insertOrder');
         Route::post('add_order/{id?}', 'insert');
         Route::get('edit_order/{id}', 'editOrder');
-//        Route::post('edit_order/{id}', 'updateOrder');
         Route::post('edit_order/{id}', 'insert');
         Route::post('delete_order/{id}', 'deleteOrder');
         Route::get('changeWarehouse/{orderId}/{warehouseId}', 'changeWarehose');
@@ -235,7 +225,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
     });
 
     //CHEQUES
-   Route::controller(ChequeController::class)->prefix('cheque')->group(function () {
+    Route::controller(ChequeController::class)->prefix('cheque')->group(function () {
         Route::get('/cheque', 'cheque')->name('chequeList');
         Route::post('/cheque', 'cheque')->name('chequeList');
         Route::get('/given/{id}', 'view')->name('cheque.view');
@@ -259,13 +249,15 @@ Route::middleware(['auth', 'verify'])->group(function () {
 
     ///Keysun
     Route::controller(KeysunController::class)->prefix('keysun')->group(function () {
-        Route::get('/good','good');
-        Route::get('/orders/excel', 'excelData');
+        Route::match(['post', 'get'], '/list', 'list')->name('TaxList');
+        Route::get('/good', 'good');
+        Route::post('/orders/excel', 'excelData');
+        Route::get('/change/{id}', 'viewChange');
     });
 
     ///Formulation
     Route::controller(FormulationController::class)->prefix('formulation')->group(function () {
-        Route::get('/list','list');
+        Route::get('/list', 'list');
         Route::get('/add', 'add');
         Route::get('/edit/{id}', 'edit');
         Route::post('/addEditRow/{id?}', 'addEditRow');
@@ -314,6 +306,6 @@ Route::middleware(['auth', 'verify'])->group(function () {
 Route::post('/woocommerce/{website}', [WoocommerceController::class, 'addWebsiteOrder']);
 Route::get('/backup', [TelegramController::class, 'backUpDatabase']);
 
-Route::post('/sms' , [TelegramController::class, 'sms']);
-Route::get('/sms' , [TelegramController::class, 'sms']);
+Route::post('/sms', [TelegramController::class, 'sms']);
+Route::get('/sms', [TelegramController::class, 'sms']);
 require __DIR__ . '/auth.php';

@@ -27,29 +27,19 @@
     </tr>
     </thead>
     <tbody>
-    @foreach($orders as $id => $order)
-        @foreach($order->orderProducts as $orderProduct)
-            @php
-                $good = $orderProduct->product->good;
-                if(!$good->keysungood){
-                    if($good->replace_id){
-                        $good = \App\Models\Good::find($good->replace_id);
-                    }else{
-                        return abort(403, 'کالا: '. $good->name .' '. $good->id.' از سفارش : '. $id .' شناسه کالا ندارد!');
-                    }
-                }
-            @endphp
+    @foreach($keysuns as $keysun)
+        @foreach($keysun->keysunMetas as $keysunMeta)
             <tr>
-                <td>{{$id}}</td>
-                <td><input type="text" value="{!!verta($order->created_at)->format('Y/m/d')!!}"></td>
-                <td>{{$good->id}}</td>
+                <td>{{$keysun->id + 1000000}}</td>
+                <td><input type="text" value="{!!verta()->format('Y/m/d')!!}"></td>
+                <td>{{$keysunMeta->keysungood_id}}</td>
                 <td>1627</td>
-                <td>{{$orderProduct->number}}</td>
+                <td>{{$keysunMeta->number}}</td>
                 <td>364</td>
                 <td>1</td>
-                <td>{{$orderProduct->originalPrice()*(10/11+$orderProduct->discount/1100)}}</td>
-                <td>{{($orderProduct->originalPrice()*$orderProduct->number)*($orderProduct->discount/100)}}</td>
-                <td>{{$good->vat?'10':'0'}}</td>
+                <td>{{round($keysunMeta->price * (100/($keysunMeta->keysungood->vat + 100)))}}</td>
+                <td>0</td>
+                <td>{{$keysunMeta->keysungood->vat}}</td>
                 <td></td>
                 <td></td>
                 <td></td>

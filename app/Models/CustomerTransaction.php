@@ -53,4 +53,8 @@ class CustomerTransaction extends Model
             return '<i class="btn btn-danger">رد شده</i>';
     }
 
+    public function keysun()
+    {
+        return $this->hasOne(Keysun::class);
+    }
 }

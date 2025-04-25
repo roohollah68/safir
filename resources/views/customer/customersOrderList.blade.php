@@ -95,7 +95,7 @@
                            onclick="view_comment({{$order->id}})"
                            title="مشاهده کامنت ها"></a>
                         <a class="fa fa-file-invoice-dollar btn btn-secondary"
-                           onclick="invoice({{$order->id}})"
+                           onclick="invoice({{$order->id}} , event)"
                            title=" فاکتور"></a>
                         @foreach($order->paymentLinks as $paymentLink)
                             <i class="btn btn-warning fa fa-eye"
