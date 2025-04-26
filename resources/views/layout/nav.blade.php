@@ -53,12 +53,17 @@
                                 <a class="dropdown-item" href="{{ route('productList') }}">
                                     لیست محصولات
                                 </a>
-                                <a class="dropdown-item" href="{{ route('addProduct') }}">
-                                    افزودن محصول جدید
-                                </a>
-                                <a class="dropdown-item" href="/warehouse/transfer">
-                                    انتقال بین انبارها
-                                </a>
+                                @if ($User->meta('editWarehouse'))
+                                    <a class="dropdown-item" href="{{ route('addProduct') }}">
+                                        افزودن محصول جدید
+                                    </a>
+                                @endif
+
+                                @if ($User->meta('warehouseTransfer'))
+                                    <a class="dropdown-item" href="/warehouse/transfer">
+                                        انتقال بین انبارها
+                                    </a>
+                                @endif
                                 <a class="dropdown-item" href="/goods/management">
                                     مدیریت کالاها
                                 </a>
@@ -71,9 +76,12 @@
                                 <a class="dropdown-item" href="/good/tag">
                                     ثبت شناسه کالا
                                 </a>
-                                <a class="dropdown-item" href="/formulation/list">
-                                    فرمول تولید
-                                </a>
+                                
+                                @if ($User->meta('formulation'))
+                                    <a class="dropdown-item" href="/formulation/list">
+                                        فرمول تولید
+                                    </a>
+                                @endif
                                 <a class="dropdown-item" href="{{ route('productionList') }}">
                                     لیست تولید
                                 </a>
