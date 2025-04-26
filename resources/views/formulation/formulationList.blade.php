@@ -6,6 +6,9 @@
 
 @section('content')
     <a class="btn btn-info" href="/formulation/add">ثبت فرمول جدید</a>
+    <a class="btn btn-warning" href="/formulation/raw-usage">
+        لیست مواد اولیه
+    </a>
     <br>
     <br>
     <table class="table table-striped" id="formulation-table">

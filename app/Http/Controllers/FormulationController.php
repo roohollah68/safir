@@ -81,4 +81,29 @@ class FormulationController extends Controller
         $good = Good::with('formulations.rawGood')->findOrFail($id);
         return view('formulation/rawGoods', compact('good'));
     }
+
+    public function rawUsage()
+    {
+        Helper::access('formulation');
+
+        $formulations = Formulation::with(['good', 'rawGood.unit'])
+            ->whereHas('rawGood', fn($query) => $query->whereIn('category', ['raw', 'pack']))
+            ->get()
+            ->groupBy('rawGood_id');
+
+        $rawMaterial = $formulations->map(function ($entries) {
+            $total = $entries->sum(fn($formule) => (float)$formule->amount);
+            
+            return (object)[
+                'material' => $entries->first()->rawGood,
+                'usage' => $entries->map(fn($formule) => (object)[
+                    'final_product' => $formule->good->name,
+                    'amount' => (float)$formule->amount
+                ]),
+                'total' => (float)$total 
+            ];
+        })->sortBy('total')->values();
+
+        return view('formulation.rawUsage', compact('rawMaterial'));
+    }
 }
