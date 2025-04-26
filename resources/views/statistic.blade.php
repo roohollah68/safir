@@ -102,7 +102,7 @@
                         <th>مبلغ کل(ریال)</th>
                         <th>قیمت میانگین(ریال)</th>
                         @if($User->meta('statistic'))
-                            <th>قیمت تولید(ریال)</th>
+{{--                            <th>قیمت تولید(ریال)</th>--}}
 {{--                            <th>سود(ریال)</th>--}}
                         @endif
                         <th>میانگین درصد تخفیف</th>
@@ -117,7 +117,7 @@
                             <td>{{number_format($good->total)}}</td>
                             <td>{{number_format(($good->number>0)?$good->total/$good->number:0)}}</td>
                             @if($User->meta('statistic'))
-                                <td>{{number_format($good->productPrice)}}</td>
+{{--                                <td>{{number_format($good->productPrice)}}</td>--}}
 {{--                                <td>{{number_format($good->profit)}}</td>--}}
                             @endif
                             <td>{{$good->discount}}</td>
