@@ -44,10 +44,55 @@
                     </li>
 
                     @if ($User->meta('warehouse'))
-                        <li class="nav-item"><a class="nav-link px-3" href="{{ route('productList') }}">محصولات</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle active px-3" id="productDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                محصولات
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="productDropdown">
+                                <a class="dropdown-item" href="{{ route('productList') }}">
+                                    لیست محصولات
+                                </a>
+                                <a class="dropdown-item" href="{{ route('addProduct') }}">
+                                    افزودن محصول جدید
+                                </a>
+                                <a class="dropdown-item" href="/warehouse/transfer">
+                                    انتقال بین انبارها
+                                </a>
+                                <a class="dropdown-item" href="/goods/management">
+                                    مدیریت کالاها
+                                </a>
+                                {{-- <a class="dropdown-item" href="production/schedule/${warehouseId}">
+                                    برنامه تولید
+                                </a> --}}
+                                <a class="dropdown-item" href="/warehouse/manager">
+                                    تعیین مسئول انبار
+                                </a>
+                                <a class="dropdown-item" href="/good/tag">
+                                    ثبت شناسه کالا
+                                </a>
+                                <a class="dropdown-item" href="/formulation/list">
+                                    فرمول تولید
+                                </a>
+                                <a class="dropdown-item" href="{{ route('productionList') }}">
+                                    لیست تولید
+                                </a>
+                            </div>
+                        </li>
                     @endif
 
-                    <li class="nav-item"><a class="nav-link px-3" href="{{ route('CustomerList') }}">مشتریان</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active px-3" href="#" id="customerDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            مشتریان
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="customerDropdown">
+                            <a class="dropdown-item" href="{{ route('CustomerList') }}">لیست مشتریان</a>
+                            <a class="dropdown-item" href="{{route('newCustomer')}}">افزودن مشتری جدید</a>
+                            <a class="dropdown-item" href="/customerPaymentTracking">پیگیری پرداختی مشتریان</a>
+                            <a class="dropdown-item" href="/blockList">مسدود کردن دسترسی مشتریان</a>
+                        </div>
+                    </li>
 
                     @if ($User->meta('usersEdit'))
                         <li class="nav-item"><a class="nav-link px-3" href="{{ route('usersList') }}">کاربران</a></li>
