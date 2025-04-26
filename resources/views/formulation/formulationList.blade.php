@@ -14,6 +14,7 @@
             <th>شماره</th>
             <th>نام کالا</th>
             <th>فرمول</th>
+            <th>قیمت (ریال)</th>
             <th>عملیات</th>
         </tr>
         </thead>
@@ -27,6 +28,7 @@
                         {{$formule->rawGood->name}} -> {{+$formule->amount}} {{$formule->rawGood->unit->name}}<br>
                     @endforeach
                 </td>
+                <td>{{ number_format($productionPrices[$id]) }}</td>
                 <td>
                     <a class="fa fa-edit btn btn-primary" href="/formulation/edit/{{$id}}" title="ویرایش"></a>
                     <a class="fa fa-trash btn btn-danger" href="/formulation/deleteAll/{{$formulation[0]->good_id}}"

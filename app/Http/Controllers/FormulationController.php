@@ -13,7 +13,17 @@ class FormulationController extends Controller
     {
         Helper::access('formulation');
         $formulations = Formulation::with(['good' , 'rawGood.unit'])->get()->groupBy('good_id');
-        echo view('formulation/formulationList', compact('formulations'));
+
+        $productionPrices = [];
+        foreach ($formulations as $goodId => $formulationGroup) {
+            $total = 0;
+            foreach ($formulationGroup as $formule) {
+                $total += $formule->rawGood->price * $formule->amount;
+            }
+            $productionPrices[$goodId] = $total;
+        }
+        
+        echo view('formulation/formulationList', compact('formulations', 'productionPrices'));
     }
 
     public function add()
