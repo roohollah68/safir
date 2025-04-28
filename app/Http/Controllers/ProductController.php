@@ -90,9 +90,9 @@ class ProductController extends Controller
         $good->fill($req->all())->save();
 
         request()->validate([
-            'sweetener' => 'required|integer|between:0,3',
-            'packaging' => 'required|integer|between:0,15',
-            'type' => 'required|integer|between:0,6'
+            'sweetener' => 'nullable|integer|between:0,3',
+            'packaging' => 'nullable|integer|between:0,15',
+            'type' => 'nullable|integer|between:0,6'
         ]);
         GoodCategory::updateOrCreate(
             ['good_id' => $good->id],

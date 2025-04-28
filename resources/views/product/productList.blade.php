@@ -15,35 +15,50 @@
 
     </div>
     <br>
+    @if(auth()->user()->meta('editWarehouse'))
     <a class="btn btn-info mb-3" href="{{route('addProduct')}}">
         <span class=" fa fa-plus"></span>
         افزودن محصول جدید
     </a>
+    @endif
+
+    @if (auth()->user()->meta('warehouseTransfer'))
     <a class="btn btn-primary mb-3" href="/warehouse/transfer">
         <span class=" fa fa-warehouse"></span>
         انتقال بین انبارها
     </a>
-    <a class="btn btn-secondary mb-3" href="/goods/management">
-        <span class=" fa fa-list"></span>
-        مدیریت کالاها
-    </a>
+    @endif
+
     <a class="btn btn-secondary mb-3" id="production_schedule"
        onclick="window.location.href = `production/schedule/${warehouseId}`">
         <span class=" fa fa-industry"></span>
         برنامه تولید
     </a>
+
+    @if (auth()->user()->meta('warehouse'))
+    <a class="btn btn-secondary mb-3" href="/goods/management">
+        <span class=" fa fa-list"></span>
+        مدیریت کالاها
+    </a>
+
     <a class="btn btn-dark mb-3" href="/warehouse/manager">
         <span class=" fa fa-user"></span>
         تعیین مسئول انبار
     </a>
+
     <a class="btn btn-info mb-3" href="/good/tag">
         <span class=" fa fa-tag"></span>
         ثبت شناسه کالا
     </a>
+    @endif
+
+    @if (auth()->user()->meta('formulation'))
     <a class="btn btn-success mb-3" href="/formulation/list">
         <span class=" fa fa-flask"></span>
         فرمول تولید
     </a>
+    @endif
+
     <a class="btn btn-warning mb-3" href="{{ route('productionList') }}">
         <span class="fa fa-list"></span>
         لیست تولید

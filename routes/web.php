@@ -265,6 +265,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('/deleteRow/{id}', 'deleteRow');
         Route::get('/view/{id}', 'view');
         Route::post('/getRawGoods/{id}', 'getRawGoods');
+        Route::get('/raw-usage', 'rawUsage');
     });
 
     //PRODUCTION REQUESTS

@@ -13,7 +13,17 @@ class FormulationController extends Controller
     {
         Helper::access('formulation');
         $formulations = Formulation::with(['good' , 'rawGood.unit'])->get()->groupBy('good_id');
-        echo view('formulation/formulationList', compact('formulations'));
+
+        $productionPrices = [];
+        foreach ($formulations as $goodId => $formulationGroup) {
+            $total = 0;
+            foreach ($formulationGroup as $formule) {
+                $total += $formule->rawGood->price * $formule->amount;
+            }
+            $productionPrices[$goodId] = $total;
+        }
+        
+        echo view('formulation/formulationList', compact('formulations', 'productionPrices'));
     }
 
     public function add()
@@ -70,5 +80,30 @@ class FormulationController extends Controller
         Helper::access('formulation');
         $good = Good::with('formulations.rawGood')->findOrFail($id);
         return view('formulation/rawGoods', compact('good'));
+    }
+
+    public function rawUsage()
+    {
+        Helper::access('formulation');
+
+        $formulations = Formulation::with(['good', 'rawGood.unit'])
+            ->whereHas('rawGood', fn($query) => $query->whereIn('category', ['raw', 'pack']))
+            ->get()
+            ->groupBy('rawGood_id');
+
+        $rawMaterial = $formulations->map(function ($entries) {
+            $total = $entries->sum(fn($formule) => (float)$formule->amount);
+            
+            return (object)[
+                'material' => $entries->first()->rawGood,
+                'usage' => $entries->map(fn($formule) => (object)[
+                    'final_product' => $formule->good->name,
+                    'amount' => (float)$formule->amount
+                ]),
+                'total' => (float)$total 
+            ];
+        })->sortBy('total')->values();
+
+        return view('formulation.rawUsage', compact('rawMaterial'));
     }
 }
