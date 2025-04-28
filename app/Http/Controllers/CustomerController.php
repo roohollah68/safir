@@ -89,6 +89,7 @@ class CustomerController extends Controller
             'national_id' => 'nullable|string|max:11|min:11',
             'economic_code' => 'nullable|string|max:14|min:11',
             'customer_type' => 'required|in:Individual,LegalEntity',
+            'invoice_type' => 'required|in:official,unofficial',
             'customer_category' => 'required|int',
         ], [
             'agreement.required' => 'پر کردن فیلد تفاهم اجباری است.',
@@ -118,6 +119,7 @@ class CustomerController extends Controller
             'discount' => $request->discount,
             'agreement' => $request->agreement,
             'customer_type' => $request->customer_type,
+            'invoice_type' => $request->invoice_type,
             'customer_category' => $request->customer_category,
             'national_code' => Helper::number_Fa_En($request->national_code),
             'national_id' => Helper::number_Fa_En($request->national_id),
