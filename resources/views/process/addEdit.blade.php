@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-    <form action="{{ $edit ? route('update', $process->id) : route('add') }}" method="post" enctype="multipart/form-data">
+    <form action="{{ $edit ? route('process.update', $process->id) : route('process.add') }}" method="post" enctype="multipart/form-data">
         @csrf
         <div class="row my-4">
             {{-- عنوان فرآیند --}}
