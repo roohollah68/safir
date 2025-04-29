@@ -11,10 +11,25 @@ class Project extends Model
     const UPDATED_AT = null;
 
     protected $fillable = [
-        'title',
-        'desc',
-        'image',
-        'location'
+        'title', 'desc', 'image', 'location', 
+        'user_id', 'task_owner_id', 'deadline', 'result'
     ];
+
+    protected $casts = [
+        'deadline' => 'date'
+    ];
+
+    public function user() {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function taskOwner() {
+        return $this->belongsTo(User::class, 'task_owner_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(ProjectComment::class);
+    }
 }
 

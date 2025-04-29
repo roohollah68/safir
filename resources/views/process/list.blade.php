@@ -6,7 +6,7 @@
 
 @section('content')
 <div class="container">
-    <a class="btn btn-outline-success mb-5" href="{{ route('add.form') }}">
+    <a class="btn btn-outline-success mb-5" href="{{ route('process.add.form') }}">
         <span class="fa fa-plus"></span>
         افزودن فرآیند
     </a>
@@ -27,7 +27,7 @@
                         <div class="card-body d-flex justify-content-between align-items-start">
                             <h2 class="card-title">{{ $process->title }}</h2>
                             <div>
-                                <a href="{{ route('edit', $process->id) }}" class="btn btn-outline-primary">
+                                <a href="{{ route('process.edit', $process->id) }}" class="btn btn-outline-primary">
                                 <i class="fas fa-edit"></i> ویرایش
                                 </a>
                                 @if ($process->image)
@@ -62,7 +62,7 @@
                                 <div class="card-body d-flex justify-content-between align-items-start">
                                     <h2 class="card-title">{{ $process->title }}</h2>
                                     <div>
-                                        <a href="{{ route('edit', $process->id) }}" class="btn btn-outline-primary">
+                                        <a href="{{ route('process.edit', $process->id) }}" class="btn btn-outline-primary">
                                         <i class="fas fa-edit"></i> ویرایش
                                         </a>
                                         @if ($process->image)
