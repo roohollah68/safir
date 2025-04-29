@@ -10,6 +10,7 @@ class Keysun extends Model
     use HasFactory;
     public $timestamps = false;
     public $guarded = [];
+    public $incrementing = false;
 
     public function order()
     {
@@ -23,7 +24,7 @@ class Keysun extends Model
 
     public function keysunMetas()
     {
-        return $this->hasMany(KeysunMeta::class);
+        return $this->hasMany(KeysunMeta::class,'keysun_id','id');
     }
 
     public function conversion()

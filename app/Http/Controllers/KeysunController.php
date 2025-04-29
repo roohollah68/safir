@@ -6,6 +6,7 @@ use App\Models\CustomerTransaction;
 use App\Models\Good;
 use App\Models\Keysun;
 use App\Models\Keysungood;
+use App\Models\KeysunMeta;
 use App\Models\Order;
 use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
@@ -31,6 +32,7 @@ class KeysunController extends Controller
 
         $transactions = CustomerTransaction::where('verified', 'approved')
             ->where('official', true)
+            ->where('pay_method', 'cash')
             ->whereDate('created_at', '>=', Verta::parse($request->from ?? '1404/01/01')->DateTime())
             ->whereDate('created_at', '<=', Verta::parse($request->to ?? verta())->DateTime())
             ->with(['customer.user', 'keysun.keysunMetas', 'paymentLinks.order.orderProducts'])
@@ -76,7 +78,8 @@ class KeysunController extends Controller
             if ($total > 0) {
                 $conv = round($order->total / $total, 3);
                 $keysun = $order->keysun()->create([
-                    'conv' => $conv
+                    'conv' => $conv,
+                    'id' => $order->id + 1000000,
                 ]);
                 foreach ($list as $id => $value) {
                     $keysun->keysunMetas()->create([
@@ -87,7 +90,8 @@ class KeysunController extends Controller
                 }
             } else {
                 $order->keysun()->create([
-                    'conv' => 0
+                    'conv' => 0,
+                    'id' => $order->id+1000000,
                 ]);
             }
             return $order->keysun()->with('keysunMetas')->first();
@@ -124,7 +128,8 @@ class KeysunController extends Controller
             if ($total > 0) {
                 $conv = round($transaction->amount / $total, 3);
                 $keysun = $transaction->keysun()->create([
-                    'conv' => $conv
+                    'conv' => $conv,
+                    'id' => $transaction->id + 3000000
                 ]);
                 foreach ($list as $id => $value) {
                     $keysun->keysunMetas()->create([
@@ -135,7 +140,8 @@ class KeysunController extends Controller
                 }
             } else {
                 $transaction->keysun()->create([
-                    'conv' => 0
+                    'conv' => 0,
+                    'id' => $transaction->id + 3000000
                 ]);
             }
             return $transaction->keysun()->with('keysunMetas')->first();

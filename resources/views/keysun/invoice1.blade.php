@@ -25,7 +25,7 @@
     <tbody>
     @foreach($keysuns as $keysun)
         <tr>
-            <td>{{$keysun->id + 1000000}}</td>
+            <td>{{$keysun->id}}</td>
             <td><input type="text" value="{!!verta()->format('Y/m/d')!!}"></td>
             <td>2</td>
             <td>1</td>
