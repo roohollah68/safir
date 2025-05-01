@@ -187,6 +187,7 @@
                         <label for="cheque_registration" class="input-group-text cheque">تصویر ثبت چک در بانک:</label>
                     </div>
                 <input type="file" id="cheque_registration" class="compress-image ms-2" name="cheque_registration">
+                    <input type="hidden" name="old_cheque_registration" value="{{$deposit->cheque_registration}}">
                 </div>
             </div>
             @if($deposit->cheque_registration)

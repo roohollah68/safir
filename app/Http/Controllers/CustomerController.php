@@ -216,15 +216,21 @@ class CustomerController extends Controller
         $user = auth()->user();
         request()->validate([
             'photo' => 'required_without:old_Photo|mimes:jpeg,jpg,png,bmp|max:2048',
-            'cheque_registration' => 'required_if:pay_method,cheque|mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:2048',
             'old_Photo' => 'required_without:photo',
-        ], [
+            ], [
             'photo.required_without' => 'ارائه تصویر الزامی است!',
-            'old_Photo.required_without' => '',
             'photo.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
-            'cheque_registration.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
-            'cheque_registration.required_if' => 'ارائه تصویر ثبت چک الزامی است!'
+            'old_Photo.required_without' => '',
         ]);
+        if($req->pay_method == 'cheque')
+            request()->validate([
+                'cheque_registration' => 'required_without:old_cheque_registration|mimes:jpeg,jpg,png,bmp|max:2048',
+                'old_cheque_registration' => 'required_without:cheque_registration',
+            ], [
+                'cheque_registration.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
+                'cheque_registration.required_without' => 'ارائه تصویر ثبت چک الزامی است!',
+                'old_cheque_registration.required_without' => '',
+            ]);
 
         if ($user->meta('editAllCustomers'))
             $customer = Customer::findOrFail($customerId);
@@ -235,6 +241,7 @@ class CustomerController extends Controller
         if ($req->file("photo")) {
             $photo = $req->file("photo")->store("", 'deposit');
         }
+        $cheque_registration = $req->old_cheque_registration;
         if ($req->file('cheque_registration')) {
             $cheque_registration = $req->file('cheque_registration')->store("", 'deposit');
         }
