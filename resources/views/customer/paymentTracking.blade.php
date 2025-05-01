@@ -99,7 +99,7 @@
                        title=" فاکتور"></a>
                     <a class="fa fa-comment btn btn-info" onclick="view_comment({{$id}})"></a>
                     <span class="btn btn-primary fa fa-chain" onclick="showOrderLink({{$id}})"></span>
-                    @if($User->meta('counter') && )
+                    @if($User->meta('counter') )
                         <span class="btn btn-secondary fa fa-clock" onclick="postponed({{$id}})"></span>
                     @endif
                 </td>
