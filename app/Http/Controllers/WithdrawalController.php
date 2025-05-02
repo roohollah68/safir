@@ -43,16 +43,27 @@ class WithdrawalController extends Controller
                 'code' => $req->cheque_id,
             ]
         );
-        $withdrawal = $user->withdrawals()->where('manager_confirm', '<', 1)->updateOrCreate([
-            'id' => $id
-        ], $req->merge(
-            [
-                'manager_confirm' => 0,
-                'counter_confirm' => 0,
-                'payment_confirm' => 0,
-                'supplier_id' => $supplier->id
-            ]
-        )->all());
+        $data = [
+            'amount' => $req->amount,
+            'expense' => $req->expense,
+            'location' => $req->location,
+            'pay_method' => $req->pay_method,
+            'account_name' => $req->account_name,
+            'account_number' => $req->account_number,
+            'cheque_id' => $req->cheque_id,
+            'cheque_date' => $req->cheque_date,
+            'user_desc' => $req->user_desc,
+            'manager_confirm' => 0,
+            'counter_confirm' => 0,
+            'payment_confirm' => 0,
+            'supplier_id' => $supplier->id,
+        ];
+        if($id){
+            $withdrawal = Withdrawal::where('manager_confirm' ,'<>' ,1)->findOrFail($id);
+            $withdrawal->update($data);
+        }else{
+            $withdrawal = $user->withdrawals()->create($data);
+        }
         if ($req->file("user_file")) {
             $withdrawal->user_file = $req->file("user_file")->store("", 'withdrawal');
         } elseif (!$req->old_user_file) {
@@ -125,7 +136,7 @@ class WithdrawalController extends Controller
             $withdrawals = $withdrawals->whereDate('created_at', '>=', $req->from);
         if (isset($req->to))
             $withdrawals = $withdrawals->whereDate('created_at', '<=', $req->to);
-        if(isset($req->postpone))
+        if (isset($req->postpone))
             $withdrawals = $withdrawals->where('counter_confirm', 2);
         // if (isset($req->dateFilter)) {
         //     $today = verta();
@@ -165,7 +176,7 @@ class WithdrawalController extends Controller
     {
         $user = auth()->user();
         if ($user->id != 122 && $user->id != 107 && $user->id != 110 && $user->id != 130)
-            abort(403,'شما مجاز نیستید!' );
+            abort(403, 'شما مجاز نیستید!');
         $withdrawal = Withdrawal::findOrFail($id)->update($req->all());
         $this->bale($id);
         return redirect()->back();
@@ -179,7 +190,7 @@ class WithdrawalController extends Controller
         ], [
             'expense_desc.required' => 'نوع هزینه باید مشخص شود!'
         ]);
-        Withdrawal::where('manager_confirm' , 1)->findOrFail($id)->update($req->all());
+        Withdrawal::where('manager_confirm', 1)->findOrFail($id)->update($req->all());
         $this->bale($id);
         return redirect()->back();
     }
@@ -193,7 +204,7 @@ class WithdrawalController extends Controller
             'payment_file2' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
             'payment_file3' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
         ]);
-        $withdrawal = Withdrawal::where('counter_confirm' , 1)->findOrFail($id);
+        $withdrawal = Withdrawal::where('counter_confirm', 1)->findOrFail($id);
         $withdrawal->update($req->all());
         if ($req->file('payment_file'))
             $withdrawal->payment_file = $req->file("payment_file")->store("", 'withdrawal');
@@ -212,7 +223,7 @@ class WithdrawalController extends Controller
         request()->validate([
             'recipient_file' => 'mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
         ]);
-        $withdrawal = Withdrawal::where('payment_confirm' , 1)->findOrFail($id);
+        $withdrawal = Withdrawal::where('payment_confirm', 1)->findOrFail($id);
 
         $withdrawal->recipient_confirm = ($req->recipient_confirm || $withdrawal->tankhah);
         $withdrawal->recipient_desc = $req->recipient_desc;

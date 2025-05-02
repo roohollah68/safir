@@ -11,8 +11,8 @@ class Withdrawal extends Model
     use SoftDeletes;
 
     protected $guarded = [
-        'id',
-        'user_id'
+//        'id',
+//        'user_id'
     ];
 
     public function user()

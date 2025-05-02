@@ -15,7 +15,7 @@
             $(".checkboxradio").checkboxradio();
 
             const chequeDate = new mds.MdsPersianDateTimePicker(document.getElementById('cheque_date_farsi'), {
-                targetTextSelector: '[name="cheque_date_farsi"]',
+                targetTextSelector: '#cheque_date_farsi',
                 targetDateSelector: '[name="cheque_date"]',
                 @if (old('cheque_date') ?: $withdrawal->cheque_date)
                     selectedDate: new Date('{{ old('cheque_date') ?: $withdrawal->cheque_date }}'),
@@ -147,7 +147,7 @@
                     <div class="input-group-append" style="min-width: 160px">
                         <label for="cheque_date_farsi" class="input-group-text w-100">تاریخ چک:</label>
                     </div>
-                    <input type="text" class="form-control cheque" name="cheque_date_farsi" id="cheque_date_farsi"
+                    <input type="text" class="form-control cheque" id="cheque_date_farsi"
                         required>
                     <input type="hidden" name="cheque_date">
                 </div>
