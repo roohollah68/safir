@@ -33,13 +33,17 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle active px-3" href="#" id="navbarDropdown" role="button"
                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            سفارشات
+                            <i class="fas fa-shopping-cart me-2" aria-hidden="true"></i>سفارشات
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             @if ($User->meta('addOrder'))
-                                <a class="dropdown-item" href="{{ route('newOrder') }}">ایجاد سفارش</a>
+                                <a class="dropdown-item" href="{{ route('newOrder') }}">
+                                    <i class="fas fa-plus me-2" aria-hidden="true"></i>ایجاد سفارش
+                                </a>
                             @endif
-                            <a class="dropdown-item" href="{{ route('listOrders') }}">مشاهده سفارشات</a>
+                            <a class="dropdown-item" href="{{ route('listOrders') }}">
+                                <i class="fas fa-list me-2" aria-hidden="true"></i>مشاهده سفارشات
+                            </a>
                         </div>
                     </li>
 
@@ -47,43 +51,38 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle active px-3" id="productDropdown" role="button"
                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                محصولات
+                                <i class="fas fa-box me-2" aria-hidden="true"></i>محصولات
                             </a>
                             <div class="dropdown-menu" aria-labelledby="productDropdown">
                                 <a class="dropdown-item" href="{{ route('productList') }}">
-                                    لیست محصولات
+                                    <i class="fas fa-list me-2" aria-hidden="true"></i>لیست محصولات
                                 </a>
                                 @if ($User->meta('editWarehouse'))
                                     <a class="dropdown-item" href="{{ route('addProduct') }}">
-                                        افزودن محصول جدید
+                                        <i class="fas fa-plus me-2" aria-hidden="true"></i>افزودن محصول جدید
                                     </a>
                                 @endif
-
                                 @if ($User->meta('warehouseTransfer'))
                                     <a class="dropdown-item" href="/warehouse/transfer">
-                                        انتقال بین انبارها
+                                        <i class="fas fa-exchange-alt me-2" aria-hidden="true"></i>انتقال بین انبارها
                                     </a>
                                 @endif
                                 <a class="dropdown-item" href="/goods/management">
-                                    مدیریت کالاها
+                                    <i class="fas fa-cogs me-2" aria-hidden="true"></i>مدیریت کالاها
                                 </a>
-                                {{-- <a class="dropdown-item" href="production/schedule/${warehouseId}">
-                                    برنامه تولید
-                                </a> --}}
                                 <a class="dropdown-item" href="/warehouse/manager">
-                                    تعیین مسئول انبار
+                                    <i class="fas fa-user-tie me-2" aria-hidden="true"></i>تعیین مسئول انبار
                                 </a>
                                 <a class="dropdown-item" href="/good/tag">
-                                    ثبت شناسه کالا
+                                    <i class="fas fa-tag me-2" aria-hidden="true"></i>ثبت شناسه کالا
                                 </a>
-                                
                                 @if ($User->meta('formulation'))
                                     <a class="dropdown-item" href="/formulation/list">
-                                        فرمول تولید
+                                        <i class="fas fa-flask me-2" aria-hidden="true"></i>فرمول تولید
                                     </a>
                                 @endif
                                 <a class="dropdown-item" href="{{ route('productionList') }}">
-                                    لیست تولید
+                                    <i class="fas fa-list me-2" aria-hidden="true"></i>لیست تولید
                                 </a>
                             </div>
                         </li>
@@ -92,28 +91,48 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle active px-3" href="#" id="customerDropdown" role="button"
                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            مشتریان
+                            <i class="fas fa-users me-2" aria-hidden="true"></i>مشتریان
                         </a>
                         <div class="dropdown-menu" aria-labelledby="customerDropdown">
-                            <a class="dropdown-item" href="{{ route('CustomerList') }}">لیست مشتریان</a>
-                            <a class="dropdown-item" href="{{route('newCustomer')}}">افزودن مشتری جدید</a>
-                            <a class="dropdown-item" href="/customerPaymentTracking">پیگیری پرداختی مشتریان</a>
-                            <a class="dropdown-item" href="/blockList">مسدود کردن دسترسی مشتریان</a>
+                            <a class="dropdown-item" href="{{ route('CustomerList') }}">
+                                <i class="fas fa-list me-2" aria-hidden="true"></i>لیست مشتریان
+                            </a>
+                            <a class="dropdown-item" href="{{route('newCustomer')}}">
+                                <i class="fas fa-plus me-2" aria-hidden="true"></i>افزودن مشتری جدید
+                            </a>
+                            <a class="dropdown-item" href="/customerPaymentTracking">
+                                <i class="fas fa-money-check me-2" aria-hidden="true"></i>پیگیری پرداختی مشتریان
+                            </a>
+                            <a class="dropdown-item" href="/blockList">
+                                <i class="fas fa-ban me-2" aria-hidden="true"></i>مسدود کردن دسترسی مشتریان
+                            </a>
                         </div>
                     </li>
 
                     @if ($User->meta('usersEdit'))
-                        <li class="nav-item"><a class="nav-link px-3" href="{{ route('usersList') }}">کاربران</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link px-3" href="{{ route('usersList') }}">
+                                <i class="fas fa-user-friends me-2" aria-hidden="true"></i>کاربران
+                            </a>
+                        </li>
                     @endif
 
                     @if ($User->meta('manageSafir'))
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle active px-3" href="#" id="navbarDropdown" role="button"
-                               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">سفیران</a>
+                               data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-star me-2" aria-hidden="true"></i>سفیران
+                            </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('DepositList') }}">واریزی های سفیران</a>
-                                <a class="dropdown-item" href="{{ route('couponList') }}">مدیریت تخفیف‌ها</a>
-                                <a class="dropdown-item" href="{{ route('settings') }}">تنظیمات </a>
+                                <a class="dropdown-item" href="{{ route('DepositList') }}">
+                                    <i class="fas fa-money-bill-wave me-2" aria-hidden="true"></i>واریزی های سفیران
+                                </a>
+                                <a class="dropdown-item" href="{{ route('couponList') }}">
+                                    <i class="fas fa-ticket-alt me-2" aria-hidden="true"></i>مدیریت تخفیف‌ها
+                                </a>
+                                <a class="dropdown-item" href="{{ route('settings') }}">
+                                    <i class="fas fa-cog me-2" aria-hidden="true"></i>تنظیمات
+                                </a>
                             </div>
                         </li>
                     @endif
@@ -121,21 +140,26 @@
                     @if ($User->meta('counter'))
                         <li class="nav-item dropdown">
                             <a class="nav-link px-3 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                حسابداری
+                                <i class="fas fa-calculator me-2" aria-hidden="true"></i>حسابداری
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item py-2" href="{{ route('customersOrderList') }}">بررسی
-                                        سفارشات</a></li>
-                                <li><a class="dropdown-item py-2" href="{{ route('customersDepositList') }}">بررسی
-                                        واریزی‌ها</a></li>
-                                <li><a class="dropdown-item py-2" href="{{ route('BankTransactionList') }}">مدیریت
-                                        نقدینگی</a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('customersOrderList') }}">
+                                    <i class="fas fa-eye me-2" aria-hidden="true"></i>بررسی سفارشات
+                                </a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('customersDepositList') }}">
+                                    <i class="fas fa-eye me-2" aria-hidden="true"></i>بررسی واریزی‌ها
+                                </a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('BankTransactionList') }}">
+                                    <i class="fas fa-wallet me-2" aria-hidden="true"></i>مدیریت نقدینگی
+                                </a></li>
                                 @if($User->meta('cheque'))
-                                    <li><a class="dropdown-item py-2" href="{{ route('chequeList') }}">لیست چک‌ها</a>
-                                    </li>
+                                    <li><a class="dropdown-item py-2" href="{{ route('chequeList') }}">
+                                        <i class="fas fa-money-check-alt me-2" aria-hidden="true"></i>لیست چک‌ها
+                                    </a></li>
                                 @endif
-                                <li><a class="dropdown-item py-2" href="{{ route('TaxList') }}">سامانه
-                                        مودیان</a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('TaxList') }}">
+                                    <i class="fas fa-file-invoice-dollar me-2" aria-hidden="true"></i>سامانه مودیان
+                                </a></li>
                             </ul>
                         </li>
                     @endif
@@ -143,11 +167,15 @@
                     @if ($safir)
                         <li class="nav-item dropdown">
                             <a class="nav-link px-3 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                امور مالی
+                                <i class="fas fa-wallet me-2" aria-hidden="true"></i>امور مالی
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item py-2" href="{{ route('DepositList') }}">واریزی‌ها</a></li>
-                                <li><a class="dropdown-item py-2" href="{{ route('transactions') }}">تراکنش‌ها</a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('DepositList') }}">
+                                    <i class="fas fa-money-bill-wave me-2" aria-hidden="true"></i>واریزی‌ها
+                                </a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('transactions') }}">
+                                    <i class="fas fa-exchange-alt me-2" aria-hidden="true"></i>تراکنش‌ها
+                                </a></li>
                             </ul>
                         </li>
                     @endif
@@ -155,39 +183,45 @@
                     @if ($User->meta(['withdrawal', 'allWithdrawal']))
                         <li class="nav-item">
                             <a class="nav-link px-3" href="{{ route('WithdrawalList') }}">
-                                درخواست پرداخت
+                                <i class="fas fa-hand-holding-usd me-2" aria-hidden="true"></i>درخواست پرداخت
                             </a>
                         </li>
                     @endif
 
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{{ route('statistic') }}">
-                            آمار
+                            <i class="fas fa-chart-bar me-2" aria-hidden="true"></i>آمار
                         </a>
                     </li>
 
                     @if ($User->meta(['workReport', 'addWorkReport']))
                         <li class="nav-item">
                             <a class="nav-link px-3" href="{{ route('reportList') }}">
-                                گزارش کار
+                                <i class="fas fa-clipboard me-2" aria-hidden="true"></i>گزارش کار
                             </a>
                         </li>
                     @endif
 
                     <li class="nav-item dropdown">
                         <a class="nav-link px-3 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            اتوماسیون
+                            <i class="fas fa-cogs me-2" aria-hidden="true"></i>اتوماسیون
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item py-2" href="{{ route('processList') }}">فرآیند‌ها</a></li>
-                            <li><a class="dropdown-item py-2" href="{{ route('projectList') }}">پروژه‌ها</a></li>
+                            <li><a class="dropdown-item py-2" href="{{ route('processList') }}">
+                                <i class="fas fa-project-diagram me-2" aria-hidden="true"></i>فرآیند‌ها
+                            </a></li>
+                            <li><a class="dropdown-item py-2" href="{{ route('projectList') }}">
+                                <i class="fas fa-tasks me-2" aria-hidden="true"></i>پروژه‌ها
+                            </a></li>
                         </ul>
                     </li>
 
-                    <!-- Mobile Logout -->
+
                     <li class="nav-item d-lg-none mt-3">
                         <a class="nav-link px-3 text-center" href="{{ route('logout') }}">
-                            <button class="btn btn-logout w-100">خروج</button>
+                            <button class="btn btn-logout w-100">
+                                <i class="fas fa-sign-out-alt me-2" aria-hidden="true"></i>خروج
+                            </button>
                         </a>
                     </li>
                 </div>
@@ -302,6 +336,10 @@
         box-shadow: gray 0px 1px 2px 0px;
     }
 
+    .nav-link i, .dropdown-item i {
+        display: none;
+    }
+
     @media (max-width: 991px) {
 
         .navbar-collapse {
@@ -310,12 +348,14 @@
             top: 0;
             left: 0;
             height: 100%;
-            width: 250px;
+            width: 100%;
             background-color: var(--color-bg-nav);
             z-index: 10000;
             overflow-y: auto;
             transition: transform 0.3s ease;
             transform: translateX(-100%);
+            padding-top: 200px;
+            padding-bottom: 70px;
         }
 
         .navbar-collapse.show {
@@ -326,18 +366,35 @@
             position: fixed;
             top: 15px;
             left: 15px;
-            z-index: 1050;
+            z-index: 10001;
         }
 
         .nav-item.dropdown .dropdown-menu {
-            transform: none;
+            position: absolute;
             width: 100%;
             text-align: center;
+            top: 100%;
+            margin-top: 0.5rem;
         }
 
         .nav-item {
             text-align: center;
             padding-bottom: 0.5em;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-item:last-child {
+            border-bottom: none;
+        }
+
+        .nav-link {
+            font-size: 1.4rem;
+            padding: 1.5rem;
+        }
+
+        .dropdown-item {
+            font-size: 1.4rem;
+            padding: 1.5rem;
         }
 
         .navbar-brand {
@@ -349,5 +406,34 @@
             height: 35px !important;
         }
 
+        .nav-link i, .dropdown-item i {
+            display: inline-block;
+            font-size: 1.6rem;
+            margin-right: 0.5rem;
+        }
+
+        .nav-link:active, .dropdown-item:active {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        body.nav-open {
+            overflow: hidden;
+        }
+
+        .nav-link:focus, .dropdown-item:focus {
+            outline: 2px solid #fff;
+            outline-offset: -2px;
+        }
+
+        #navbarContent {
+            position: absolute !important;
+            top: 56px !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            overflow-y: auto !important;
+            background-color: var(--bs-primary) !important;
+            z-index: 1050;
+        }
     }
 </style>

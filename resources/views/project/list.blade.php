@@ -27,9 +27,11 @@
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <h2 class="card-title">{{ $project->title }}</h2>
                             <div class="d-flex align-items-center">
-                                <a href="{{ route('project.edit', $project->id) }}" class="btn btn-outline-primary mx-1">
-                                    <i class="fas fa-edit"></i> ویرایش
-                                </a>
+                                @if ($project->user_id === auth()->id())
+                                    <a href="{{ route('project.edit', $project->id) }}" class="btn btn-outline-primary mx-1">
+                                        <i class="fas fa-edit"></i> ویرایش
+                                    </a>
+                                @endif
                                 @if ($project->image)
                                     <a class="btn btn-outline-secondary mx-1" href="/project/{{$project->image}}" target="_blank">مشاهده تصویر</a>
                                 @endif
@@ -80,9 +82,11 @@
                                 <div class="card-body d-flex justify-content-between align-items-center">
                                     <h2 class="card-title">{{ $project->title }}</h2>
                                     <div class="d-flex align-items-center">
-                                        <a href="{{ route('project.edit', $project->id) }}" class="btn btn-outline-primary mx-1">
-                                            <i class="fas fa-edit"></i> ویرایش
-                                        </a>
+                                        @if ($project->user_id === auth()->id())
+                                            <a href="{{ route('project.edit', $project->id) }}" class="btn btn-outline-primary mx-1">
+                                                <i class="fas fa-edit"></i> ویرایش
+                                            </a>
+                                        @endif
                                         @if ($project->image)
                                             <a class="btn btn-outline-secondary mx-1" href="/project/{{$project->image}}" target="_blank">مشاهده تصویر</a>
                                         @endif
