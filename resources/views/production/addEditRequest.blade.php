@@ -63,14 +63,38 @@
             {{-- Production Tab --}}
             <div id="productionTable" class="tab-pane active">
                 <table id="alertTable" class="table table-striped" style="width:100%; text-align: center;">
-                    <thead>
+                   <thead>
                         <tr>
                             <th>شناسه محصول</th>
                             <th>محصول</th>
-                            <th>جمع موجودی</th>
-                            <th>حد پایین</th>
-                            <th>حد بالا</th>
-                            <th>تعداد مورد نیاز</th>
+                            <th>
+                                جمع موجودی
+                                <i class="fas fa-info-circle text-primary" 
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top"
+                                title="محاسبه شده از: موجودی انبار تهران + موجودی انبار فریمان + درخواست‌های تولید ثبت شده"></i>
+                            </th>
+                            <th>
+                                حد پایین
+                                <i class="fas fa-info-circle text-primary" 
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top"
+                                title="حداقل مقدار مجاز در انبار تهران"></i>
+                            </th>
+                            <th>
+                                حد بالا
+                                <i class="fas fa-info-circle text-primary" 
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top"
+                                title="حد ایده‌آل موجودی در انبار تهران"></i>
+                            </th>
+                            <th>
+                                تعداد مورد نیاز
+                                <i class="fas fa-info-circle text-primary" 
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top"
+                                title="محاسبه شده از: (حد بالا) - (جمع موجودی فعلی)"></i>
+                            </th>
                             <th>عملیات</th>
                         </tr>
                     </thead>
@@ -135,6 +159,7 @@
 
 <script>
     $(document).ready(function() {
+        $('[data-bs-toggle="tooltip"]').tooltip();
         $("#tabs").tabs({
             active: 0,
         });
@@ -145,7 +170,10 @@
                 [5, "desc"]
             ],
             language: language,
-            search: true
+            search: true,
+            "columnDefs": [
+                { "targets": [2,3,4,5], "className": "dt-nowrap" }
+            ]
         });
 
         $('#historyTable').DataTable({

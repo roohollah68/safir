@@ -14,6 +14,7 @@ class ProductionRequestController extends Controller
     {
         $goods = Good::where('category', 'final')->get();
         $products = Product::withTrashed()->from('products as warehouse1')
+            ->where('warehouse1.available', 1)
             ->join('products as warehouse3', function ($join) {
                 $join->on('warehouse1.good_id', '=', 'warehouse3.good_id')
                     ->where('warehouse1.warehouse_id', 1)
@@ -109,6 +110,7 @@ class ProductionRequestController extends Controller
         $goods = Good::where('category', 'final')->get();
         
         $products = Product::withTrashed()->from('products as warehouse1')
+            ->where('warehouse1.available', 1)
             ->join('products as warehouse3', function ($join) {
                 $join->on('warehouse1.good_id', '=', 'warehouse3.good_id')
                     ->where('warehouse1.warehouse_id', 1)

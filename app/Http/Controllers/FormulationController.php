@@ -12,7 +12,10 @@ class FormulationController extends Controller
     public function list()
     {
         Helper::access('formulation');
-        $formulations = Formulation::with(['good' , 'rawGood.unit'])->get()->groupBy('good_id');
+        $formulations = Formulation::with(['good' , 'rawGood.unit'])
+            ->whereHas('rawGood')
+            ->get()
+            ->groupBy('good_id');
 
         $productionPrices = [];
         foreach ($formulations as $goodId => $formulationGroup) {
@@ -105,5 +108,12 @@ class FormulationController extends Controller
         })->sortBy('total')->values();
 
         return view('formulation.rawUsage', compact('rawMaterial'));
+    }
+
+    public function exists($goodId)
+    {
+        return response()->json([
+            'exists' => Formulation::where('good_id', $goodId)->exists()
+        ]);
     }
 }

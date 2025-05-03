@@ -258,14 +258,15 @@ Route::middleware(['auth', 'verify'])->group(function () {
     ///Formulation
     Route::controller(FormulationController::class)->prefix('formulation')->group(function () {
         Route::get('/list', 'list');
-        Route::get('/add', 'add');
-        Route::get('/edit/{id}', 'edit');
+        Route::get('/add', 'add')->name('formulation.add');
+        Route::get('/edit/{id}', 'edit')->name('formulation.edit');
         Route::post('/addEditRow/{id?}', 'addEditRow');
         Route::get('/deleteAll/{id}', 'deleteAll');
         Route::get('/deleteRow/{id}', 'deleteRow');
         Route::get('/view/{id}', 'view');
         Route::post('/getRawGoods/{id}', 'getRawGoods');
         Route::get('/raw-usage', 'rawUsage');
+        Route::get('/formulation/exists/{goodId}', 'exists');
     });
 
     //PRODUCTION REQUESTS

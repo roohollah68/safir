@@ -33,7 +33,8 @@
 
         <div class="row my-4">
             <div class="col-md-12 text-center">
-                <button type="submit" class="btn btn-success">ثبت تولید</button>
+                <div id="formError" style="display: none"></div>
+                <button type="submit" class="btn btn-success" id="submitBtn">ثبت تولید</button>
                 <a href="{{ route('productionList') }}" class="btn btn-danger">بازگشت</a>
             </div>
         </div>
@@ -61,15 +62,34 @@
                     <tbody>
                         @foreach ($requests->unique('good_id') as $request)
                             @if ($request->good->remainingRequests() > 0)
-                                <tr>
+                                <tr data-has-formulation="{{ $request->good->has_formulation ? 1 : 0 }}"
+                                    data-good-id="{{ $request->good->id }}">
                                     <td>{{ $request->good->id }}</td>
                                     <td>{{ $request->good->name }}</td>
                                     <td>{{ number_format($request->good->remainingRequests()) }}</td>
                                     <td>
                                         <button class="btn btn-sm btn-primary" 
-                                            onclick="addRequest('{{ $request->good->id }}', '{{ $request->good->name }}')">
-                                            <i class="fas fa-plus"></i> 
+                                                onclick="addRequest('{{ $request->good->id }}', '{{ $request->good->name }}')">
+                                            <i class="fas fa-plus"></i>
                                         </button>
+                                        
+                                        @if($request->good->formulations->isNotEmpty())
+                                            <a href="{{ route('formulation.edit', ['id' => $request->good->id]) }}" 
+                                            class="btn btn-sm btn-info" 
+                                            target="_blank"
+                                            data-toggle="tooltip" 
+                                            title="مشاهده/ویرایش فرمولاسیون">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        @else
+                                            <a href="{{ route('formulation.add') }}" 
+                                            class="btn btn-sm btn-danger"
+                                            target="_blank"
+                                            data-toggle="tooltip" 
+                                            title="افزودن فرمولاسیون">
+                                                <i class="fas fa-flask text-light"></i>
+                                            </a>
+                                        @endif
                                     </td>
                                 </tr>
                             @endif
@@ -129,15 +149,26 @@
             ],
             language: language
         });
+
+        $('#submitBtn').prop('disabled', true);
+        
+        $('#good_name').on('input', function() {
+            const goodId = $('#good_id').val();
+            if(goodId) updateSubmitButton(goodId);
+        });
     });
 
     function addRequest(goodId, goodName) {
         document.getElementById('good_name').value = goodName;
         document.getElementById('good_id').value = goodId;
+        updateSubmitButton(goodId);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        const goods = @json($goods->map(fn($good) => ['id' => $good->id, 'name' => $good->name]));
+        const goods = @json($requests->unique('good_id')->map(fn($request) => [
+            'id' => $request->good->id,
+            'name' => $request->good->name
+        ]));
         const goodInput = document.getElementById('good_name');
         const goodIdInput = document.getElementById('good_id');
         const dropdown = document.createElement('ul');
@@ -175,5 +206,56 @@
 
         goodInput.addEventListener('blur', () => setTimeout(() => dropdown.style.display = 'none', 200));
     });
+
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const goodId = document.getElementById('good_id').value;
+        if(!goodId) {
+            e.preventDefault();
+            return;
+        }
+        
+        fetch(`/formulation/exists/${goodId}`)
+            .then(response => response.json())
+            .then(data => {
+                if(!data.exists) {
+                    e.preventDefault();
+                    $('#formError').show().html(`
+                        <div class="alert alert-danger mt-3">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            فرمولاسیون برای این محصول ثبت نشده است!
+                            <a href="/formulation/add" target="_blank" class="alert-link">
+                                (افزودن فرمولاسیون)
+                            </a>
+                        </div>
+                    `);
+                    window.scrollTo(0, 0);
+                }
+            });
+    });
+
+    function checkFormulation(goodId) {
+        const row = $(`tr[data-good-id="${goodId}"]`);
+        if(row.length === 0) return false;
+        return row.data('has-formulation') === 1;
+    }
+
+    function updateSubmitButton(goodId) {
+        const isValid = checkFormulation(goodId);
+        $('#submitBtn').prop('disabled', !isValid);
+        
+        if(!isValid) {
+            $('#formError').show().html(`
+                <div class="alert alert-danger mt-3">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    فرمولاسیون برای این محصول ثبت نشده است!
+                    <a href="/formulation/add" target="_blank" class="alert-link">
+                        (افزودن فرمولاسیون)
+                    </a>
+                </div>
+            `);
+        } else {
+            $('#formError').hide();
+        }
+    }
 </script>
 @endsection
