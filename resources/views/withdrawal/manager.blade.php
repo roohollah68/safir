@@ -13,8 +13,8 @@
         <label class="btn btn-danger" for="reject">عدم تائید</label>
         <input type="radio" name="manager_confirm" value="-1" id="reject" class="checkboxradio">
 
-        <label class="btn btn-secondary" for="postpone_radio">تعویق</label>
-        <input type="radio" name="manager_confirm" value="2" id="postpone_radio" class="checkboxradio">
+{{--        <label class="btn btn-secondary" for="postpone_radio">تعویق</label>--}}
+{{--        <input type="radio" name="manager_confirm" value="2" id="postpone_radio" class="checkboxradio">--}}
 
         <br>
         <br>
