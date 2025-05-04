@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helper\Helper;
 use App\Models\Formulation;
 use App\Models\Good;
+use App\Models\ProductionRequest;
 use Illuminate\Http\Request;
 
 class FormulationController extends Controller
@@ -115,5 +116,46 @@ class FormulationController extends Controller
         return response()->json([
             'exists' => Formulation::where('good_id', $goodId)->exists()
         ]);
+    }
+
+    public function productionReport()
+    {
+        Helper::access('formulation');
+        $productions = ProductionRequest::selectRaw('
+                production_requests.good_id,
+                SUM(production_requests.amount) - COALESCE((
+                    SELECT SUM(productions.amount) 
+                    FROM productions 
+                    WHERE productions.good_id = production_requests.good_id
+                ), 0) as remaining_requests
+            ')
+            ->groupBy('production_requests.good_id')
+            ->having('remaining_requests', '>', 0)
+            ->get();
+
+        $formulations = Formulation::with(['good', 'rawGood.unit'])
+            ->whereHas('rawGood', fn($q) => $q->whereIn('category', ['raw', 'pack']))
+            ->whereIn('good_id', $productions->pluck('good_id'))
+            ->get()
+            ->groupBy('good_id');
+
+        $reportData = [];
+        foreach ($formulations as $goodId => $items) {
+            $production = $productions->firstWhere('good_id', $goodId);
+            $multiplier = $production->remaining_requests;
+
+            $reportData[$goodId] = [
+                'good' => $items->first()->good,
+                'remaining_requests' => $multiplier,
+                'raws' => $items->map(function($item) use ($multiplier) {
+                    return [
+                        'name' => $item->rawGood->name,
+                        'amount' => $item->amount * $multiplier,
+                        'unit' => $item->rawGood->unit->name ?? '-'
+                    ];
+                })
+            ];
+        }
+        return view('production.formulationPDF', compact('reportData'));
     }
 }

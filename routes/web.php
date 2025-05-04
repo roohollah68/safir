@@ -267,6 +267,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/getRawGoods/{id}', 'getRawGoods');
         Route::get('/raw-usage', 'rawUsage');
         Route::get('/formulation/exists/{goodId}', 'exists');
+        Route::get('/production/formulationPDF', 'productionReport')->name('formulation.pdf');
     });
 
     //PRODUCTION REQUESTS
