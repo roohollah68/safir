@@ -41,7 +41,7 @@ class WoocommerceController extends Controller
             'name' => $request->billing->first_name . ' ' . $request->billing->last_name,
             'phone' => $request->billing->phone,
             'address' => $request->billing->state . '، ' . $request->billing->city . '، '
-                . $request->billing->address_1 . '، ' . $unit_num . $house_num,
+                . $request->billing->address_1 . '، ' . $house_num . $unit_num,
             'zip_code' => $request->billing->postcode,
             'orders' => '',
             'desc' => $request->customer_note . ($desc ? ' - ' . $desc : ''),
@@ -62,7 +62,7 @@ class WoocommerceController extends Controller
                 $order->update($orderData);
                 if ($order->deleted_at) {
                     $order->restore();
-                    $this->orderProducts($order,$request,$website,$currency);
+                    $this->orderProducts($order, $request, $website, $currency);
                     (new TelegramController())->deleteOrderFromBale($order, '5742084958');
                     if ($website == 'dorateashop')
                         $this->dorateashop($order);
@@ -97,7 +97,7 @@ class WoocommerceController extends Controller
             ]);
             (new CommentController)->create($order, $user, 'سفارش ایجاد شد');
             $order->save();
-            $this->orderProducts($order,$request,$website,$currency);
+            $this->orderProducts($order, $request, $website, $currency);
             if ($website == 'dorateashop')
                 $this->dorateashop($order);
             else
