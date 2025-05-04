@@ -40,15 +40,106 @@
             ],
             language: language,
             dom: 'Bfrtip',
-            buttons: [
-            {
-            extend: 'excelHtml5',
-            text: '<i class="fas fa-file-excel me-1"></i> فایل اکسل',
-            className: 'btn btn-success mb-3',
-            }
-            ],
             searching: true,
+            buttons: [
+            ],
         });
+
+    function printTable() {
+        const printWindow = window.open('', '_blank');
+        const table = document.getElementById('productionTable');
+        const tableHtml = table.outerHTML;
+
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>لیست تولید</title>
+                    <style>
+                        @font-face {
+                            font-family: BNazanin;
+                            src: url('/css/BNAZANB.TTF');
+                        }
+                        body { font-family: 'Vazir', Arial, sans-serif; margin: 20px; direction: rtl; }
+                        table { width: 100%; border-collapse: collapse; text-align: center; margin-top: 20px; direction: rtl; }
+                        th, td { border: 1px solid black; padding: 10px; }
+                        h1 { text-align: center; margin-bottom: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>لیست تولید</h1>
+                    ${tableHtml}
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.onafterprint = function() {
+            printWindow.close();
+        };
+    }
+
+    function printRaw() {
+        const printWindow = window.open('', '_blank');
+        fetch("{{ route('formulation.pdf') }}")
+            .then(response => response.text())
+            .then(html => {
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>لیست تولید مواد اولیه</title>
+                            <style>
+                                @font-face {
+                                    font-family: 'Vazir';
+                                    src: url('/css/Vazir.ttf');
+                                }
+                                body {
+                                    font-family: Vazir, sans-serif;
+                                    margin: 20px;
+                                    direction: rtl;
+                                }
+                                table {
+                                    width: 100%;
+                                    border-collapse: collapse;
+                                    margin-top: 20px;
+                                }
+                                th, td {
+                                    border: 1px solid #000;
+                                    padding: 8px;
+                                    text-align: center;
+                                }
+                                h1 {
+                                    text-align: center;
+                                    margin-bottom: 30px;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            ${html}
+                        </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.focus();
+                printWindow.print();
+                printWindow.onafterprint = function() {
+                    printWindow.close();
+                };
+            });
+    }
+
+    $('<button>')
+        .html('<i class="fas fa-flask me-1"></i>فرمول تولید  ')
+        .addClass('btn btn-info mb-3 ms-2')
+        .on('click', printRaw)
+        .insertAfter('.dt-buttons');
+
+    $('<button>')
+        .html('<i class="fas fa-print me-1"></i> برنامه تولید')
+        .addClass('btn btn-warning mb-3')
+        .on('click', printTable)
+        .insertAfter('.dt-buttons');
+        
     });
 </script>
 @endsection
