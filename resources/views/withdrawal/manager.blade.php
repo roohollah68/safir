@@ -18,17 +18,17 @@
 
         <br>
         <br>
-        <div id="postpone-section" style="display: none;">
-            <div class="form-group input-group">
-                <div class="input-group-append" id="postpone-trigger">
-                    <label class="input-group-text"><i class="fas fa-calendar-alt me-2"></i>تاریخ پرداخت:</label>
-                </div>
-                <input type="text" name="postpone" id="postpone" class="form-control rounded"
-                       style="cursor: pointer;">
+{{--        <div id="postpone-section" style="display: none;">--}}
+{{--            <div class="form-group input-group">--}}
+{{--                <div class="input-group-append" id="postpone-trigger">--}}
+{{--                    <label class="input-group-text"><i class="fas fa-calendar-alt me-2"></i>تاریخ پرداخت:</label>--}}
+{{--                </div>--}}
+{{--                <input type="text" name="postpone" id="postpone" class="form-control rounded"--}}
+{{--                       style="cursor: pointer;">--}}
 
-                <input type="hidden" name="postpone_date" id="postpone_date">
-            </div>
-        </div>
+{{--                <input type="hidden" name="postpone_date" id="postpone_date">--}}
+{{--            </div>--}}
+{{--        </div>--}}
         <br>
 
         <label for="manager_desc">توضیحات</label><br>
