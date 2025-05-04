@@ -33,7 +33,7 @@ class WithdrawalController extends Controller
             'user_file.mimes' => 'فایل با این پسوند قابل قبول نیست!',
             'user_file.max' => 'حجم فایل نباید از 3 mb بیشتر باشد!',
         ]);
-        $req->merge(['amount' => +str_replace(",", "", $req->amount)]);
+
         $supplier = Supplier::updateOrCreate(
             [
                 'name' => $req->account_name
@@ -44,7 +44,7 @@ class WithdrawalController extends Controller
             ]
         );
         $data = [
-            'amount' => $req->amount,
+            'amount' => +str_replace(",", "", $req->amount),
             'expense' => $req->expense,
             'location' => $req->location,
             'pay_method' => $req->pay_method,
@@ -285,14 +285,41 @@ class WithdrawalController extends Controller
             'user_file.max' => 'حجم فایل نباید از 3 mb بیشتر باشد!',
             'expense_desc.required' => 'نوع هزینه باید مشخص شود!'
         ]);
-        $req->merge(['amount' => +str_replace(",", "", $req->amount)]);
-        $withdrawal = $user->withdrawals()->updateOrCreate(['id' => $req->id], $req->merge([
+//        $req->merge(['amount' => +str_replace(",", "", $req->amount)]);
+//        $withdrawal = $user->withdrawals()->updateOrCreate(['id' => $req->id], $req->merge([
+//            'tankhah' => 1,
+//            'counter_confirm' => 1,
+//            'manager_confirm' => 1,
+//            'payment_confirm' => 1,
+//            'recipient_confirm' => 1,
+//        ])->all());
+        $data = [
             'tankhah' => 1,
-            'counter_confirm' => 1,
+            'amount' => +str_replace(",", "", $req->amount),
+            'expense' => $req->expense,
+            'location' => $req->location,
+            'pay_method' => $req->pay_method,
+            'account_name' => $req->account_name,
+            'account_number' => $req->account_number,
+            'cheque_id' => $req->cheque_id,
+            'cheque_date' => $req->cheque_date,
+            'user_desc' => $req->user_desc,
+            'expense_type' => $req->expense_type,
+            'expense_desc' => $req->expense_desc,
+            'official' => $req->official,
+            'vat' => $req->vat,
+            'bank_id' => $req->bank_id,
             'manager_confirm' => 1,
+            'counter_confirm' => 1,
             'payment_confirm' => 1,
             'recipient_confirm' => 1,
-        ])->all());
+        ];
+        if($id){
+            $withdrawal = Withdrawal::findOrFail($id);
+            $withdrawal->update($data);
+        }else{
+            $withdrawal = $user->withdrawals()->create($data);
+        }
         $supplier = Supplier::updateOrCreate(['name' => $req->account_name], [
             'account' => $req->account_number,
             'code' => $req->cheque_id,
