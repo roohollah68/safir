@@ -47,9 +47,16 @@ class ProductionController extends Controller
 
             if($formulations->isNotEmpty()) {
                 foreach($formulations as $formulation) {
-                    $rawProduct = Product::where('good_id', $formulation->rawGood_id)
-                        ->where('warehouse_id', 3)
-                        ->firstOrFail();
+                    $rawProduct = Product::firstOrCreate(
+                        [
+                            'good_id' => $formulation->rawGood_id,
+                            'warehouse_id' => 3
+                        ],
+                        [
+                            'quantity' => 0,
+                            'available' => 1
+                        ]
+                    );
 
                 $requiredRaw = $formulation->amount * $validated['amount'];
 
