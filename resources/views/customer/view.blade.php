@@ -24,6 +24,9 @@
     @endif
     <span>وضعیت:</span> <b>{!! $deposit->verified() !!}</b> <br>
     <span>توضیحات:</span> <b>{{$deposit->description}}</b> <br>
+    @if($deposit->deposit_date)
+        <span>تاریخ واریزی:</span> <b>{{verta($deposit->deposit_date)->formatJalaliDate()}}</b> <br>
+    @endif
     <span>زمان ثبت:</span><b>{{verta($deposit->created_at)->formatJalaliDate()}}</b><br>
     <span>زمان ویرایش:</span><b>{{verta($deposit->updated_at)->formatJalaliDate()}}</b><br>
 </div>

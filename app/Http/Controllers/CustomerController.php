@@ -217,6 +217,7 @@ class CustomerController extends Controller
         request()->validate([
             'photo' => 'required_without:old_Photo|mimes:jpeg,jpg,png,bmp|max:2048',
             'old_Photo' => 'required_without:photo',
+            'deposit_date' => 'date',
             ], [
             'photo.required_without' => 'ارائه تصویر الزامی است!',
             'photo.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
@@ -256,6 +257,7 @@ class CustomerController extends Controller
             'amount' => +str_replace(",", "", $req->amount),
             'photo' => $photo,
             'cheque_registration' => $req->pay_method == 'cheque' ? $cheque_registration : null,
+            'deposit_date' => $req->deposit_date,
         ]);
         $transaction->official = ($req->pay_method == 'cash') ? $transaction->bank->official : $req->official ;
         $transaction->save();

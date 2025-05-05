@@ -31,6 +31,14 @@
                 selectedDate: new Date("{{old('cheque_date')?:$deposit->cheque_date}}"),
                 @endif
             });
+
+            const depositDate = new mds.MdsPersianDateTimePicker($('#deposit_date_farsi')[0], {
+                targetTextSelector: '#deposit_date_farsi',
+                targetDateSelector: '#deposit_date',
+                @if(old('deposit_date')?:$deposit->deposit_date)
+                selectedDate: new Date("{{old('deposit_date')?:$deposit->deposit_date}}"),
+                @endif
+            });
         });
     </script>
 @endsection
@@ -154,6 +162,16 @@
                 </div>
             </div>
 
+            {{--            تاریخ واریزی--}}
+            <div class="col-md-6 my-2">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="deposit_date_farsi" class="input-group-text w-100">تاریخ واریزی:</label>
+                    </div>
+                    <input type="text" class="form-control" name="deposit_date_farsi" id="deposit_date_farsi">
+                    <input type="hidden" name="deposit_date" id="deposit_date">
+                </div>
+            </div>
 
             <div class="col-md-6">
                 <div class="form-group input-group">
