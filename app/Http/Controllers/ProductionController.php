@@ -15,11 +15,9 @@ class ProductionController extends Controller
 {
     public function addProductionForm()
     {
-        $requests = ProductionRequest::with(['good.formulations'])
-            ->get()
-            ->each(function ($request) {
-                $request->good->has_formulation = $request->good->formulations->isNotEmpty();
-            });
+        $requests = ProductionRequest::with(['good'])
+            ->get();
+            
         foreach ($requests as $request) {
             $request->remaining_requests = $request->good->remainingRequests();
         }

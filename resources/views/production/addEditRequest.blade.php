@@ -44,7 +44,8 @@
 
             <div class="row my-4">
                 <div class="col-md-12 text-center">
-                    <button type="submit" class="btn btn-success">{{ $edit ? 'ویرایش' : 'ثبت' }}</button>
+                    <div id="formError" style="display: none"></div>
+                    <button type="submit" class="btn btn-success" id="submitBtn">{{ $edit ? 'ویرایش' : 'ثبت' }}</button>
                     <a href="{{ route('productionList') }}" class="btn btn-danger">بازگشت</a>
                 </div>
             </div>
@@ -100,7 +101,7 @@
                     </thead>
                     <tbody>
                         @foreach ($products as $product)
-                            <tr>
+                            <tr data-good-id="{{ $product->good_id }}" data-has-formulation="{{ $product->has_formulation ? 1 : 0 }}">
                                 <td>{{ $product->good_id }}</td>
                                 <td>{{ $product->good->name }}</td>
                                 <td>{{ number_format($product->quantity) }}</td>
@@ -112,6 +113,22 @@
                                             class="btn btn-sm btn-success">
                                         <i class="fas fa-plus"></i> 
                                     </button>
+                                    
+                                    @if($product->has_formulation)
+                                        <a href="{{ route('formulation.edit', ['id' => $product->good_id]) }}" 
+                                        class="btn btn-sm btn-info" 
+                                        target="_blank"
+                                        title="مشاهده/ویرایش فرمولاسیون">
+                                        <i class="fas fa-eye"></i>
+                                        </a>
+                                    @else
+                                        <a href="{{ route('formulation.add') }}?good_id={{ $product->good_id }}" 
+                                        class="btn btn-sm btn-danger" 
+                                        target="_blank"
+                                        title="افزودن فرمولاسیون">
+                                            <i class="fas fa-flask text-light"></i>
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -172,7 +189,7 @@
             language: language,
             search: true,
             "columnDefs": [
-                { "targets": [2,3,4,5], "className": "dt-nowrap" }
+                { "targets": [2,3,4,5,6], "className": "dt-nowrap" }
             ]
         });
 
@@ -204,17 +221,41 @@
             }
         });
 
+        const initialGoodId = $('#good_id').val();
+        if(initialGoodId) updateSubmitButton(initialGoodId);
+
     });
 
     function fillForm(goodId, quantity) {
-        const goods = @json($goods->map(fn($good) => ['id' => $good->id, 'name' => $good->name]));
+        const goods = @json($products->map(fn($product) => ['id' => $product->good_id, 'name' => $product->good->name]));
         const selectedGood = goods.find(good => good.id === goodId);
-        if (selectedGood) {
+        if(selectedGood) {
             document.getElementById('good_name').value = selectedGood.name;
+            document.getElementById('good_id').value = goodId;
+            document.getElementById('amount').value = quantity;
+            updateSubmitButton(goodId);
         }
-        document.getElementById('good_id').value = goodId;
-        document.getElementById('amount').value = quantity;
-        document.getElementById('amount').dispatchEvent(new Event('input'));
+    }
+
+    function updateSubmitButton(goodId) {
+        const row = $(`tr[data-good-id="${goodId}"]`);
+        const hasFormulation = row.length ? row.data('has-formulation') : false;
+        
+        $('#submitBtn').prop('disabled', !hasFormulation);
+        
+        if(!hasFormulation) {
+            $('#formError').show().html(`
+                <div class="alert alert-danger mt-3">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    فرمولاسیون برای این محصول ثبت نشده است!
+                    <a href="/formulation/add" target="_blank" class="alert-link">
+                        (افزودن فرمولاسیون)
+                    </a>
+                </div>
+            `);
+        } else {
+            $('#formError').hide();
+        }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -250,11 +291,37 @@
                     goodInput.value = item.dataset.name;
                     goodIdInput.value = item.dataset.id;
                     dropdown.style.display = 'none';
+                    updateSubmitButton(item.dataset.id);
                 };
             });
         });
 
         goodInput.addEventListener('blur', () => setTimeout(() => dropdown.style.display = 'none', 200));
+    });
+
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const goodId = document.getElementById('good_id').val();
+        if(!goodId) {
+            e.preventDefault();
+            return;
+        }
+
+        const row = $(`tr[data-good-id="${goodId}"]`);
+        const hasFormulation = row.length ? row.data('has-formulation') : false;
+        
+        if(!hasFormulation) {
+            e.preventDefault();
+            $('#formError').show().html(`
+                <div class="alert alert-danger mt-3 d-inline-block">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    فرمولاسیون برای این محصول ثبت نشده است!
+                    <a href="/formulation/add target="_blank" class="alert-link">
+                        (افزودن فرمولاسیون)
+                    </a>
+                </div>
+            `);
+            window.scrollTo(0, 0);
+        }
     });
 </script>
 @endsection

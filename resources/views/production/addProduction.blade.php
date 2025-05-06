@@ -62,8 +62,8 @@
                     <tbody>
                         @foreach ($requests->unique('good_id') as $request)
                             @if ($request->good->remainingRequests() > 0)
-                                <tr data-has-formulation="{{ $request->good->has_formulation ? 1 : 0 }}"
-                                    data-good-id="{{ $request->good->id }}">
+                                <tr data-good-id="{{ $request->good_id }}" 
+                                    data-has-formulation="{{ $request->good->formulations->isNotEmpty() ? 1 : 0 }}">
                                     <td>{{ $request->good->id }}</td>
                                     <td>{{ $request->good->name }}</td>
                                     <td>{{ number_format($request->good->remainingRequests()) }}</td>
@@ -149,8 +149,6 @@
             ],
             language: language
         });
-
-        $('#submitBtn').prop('disabled', true);
         
         $('#good_name').on('input', function() {
             const goodId = $('#good_id').val();
@@ -165,6 +163,10 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        const initialGoodId = $('#good_id').val();
+        if (initialGoodId) {
+            updateSubmitButton(initialGoodId);
+        }
         const goods = @json($requests->unique('good_id')->map(fn($request) => [
             'id' => $request->good->id,
             'name' => $request->good->name
@@ -200,6 +202,7 @@
                     goodInput.value = item.dataset.name;
                     goodIdInput.value = item.dataset.id;
                     dropdown.style.display = 'none';
+                    updateSubmitButton(item.dataset.id);
                 };
             });
         });
@@ -208,42 +211,36 @@
     });
 
     document.querySelector('form').addEventListener('submit', function(e) {
-        const goodId = document.getElementById('good_id').value;
+        const goodId = document.getElementById('good_id').val();
         if(!goodId) {
             e.preventDefault();
             return;
         }
-        
-        fetch(`/formulation/exists/${goodId}`)
-            .then(response => response.json())
-            .then(data => {
-                if(!data.exists) {
-                    e.preventDefault();
-                    $('#formError').show().html(`
-                        <div class="alert alert-danger mt-3">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            فرمولاسیون برای این محصول ثبت نشده است!
-                            <a href="/formulation/add" target="_blank" class="alert-link">
-                                (افزودن فرمولاسیون)
-                            </a>
-                        </div>
-                    `);
-                    window.scrollTo(0, 0);
-                }
-            });
+        const row = $(`tr[data-good-id="${goodId}"]`);
+        const hasFormulation = row.length ? row.data('has-formulation') : false;
+
+        if(!hasFormulation) {
+            e.preventDefault();
+            $('#formError').show().html(`
+                <div class="alert alert-danger mt-3 d-inline-block">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    فرمولاسیون برای این محصول ثبت نشده است!
+                    <a href="/formulation/add" target="_blank" class="alert-link">
+                        (افزودن فرمولاسیون)
+                    </a>
+                </div>
+            `);
+            window.scrollTo(0, 0);
+        }
     });
 
-    function checkFormulation(goodId) {
-        const row = $(`tr[data-good-id="${goodId}"]`);
-        if(row.length === 0) return false;
-        return row.data('has-formulation') === 1;
-    }
-
     function updateSubmitButton(goodId) {
-        const isValid = checkFormulation(goodId);
-        $('#submitBtn').prop('disabled', !isValid);
+        const row = $(`tr[data-good-id="${goodId}"]`);
+        const hasFormulation = row.length ? row.data('has-formulation') : false;
         
-        if(!isValid) {
+        $('#submitBtn').prop('disabled', !hasFormulation);
+        
+        if(!hasFormulation) {
             $('#formError').show().html(`
                 <div class="alert alert-danger mt-3">
                     <i class="fas fa-exclamation-triangle"></i>
