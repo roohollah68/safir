@@ -24,7 +24,6 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\WoocommerceController;
-use App\Livewire\Counter;
 use Illuminate\Support\Facades\Route;
 
 
@@ -253,6 +252,8 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('/good', 'good');
         Route::post('/orders/excel', 'excelData');
         Route::get('/change/{id}', 'viewChange');
+        Route::post('/import-excel', 'import');
+        Route::get('/import-excel', 'importForm');
     });
 
     ///Formulation
@@ -289,8 +290,8 @@ Route::middleware(['auth', 'verify'])->group(function () {
     // PROJECTS
     Route::controller(ProjectController::class)->prefix('projects')->group(function () {
         Route::get('/', 'index')->name('projectList');
-        Route::get('/add', 'create')->name('project.add.form'); 
-        Route::post('/add', 'storeProject')->name('project.add'); 
+        Route::get('/add', 'create')->name('project.add.form');
+        Route::post('/add', 'storeProject')->name('project.add');
         Route::get('/edit/{id}', 'edit')->name('project.edit');
         Route::post('/update/{id}', 'update')->name('project.update');
         Route::get('/{project}/comments', 'getComments')->name('projects.comments');
@@ -301,9 +302,9 @@ Route::middleware(['auth', 'verify'])->group(function () {
     Route::controller(ProcessController::class)->prefix('processes')->group(function () {
         Route::get('/', 'index')->name('processList');
         Route::get('/add', 'create')->name('process.add.form');
-        Route::post('/add', 'store')->name('process.add'); 
-        Route::get('/edit/{id}', 'edit')->name('process.edit'); 
-        Route::post('/update/{id}', 'update')->name('process.update'); 
+        Route::post('/add', 'store')->name('process.add');
+        Route::get('/edit/{id}', 'edit')->name('process.edit');
+        Route::post('/update/{id}', 'update')->name('process.update');
     });
 
 });

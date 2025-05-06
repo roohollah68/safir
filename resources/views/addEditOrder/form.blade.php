@@ -92,12 +92,12 @@
             @if(!$edit)
                 <x-radio :id="'credit'" :name="'paymentMethod'" value="credit" onclick="paymentAction()" checked>
                     {{config('payMethods')['credit']}}</x-radio>
-                <x-radio :id="'receipt'" :name="'paymentMethod'" value="receipt" onclick="paymentAction()">
-                    {{config('payMethods')['receipt']}}</x-radio>
+{{--                <x-radio :id="'receipt'" :name="'paymentMethod'" value="receipt" onclick="paymentAction()">--}}
+{{--                    {{config('payMethods')['receipt']}}</x-radio>--}}
                 <x-radio :id="'onDelivery'" :name="'paymentMethod'" value="onDelivery" onclick="paymentAction()">
                     {{config('payMethods')['onDelivery']}}</x-radio><br>
-                <label for='receiptPhoto' class="btn btn-info m-2 hide receiptPhoto">بارگذاری تصویر رسید بانکی <i
-                        class="fa fa-image"></i></label>
+{{--                <label for='receiptPhoto' class="btn btn-info m-2 hide receiptPhoto">بارگذاری تصویر رسید بانکی <i--}}
+{{--                        class="fa fa-image"></i></label>--}}
                 <input type="file" id="receiptPhoto" class="hide compress-image*" name="receipt">
                 <label for="customerDiscount">درصد تخفیف به مشتری</label>
                 <input type="number" style="max-width: 60px" min="0" max="50" id="customerDiscount"

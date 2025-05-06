@@ -237,13 +237,15 @@ class OrderController extends Controller
                     'type' => false,
                     'description' => 'ثبت سفارش',
                 ]);
-            } elseif ($order->paymentMethod == 'receipt') {
-                if ($request->file("receipt"))
-                    $order->receipt = $request->file("receipt")->store("", 'receipt');
-                else
-                    return $this->errorBack('باید عکس رسید بانکی بارگذاری شود!');
-
-            } elseif ($order->paymentMethod == 'onDelivery') {
+            }
+//            elseif ($order->paymentMethod == 'receipt') {
+//                if ($request->file("receipt"))
+//                    $order->receipt = $request->file("receipt")->store("", 'receipt');
+//                else
+//                    return $this->errorBack('باید عکس رسید بانکی بارگذاری شود!');
+//
+//            }
+            elseif ($order->paymentMethod == 'onDelivery') {
                 $order->desc .= '- پرداخت در محل';
                 $order->customerCost = round($Total * (100 - $request->customerDiscount) / 100 + $deliveryCost);
             } else

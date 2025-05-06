@@ -6,10 +6,10 @@ use App\Models\CustomerTransaction;
 use App\Models\Good;
 use App\Models\Keysun;
 use App\Models\Keysungood;
-use App\Models\KeysunMeta;
 use App\Models\Order;
 use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class KeysunController extends Controller
 {
@@ -91,7 +91,7 @@ class KeysunController extends Controller
             } else {
                 $order->keysun()->create([
                     'conv' => 0,
-                    'id' => $order->id+1000000,
+                    'id' => $order->id + 1000000,
                 ]);
             }
             return $order->keysun()->with('keysunMetas')->first();
@@ -172,10 +172,43 @@ class KeysunController extends Controller
 
     public function viewChange($id)
     {
-        $keysun = Keysun::with(['order','transaction'])->findOrFail($id);
+        $keysun = Keysun::with(['order', 'transaction'])->findOrFail($id);
         $order = $keysun->order;
 //        $transaction = $keysun->transaction;
         $transaction = CustomerTransaction::find($keysun->customer_transaction_id);
         return view('keysun.change', compact('order', 'keysun', 'transaction'));
+    }
+
+    public function importForm()
+    {
+        echo view('keysun.import');
+    }
+
+    public function import(Request $request)
+    {
+        // اعتبارسنجی فایل آپلود شده
+        $request->validate([
+            'excel_file' => 'required|file|mimes:xlsx,xls'
+        ]);
+
+        // دریافت فایل از درخواست
+        $file = $request->file('excel_file');
+
+        // خواندن فایل اکسل و تبدیل به آرایه
+        $excelData = Excel::toArray([], $file);
+
+        // یا برای خواندن هر Sheet به صورت جداگانه
+        $sheetsData = [];
+        $sheetNames = Excel::load($file)->getSheetNames();
+
+        foreach ($sheetNames as $sheetName) {
+            $sheetsData[$sheetName] = Excel::toArray([], $file, $sheetName);
+        }
+
+        // خروجی به صورت آرایه
+        return response()->json([
+            'all_sheets_data' => $excelData,
+            'per_sheet_data' => $sheetsData
+        ]);
     }
 }
