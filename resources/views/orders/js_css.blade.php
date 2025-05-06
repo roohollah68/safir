@@ -8,7 +8,7 @@
     let orders = {!!json_encode($orders)!!};
     let ids;
     let showDeleted, printWait, confirmWait, counterWait, proccessWait, editAfterPrint, notsent, sent, delivered,
-        COD, refund,
+        COD, refund, receipt;
         user = 'all',
         warehouseId = 'all';
     let changeOrdersPermit = !!'{{$User->meta('showAllOrders')}}';
@@ -91,6 +91,8 @@
         if (COD && order.paymentMethod !== 'cod' && order.paymentMethod !== 'پرداخت در محل' && order.paymentMethod !== 'onDelivery')
             return;
         if (refund && order.total >= 0)
+            return;
+        if (receipt && order.paymentMethod != 'receipt')
             return;
         if (order.user.role === 'admin' && !adminOrders) {
             return

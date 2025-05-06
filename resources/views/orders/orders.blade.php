@@ -51,6 +51,7 @@
             <x-checkbox :id="'adminOrders'" checked>فروشگاه ها</x-checkbox>
             <x-checkbox :id="'COD'">پرداخت در محل</x-checkbox>
             <x-checkbox :id="'refund'">بازگشت به انبار</x-checkbox>
+            <x-checkbox :id="'receipt'">رسید پرداخت</x-checkbox>
         @endif
         <br>
         <br>
