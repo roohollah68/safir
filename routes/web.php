@@ -7,6 +7,7 @@ use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DepositController;
 use App\Http\Controllers\FormulationController;
+use App\Http\Controllers\FixedCostController;
 use App\Http\Controllers\KeysunController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProcessController;
@@ -305,6 +306,13 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/add', 'store')->name('process.add');
         Route::get('/edit/{id}', 'edit')->name('process.edit');
         Route::post('/update/{id}', 'update')->name('process.update');
+    });
+
+    Route::controller(FixedCostController::class)->prefix('fixed-costs')->group(function () {
+        Route::get('/', 'index')->name('fixed-costs.index');
+        Route::get('/create', 'create')->name('fixed-costs.create');
+        Route::post('/store/{id?}', 'store')->name('fixed-costs.store');
+        Route::get('/edit/{id}', 'edit')->name('fixed-costs.edit');
     });
 
 });

@@ -160,6 +160,9 @@
                                 <li><a class="dropdown-item py-2" href="{{ route('TaxList') }}">
                                     <i class="fas fa-file-invoice-dollar me-2" aria-hidden="true"></i>سامانه مودیان
                                 </a></li>
+                                <li><a class="dropdown-item py-2" href="{{ route('fixed-costs.index') }}">
+                                    <i class="fas fa-coins me-2" aria-hidden="true"></i>هزینه‌های ثابت
+                                </a></li>
                             </ul>
                         </li>
                     @endif
