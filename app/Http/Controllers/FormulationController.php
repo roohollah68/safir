@@ -33,7 +33,13 @@ class FormulationController extends Controller
     public function add()
     {
         Helper::access('formulation');
-        $goods = Good::all();
+        $goods = Good::with(['products' => function ($query) {
+                $query->where('warehouse_id', 3)
+                    ->where('available', 1)
+                    ->whereNull('deleted_at');
+            }])
+            ->whereHas('products')
+            ->get();
         $finals = $goods->keyBy('name')->filter(fn($good) => $good->category == 'final')->map(fn($good) => $good->id);
         $raws = $goods->keyBy('name')->filter(fn($good) => $good->category != 'final')->map(fn($good) => $good->id);
         $edit = false;
@@ -43,8 +49,13 @@ class FormulationController extends Controller
     public function edit($id)
     {
         Helper::access('formulation');
-        $good = Good::with('formulations')->findOrFail($id);
-        $goods = Good::all();
+        $good = Good::with(['formulations', 'products' => function ($query) {
+            $query->where('warehouse_id', 3)
+                  ->where('available', 1)
+                  ->whereNull('deleted_at');
+        }])
+        ->findOrFail($id);
+        $goods = Good::whereHas('products')->get();
         $finals = $goods->keyBy('name')->filter(fn($good) => $good->category == 'final')->map(fn($good) => $good->id);
         $raws = $goods->keyBy('name')->filter(fn($good) => $good->category != 'final')->map(fn($good) => $good->id);
         $edit = true;
@@ -109,13 +120,6 @@ class FormulationController extends Controller
         })->sortBy('total')->values();
 
         return view('formulation.rawUsage', compact('rawMaterial'));
-    }
-
-    public function exists($goodId)
-    {
-        return response()->json([
-            'exists' => Formulation::where('good_id', $goodId)->exists()
-        ]);
     }
 
     public function productionReport()
