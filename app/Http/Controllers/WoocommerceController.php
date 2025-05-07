@@ -41,7 +41,7 @@ class WoocommerceController extends Controller
             'name' => $request->billing->first_name . ' ' . $request->billing->last_name,
             'phone' => $request->billing->phone,
             'address' => $request->billing->state . '، ' . $request->billing->city . '، '
-                . $request->billing->address_1 . '، ' . $house_num . $unit_num,
+                . $request->billing->address_1 ,
             'zip_code' => $request->billing->postcode,
             'orders' => '',
             'desc' => $request->customer_note . ($desc ? ' - ' . $desc : ''),
