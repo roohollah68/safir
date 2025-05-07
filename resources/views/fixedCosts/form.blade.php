@@ -16,11 +16,11 @@
                     </div>
                     <select id="category" name="category" class="form-control" required>
                         <option value="" disabled {{ !isset($fixedCost) ? 'selected' : '' }}>انتخاب کنید</option>
-                        <option value="0" {{ isset($fixedCost) && $fixedCost->category == '0' ? 'selected' : '' }}>حقوق تولید</option>
-                        <option value="1" {{ isset($fixedCost) && $fixedCost->category == '1' ? 'selected' : '' }}>حقوق فروش</option>
-                        <option value="2" {{ isset($fixedCost) && $fixedCost->category == '2' ? 'selected' : '' }}>اجاره</option>
-                        <option value="3" {{ isset($fixedCost) && $fixedCost->category == '3' ? 'selected' : '' }}>بیمه</option>
-                        <option value="4" {{ isset($fixedCost) && $fixedCost->category == '4' ? 'selected' : '' }}>بودجه‌ی ماهیانه‌ی تبلیغات</option>
+                        <option value="{{ $expenseTypes[0] }}" {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[0] ? 'selected' : '' }}>{{ $expenseTypes[0] }}</option>
+                        <option value="{{ $expenseTypes[1] }}" {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[1] ? 'selected' : '' }}>{{ $expenseTypes[1] }}</option>
+                        <option value="{{ $expenseTypes[9] }}" {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[9] ? 'selected' : '' }}>{{ $expenseTypes[9] }}</option>
+                        <option value="{{ $expenseTypes[6] }}" {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[6] ? 'selected' : '' }}>{{ $expenseTypes[6] }}</option>
+                        <option value="{{ $expenseTypes[16] }}" {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[16] ? 'selected' : '' }}>{{ $expenseTypes[16] }}</option>
                     </select>
                 </div>
             </div>
@@ -85,6 +85,55 @@
                            value="{{ isset($fixedCost) ? $fixedCost->due_day : '' }}">
                 </div>
             </div>
+
+        <div class="col-md-6 my-2">
+            <div class="form-group input-group">
+            <div class="input-group-append" style="min-width: 160px">
+                <label class="input-group-text w-100">نوع فاکتور:</label>
+            </div>
+            <label for="official" class="">رسمی</label>
+            <input type="radio" class="checkboxradio" name="official" id="official"
+                   value="1" onclick="$('.VAT').show()" 
+                   {{ isset($fixedCost) && $fixedCost->official == 1 ? 'checked' : '' }}>
+
+            <label for="unofficial" class="">غیر رسمی</label>
+            <input type="radio" class="checkboxradio" name="official" id="unofficial"
+                   value="0" onclick="$('.VAT').hide()" 
+                   {{ !isset($fixedCost) || $fixedCost->official == 0 ? 'checked' : '' }}>
+            </div>
+        </div>
+
+        {{-- ارزش افزوده(10%) --}}
+        <div class="col-md-6 my-2 VAT {{ isset($fixedCost) && $fixedCost->official == 1 ? '' : 'hide' }}">
+            <div class="form-group input-group">
+            <div class="input-group-append" style="min-width: 160px">
+                <label class="input-group-text w-100">ارزش افزوده(10%):</label>
+            </div>
+            <label for="vat" class="">دارد</label>
+            <input type="radio" class="checkboxradio" name="vat" id="vat" value="1" 
+                   {{ isset($fixedCost) && $fixedCost->vat == 1 ? 'checked' : '' }}>
+            <label for="no-vat" class="">ندارد</label>
+            <input type="radio" class="checkboxradio" name="vat" id="no-vat" value="0" 
+                   {{ isset($fixedCost) && $fixedCost->vat == 0 ? 'checked' : '' }}>
+            </div>
+        </div>
+
+        {{-- انتخاب بانک --}}
+        <div class="col-md-6 my-2">
+            <div class="form-group input-group">
+            <div class="input-group-append" style="min-width: 160px">
+                <label for="bank_id" class="input-group-text w-100">انتخاب بانک:</label>
+            </div>
+            <select id="bank_id" name="bank_id" class="form-control">
+                <option value="">لطفا انتخاب کنید</option>
+                @foreach($banks as $bank)
+                <option value="{{ $bank->id }}" 
+                    {{ isset($fixedCost) && (int)$fixedCost->bank_id === (int)$bank->id ? 'selected' : '' }}>
+                    {{ $bank->name }}
+                </option>
+                @endforeach
+            </select>
+            </div>
         </div>
 
         {{-- دکمه‌ها --}}
@@ -96,4 +145,12 @@
             </div>
         </div>
     </form>
+@endsection
+
+@section('files')
+<script>
+    $(document).ready(function() {
+        $('.checkboxradio').checkboxradio();
+    });
+</script>
 @endsection

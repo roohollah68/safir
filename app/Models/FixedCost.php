@@ -10,11 +10,25 @@ class FixedCost extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
+        'bank_id',
         'category',
         'amount',
         'account_owner',
         'desc',
         'iban',
         'due_day',
+        'official',
+        'vat',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class);
+    }
 }

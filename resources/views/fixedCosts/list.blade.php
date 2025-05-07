@@ -15,10 +15,20 @@
             <input type="radio" class="btn-check filter-radio" name="categoryFilter" id="all" value="all" checked>
             <label class="btn btn-outline-primary" for="all">همه</label>
 
-            @foreach ($categoryMap as $key => $label)
-                <input type="radio" class="btn-check filter-radio" name="categoryFilter" id="category{{ $key }}" value="{{ $key }}">
-                <label class="btn btn-outline-secondary" for="category{{ $key }}">{{ $label }}</label>
-            @endforeach
+            <input type="radio" class="btn-check filter-radio" name="categoryFilter" id="category0" value="0">
+            <label class="btn btn-outline-secondary" for="category0">حقوق تولید</label>
+
+            <input type="radio" class="btn-check filter-radio" name="categoryFilter" id="category1" value="1">
+            <label class="btn btn-outline-secondary" for="category1">حقوق فروش</label>
+
+            <input type="radio" class="btn-check filter-radio" name="categoryFilter" id="category9" value="9">
+            <label class="btn btn-outline-secondary" for="category9">هزینه‌ی اجاره</label>
+
+            <input type="radio" class="btn-check filter-radio" name="categoryFilter" id="category6" value="6">
+            <label class="btn btn-outline-secondary" for="category6">هزینه‌ی بیمه</label>
+
+            <input type="radio" class="btn-check filter-radio" name="categoryFilter" id="category16" value="16">
+            <label class="btn btn-outline-secondary" for="category16">هزینه‌ی تبلیغات</label>
         </div>
     </div>
 
@@ -44,7 +54,7 @@
             @foreach ($fixedCosts as $fixedCost)
                 <tr>
                     <td>{{ $fixedCost->id }}</td>
-                    <td>{{ $categoryMap[$fixedCost->category] ?? 'نامشخص' }}</td>
+                    <td>{{ $fixedCost->category ?? 'نامشخص' }}</td>
                     <td>{{ number_format($fixedCost->amount) }}</td>
                     <td>{{ $fixedCost->account_owner }}</td>
                     <td>{{ $fixedCost->desc }}</td>
@@ -63,8 +73,6 @@
 @section('files')
     <script>
         $(document).ready(function() {
-            const categoryMap = @json($categoryMap);
-
             const table = $('#fixedCostsTable').DataTable({
                 paging: false,
                 order: [[0, 'desc']],
@@ -74,11 +82,11 @@
 
             $.fn.dataTable.ext.search.push(function(settings, data) {
                 const selectedCategory = $('input[name="categoryFilter"]:checked').val();
-                const rowCategory = data[1].trim(); 
+                const rowCategory = data[1].trim();
                 if (selectedCategory === 'all') {
                     return true;
                 }
-                return rowCategory === categoryMap[selectedCategory];
+                return rowCategory === @json($expenseTypes)[selectedCategory];
             });
 
             $('input.filter-radio').on('change', function() {
