@@ -37,16 +37,17 @@
         <strong>مجموع مبلغ:</strong> {{ number_format($totalAmount) }} ریال
     </div>
 
-    <table id="fixedCostsTable" class="table table-striped" style="width:100%; text-align: center;">
+    <table id="fixedCostsTable" class="table table-striped mt-3" style="width:100%; text-align: center;">
         <thead>
             <tr>
                 <th>شناسه</th>
                 <th>دسته‌بندی</th>
                 <th>مبلغ (ریال)</th>
                 <th>صاحب حساب</th>
+                <th>شماره حساب</th>
                 <th>بابت</th>
-                <th>شماره شبا</th>
                 <th>روز سررسید</th>
+                <th>موقعیت</th>
                 <th>عملیات</th>
             </tr>
         </thead>
@@ -57,9 +58,10 @@
                     <td>{{ $fixedCost->category ?? 'نامشخص' }}</td>
                     <td>{{ number_format($fixedCost->amount) }}</td>
                     <td>{{ $fixedCost->account_owner }}</td>
-                    <td>{{ $fixedCost->desc }}</td>
                     <td>{{ $fixedCost->iban }}</td>
+                    <td>{{ $fixedCost->desc }}</td>
                     <td>{{ $fixedCost->due_day }}</td>
+                    <td>{{ $withdrawalLocations[$fixedCost->location] ?? 'نامشخص' }}</td>
                     <td>
                         <a href="{{ route('fixed-costs.edit', $fixedCost->id) }}">
                         <i class="btn btn-primary fas fa-edit" title="ویرایش"></i></a>
@@ -77,7 +79,10 @@
                 paging: false,
                 order: [[0, 'desc']],
                 searching: true,
-                language: language
+                language: language,
+                "columnDefs": [
+                { "targets": [2,4,5,6], "className": "dt-nowrap" }
+                ]
             });
 
             $.fn.dataTable.ext.search.push(function(settings, data) {

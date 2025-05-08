@@ -20,6 +20,8 @@ class FixedCost extends Model
         'due_day',
         'official',
         'vat',
+        'supplier_id',
+        'location',
     ];
 
     public function user()
@@ -30,5 +32,10 @@ class FixedCost extends Model
     public function bank()
     {
         return $this->belongsTo(Bank::class);
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
     }
 }

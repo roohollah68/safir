@@ -10,7 +10,7 @@ class CheckDailyCosts extends Command {
 
     public function handle() {
         $today = Verta::now();
-        FixedCost::where('due_day', $today->day)->each(function ($fixedCost) {
+        FixedCost::with('supplier')->where('due_day', $today->day)->each(function ($fixedCost) {
             event(new \App\Events\FixedCostEvent($fixedCost));
         });
     }

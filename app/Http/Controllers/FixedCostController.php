@@ -14,14 +14,17 @@ class FixedCostController extends Controller
         $expenseTypes = Config::get('expense_type.current');
         $fixedCosts = FixedCost::all();
         $totalAmount = $fixedCosts->sum('amount');
-        return view('fixedCosts.list', compact('fixedCosts', 'totalAmount', 'expenseTypes'));
+        $withdrawalLocations = Config::get('withdrawalLocation');
+        return view('fixedCosts.list', compact('fixedCosts', 'totalAmount', 'expenseTypes', 'withdrawalLocations'));
     }
 
     public function create()
     {
+        $suppliers = \App\Models\Supplier::all();
         $expenseTypes = Config::get('expense_type.current');
         $banks = \App\Models\Bank::all(); 
-        return view('fixedCosts.form', compact('expenseTypes', 'banks'));
+        $withdrawalLocations = Config::get('withdrawalLocation');
+        return view('fixedCosts.form', compact('suppliers', 'expenseTypes', 'banks', 'withdrawalLocations'));
     }
 
     public function store(Request $request, $id = null)
@@ -34,9 +37,14 @@ class FixedCostController extends Controller
             'iban' => 'required',
             'due_day' => 'required|integer|min:1|max:31',
             'official' => 'required|boolean',
-            'vat' => 'nullable|boolean',
+            'vat' => 'required_if:official,1|boolean',
             'bank_id' => 'nullable|integer|exists:banks,id',
+            'supplier_id' => 'required|integer|exists:suppliers,id',
+            'location' => 'required|string',
         ]);
+         if ($validated['official'] == 0) {
+            $validated['vat'] = 0;
+        }
         $validated['user_id'] = auth()->id();
         $validated['amount'] = +str_replace(",", "", $request->amount);
 
@@ -57,6 +65,8 @@ class FixedCostController extends Controller
         $expenseTypes = Config::get('expense_type.current');
         $banks = \App\Models\Bank::all(); 
         $fixedCost = FixedCost::with('bank')->findOrFail($id);
-        return view('fixedCosts.form', compact('fixedCost', 'expenseTypes', 'banks'));
+        $suppliers = \App\Models\Supplier::all();
+        $withdrawalLocations = Config::get('withdrawalLocation');
+        return view('fixedCosts.form', compact('fixedCost', 'expenseTypes', 'banks', 'suppliers', 'withdrawalLocations'));
     }
 }

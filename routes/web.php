@@ -237,7 +237,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
 
     Route::controller(SupplierController::class)->prefix('Supplier')->group(function () {
         ///SUPPLIERS
-        Route::get('/add', 'new');
+        Route::get('/add', 'new')->name('suppliers.new');
         Route::post('/add', 'insertOrUpdate');
         Route::get('/edit/{id}', 'edit');
         Route::get('/list', 'list');

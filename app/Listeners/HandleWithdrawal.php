@@ -27,7 +27,9 @@ class HandleWithdrawal {
                 'expense_desc' => $fixedCost->category,
                 'bank_id' => $fixedCost->bank_id,
                 'vat' => $fixedCost->vat,
-                'official' => $fixedCost->official
+                'official' => $fixedCost->official,
+                'supplier_id' => $fixedCost->supplier_id,
+                'location' => $fixedCost->location,
             ]);
         }
     }
