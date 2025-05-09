@@ -144,4 +144,9 @@ class User extends Authenticatable
         return -$total;
     }
 
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable')->latest();
+    }
+
 }

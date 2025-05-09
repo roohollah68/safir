@@ -18,7 +18,62 @@
             @endif
         </div>
 
-        <div class="d-flex align-items-center gap-2">
+    <div class="d-flex align-items-center gap-2">
+        <div class="dropdown me-3">
+        <a class="text-white fs-5 position-relative" href="#" role="button" 
+            data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fas fa-bell mt-2" style="font-size: 1.5rem"></i>
+        @auth
+        @if($unreadCount = auth()->user()->unreadNotifications->count())
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{ $unreadCount }}
+            </span>
+        @endif
+        @endauth
+        </a>
+        
+        <div class="dropdown-menu dropdown-menu-start p-0" style="min-width: 400px; max-width: 600px;">
+        <div class="p-3 border-bottom bg-secondary bg-opacity-25">
+        <div class="d-flex justify-content-between align-items-center">
+            <strong>اعلان‌ها</strong>
+            <form action="{{ route('notifications.markAllRead') }}" method="POST">
+            @csrf
+            <button type="submit" class="btn btn-link btn-sm text-decoration-none fw-bold">
+            خواندن همه
+            </button>
+            </form>
+        </div>
+        </div>
+        
+        <div class="notification-list" style="max-height: 500px; overflow-y: auto;">
+            @foreach(auth()->user()->notifications->take(5) as $notification)
+                <a href="{{ $notification->link ?? '#' }}" 
+                   class="dropdown-item d-flex justify-content-between align-items-center py-3 {{ $notification->unread() ? 'bg-light' : '' }}"
+                   data-notification-id="{{ $notification->id }}">
+                   <div class="d-flex flex-column ms-1">
+                       <div class="text-truncate text-dark text-end">{{ $notification->message }}</div>
+                       <small class="text-muted" style="text-align: right">{{ \Carbon\Carbon::parse($notification->created_at)->locale('fa')->diffForHumans() }}</small>
+                   </div>
+                   @if($notification->unread())
+                       <span class="badge bg-primary">جدید</span>
+                   @endif
+                </a>
+            @endforeach
+            @if(auth()->user()->notifications->isEmpty())
+                <div class="p-3 text-muted text-center">
+                    هیچ اعلانی یافت نشد
+                </div>
+            @endif
+        </div>
+        
+        <div class="p-2 border-top text-center bg-secondary bg-opacity-25">
+        <a href="{{ route('notifications.index') }}" class="text-decoration-none small fw-bold">
+            مشاهده همه اعلان‌ها
+        </a>
+        </div>
+        </div>
+    </div>
+
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent"
                     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -346,6 +401,20 @@
 
     .nav-link i, .dropdown-item i {
         display: none;
+    }
+
+    .notification-list a.dropdown-item {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .notification-list a.dropdown-item:hover {
+        background-color: #f8f9fa !important;
+        transform: translateX(5px);
+    }
+
+    .notification-list a.dropdown-item:active {
+        background-color: #e9ecef !important;
     }
 
     @media (max-width: 991px) {

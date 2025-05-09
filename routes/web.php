@@ -25,6 +25,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WithdrawalController;
 use App\Http\Controllers\WoocommerceController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -311,11 +312,18 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/update/{id}', 'update')->name('process.update');
     });
 
+    // FIXED COSTS
     Route::controller(FixedCostController::class)->prefix('fixed-costs')->group(function () {
         Route::get('/', 'index')->name('fixed-costs.index');
         Route::get('/create', 'create')->name('fixed-costs.create');
         Route::post('/store/{id?}', 'store')->name('fixed-costs.store');
         Route::get('/edit/{id}', 'edit')->name('fixed-costs.edit');
+    });
+
+    // NOTIFICATIONS
+    Route::controller(NotificationController::class)->prefix('notifications')->group(function () {
+        Route::get('/', 'index')->name('notifications.index');
+        Route::post('/mark-all-read', 'markAllRead')->name('notifications.markAllRead');
     });
 
 });
