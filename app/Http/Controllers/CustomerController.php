@@ -6,6 +6,7 @@ use App\Helper\Helper;
 use App\Models\Bank;
 use App\Models\City;
 use App\Models\Customer;
+use App\Models\CustomerCrm;
 use App\Models\CustomerTransaction;
 use App\Models\Order;
 use App\Models\PaymentLink;
@@ -218,12 +219,12 @@ class CustomerController extends Controller
             'photo' => 'required_without:old_Photo|mimes:jpeg,jpg,png,bmp|max:2048',
             'old_Photo' => 'required_without:photo',
             'deposit_date' => 'date',
-            ], [
+        ], [
             'photo.required_without' => 'ارائه تصویر الزامی است!',
             'photo.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',
             'old_Photo.required_without' => '',
         ]);
-        if($req->pay_method == 'cheque')
+        if ($req->pay_method == 'cheque')
             request()->validate([
                 'cheque_registration' => 'required_without:old_cheque_registration|mimes:jpeg,jpg,png,bmp|max:2048',
                 'old_cheque_registration' => 'required_without:cheque_registration',
@@ -259,7 +260,7 @@ class CustomerController extends Controller
             'cheque_registration' => $req->pay_method == 'cheque' ? $cheque_registration : null,
             'deposit_date' => $req->deposit_date,
         ]);
-        $transaction->official = ($req->pay_method == 'cash') ? $transaction->bank->official : $req->official ;
+        $transaction->official = ($req->pay_method == 'cash') ? $transaction->bank->official : $req->official;
         $transaction->save();
         if (+$orderId) {
             $transaction->paymentLinks()->create([
@@ -603,5 +604,31 @@ class CustomerController extends Controller
         $customer->block = !$customer->block;
         $customer->save();
         return $customer->block;
+    }
+
+    public function CRM(Request $request)
+    {
+        $user = auth()->user();
+        $users = User::with(['customers.orders', 'customers.CRMs']);
+        if ($request->user)
+            $users = $users->where('id', $request->user);
+        if (!$user->meta('allCustomers'))
+            $users = $users->where('id', $user->id);
+        $users = $users->get()->keyBy('id');
+        return view('customer.CRM', compact('users'));
+    }
+
+    public function viewCRM($id)
+    {
+        $customer = Customer::with('CRMs')->findOrFail($id);
+        return view('customer.viewCRM', compact('customer'));
+    }
+
+    public function addCRM(Request $request)
+    {
+        CustomerCrm::create(
+            $request->all()
+        );
+        return redirect()->back();
     }
 }

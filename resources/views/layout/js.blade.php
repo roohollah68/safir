@@ -136,6 +136,15 @@
             })
     }
 
+    function view_CRM(id) {
+        $.post('/customer/viewCRM/' + id, {
+            _token: token
+        })
+            .done(res => {
+                dialog = Dialog(res);
+            })
+    }
+
     function addComment(id) {
         $.ajax({
             type: "POST",

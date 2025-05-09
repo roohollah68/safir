@@ -106,6 +106,11 @@
                             <a class="dropdown-item" href="/blockList">
                                 <i class="fas fa-ban me-2" aria-hidden="true"></i>مسدود کردن دسترسی مشتریان
                             </a>
+                            @if (!$safir)
+                                <a class="dropdown-item" href="/customer/CRM">
+                                    <i class="fas fa-ban me-2" aria-hidden="true"></i>CRM
+                                </a>
+                            @endif
                         </div>
                     </li>
 
@@ -144,25 +149,25 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item py-2" href="{{ route('customersOrderList') }}">
-                                    <i class="fas fa-eye me-2" aria-hidden="true"></i>بررسی سفارشات
-                                </a></li>
+                                        <i class="fas fa-eye me-2" aria-hidden="true"></i>بررسی سفارشات
+                                    </a></li>
                                 <li><a class="dropdown-item py-2" href="{{ route('customersDepositList') }}">
-                                    <i class="fas fa-eye me-2" aria-hidden="true"></i>بررسی واریزی‌ها
-                                </a></li>
+                                        <i class="fas fa-eye me-2" aria-hidden="true"></i>بررسی واریزی‌ها
+                                    </a></li>
                                 <li><a class="dropdown-item py-2" href="{{ route('BankTransactionList') }}">
-                                    <i class="fas fa-wallet me-2" aria-hidden="true"></i>مدیریت نقدینگی
-                                </a></li>
+                                        <i class="fas fa-wallet me-2" aria-hidden="true"></i>مدیریت نقدینگی
+                                    </a></li>
                                 @if($User->meta('cheque'))
                                     <li><a class="dropdown-item py-2" href="{{ route('chequeList') }}">
-                                        <i class="fas fa-money-check-alt me-2" aria-hidden="true"></i>لیست چک‌ها
-                                    </a></li>
+                                            <i class="fas fa-money-check-alt me-2" aria-hidden="true"></i>لیست چک‌ها
+                                        </a></li>
                                 @endif
                                 <li><a class="dropdown-item py-2" href="{{ route('TaxList') }}">
-                                    <i class="fas fa-file-invoice-dollar me-2" aria-hidden="true"></i>سامانه مودیان
-                                </a></li>
+                                        <i class="fas fa-file-invoice-dollar me-2" aria-hidden="true"></i>سامانه مودیان
+                                    </a></li>
                                 <li><a class="dropdown-item py-2" href="{{ route('fixed-costs.index') }}">
-                                    <i class="fas fa-coins me-2" aria-hidden="true"></i>هزینه‌های ثابت
-                                </a></li>
+                                        <i class="fas fa-coins me-2" aria-hidden="true"></i>هزینه‌های ثابت
+                                    </a></li>
                             </ul>
                         </li>
                     @endif
@@ -174,11 +179,11 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item py-2" href="{{ route('DepositList') }}">
-                                    <i class="fas fa-money-bill-wave me-2" aria-hidden="true"></i>واریزی‌ها
-                                </a></li>
+                                        <i class="fas fa-money-bill-wave me-2" aria-hidden="true"></i>واریزی‌ها
+                                    </a></li>
                                 <li><a class="dropdown-item py-2" href="{{ route('transactions') }}">
-                                    <i class="fas fa-exchange-alt me-2" aria-hidden="true"></i>تراکنش‌ها
-                                </a></li>
+                                        <i class="fas fa-exchange-alt me-2" aria-hidden="true"></i>تراکنش‌ها
+                                    </a></li>
                             </ul>
                         </li>
                     @endif
@@ -211,11 +216,11 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item py-2" href="{{ route('processList') }}">
-                                <i class="fas fa-project-diagram me-2" aria-hidden="true"></i>فرآیند‌ها
-                            </a></li>
+                                    <i class="fas fa-project-diagram me-2" aria-hidden="true"></i>فرآیند‌ها
+                                </a></li>
                             <li><a class="dropdown-item py-2" href="{{ route('projectList') }}">
-                                <i class="fas fa-tasks me-2" aria-hidden="true"></i>پروژه‌ها
-                            </a></li>
+                                    <i class="fas fa-tasks me-2" aria-hidden="true"></i>پروژه‌ها
+                                </a></li>
                         </ul>
                     </li>
 
@@ -383,7 +388,7 @@
         .nav-item {
             text-align: center;
             padding-bottom: 0.5em;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .nav-item:last-child {
@@ -416,7 +421,7 @@
         }
 
         .nav-link:active, .dropdown-item:active {
-            background-color: rgba(255,255,255,0.2);
+            background-color: rgba(255, 255, 255, 0.2);
         }
 
         body.nav-open {

@@ -56,6 +56,11 @@ class Customer extends Model
         return $this->belongsTo(City::class);
     }
 
+    public function CRMs()
+    {
+        return $this->hasMany(CustomerCrm::class);
+    }
+
     public function cityName()
     {
         return $this->city()->first()->name;

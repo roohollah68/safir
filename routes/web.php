@@ -112,6 +112,9 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('/changeTrust/{id}', 'changeTrust');
         Route::get('/blockList', 'blockList');
         Route::get('/changeBlock/{id}', 'changeBlock');
+        Route::get('/customer/CRM', 'CRM');
+        Route::post('/customer/CRM', 'addCRM');
+        Route::post('/customer/viewCRM/{id}', 'viewCRM');
 
         ///CUSTOMER DEPOSIT
         Route::get('/customer/transaction/{id}', 'customersTransactionList')
