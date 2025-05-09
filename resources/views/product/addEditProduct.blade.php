@@ -149,7 +149,7 @@
                         <option value="" disabled selected>انتخاب کنید</option>
                         @foreach(config('productCat.sweetener') as $key => $value)
                             @continue ($key == 0)
-                            <option value="{{ $key }}" @selected(old('sweetener', $good->sweetener ?? 0) == $key)>
+                            <option value="{{ $key }}" @selected(old('sweetener', $good->goodCategory->sweetener ?? 0) == $key)>
                                 {{ $value }}
                             </option>
                         @endforeach
@@ -167,7 +167,7 @@
                         <option value="" disabled selected>انتخاب کنید</option>
                         @foreach(config('productCat.packaging') as $key => $value)
                             @continue ($key == 0)
-                            <option value="{{ $key }}" @selected(old('packaging', $good->packaging ?? 0) == $key)>
+                            <option value="{{ $key }}" @selected(old('packaging', $good->goodCategory->packaging ?? 0) == $key)>
                                 {{ $value }}
                             </option>
                         @endforeach
@@ -179,13 +179,30 @@
             <div class="col-md-6 my-1">
                 <div class="form-group input-group">
                     <div class="input-group-append" style="min-width: 160px">
-                        <label for="type" class="input-group-text w-100">نوع محصول:</label>
+                        <label for="type" class="input-group-text w-100">نوع ترکیب:</label>
                     </div>
                     <select id="type" class="form-control" name="type">
                         <option value="" disabled selected>انتخاب کنید</option>
                         @foreach(config('productCat.type') as $key => $value)
                             @continue ($key == 0)
-                            <option value="{{ $key }}" @selected(old('type', $good->type ?? 0) == $key)>
+                            <option value="{{ $key }}" @selected(old('type', $good->goodCategory->type ?? 0) == $key)>
+                                {{ $value }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            {{-- برند محصول --}}
+            <div class="col-md-6 my-1">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label for="brand" class="input-group-text w-100">برند محصول:</label>
+                    </div>
+                    <select id="brand" class="form-control" name="brand">
+                        <option value="" disabled selected>انتخاب کنید</option>
+                        @foreach(config('productCat.brand') as $key => $value)
+                            @continue ($key == 0)
+                            <option value="{{ $key }}" @selected(old('brand', $good->goodCategory->brand ?? 0) == $key)>
                                 {{ $value }}
                             </option>
                         @endforeach

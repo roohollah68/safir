@@ -9,7 +9,7 @@ use App\Models\Keysungood;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Warehouse;
-use App\Models\GoodCategory; 
+use App\Models\GoodCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -92,7 +92,8 @@ class ProductController extends Controller
         request()->validate([
             'sweetener' => 'nullable|integer|between:0,3',
             'packaging' => 'nullable|integer|between:0,15',
-            'type' => 'nullable|integer|between:0,6'
+            'type' => 'nullable|integer|between:0,6',
+            'brand' => 'nullable|integer|between:0,7'
         ]);
         GoodCategory::updateOrCreate(
             ['good_id' => $good->id],
@@ -100,6 +101,7 @@ class ProductController extends Controller
                 'sweetener' => $req->sweetener,
                 'packaging' => $req->packaging,
                 'type' => $req->type,
+                'brand' => $req->brand,
             ]
         );
         GoodMeta::updateOrCreate([

@@ -14,6 +14,7 @@ class GoodCategory extends Model
         'sweetener',
         'packaging',
         'type',
+        'brand',
     ];
 
     public function good()
