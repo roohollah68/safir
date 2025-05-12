@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\SubProject; 
 
 class Project extends Model
 {
@@ -30,6 +31,11 @@ class Project extends Model
     public function comments()
     {
         return $this->hasMany(ProjectComment::class);
+    }
+
+    public function subProjects()
+    {
+        return $this->hasMany(SubProject::class);
     }
 }
 

@@ -72,6 +72,33 @@
                                     مهلت: {{ verta($project->deadline)->formatJalaliDate() }}
                                 </p>
                                 @endif
+                                @if ($project->subProjects->count() > 0)
+                                    <div class="mb-3 d-flex align-items-center">
+                                        <h5 class="mb-1 me-2">زیر پروژه‌ها:</h5>
+                                        <span class="badge bg-success">
+                                            {{ $project->subProjects->count() }} / {{ $project->subProjects->where('completed', true)->count() }}
+                                        </span>
+                                    </div>
+                                @endif
+
+                                <div class="subprojects">
+                                    @foreach ($project->subProjects as $subProject)
+                                        <div class="subproject-item d-flex align-items-center" data-id="{{ $subProject->id }}">
+                                            @if (auth()->id() == $project->user_id || auth()->id() == $project->task_owner_id)
+                                                <input type="checkbox" {{ $subProject->completed ? 'checked' : '' }} 
+                                                    data-id="{{ $subProject->id }}" class="complete-subproject me-2">
+
+                                            @else
+                                               <span class="me-2 fw-bold">--</span> 
+                                            @endif
+
+                                            <h5 class="mb-0">{{ $subProject->title }}</h5>
+                                            @if ($subProject->completed)
+                                                <i class="fas fa-check text-success ms-2"></i> 
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -129,6 +156,33 @@
                                             مهلت: {{ verta($project->deadline)->formatJalaliDate() }}
                                         </p>
                                         @endif
+                                        @if ($project->subProjects->count() > 0)
+                                            <div class="mb-3 d-flex align-items-center">
+                                                <h5 class="mb-1 me-2">زیر پروژه‌ها:</h5>
+                                                <span class="badge bg-success">
+                                                    {{ $project->subProjects->count() }} / {{ $project->subProjects->where('completed', true)->count() }}
+                                                </span>
+                                            </div>
+                                        @endif
+
+                                        <div class="subprojects">
+                                            @foreach ($project->subProjects as $subProject)
+                                                <div class="subproject-item d-flex align-items-center" data-id="{{ $subProject->id }}">
+                                                    @if (auth()->id() == $project->user_id || auth()->id() == $project->task_owner_id)
+                                                        <input type="checkbox" {{ $subProject->completed ? 'checked' : '' }} 
+                                                            data-id="{{ $subProject->id }}" class="complete-subproject me-2">
+
+                                                    @else
+                                                    <span class="me-2 fw-bold">--</span> 
+                                                    @endif
+
+                                                    <h5 class="mb-0">{{ $subProject->title }}</h5>
+                                                    @if ($subProject->completed)
+                                                        <i class="fas fa-check text-success ms-2"></i> 
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -144,6 +198,18 @@
 <style>
     .hidden-by-filter {
         display: none;
+    }
+    .subproject-item { 
+        display: flex; align-items: center; margin-bottom: 5px;
+    }
+    .subproject-item input[type="checkbox"] {
+        margin-left: 10px;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    .subproject-item input[type="checkbox"]:checked {
+        accent-color: green;
     }
 </style>
 @endsection
@@ -226,6 +292,36 @@
                     $('.project-card').addClass('hidden-by-filter');
                     $('.project-card.assigned-to-me').removeClass('hidden-by-filter');
                 }
+            });
+
+            $(document).on('change', '.complete-subproject', function() {
+                var checkbox = $(this);
+                var id = checkbox.data('id');
+                var completed = checkbox.is(':checked') ? 1 : 0;
+
+                $.ajax({
+                    url: `{{ route('subproject.update', '') }}/${id}`,
+                    method: 'POST',
+                    data: { 
+                        completed: completed, 
+                        _token: '{{ csrf_token() }}' 
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            var card = checkbox.closest('.project-card');
+                            var total = card.find('.subproject-item').length;
+                            var completedCount = card.find('.complete-subproject:checked').length;
+                            card.find('.badge.bg-success').text(`${total} / ${completedCount}`);
+                        } else {
+                            alert('خطا در به‌روزرسانی زیر پروژه');
+                            checkbox.prop('checked', !completed);
+                        }
+                    },
+                    error: function() {
+                        alert('خطا در ارتباط با سرور');
+                        checkbox.prop('checked', !completed);
+                    }
+                });
             });
         });
     </script>

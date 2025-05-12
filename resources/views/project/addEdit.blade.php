@@ -92,6 +92,44 @@
                     @endif
                 </div>
             </div>
+
+            {{-- زیرپروژه‌ها --}}
+            <div class="col-md-6 my-2">
+                <h4 class="mb-3 fw-bold text-primary">زیرپروژه‌ها</h4>
+                <div class="input-group mb-3">
+                    <input type="text" 
+                        id="subproject-input" 
+                        class="form-control"
+                        placeholder="عنوان زیرپروژه جدید"
+                    >
+                    <button type="button" 
+                        class="btn btn-primary" 
+                        id="add-subproject-btn"
+                    >
+                        <i class="fas fa-plus"></i> افزودن
+                    </button>
+                </div>
+    
+                {{-- Subprojects list --}}
+                <div id="subprojects-list" class="list-group mb-1">
+                    @if($edit)
+                        @foreach($project->subProjects as $index => $sub)
+                            <div class="list-group-item d-flex align-items-center">
+                                <input type="hidden" 
+                                    name="subprojects[{{ $index }}][id]" 
+                                    value="{{ $sub->id }}">
+                                <input type="hidden" 
+                                    name="subprojects[{{ $index }}][title]" 
+                                    value="{{ $sub->title }}">
+                                <span class="me-auto">{{ $sub->title }}</span>
+                                <button type="button" class="btn btn-danger btn-sm remove-subproject">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+            </div>
         </div>
 
         {{-- دکمه‌ها --}}
@@ -103,6 +141,19 @@
             </div>
         </div>
     </form>
+    <style>
+        #subprojects-list .list-group-item {
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .remove-subproject {
+            margin-left: 1rem;
+        }
+
+        .list-group-item {
+            transition: all 0.3s ease;
+        }
+    </style>
 @endsection
 
 @section('files')
@@ -174,6 +225,50 @@
             targetDateSelector: '#deadline',
             selectedDate: deadline,
             isGregorian: false,
+        });
+
+        let subprojectCounter = {{ $edit ? count($project->subProjects) : 0 }};
+        const subprojectList = document.getElementById('subprojects-list');
+
+        subprojectList.addEventListener('click', (e) => {
+            if (e.target.closest('.remove-subproject')) {
+                const item = e.target.closest('.list-group-item');
+                item.remove();
+
+                Array.from(subprojectList.children).forEach((item, index) => {
+                    item.querySelectorAll('input').forEach(input => {
+                        const inputType = input.name.includes('[id]') ? 'id' : 'title';
+                        input.name = `subprojects[${index}][${inputType}]`;
+                    });
+                });
+                
+                subprojectCounter = subprojectList.children.length;
+            }
+        });
+
+        const addSubprojectBtn = document.getElementById('add-subproject-btn');
+        const subprojectInput = document.getElementById('subproject-input');
+
+        addSubprojectBtn.addEventListener('click', () => {
+            const title = subprojectInput.value.trim();
+            if (title === '') {
+                alert('عنوان زیرپروژه نمی‌تواند خالی باشد.');
+                return;
+            }
+
+            const subprojectItem = document.createElement('div');
+            subprojectItem.className = 'list-group-item d-flex align-items-center';
+            subprojectItem.innerHTML = `
+                <input type="hidden" name="subprojects[${subprojectCounter}][title]" value="${title}">
+                <span class="me-auto">${title}</span>
+                <button type="button" class="btn btn-danger btn-sm remove-subproject">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+
+            subprojectList.appendChild(subprojectItem);
+            subprojectInput.value = '';
+            subprojectCounter++;
         });
     });
 </script>

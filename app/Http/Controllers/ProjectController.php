@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\SubProject;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -54,7 +55,12 @@ class ProjectController extends Controller
             $validated['image'] = $imagePath;
         }
 
-        Project::create($validated);
+        $project = Project::create($validated);
+        if ($request->has('subprojects')) {
+            foreach ($request->subprojects as $subprojectData) {
+                $project->subProjects()->create($subprojectData);
+            }
+        }
         return redirect()->route('projectList')->with('success', 'Project added successfully.');
     }
 
@@ -89,6 +95,24 @@ class ProjectController extends Controller
             $validated['image'] = $imagePath;
         }
 
+        $existingIds = collect($request->subprojects)
+        ->pluck('id')
+        ->filter()
+        ->toArray();
+
+        $project->subProjects()
+            ->whereNotIn('id', $existingIds)
+            ->delete();
+
+        if ($request->has('subprojects')) {
+            foreach ($request->subprojects as $subproject) {
+                $project->subProjects()->updateOrCreate(
+                    ['id' => $subproject['id'] ?? null],
+                    ['title' => $subproject['title']]
+                );
+            }
+        }
+
         $project->update($validated);
         return redirect()->route('projectList')->with('success', 'Project updated successfully.');
     }
@@ -115,5 +139,27 @@ class ProjectController extends Controller
             ],
             'count' => $project->comments()->count()
         ]);
+    }
+
+    public function storeSubProject(Request $request, Project $project)
+    {
+        $validated = $request->validate(['title' => 'required|string|max:255']);
+        $subProject = $project->subProjects()->create($validated);
+        return response()->json(['success' => true, 'subproject' => ['id' => $subProject->id, 'title' => $subProject->title]]);
+    }
+
+    public function updateSubProject(Request $request, $id)
+    {
+        $subProject = SubProject::findOrFail($id);
+        $subProject->completed = $request->input('completed');
+        $subProject->save();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function deleteSubProject(SubProject $subProject)
+    {
+        $subProject->delete();
+        return response()->json(['success' => true]);
     }
 }
