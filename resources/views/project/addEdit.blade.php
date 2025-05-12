@@ -32,7 +32,7 @@
                     <select id="location" class="form-control" name="location" required>
                         <option value="" disabled selected>انتخاب کنید</option>
                         <option value="general" {{ (old('location') ?: $project->location) == 'general' ? 'selected' : '' }}>کلی</option>
-                        @foreach (config('withdrawalLocation') as $key => $value)
+                        @foreach (config('projectLocation') as $key => $value)
                             @if ($key != 0)
                                 <option value="{{ $key }}" {{ (old('location') ?: $project->location) == $key ? 'selected' : '' }}>{{ $value }}</option>
                             @endif

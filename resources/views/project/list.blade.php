@@ -13,7 +13,7 @@
     <div id="location-tabs" dir="rtl">
         <ul class="nav nav-tabs">
             <li><a href="#tab-general">کلی</a></li>
-            @foreach (config('withdrawalLocation') as $key => $value)
+            @foreach (config('projectLocation') as $key => $value)
                 @if ($key != 0)
                     <li><a href="#tab-{{ $key }}">{{ $value }}</a></li>
                 @endif
@@ -72,7 +72,7 @@
                 @endforeach
             </div>
         </div>
-        @foreach (config('withdrawalLocation') as $key => $value)
+        @foreach (config('projectLocation') as $key => $value)
             @if ($key != 0)
                 <div id="tab-{{ $key }}">
                     <div class="row">
@@ -101,7 +101,7 @@
                                     <div class="mt-3">
                                         <p class="text-muted mb-1">
                                             <i class="fas fa-map-marker-alt"></i>
-                                            {{ config('withdrawalLocation')[$project->location] }}
+                                            {{ config('projectLocation')[$project->location] }}
                                         </p>
                                         <p class="text-muted mb-1">
                                             <i class="fas fa-calendar-alt"></i> 
