@@ -6,10 +6,16 @@
 
 @section('content')
 <div class="container">
-    <a class="btn btn-outline-success mb-5" href="{{ route('project.add.form') }}">
+    <a class="btn btn-outline-success mb-3" href="{{ route('project.add.form') }}">
         <span class="fa fa-plus"></span>
         افزودن پروژه
     </a>
+    <br>
+    <div class="btn-group mb-4 d-block justify-content-between" aria-label="Project Filter">
+        <button type="button" class="btn btn-outline-primary active me-1 rounded" data-filter="all">همه</button>
+        <button type="button" class="btn btn-outline-primary me-1 rounded" data-filter="created">پروژه‌های شما</button>
+        <button type="button" class="btn btn-outline-primary me-1 rounded" data-filter="assigned">پروژه‌های دیگران برای شما</button>
+    </div>
     <div id="location-tabs" dir="rtl">
         <ul class="nav nav-tabs">
             <li><a href="#tab-general">کلی</a></li>
@@ -22,7 +28,8 @@
         <div id="tab-general">
             <div class="row">
                 @foreach ($projects->where('location', 'general') as $project)
-                <div class="col-12 mb-4">
+                <div class="col-12 mb-4 project-card {{ $project->user_id == auth()->id() ? 'created-by-me' : '' }}
+                     {{ $project->task_owner_id == auth()->id() ? 'assigned-to-me' : '' }}">
                     <div class="card">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <h2 class="card-title">{{ $project->title }}</h2>
@@ -77,7 +84,8 @@
                 <div id="tab-{{ $key }}">
                     <div class="row">
                         @foreach ($projects->where('location', $key) as $project)
-                        <div class="col-12 mb-4">
+                        <div class="col-12 mb-4 project-card {{ $project->user_id == auth()->id() ? 'created-by-me' : '' }} 
+                             {{ $project->task_owner_id == auth()->id() ? 'assigned-to-me' : '' }}">
                             <div class="card">
                                 <div class="card-body d-flex justify-content-between align-items-center">
                                     <h2 class="card-title">{{ $project->title }}</h2>
@@ -133,6 +141,11 @@
     </div>
 </div>
 <div id="comments-dialog" style="display: none;"></div>
+<style>
+    .hidden-by-filter {
+        display: none;
+    }
+</style>
 @endsection
 
 @section('files')
@@ -198,6 +211,21 @@
                 .fail(function() {
                     alert('خطا در ثبت پیام');
                 });
+            });
+
+            $('.btn-group button').click(function() {
+                $('.btn-group button').removeClass('active');
+                $(this).addClass('active');
+                const filter = $(this).data('filter');
+                if (filter === 'all') {
+                    $('.project-card').removeClass('hidden-by-filter');
+                } else if (filter === 'created') {
+                    $('.project-card').addClass('hidden-by-filter');
+                    $('.project-card.created-by-me').removeClass('hidden-by-filter');
+                } else if (filter === 'assigned') {
+                    $('.project-card').addClass('hidden-by-filter');
+                    $('.project-card.assigned-to-me').removeClass('hidden-by-filter');
+                }
             });
         });
     </script>

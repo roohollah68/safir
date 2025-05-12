@@ -9,7 +9,15 @@ class ProjectController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
         $projects = Project::orderBy('created_at', 'desc')->get();
+        if ($user->meta('workReport')) {
+            $projects = Project::all();
+        } else {
+            $projects = Project::where('user_id', $user->id)
+            ->orWhere('task_owner_id', $user->id)
+            ->get();
+        }
         return view('project.list', compact('projects'));
     }
 
