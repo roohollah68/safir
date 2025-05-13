@@ -16,19 +16,19 @@
                     </div>
                     <select id="category" name="category" class="form-control" required>
                         <option value="" disabled {{ !isset($fixedCost) ? 'selected' : '' }}>انتخاب کنید</option>
-                        <option value="{{ $expenseTypes[0] }}"
+                        <option value="0"
                             {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[0] ? 'selected' : '' }}>
                             {{ $expenseTypes[0] }}</option>
-                        <option value="{{ $expenseTypes[1] }}"
+                        <option value="1"
                             {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[1] ? 'selected' : '' }}>
                             {{ $expenseTypes[1] }}</option>
-                        <option value="{{ $expenseTypes[9] }}"
+                        <option value="9"
                             {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[9] ? 'selected' : '' }}>
                             {{ $expenseTypes[9] }}</option>
-                        <option value="{{ $expenseTypes[6] }}"
+                        <option value="6"
                             {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[6] ? 'selected' : '' }}>
                             {{ $expenseTypes[6] }}</option>
-                        <option value="{{ $expenseTypes[16] }}"
+                        <option value="16"
                             {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[16] ? 'selected' : '' }}>
                             {{ $expenseTypes[16] }}</option>
                     </select>
@@ -244,6 +244,17 @@
             });
 
             $supplierSearch.on('blur', () => setTimeout(() => dropdown.hide(), 200));
+
+            $('form').on('submit', function(e) {
+                if ($('input[name="official"]:checked').val() == "1") {
+                    if (!$('input[name="vat"]:checked').length) {
+                        alert('لطفا وضعیت ارزش افزوده را انتخاب کنید.');
+                        $('input[name="vat"]').first().focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+            });
         });
     </script>
 @endsection

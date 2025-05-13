@@ -55,7 +55,7 @@
             @foreach ($fixedCosts as $fixedCost)
                 <tr>
                     <td>{{ $fixedCost->id }}</td>
-                    <td>{{ $fixedCost->category ?? 'نامشخص' }}</td>
+                    <td>{{ $expenseTypes[$fixedCost->category] ?? 'نامشخص' }}</td>
                     <td>{{ number_format($fixedCost->amount) }}</td>
                     <td>{{ $fixedCost->account_owner }}</td>
                     <td>{{ $fixedCost->iban }}</td>
