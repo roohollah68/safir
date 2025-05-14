@@ -15,7 +15,8 @@
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "^1.1",
-        "nunomaduro/collision": "^8.1"
+        "nunomaduro/collision": "^8.1",
+        "tzsk/sms": "^9.0"
     },
     "config": {
         "optimize-autoloader": true,
