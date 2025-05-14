@@ -626,9 +626,9 @@ class CustomerController extends Controller
 
     public function addCRM(Request $request)
     {
-        CustomerCrm::create(
-            $request->all()
-        );
+        $data = $request->all();
+        unset($data['next_date_text']);
+        CustomerCrm::create($data);
         return redirect()->back();
     }
 }

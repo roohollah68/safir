@@ -32,6 +32,7 @@
             <th>کاربر مرتبط</th>
             <th>آخرین ارتباط</th>
             <th>آخرین خرید</th>
+            <th>تاریخ پیگیری بعدی</th>
             <th>عملیات</th>
         </tr>
         </thead>
@@ -46,9 +47,9 @@
                     <td><a href="/customer/transaction/{{$customer->id}}" target="_blank">{{$customer->name}}</a></td>
                     <td><a href="tel:{{$customer->phone}}">{{$customer->phone}}</a></td>
                     <td><a href="?user={{$user->id}}">{{$user->name}}</a></td>
-                    <td>{{$CRM? verta($CRM->created_at)->formatJalaliDate(): '-'}}
-                    </td>
+                    <td>{{$CRM? verta($CRM->created_at)->formatJalaliDate(): '-'}}</td>
                     <td>{{$order? verta($order->created_at)->formatJalaliDate(): '-'}}</td>
+                    <td>{{ $CRM && $CRM->next_date ? verta($CRM->next_date)->formatJalaliDate() : '-' }}</td>
                     <td>
                         @if($order)
                             <span class="btn btn-info fa fa-eye"
@@ -64,9 +65,7 @@
     </table>
 @endsection
 
-
 @section('files')
-
     <script>
         $(function () {
             $('#crm-table').DataTable({
@@ -75,7 +74,5 @@
                 language: language,
             });
         });
-
-
     </script>
 @endsection
