@@ -18,9 +18,21 @@ class ProductController extends Controller
     public function showProducts()
     {
         Helper::access('warehouse');
+        $goods = Good::with(['formulations', 'formulations.rawGood'])->get()->keyBy('id');
+        $finalPrices = [];
+        foreach ($goods as $good) {
+            $total = 0;
+            foreach ($good->formulations as $formule) {
+                if ($formule->rawGood) {
+                    $total += $formule->rawGood->price * $formule->amount;
+                }
+            }
+            $finalPrices[$good->id] = $total;
+        }
         return view('product.productList', [
             'warehouses' => Warehouse::all(),
-            'goods' => Good::all()->keyBy('id'),
+            'goods' => $goods,
+            'finalPrices' => $finalPrices,
         ]);
     }
 

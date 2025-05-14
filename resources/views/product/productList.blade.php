@@ -112,6 +112,9 @@
         <input type="checkbox" id="col-productPrice">
         <label class="btn btn-secondary" for="col-productPrice">قیمت تولید</label>
 
+        <input type="checkbox" id="col-finalPrice" checked>
+        <label class="btn btn-secondary" for="col-finalPrice">قیمت نهایی</label>
+
         <input type="checkbox" id="col-quantity" checked>
         <label class="btn btn-secondary" for="col-quantity">موجودی</label>
 
@@ -136,6 +139,7 @@
             <th>نام</th>
             <th>قیمت(ریال)</th>
             <th>قیمت تولید</th>
+            <th>قیمت نهایی</th>
             <th>موجودی</th>
             <th>حد پایین</th>
             <th>حد بالا</th>
@@ -151,7 +155,7 @@
 
 @section('files')
     <script>
-        let products = {}, goods = {!! $goods !!};
+        let products = {}, goods = {!! $goods !!}, finalPrices = {!! json_encode($finalPrices) !!};
         let table;
         let low, high, normal, unavailableFilter, availableFilter, undefinedFilter, final, raw, pack, other, hideCols,
             warehouseId = {{auth()->user()->meta('warehouseId')}};
@@ -248,6 +252,7 @@
                     good.name,
                     priceFormat(good.price),
                     priceFormat(good.productPrice),
+                    priceFormat(finalPrices[good.id] ?? 0),
                     quantity(product.alarm, product.high_alarm, product.quantity),
                     alarm(product.alarm, product.quantity),
                     high_alarm(product.high_alarm, product.quantity),
@@ -265,6 +270,7 @@
                         good.name,
                         priceFormat(good.price),
                         priceFormat(good.productPrice),
+                        priceFormat(finalPrices[good.id] ?? 0),
                         '',
                         '',
                         '',
@@ -344,11 +350,12 @@
             hideCols = [];
             $('#col-price')[0].checked ? null : hideCols.push(2);
             $('#col-productPrice')[0].checked ? null : hideCols.push(3);
-            $('#col-quantity')[0].checked ? null : hideCols.push(4);
-            $('#col-alarm')[0].checked ? null : hideCols.push(5);
-            $('#col-high_alarm')[0].checked ? null : hideCols.push(6);
-            $('#col-production')[0].checked ? null : hideCols.push(7);
-            $('#col-available')[0].checked ? null : hideCols.push(8);
+            $('#col-finalPrice')[0]?.checked ? null : hideCols.push(4);
+            $('#col-quantity')[0].checked ? null : hideCols.push(5);
+            $('#col-alarm')[0].checked ? null : hideCols.push(6);
+            $('#col-high_alarm')[0].checked ? null : hideCols.push(7);
+            $('#col-production')[0].checked ? null : hideCols.push(8);
+            $('#col-available')[0].checked ? null : hideCols.push(9);
         }
 
         function changeWarehouse(element) {
