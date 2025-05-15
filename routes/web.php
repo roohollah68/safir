@@ -303,6 +303,8 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/{project}/comments', 'storeComment')->name('comments.store');
         Route::post('/subprojects/{id}', 'updateSubProject')->name('subproject.update');
         Route::delete('/subprojects/{id}', 'deleteSubProject')->name('subproject.destroy');
+        Route::get('/{id}/report', 'report')->name('project.report.dialog');
+        Route::post('/{id}/report', 'AddReport')->name('project.report');
     });
 
     // PROCESSES

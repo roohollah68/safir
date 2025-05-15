@@ -68,6 +68,19 @@
                 </div>
             </div>
 
+            {{-- تاریخ گزارش --}}
+            <div class="col-md-6 my-2">
+                <div class="form-group input-group">
+                    <div class="input-group-append" style="min-width: 160px">
+                        <label class="input-group-text w-100">تاریخ گزارش:</label>
+                    </div>
+                    <input type="text" id="report_date_text" class="form-control" autocomplete="off"
+                        value="{{ old('report_date') ?: ($project->report_date ? verta($project->report_date)->formatJalaliDate() : '') }}">
+                    <input type="hidden" name="report_date" id="report_date"
+                        value="{{ old('report_date') ?: ($project->report_date ?? '') }}">
+                </div>
+            </div>
+
             {{-- توضیحات --}}
             <div class="col-md-6 my-2">
                 <div class="form-group input-group">
@@ -224,6 +237,20 @@
             targetTextSelector: '#deadline_date',
             targetDateSelector: '#deadline',
             selectedDate: deadline,
+            isGregorian: false,
+        });
+
+        const reportDate =
+            @if ($project->report_date)
+                new Date('{{ $project->report_date }}')
+            @else
+                null
+            @endif;
+
+        new mds.MdsPersianDateTimePicker($('#report_date_text')[0], {
+            targetTextSelector: '#report_date_text',
+            targetDateSelector: '#report_date',
+            selectedDate: reportDate,
             isGregorian: false,
         });
 

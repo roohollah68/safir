@@ -13,11 +13,12 @@ class Project extends Model
 
     protected $fillable = [
         'title', 'desc', 'image', 'location', 
-        'user_id', 'task_owner_id', 'deadline', 'result'
+        'user_id', 'task_owner_id', 'deadline', 'result', 'report', 'report_date'
     ];
 
     protected $casts = [
-        'deadline' => 'date'
+        'deadline' => 'date',
+        'report_date' => 'date'
     ];
 
     public function user() {

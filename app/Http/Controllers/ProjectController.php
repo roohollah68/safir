@@ -38,6 +38,7 @@ class ProjectController extends Controller
             'location' => 'required|string|max:255',
             'task_owner_id' => 'nullable|exists:users,id',
             'deadline' => 'nullable|date',
+            'report_date' => 'nullable|date',
         ],[
             'image.mimes' => 'فایل با این پسوند قابل قبول نیست!',
             'image.max' => 'حجم فایل نباید از 3 mb بیشتر باشد!',
@@ -45,6 +46,10 @@ class ProjectController extends Controller
         
         if ($request->deadline) {
             $validated['deadline'] = Carbon::parse($request->deadline);
+        }
+
+        if ($request->report_date) {
+            $validated['report_date'] = Carbon::parse($request->report_date);
         }
 
         $validated['user_id'] = auth()->id();
@@ -161,5 +166,28 @@ class ProjectController extends Controller
     {
         $subProject->delete();
         return response()->json(['success' => true]);
+    }
+
+    public function AddReport(Request $request, $id)
+    {
+        $project = Project::findOrFail($id);
+        if ($project->task_owner_id !== auth()->id()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+        $request->validate([
+            'report' => 'required|string'
+        ]);
+        $project->report = $request->input('report');
+        $project->save();
+        return response()->json(['success' => true]);
+    }
+
+    public function report($id)
+    {
+        $project = Project::findOrFail($id);
+        if ($project->task_owner_id !== auth()->id()) {
+            abort(403);
+        }
+        return view('project.report', compact('project'));
     }
 }

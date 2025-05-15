@@ -46,6 +46,25 @@
                                    data-project-id="{{ $project->id }}" title="مشاهده پیام‌ها">
                                     <i class="fas fa-comments"></i>
                                 </a>
+                                @if ($project->task_owner_id === auth()->id())
+                                    <button class="btn btn-warning mx-1 add-report-btn" 
+                                        data-project-id="{{ $project->id }}" 
+                                        data-project-title="{{ $project->title }}"
+                                        data-current-report="{{ $project->report ?? '' }}"
+                                        style="font-family: inherit"
+                                        title="افزودن گزارش">
+                                        <i class="fas fa-file-alt"></i>
+                                    </button>
+                                    @if ($project->report)
+                                        <button class="btn btn-success mx-1 view-report-btn"
+                                            data-project-title="{{ $project->title }}"
+                                            data-report="{{ e($project->report) }}"
+                                            style="font-family: inherit"
+                                            title="مشاهده گزارش">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    @endif
+                                @endif
                             </div>
                         </div>
                         <div class="card-body">
@@ -67,10 +86,16 @@
                                 </p>
                                 @endif
                                @if($project->deadline)
-                                <p class="text-muted mb-4">
+                                <p class="text-muted mb-1">
                                     <i class="fas fa-clock"></i> 
                                     مهلت: {{ verta($project->deadline)->formatJalaliDate() }}
                                 </p>
+                                @endif
+                                @if($project->report_date)
+                                    <p class="text-muted mb-4">
+                                        <i class="fas fa-file-lines"></i>
+                                        تاریخ گزارش: {{ verta($project->report_date)->formatJalaliDate() }}
+                                    </p>
                                 @endif
                                 @if ($project->subProjects->count() > 0)
                                     <div class="mb-3 d-flex align-items-center">
@@ -129,6 +154,23 @@
                                         data-project-id="{{ $project->id }}" title="مشاهده پیام‌ها">
                                             <i class="fas fa-comments"></i>
                                         </a>
+                                        @if ($project->task_owner_id === auth()->id())
+                                            <button class="btn btn-warning mx-1 add-report-btn" 
+                                                data-project-id="{{ $project->id }}" 
+                                                data-project-title="{{ $project->title }}"
+                                                data-current-report="{{ $project->report ?? '' }}"
+                                                style="font-family: inherit">
+                                                <i class="fas fa-file-alt"></i> افزودن گزارش
+                                            </button>
+                                            @if ($project->report)
+                                                <button class="btn btn-success mx-1 view-report-btn"
+                                                    data-project-title="{{ $project->title }}"
+                                                    data-report="{{ e($project->report) }}"
+                                                    style="font-family: inherit">
+                                                    <i class="fas fa-eye"></i> مشاهده گزارش
+                                                </button>
+                                            @endif
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -151,10 +193,16 @@
                                         </p>
                                         @endif
                                         @if($project->deadline)
-                                        <p class="text-muted mb-4">
+                                        <p class="text-muted mb-1">
                                             <i class="fas fa-clock"></i> 
                                             مهلت: {{ verta($project->deadline)->formatJalaliDate() }}
                                         </p>
+                                        @endif
+                                        @if($project->report_date)
+                                            <p class="text-muted mb-4">
+                                                <i class="fas fa-file-lines"></i>
+                                                تاریخ گزارش: {{ verta($project->report_date)->formatJalaliDate() }}
+                                            </p>
                                         @endif
                                         @if ($project->subProjects->count() > 0)
                                             <div class="mb-3 d-flex align-items-center">
@@ -195,6 +243,7 @@
     </div>
 </div>
 <div id="comments-dialog" style="display: none;"></div>
+<div id="view-report-dialog" style="display: none;"></div>
 <style>
     .hidden-by-filter {
         display: none;
@@ -231,6 +280,7 @@
 
             $(document).on('click', '#closeDialogBtn', function() {
                 commentsDialog.dialog('close');
+                reportModalDiv.dialog('close');
             });
             
             $('.view-comments-btn').click(function(e) {
@@ -322,6 +372,76 @@
                         checkbox.prop('checked', !completed);
                     }
                 });
+            });
+
+            var reportModalDiv = $('<div id="report-modal"></div>').appendTo('body').hide();
+
+            $(document).on('click', '.add-report-btn', function() {
+                var btn = $(this);
+                var projectId = btn.data('project-id');
+                $.get('/projects/' + projectId + '/report', function(html) {
+                    reportModalDiv.html(html);
+                    if (reportModalDiv.hasClass('ui-dialog-content')) {
+                        reportModalDiv.dialog('destroy');
+                    }
+                    reportModalDiv.dialog({
+                        modal: true,
+                        width: 500,
+                        title: 'افزودن گزارش برای: ' + btn.data('project-title'),
+                        open: function() {
+                            $('#report-text').focus();
+                        }
+                    });
+                });
+            });
+
+            $(document).on('submit', '#report-form', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                var projectId = $('#report-project-id').val();
+                $.ajax({
+                    url: '/projects/' + projectId + '/report',
+                    method: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            reportModalDiv.dialog('close');
+                            window.location.reload();
+                        } else {
+                            alert('خطا در ثبت گزارش');
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('خطا در ثبت گزارش');
+                    }
+                });
+            });
+
+            var viewReportDialog = $("#view-report-dialog");
+            viewReportDialog.dialog({
+                autoOpen: false,
+                width: 500,
+                modal: true,
+                title: 'مشاهده گزارش',
+                buttons: [
+                    {
+                        'class': 'btn btn-danger',
+                        text: "بستن",
+                        click: function() { $(this).dialog("close"); },
+                        style: 'font-family: inherit'
+                    }
+                ]
+            });
+
+            $(document).on('click', '.view-report-btn', function() {
+                var btn = $(this);
+                var report = btn.data('report');
+                var title = btn.data('project-title');
+                viewReportDialog.html(
+                    `<div style="white-space: pre-line; font-family: inherit; font-size: 1.1em;">${report}</div>`
+                );
+                viewReportDialog.dialog('option', 'title', 'مشاهده گزارش برای: ' + title);
+                viewReportDialog.dialog('open');
             });
         });
     </script>
