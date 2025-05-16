@@ -88,10 +88,14 @@ class ProjectController extends Controller
             'location' => 'required|string|max:255',
             'task_owner_id' => 'nullable|exists:users,id',
             'deadline' => 'nullable|date',
+            'report_date' => 'nullable|date'
         ]);
 
         if ($request->deadline) {
             $validated['deadline'] = Carbon::parse($request->deadline);
+        }
+        if ($request->report_date) {
+            $validated['report_date'] = Carbon::parse($request->report_date);
         }
 
         if ($request->hasFile('image')) {
@@ -101,9 +105,9 @@ class ProjectController extends Controller
         }
 
         $existingIds = collect($request->subprojects)
-        ->pluck('id')
-        ->filter()
-        ->toArray();
+            ->pluck('id')
+            ->filter()
+            ->toArray();
 
         $project->subProjects()
             ->whereNotIn('id', $existingIds)

@@ -24,7 +24,7 @@ class HandleWithdrawal {
                 'account_name' => $fixedCost->account_owner,
                 'pay_method' => 'cash',
                 'expense_type' => 'current',
-                'expense_desc' => $fixedCost->category,
+                'expense_desc' => \Config::get('expense_type.current.' . $fixedCost->category),
                 'bank_id' => $fixedCost->bank_id,
                 'vat' => $fixedCost->vat,
                 'official' => $fixedCost->official,

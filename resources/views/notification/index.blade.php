@@ -27,14 +27,14 @@
                                 </a>
                                 <div class="d-flex align-items-center">
                                     <small class="text-muted me-2">{{ \Carbon\Carbon::parse($notification->created_at)->locale('fa')->diffForHumans() }}</small>
-                                    @if ($notification->read_at === null)
-                                        <form action="{{ route('notifications.markAsRead', $notification->id) }}" method="POST">
+                                    {{-- @if ($notification->read_at === null)
+                                        <form action="{{ route('notifications.markAllRead', $notification->id) }}" method="POST">
                                             @csrf
                                             <button type="submit" class="btn btn-outline-success btn-sm">
                                                 <i class="fa fa-check-double" style="font-size: 1.1rem; text-align: center;" title="علامت‌گذاری به عنوان خوانده‌شده"></i>
                                             </button>
                                         </form>
-                                    @endif
+                                    @endif --}}
                                 </div>
                             </div>
                         </div>
