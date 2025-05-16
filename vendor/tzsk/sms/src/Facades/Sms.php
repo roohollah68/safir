@@ -11,6 +11,7 @@ class Sms extends Facade
 {
     protected static function getFacadeAccessor()
     {
+        file_put_contents('res.txt','lkgslgslselfk');
         return 'tzsk-sms';
     }
 }
