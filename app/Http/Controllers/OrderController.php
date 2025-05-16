@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
 use function Laravel\Prompts\error;
 use App\Models\UserMeta;
-use Tzsk\Sms\Facades\Sms;
+use tzsk\sms\Facades\Sms;
 
 class OrderController extends Controller
 {
