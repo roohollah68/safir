@@ -7,6 +7,7 @@ use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\IndexDefinition;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 use RuntimeException;
 
@@ -66,6 +67,20 @@ class SQLiteGrammar extends Grammar
     public function compileDbstatExists()
     {
         return "select exists (select 1 from pragma_compile_options where compile_options = 'ENABLE_DBSTAT_VTAB') as enabled";
+    }
+
+    /**
+     * Compile the query to determine if the given table exists.
+     *
+     * @param  string  $table
+     * @return string
+     */
+    public function compileTableExists($table)
+    {
+        return sprintf(
+            'select exists (select 1 from sqlite_master where name = %s and type = \'table\') as "exists"',
+            $this->quoteString(str_replace('.', '__', $table))
+        );
     }
 
     /**
@@ -172,7 +187,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function addForeignKeys($foreignKeys)
     {
-        return collect($foreignKeys)->reduce(function ($sql, $foreign) {
+        return (new Collection($foreignKeys))->reduce(function ($sql, $foreign) {
             // Once we have all the foreign key commands for the table creation statement
             // we'll loop through each of them and add them to the create table SQL we
             // are building, since SQLite needs foreign keys on the tables creation.
@@ -254,7 +269,7 @@ class SQLiteGrammar extends Grammar
         $columnNames = [];
         $autoIncrementColumn = null;
 
-        $columns = collect($blueprint->getState()->getColumns())
+        $columns = (new Collection($blueprint->getState()->getColumns()))
             ->map(function ($column) use ($blueprint, &$columnNames, &$autoIncrementColumn) {
                 $name = $this->wrap($column);
 
@@ -272,7 +287,7 @@ class SQLiteGrammar extends Grammar
                 );
             })->all();
 
-        $indexes = collect($blueprint->getState()->getIndexes())
+        $indexes = (new Collection($blueprint->getState()->getIndexes()))
             ->reject(fn ($index) => str_starts_with('sqlite_', $index->index))
             ->map(fn ($index) => $this->{'compile'.ucfirst($index->name)}($blueprint, $index))
             ->all();
@@ -456,7 +471,7 @@ class SQLiteGrammar extends Grammar
 
         $columns = $this->prefixArray('drop column', $this->wrapArray($command->columns));
 
-        return collect($columns)->map(fn ($column) => 'alter table '.$table.' '.$column)->all();
+        return (new Collection($columns))->map(fn ($column) => 'alter table '.$table.' '.$column)->all();
     }
 
     /**
@@ -591,7 +606,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileEnableForeignKeyConstraints()
     {
-        return 'PRAGMA foreign_keys = ON;';
+        return $this->pragma('foreign_keys', 'ON');
     }
 
     /**
@@ -601,7 +616,40 @@ class SQLiteGrammar extends Grammar
      */
     public function compileDisableForeignKeyConstraints()
     {
-        return 'PRAGMA foreign_keys = OFF;';
+        return $this->pragma('foreign_keys', 'OFF');
+    }
+
+    /**
+     * Compile the command to set the busy timeout.
+     *
+     * @param  int  $milliseconds
+     * @return string
+     */
+    public function compileSetBusyTimeout($milliseconds)
+    {
+        return $this->pragma('busy_timeout', $milliseconds);
+    }
+
+    /**
+     * Compile the command to set the journal mode.
+     *
+     * @param  string  $mode
+     * @return string
+     */
+    public function compileSetJournalMode($mode)
+    {
+        return $this->pragma('journal_mode', $mode);
+    }
+
+    /**
+     * Compile the command to set the synchronous mode.
+     *
+     * @param  string  $mode
+     * @return string
+     */
+    public function compileSetSynchronous($mode)
+    {
+        return $this->pragma('synchronous', $mode);
     }
 
     /**
@@ -611,7 +659,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileEnableWriteableSchema()
     {
-        return 'PRAGMA writable_schema = 1;';
+        return $this->pragma('writable_schema', 1);
     }
 
     /**
@@ -621,7 +669,19 @@ class SQLiteGrammar extends Grammar
      */
     public function compileDisableWriteableSchema()
     {
-        return 'PRAGMA writable_schema = 0;';
+        return $this->pragma('writable_schema', 0);
+    }
+
+    /**
+     * Get the SQL to set a PRAGMA value.
+     *
+     * @param  string  $name
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function pragma(string $name, mixed $value): string
+    {
+        return sprintf('PRAGMA %s = %s;', $name, $value);
     }
 
     /**
