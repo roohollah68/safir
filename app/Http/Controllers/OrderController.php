@@ -14,9 +14,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mccarlosen\LaravelMpdf\Facades\LaravelMpdf as PDF;
+use Tzsk\Sms\Facades\Sms;
 use function Laravel\Prompts\error;
 use App\Models\UserMeta;
-use tzsk\sms\Facades\Sms;
 
 class OrderController extends Controller
 {
@@ -362,6 +362,7 @@ class OrderController extends Controller
             Sms::send("سفارش شما از انبار پپتینا خارج شد و به زودی به دست شما خواهد رسید.", function($sms) use ($order) {
                 $sms->to($order->phone);
             });
+
         }
         if ($text)
             (new CommentController)->create($order, auth()->user(), $text);
