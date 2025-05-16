@@ -70,13 +70,10 @@
             initialTable = $('#tableWrapper').html();
             $('#tableWrapper').html('');
             $.each(products, (id, product) => {
-                if(!warehouses[product.warehouse_id]){
-                    console.log(product);
-                }
-                warehouses[product.warehouse_id][product.good_id] = product;
+                if(warehouses[product.warehouse_id])
+                    warehouses[product.warehouse_id][product.good_id] = product;
             })
             $('select').change(function (e) {
-
                 warehouseId1 = $('#warehouse1').val()
                 warehouseId2 = $('#warehouse2').val()
                 createTable();
