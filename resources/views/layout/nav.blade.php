@@ -47,22 +47,24 @@
         
         <div class="notification-list" style="max-height: 500px; overflow-y: auto;">
             @foreach(auth()->user()->notifications->take(5) as $notification)
-                <a href="{{ $notification->link ?? '#' }}" 
-                   class="dropdown-item d-flex justify-content-between align-items-center py-3 {{ $notification->unread() ? 'bg-light' : '' }}"
-                   data-notification-id="{{ $notification->id }}">
-                   <div class="d-flex flex-column ms-1">
-                       <div class="text-truncate text-dark text-end">{{ $notification->message }}</div>
-                       <small class="text-muted" style="text-align: right">{{ \Carbon\Carbon::parse($notification->created_at)->locale('fa')->diffForHumans() }}</small>
+            <a href="{{ $notification->link ?? '#' }}" 
+               class="dropdown-item d-flex justify-content-between align-items-center py-3 {{ $notification->unread() ? 'bg-light' : '' }}"
+               data-notification-id="{{ $notification->id }}">
+               <div class="d-flex flex-column ms-1" style="text-wrap: wrap; word-break: break-word;">
+                   <div class="text-dark" style="white-space: normal; word-break: break-word; text-align: right">
+                   {{ $notification->message }}
                    </div>
-                   @if($notification->unread())
-                       <span class="badge bg-primary">جدید</span>
-                   @endif
-                </a>
+                   <small class="text-muted" style="text-align: right">{{ \Carbon\Carbon::parse($notification->created_at)->locale('fa')->diffForHumans() }}</small>
+               </div>
+               @if($notification->unread())
+                   <span class="badge bg-primary">جدید</span>
+               @endif
+            </a>
             @endforeach
             @if(auth()->user()->notifications->isEmpty())
-                <div class="p-3 text-muted text-center">
-                    هیچ اعلانی یافت نشد
-                </div>
+            <div class="p-3 text-muted text-center">
+                هیچ اعلانی یافت نشد
+            </div>
             @endif
         </div>
         

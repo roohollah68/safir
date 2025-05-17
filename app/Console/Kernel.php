@@ -23,7 +23,8 @@ class Kernel extends ConsoleKernel
      * @return void
      */
     protected function schedule(Schedule $schedule) {
-        $schedule->command('costs:check')->everyFiveHours();
+        $schedule->command('costs:check')->daily();
+        $schedule->command('reports:remind')->daily();
     }
 
     /**

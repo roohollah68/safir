@@ -51,11 +51,9 @@ class FixedCostController extends Controller
         if ($id) {
             $fixedCost = FixedCost::findOrFail($id);
             $fixedCost->update($validated);
-            event(new FixedCostEvent($fixedCost));
             return redirect()->route('fixed-costs.index')->with('success', 'هزینه ثابت با موفقیت ویرایش شد.');
         } else {
             $fixedCost = FixedCost::create($validated);
-            event(new FixedCostEvent($fixedCost));
             return redirect()->route('fixed-costs.index')->with('success', 'هزینه ثابت با موفقیت اضافه شد.');
         }
     }
