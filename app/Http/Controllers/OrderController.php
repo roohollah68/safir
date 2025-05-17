@@ -341,9 +341,9 @@ class OrderController extends Controller
             if ($order->phone && preg_match('/^0\d+$/', $order->phone)) {
                 $order->phone = '98' . substr($order->phone, 1);
             }
-            Sms::send("سفارش شما در انبار پپتینا در حال آماده سازی است و به زودی برای شما ارسال خواهد شد.", function($sms) use ($order) {
-                $sms->to($order->phone);
-            });
+//            Sms::send("سفارش شما در انبار پپتینا در حال آماده سازی است و به زودی برای شما ارسال خواهد شد.", function($sms) use ($order) {
+//                $sms->to($order->phone);
+//            });
         }
         if ($order->state == 10) {
             // ثبت واریزی بازگشت به انبار
@@ -359,9 +359,9 @@ class OrderController extends Controller
             if ($order->phone && preg_match('/^0\d+$/', $order->phone)) {
                 $order->phone = '98' . substr($order->phone, 1);
             }
-            Sms::send("سفارش شما از انبار پپتینا خارج شد و به زودی به دست شما خواهد رسید.", function($sms) use ($order) {
-                $sms->to($order->phone);
-            });
+//            Sms::send("سفارش شما از انبار پپتینا خارج شد و به زودی به دست شما خواهد رسید.", function($sms) use ($order) {
+//                $sms->to($order->phone);
+//            });
 
         }
         if ($text)
