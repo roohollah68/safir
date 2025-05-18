@@ -16,7 +16,7 @@ class WoocommerceController extends Controller
 
         $request = json_decode(file_get_contents('php://input'));
         if (env('APP_ENV') == 'local') {
-            $request = json_decode(file_get_contents('woo/1404-1-10_22-05-57 _ peptina _ سایه اسماعیل پور.txt'));
+            $request = json_decode(file_get_contents('woo/1404-2-28_12-07-33 _ dorateashop _ اذین کیانی.txt'));
         }
         if (!isset($request->billing))
             return 'not used';
@@ -65,7 +65,7 @@ class WoocommerceController extends Controller
                     $this->orderProducts($order, $request, $website, $currency);
                     (new TelegramController())->deleteOrderFromBale($order, '5742084958');
                     if ($website == 'dorateashop')
-                        $this->dorateashop($order);
+                        $this->dorateashop($order, $request);
                     else {
                         $baleReq = (new TelegramController())->sendOrderToBale($order, env('GroupId'));
                         if ($baleReq) {
@@ -99,7 +99,7 @@ class WoocommerceController extends Controller
             $order->save();
             $this->orderProducts($order, $request, $website, $currency);
             if ($website == 'dorateashop')
-                $this->dorateashop($order);
+                $this->dorateashop($order, $request);
             else
                 (new TelegramController())->sendOrderToBale($order, env('GroupId'));
         }
@@ -109,7 +109,7 @@ class WoocommerceController extends Controller
 
     public function viewFile()
     {
-        $file = '1403-12-25_15-36-04 _ matchashop _ صدف ترکمنی';
+        $file = '1404-2-28_12-07-33 _ dorateashop _ اذین کیانی';
         $data = json_decode(file_get_contents("woo/{$file}.txt"));
         dd($data);
     }
@@ -138,7 +138,7 @@ class WoocommerceController extends Controller
         }
     }
 
-    public function dorateashop($order)
+    public function dorateashop($order, $request) //حذف سفارش سایت دوراتی شاپ و اضافه کردن به سفارش خانم موسوی
     {
         $website_id = $order->website->website_id;
         $website = Websites::where('website_id', $website_id)->where('website', 'moosavi')->first();
@@ -179,7 +179,8 @@ class WoocommerceController extends Controller
                 number_format($price) . ' کل: ' . number_format($price * $orderProduct->number) . '<br>';
         }
         echo 'سفیر: هزینه ارسال:' . number_format(Helper::settings()->{'peykeShahri'}) . '<br>';
-        $newOrder->total += Helper::settings()->{'peykeShahri'};
+//        $newOrder->total += Helper::settings()->{'peykeShahri'};
+        $newOrder->total += $request->shipping_total;
         echo $newOrder->name . ' ( ' . $newOrder->id . ' )<br>';
         echo 'جمع فاکتور سفیر: ' . number_format($newOrder->total) . ' ریال ' . '<br>';
         echo '=============================<br><br>';
