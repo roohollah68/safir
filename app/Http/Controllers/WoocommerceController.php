@@ -109,7 +109,7 @@ class WoocommerceController extends Controller
 
     public function viewFile()
     {
-        $file = '1404-2-28_12-07-33 _ dorateashop _ اذین کیانی';
+        $file = '1404-2-28_11-56-21 _ dorateashop _ علیرضا قربانی';
         $data = json_decode(file_get_contents("woo/{$file}.txt"));
         dd($data);
     }
