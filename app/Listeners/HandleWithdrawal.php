@@ -7,14 +7,27 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use App\Models\Withdrawal;
 use Hekmatinasser\Verta\Verta;
+use Carbon\Carbon;
 
-class HandleWithdrawal {
+class HandleWithdrawal implements ShouldQueue {
     public function handle(FixedCostEvent $event) {
         $fixedCost = $event->fixedCost;
-        $today = Verta::now();
-        $month = $today->format('Y-m');
+        $todayVerta = Verta::now();
 
-        if ($fixedCost->due_day == $today->day && !Withdrawal::where('fixed_cost_id', $fixedCost->id)->exists()) {
+        if ($fixedCost->due_day != $todayVerta->day) {
+            return;
+        }
+
+        $currentPersianYearMonth = $todayVerta->format('Y-m');
+        $hasWithdrawalThisMonth = Withdrawal::where('fixed_cost_id', $fixedCost->id)
+            ->get()
+            ->filter(function ($withdrawal) use ($currentPersianYearMonth) {
+                $createdAtVerta = Verta::parse($withdrawal->created_at);
+                return $createdAtVerta->format('Y-m') === $currentPersianYearMonth;
+            })
+            ->isNotEmpty();
+
+        if (!$hasWithdrawalThisMonth) {
             Withdrawal::create([
                 'user_id' => $fixedCost->user_id,
                 'fixed_cost_id' => $fixedCost->id,

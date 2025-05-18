@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 use App\Models\FixedCost;
 use Illuminate\Console\Command;
+use Hekmatinasser\Verta\Verta;
 
 class CheckDailyCosts extends Command {
     protected $signature = 'costs:check';
