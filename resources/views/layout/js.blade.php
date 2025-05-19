@@ -77,29 +77,6 @@
             })
     }
 
-    function confirmPassCheque(chequeId, type) {
-        if (confirm('آیا از تغییر وضعیت این چک مطمئن هستید؟')) {
-            var button = $('input[onclick="confirmPassCheque(' + chequeId + ', \'' + type + '\')"]');
-            button.prop('disabled', true);
-            $.ajax({
-                url: '/cheque/pass',
-                type: 'POST',
-                data: {
-                    _token: token,
-                    cheque_id: chequeId,
-                    type: type
-                },
-                success: function (response) {
-                    if (response.success) {
-                        button.val('پاس شده').removeClass('btn-warning').addClass('btn-success');
-                    } else {
-                        button.prop('disabled', false);
-                    }
-                }
-            });
-        }
-    }
-
     function view_comment(id) {
         $.post('/viewComment/' + id, {
             _token: token

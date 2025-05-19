@@ -26,7 +26,7 @@
     <span>زمان ویرایش:</span><b>{{ verta($viewCheque->updated_at)->formatJalaliDate() }}</b><br>
 
     @if ($viewCheque->cheque_registration)
-        <span>رسید چک:</span>
+        <span>رسید بانک:</span>
         <a class="btn btn-secondary text-light mb-2" href="/deposit/{{ $viewCheque->cheque_registration }}"
             target="_blank">مشاهده
             فایل</a>
@@ -35,7 +35,7 @@
         <form action="{{ route('cheque.view2', $viewCheque->id) }}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="form-group">
-                <label for="cheque_registration">بارگزاری تصویر ثبت چک در بانک:</label>
+                <label for="cheque_registration">بارگزاری رسید بانک:</label>
                 <br>
                 <input type="file" id="cheque_registration" name="cheque_registration" class="me-5" required>
                 <button type="submit" class="btn btn-success" style="font-family: inherit">ذخیره</button>

@@ -35,5 +35,22 @@
     <b>{{ $viewCheque->official != 1 ? 'غیر رسمی' : 'رسمی ' . ($viewCheque->vat == 1 ? 'با ارزش افزوده' : 'بدون ارزش افزوده') }}</b>
     <br>
     <span>بانک پرداخت کننده:</span>
-    <b>{{ $viewCheque->bank_id ? $viewCheque->bank->name : 'نامشخص' }}</b>
+    <b>{{ $viewCheque->bank_id ? $viewCheque->bank->name : 'نامشخص' }}</b><br>
+    @if ($viewCheque->cheque_registration)
+        <span>رسید تحویل:</span>
+        <a class="btn btn-secondary text-light mb-2" href="/withdrawal/{{ $viewCheque->cheque_registration }}"
+            target="_blank">مشاهده
+            فایل</a>
+        <br>
+    @else
+        <form action="{{ route('cheque.view', $viewCheque->id) }}" method="post" enctype="multipart/form-data">
+            @csrf
+            <div class="form-group">
+                <label for="cheque_registration">بارگزاری رسید تحویل:</label>
+                <br>
+                <input type="file" id="cheque_registration" name="cheque_registration" class="me-5" required>
+                <button type="submit" class="btn btn-success" style="font-family: inherit">ذخیره</button>
+            </div>
+        </form>
+    @endif
 </div>
