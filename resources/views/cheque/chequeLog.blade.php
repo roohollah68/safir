@@ -12,7 +12,7 @@
                 به <span class="bg-{{ $badgeClass[$record->new_status] }} badge">{{ $statuses[$record->new_status] }}</span> تغییر یافت.
             </div>
         @empty
-            <div class="text-center">تاریخچه ای یافت نشد</div>
+            <div class="text-center">تاریخچه‌ای یافت نشد.</div>
         @endforelse
     @endisset
 </div>

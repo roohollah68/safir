@@ -102,7 +102,8 @@ class ChequeController extends Controller
         if ($request->isMethod('post')) {
 
             $request->validate([
-            'cheque_registration' => 'required|mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
+            'cheque_registration' => 'nullable|mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048',
+            'delivery_receipt' => 'nullable|mimes:jpeg,jpg,png,bmp,pdf,xls,xlsx,doc,docx|max:3048'
             ]);
 
             if ($request->hasFile('cheque_registration')) {
@@ -110,6 +111,12 @@ class ChequeController extends Controller
             $viewCheque->cheque_registration = $path;
             $viewCheque->save();
             return redirect()->back();
+            }
+            if ($request->hasFile('delivery_receipt')) {
+                $path = $request->file('delivery_receipt')->store("", 'deposit');
+                $viewCheque->delivery_receipt = $path;
+                $viewCheque->save();
+                return redirect()->back();
             }
         }
 

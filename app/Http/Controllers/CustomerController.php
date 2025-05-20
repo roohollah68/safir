@@ -218,7 +218,7 @@ class CustomerController extends Controller
         request()->validate([
             'photo' => 'required_without:old_Photo|mimes:jpeg,jpg,png,bmp|max:2048',
             'old_Photo' => 'required_without:photo',
-            'deposit_date' => 'date',
+            'deposit_date' => 'nullable|date',
         ], [
             'photo.required_without' => 'ارائه تصویر الزامی است!',
             'photo.max' => 'حجم فایل نباید از 2mb بیشتر باشد.',

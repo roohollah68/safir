@@ -26,7 +26,7 @@
     <span>زمان ویرایش:</span><b>{{ verta($viewCheque->updated_at)->formatJalaliDate() }}</b><br>
 
     @if ($viewCheque->cheque_registration)
-        <span>رسید بانک:</span>
+        <span>رسید ثبت اینترنتی بانک:</span>
         <a class="btn btn-secondary text-light mb-2" href="/deposit/{{ $viewCheque->cheque_registration }}"
             target="_blank">مشاهده
             فایل</a>
@@ -35,9 +35,26 @@
         <form action="{{ route('cheque.view2', $viewCheque->id) }}" method="post" enctype="multipart/form-data">
             @csrf
             <div class="form-group">
-                <label for="cheque_registration">بارگزاری رسید بانک:</label>
+                <label for="cheque_registration">بارگزاری رسید ثبت اینترنتی بانک:</label>
                 <br>
                 <input type="file" id="cheque_registration" name="cheque_registration" class="me-5" required>
+                <button type="submit" class="btn btn-success" style="font-family: inherit">ذخیره</button>
+            </div>
+        </form>
+    @endif
+    @if ($viewCheque->delivery_receipt)
+        <span>رسید تحویل فیزیکی به بانک:</span>
+        <a class="btn btn-secondary text-light mb-2" href="/deposit/{{ $viewCheque->delivery_receipt }}"
+            target="_blank">مشاهده
+            فایل</a>
+        <br>
+    @else
+        <form action="{{ route('cheque.view2', $viewCheque->id) }}" method="post" enctype="multipart/form-data">
+            @csrf
+            <div class="form-group">
+                <label for="delivery_receipt">بارگزاری رسید تحویل فیزیکی:</label>
+                <br>
+                <input type="file" id="delivery_receipt" name="delivery_receipt" class="me-5" required>
                 <button type="submit" class="btn btn-success" style="font-family: inherit">ذخیره</button>
             </div>
         </form>

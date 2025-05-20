@@ -197,7 +197,7 @@
         </div>
     </div>
 
-    <div id="historyDialog" title="تاریخچه تغییرات" style="display: none;">
+    <div id="historyDialog" title="تاریخچه‌ی تغییرات" style="display: none;">
         <div id="historyContent"></div>
     </div>
 @endsection

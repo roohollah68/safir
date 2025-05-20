@@ -94,8 +94,10 @@
                     {{config('payMethods')['credit']}}</x-radio>
 {{--                <x-radio :id="'receipt'" :name="'paymentMethod'" value="receipt" onclick="paymentAction()">--}}
 {{--                    {{config('payMethods')['receipt']}}</x-radio>--}}
-                <x-radio :id="'onDelivery'" :name="'paymentMethod'" value="onDelivery" onclick="paymentAction()">
-                    {{config('payMethods')['onDelivery']}}</x-radio><br>
+                @if(!$user->safir())
+                    <x-radio :id="'onDelivery'" :name="'paymentMethod'" value="onDelivery" onclick="paymentAction()">
+                        {{config('payMethods')['onDelivery']}}</x-radio><br>
+                @endif
 {{--                <label for='receiptPhoto' class="btn btn-info m-2 hide receiptPhoto">بارگذاری تصویر رسید بانکی <i--}}
 {{--                        class="fa fa-image"></i></label>--}}
                 <input type="file" id="receiptPhoto" class="hide compress-image*" name="receipt">
