@@ -17,19 +17,19 @@
                     <select id="category" name="category" class="form-control" required>
                         <option value="" disabled {{ !isset($fixedCost) ? 'selected' : '' }}>انتخاب کنید</option>
                         <option value="0"
-                            {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[0] ? 'selected' : '' }}>
+                            {{ isset($fixedCost) && $fixedCost->category == 0 ? 'selected' : '' }}>
                             {{ $expenseTypes[0] }}</option>
                         <option value="1"
-                            {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[1] ? 'selected' : '' }}>
+                            {{ isset($fixedCost) && $fixedCost->category == 1 ? 'selected' : '' }}>
                             {{ $expenseTypes[1] }}</option>
                         <option value="9"
-                            {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[9] ? 'selected' : '' }}>
+                            {{ isset($fixedCost) && $fixedCost->category == 9 ? 'selected' : '' }}>
                             {{ $expenseTypes[9] }}</option>
                         <option value="6"
-                            {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[6] ? 'selected' : '' }}>
+                            {{ isset($fixedCost) && $fixedCost->category == 6 ? 'selected' : '' }}>
                             {{ $expenseTypes[6] }}</option>
                         <option value="16"
-                            {{ isset($fixedCost) && $fixedCost->category == $expenseTypes[16] ? 'selected' : '' }}>
+                            {{ isset($fixedCost) && $fixedCost->category == 16 ? 'selected' : '' }}>
                             {{ $expenseTypes[16] }}</option>
                     </select>
                 </div>
