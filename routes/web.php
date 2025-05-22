@@ -92,6 +92,8 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('statistic', 'showStatistic')->name('statistic');
         Route::post('statistic', 'showStatistic')->name('statistic');
         Route::get('productChart/{id}', 'productChart')->name('productChart');
+        Route::post('chequeChart','chequeChart')->name('chequeChart');
+        Route::get('chequeChart','chequeChart')->name('chequeChart');
     });
 
     Route::controller(CustomerController::class)->group(function () {

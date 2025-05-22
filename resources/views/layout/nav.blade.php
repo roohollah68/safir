@@ -253,10 +253,20 @@
                         </li>
                     @endif
 
-                    <li class="nav-item">
-                        <a class="nav-link px-3" href="{{ route('statistic') }}">
-                            <i class="fas fa-chart-bar me-2" aria-hidden="true"></i>آمار
+                    <li class="nav-item dropdown">
+                        <a class="nav-link px-3 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-calculator me-2" aria-hidden="true"></i>آمار
                         </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item py-2" href="{{ route('statistic') }}">
+                                <i class="fas fa-eye me-2" aria-hidden="true"></i>آمار فروش
+                            </a></li>
+                            @if ($User->meta('statistic'))
+                            <li><a class="dropdown-item py-2" href="{{ route('chequeChart') }}">
+                                <i class="fas fa-eye me-2" aria-hidden="true"></i>تحلیل چک‌ها
+                            </a></li>
+                            @endif
+                        </ul>
                     </li>
 
                     @if ($User->meta(['workReport', 'addWorkReport']))

@@ -10,6 +10,9 @@ use App\Models\Order;
 use App\Models\OrderProduct;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Bank;
+use App\Models\Withdrawal;
+use App\Helper\Helper;
 use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
 
@@ -326,5 +329,81 @@ class StatisticController extends Controller
         $priceValues = $month->map(fn($key) => $pricesData->get($key, 0));
 
         return view('productChart', compact('labels', 'data', 'priceValues'));
+    }
+
+    public function chequeChart(Request $request)
+    {
+        Helper::access('statistic');
+
+        foreach ([CustomerTransaction::class, Withdrawal::class] as $model) {
+            $model::where('pay_method', 'cheque')
+                ->where('cheque_status', 2)
+                ->whereDate('cheque_date', '<', now())
+                ->update(['cheque_status' => 1]);
+        }
+
+        $receivedQuery = CustomerTransaction::where('pay_method', 'cheque')->where('verified', 'approved');
+        $givenQuery = Withdrawal::where('pay_method', 'cheque')->where('payment_confirm', 1);
+
+        if ($request->filled('state') && $request->state !== 'all') {
+            $receivedQuery->where('cheque_status', $request->state);
+            $givenQuery->where('cheque_status', $request->state);
+        }
+
+        if ($request->filled('type')) {
+            $isOfficial = $request->type === 'official' ? 1 : 0;
+            $receivedQuery->where('official', $isOfficial);
+            $givenQuery->where('official', $isOfficial);
+        }
+
+        foreach (['from' => '>=', 'to' => '<='] as $key => $op) {
+            if ($request->filled($key)) {
+                $date = Verta::parse($request->$key)->DateTime();
+                if ($date) {
+                    $receivedQuery->whereDate('cheque_date', $op, $date);
+                    $givenQuery->whereDate('cheque_date', $op, $date);
+                }
+            }
+        }
+
+        if ($request->filled('bank')) {
+            $givenQuery->where('bank_id', $request->bank);
+        }
+
+        $receivedTotal = $receivedQuery->sum('amount');
+        $givenTotal = $givenQuery->sum('amount');
+        $receivedCheques = $receivedQuery->get(['cheque_date', 'amount']);
+        $givenCheques = $givenQuery->get(['cheque_date', 'amount']);
+
+        $dates = collect();
+        $receivedByDate = [];
+        $givenByDate = [];
+
+        foreach ($receivedCheques as $item) {
+            $date = (new Verta($item->cheque_date))->format('Y/m/d');
+            $dates->push($date);
+            $receivedByDate[$date] = ($receivedByDate[$date] ?? 0) + $item->amount;
+        }
+        foreach ($givenCheques as $item) {
+            $date = (new Verta($item->cheque_date))->format('Y/m/d');
+            $dates->push($date);
+            $givenByDate[$date] = ($givenByDate[$date] ?? 0) + $item->amount;
+        }
+
+        $chartLabels = $dates->unique()->sort()->values()->all();
+        $receivedData = array_map(fn($d) => $receivedByDate[$d] ?? 0, $chartLabels);
+        $givenData = array_map(fn($d) => $givenByDate[$d] ?? 0, $chartLabels);
+
+        return view('cheque.chart', [
+            'receivedTotal' => $receivedTotal,
+            'givenTotal' => $givenTotal,
+            'banks' => Bank::all(),
+            'filters' => $request->all(),
+            'chartLabels' => $chartLabels,
+            'receivedData' => $receivedData,
+            'givenData' => $givenData,
+            'from' => $request->from,
+            'to' => $request->to
+        ]);
     }
 }
