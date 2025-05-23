@@ -69,6 +69,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::post('/set_send_method/{id}', 'setSendMethod');
         Route::get('/history', 'orderHistory')->name('history');
         Route::post('/update-nu-records', 'updateNuRecords')->name('updateNuRecords');
+        // Route::get('/orders/CODReport', 'CODReport')->name('orders.CODReport');
     });
 
     Route::controller(SettingController::class)->group(function () {
@@ -94,6 +95,7 @@ Route::middleware(['auth', 'verify'])->group(function () {
         Route::get('productChart/{id}', 'productChart')->name('productChart');
         Route::post('chequeChart','chequeChart')->name('chequeChart');
         Route::get('chequeChart','chequeChart')->name('chequeChart');
+        Route::get('delivery-report','deliveryReport')->name('delivery.report');
     });
 
     Route::controller(CustomerController::class)->group(function () {

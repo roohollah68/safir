@@ -406,4 +406,78 @@ class StatisticController extends Controller
             'to' => $request->to
         ]);
     }
+
+    public function deliveryReport(Request $request)
+    {
+        $request->validate([
+            'from' => 'nullable|date',
+            'to' => 'nullable|date|after_or_equal:from',
+        ]);
+
+        $ordersQuery = Order::where('state', 10)
+            ->when($request->from, function ($query) use ($request) {
+                $query->whereDate('created_at', '>=', Verta::parse($request->from)->DateTime());
+            })
+            ->when($request->to, function ($query) use ($request) {
+                $query->whereDate('created_at', '<=', Verta::parse($request->to)->DateTime());
+            });
+
+        $shippingGroups = [
+            'تیپاکس' => ['peyk', 'peykCost', 4],
+            'پست' => ['post', 'postCost', 3],
+            'پیک شهری' => ['peykeShahri', 6],
+            'اسنپ' => [2],
+            'ماشین شرکت' => [1],
+            'باربری' => [5],
+            'حضوری' => [7],
+            'نفیس اکسپرس' => [8],
+            'اتوبوس' => [9],
+        ];
+
+        $orders = $ordersQuery->get();
+        $totalOrders = $orders->count();
+
+        $groupCounts = array_fill_keys(array_keys($shippingGroups), 0);
+        $config = config('sendMethods');
+
+        foreach ($orders as $order) {
+            $found = false;
+            foreach ($shippingGroups as $groupName => $keys) {
+                foreach ($keys as $key) {
+                    $needle = is_numeric($key) ? $config[$key] : $config[$key];
+                    if (mb_stripos($order->deliveryMethod, $needle) !== false) {
+                        $groupCounts[$groupName]++;
+                        $found = true;
+                        break 2;
+                    }
+                }
+            }
+            if (!$found) {
+                $groupCounts['نامشخص'] = ($groupCounts['نامشخص'] ?? 0) + 1;
+            }
+        }
+
+        $chartLabels = [];
+        $chartData = [];
+        $colorPalette = ['#FF1744','#1976D2','#FFD600','#43A047','#8E24AA',
+                        '#FF6F00','#00B8D4','#6D4C41','#C51162','#00C853'];
+
+        foreach ($groupCounts as $group => $count) {
+            if ($count > 0) {
+                $chartLabels[] = $group;
+                $chartData[] = $count;
+            }
+        }
+
+        return view('orders.deliveryReport', [
+            'chartData' => [
+                'labels' => $chartLabels,
+                'data' => $chartData,
+                'colors' => array_slice($colorPalette, 0, count($chartData)),
+                'total' => $totalOrders
+            ],
+            'from' => $request->from,
+            'to' => $request->to,
+        ]);
+    }
 }

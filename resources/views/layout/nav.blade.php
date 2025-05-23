@@ -225,6 +225,9 @@
                                 <li><a class="dropdown-item py-2" href="{{ route('fixed-costs.index') }}">
                                         <i class="fas fa-coins me-2" aria-hidden="true"></i>هزینه‌های ثابت
                                     </a></li>
+                                {{-- <li><a class="dropdown-item py-2" href="{{ route('orders.deliveryReport') }}">
+                                        <i class="fas fa-coins me-2" aria-hidden="true"></i>گزارش پرداخت در محل
+                                    </a></li> --}}
                             </ul>
                         </li>
                     @endif
@@ -264,6 +267,9 @@
                             @if ($User->meta('statistic'))
                             <li><a class="dropdown-item py-2" href="{{ route('chequeChart') }}">
                                 <i class="fas fa-eye me-2" aria-hidden="true"></i>تحلیل چک‌ها
+                            </a></li>
+                            <li><a class="dropdown-item py-2" href="{{ route('delivery.report') }}">
+                                <i class="fas fa-eye me-2" aria-hidden="true"></i>گزارش نحوه‌‌ی ارسال
                             </a></li>
                             @endif
                         </ul>
