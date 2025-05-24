@@ -8,7 +8,7 @@
 <div class="container" dir="rtl">
     <form method="POST" class="mb-4">
         @csrf
-        <div class="row g-3">
+        <div class="row border rounded p-3 m-0">
             <div class="col-md-2">
                 <select name="state" class="form-select">
                     <option value="all" {{ request('state', 'all') == 'all' ? 'selected' : '' }}>همه وضعیت‌ها</option>
@@ -49,12 +49,25 @@
     <div class="card">
         <div class="card-body">
             <h4 class="m-3">
-                اختلاف خالص: 
-                <span class="{{ ($receivedTotal - $givenTotal) >= 0 ? 'text-success' : 'text-danger' }}">
+                تراز:
+                <span class="badge {{ ($receivedTotal - $givenTotal) >= 0 ? 'bg-success' : 'bg-danger' }} fs-6">
                     {{ number_format($receivedTotal - $givenTotal) }}
                 </span>
                 ریال
             </h4>
+            <div class="row ms-2">
+                <div class="col-md-6">
+                    <span>جمع چک‌های ورودی: </span>
+                    <span style="color: #4dc9f0;">{{ number_format($receivedTotal) }}</span>
+                    <span>ریال</span>
+                </div>
+                <br>
+                <div class="col-md-6">
+                    <span>جمع چک‌های خروجی: </span>
+                    <span style="color: #f67520;">{{ number_format($givenTotal) }}</span>
+                    <span>ریال</span>
+                </div>
+            </div>
             <canvas id="chequeChart"></canvas>
         </div>
     </div>

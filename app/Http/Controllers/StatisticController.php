@@ -15,6 +15,7 @@ use App\Models\Withdrawal;
 use App\Helper\Helper;
 use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class StatisticController extends Controller
 {
@@ -415,6 +416,9 @@ class StatisticController extends Controller
         ]);
 
         $ordersQuery = Order::where('state', 10)
+            ->whereNotNull('deliveryMethod')
+            ->where('deliveryMethod', '!=', 'admin')
+            ->where('deliveryMethod', '!=', ' - ')
             ->when($request->from, function ($query) use ($request) {
                 $query->whereDate('created_at', '>=', Verta::parse($request->from)->DateTime());
             })
@@ -422,12 +426,13 @@ class StatisticController extends Controller
                 $query->whereDate('created_at', '<=', Verta::parse($request->to)->DateTime());
             });
 
-        $shippingGroups = [
-            'تیپاکس' => ['peyk', 'peykCost', 4],
-            'پست' => ['post', 'postCost', 3],
-            'پیک شهری' => ['peykeShahri', 6],
+        $sendMethods = [
+            'پیک شهری' => ['peykeShahri', 6, 'پیک شهری'],
+            'تیپاکس' => ['peyk', 'peykCost', 4, 'پیک'],
+            'پست' => ['post', 'postCost', 3, 'پست'],
             'اسنپ' => [2],
             'ماشین شرکت' => [1],
+            'پس کرایه' => ['paskerayeh', 'پس کرایه'],
             'باربری' => [5],
             'حضوری' => [7],
             'نفیس اکسپرس' => [8],
@@ -436,33 +441,71 @@ class StatisticController extends Controller
 
         $orders = $ordersQuery->get();
         $totalOrders = $orders->count();
-
-        $groupCounts = array_fill_keys(array_keys($shippingGroups), 0);
+        $methodCount = array_fill_keys(array_merge(array_keys($sendMethods), ['نامشخص', 'ارسال رایگان']), 0);
         $config = config('sendMethods');
 
         foreach ($orders as $order) {
             $found = false;
-            foreach ($shippingGroups as $groupName => $keys) {
-                foreach ($keys as $key) {
-                    $needle = is_numeric($key) ? $config[$key] : $config[$key];
-                    if (mb_stripos($order->deliveryMethod, $needle) !== false) {
-                        $groupCounts[$groupName]++;
+            $clean = Str::lower(trim(preg_replace('/[^\p{L}\p{N}\s]/u', '', $order->deliveryMethod)));
+
+            if (mb_strpos($clean, 'ارسال رایگان') !== false) {
+                $methodCount['ارسال رایگان']++;
+                $found = true;
+            }
+
+            if (!$found) {
+                $paskerayeh = ['paskerayeh', 'پس کرایه', Str::lower($config['paskerayeh'] ?? '')];
+                foreach ($paskerayeh as $keyword) {
+                    $cleanKeyword = Str::lower(trim(preg_replace('/[^\p{L}\p{N}\s]/u', '', $keyword)));
+                    if (!empty($cleanKeyword) && mb_strpos($clean, $cleanKeyword) !== false) {
+                        $methodCount['پس کرایه']++;
                         $found = true;
-                        break 2;
+                        break;
                     }
                 }
             }
+
             if (!$found) {
-                $groupCounts['نامشخص'] = ($groupCounts['نامشخص'] ?? 0) + 1;
+                foreach ($sendMethods as $groupLabel => $groupKeys) {
+                    foreach ($groupKeys as $groupKey) {
+                        $needle = is_numeric($groupKey)
+                            ? ($config[$groupKey] ?? '')
+                            : ($config[$groupKey] ?? $groupKey);
+
+                        $keywords = [];
+                        if ($groupLabel === 'پیک شهری') {
+                            $keywords = ['peykeShahri', 'پیک شهری', $config['peykeShahri'] ?? '', $config[6] ?? ''];
+                        } elseif ($groupLabel === 'پست') {
+                            $keywords = ['post', 'postCost', 'پست', $config['post'] ?? '', $config['postCost'] ?? '', $config[3] ?? ''];
+                        } elseif ($groupLabel === 'تیپاکس') {
+                            $keywords = ['peyk', 'peykCost', 'پیک', $config['peyk'] ?? '', $config['peykCost'] ?? '', $config[4] ?? ''];
+                        } else {
+                            $keywords = [$needle];
+                        }
+
+                        foreach ($keywords as $keyword) {
+                            $cleanKeyword = Str::lower(trim(preg_replace('/[^\p{L}\p{N}\s]/u', '', $keyword)));
+                            if (!empty($cleanKeyword) && mb_strpos($clean, $cleanKeyword) !== false) {
+                                $methodCount[$groupLabel]++;
+                                $found = true;
+                                break 3;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!$found) {
+                $methodCount['نامشخص']++;
             }
         }
 
         $chartLabels = [];
         $chartData = [];
         $colorPalette = ['#FF1744','#1976D2','#FFD600','#43A047','#8E24AA',
-                        '#FF6F00','#00B8D4','#6D4C41','#C51162','#00C853'];
+                        '#FF6F00','#00B8D4','#6D4C41','#C51162','#00C853','#9E9E9E', '#D79422'];
 
-        foreach ($groupCounts as $group => $count) {
+        foreach ($methodCount as $group => $count) {
             if ($count > 0) {
                 $chartLabels[] = $group;
                 $chartData[] = $count;

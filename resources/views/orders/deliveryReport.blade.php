@@ -6,8 +6,8 @@
 
 @section('content')
 <div class="container">    
-    <form method="GET" class="mb-4 bg-primary bg-opacity-25 p-3 rounded">
-        <div class="row g-3">
+    <form method="GET" class="mb-4 border p-3 rounded">
+        <div class="row">
             <div class="col-md-3 d-flex align-items-center">
                 <label for="from" class="form-label mb-0 me-2" style="min-width: 55px;">از تاریخ:</label>
                 <input type="text" name="from" id="from" class="form-control" value="{{ $from }}" style="cursor: pointer">
@@ -35,9 +35,15 @@
             <h5 class="fw-bold text-center mt-1 mb-4">
                 توزیع نحوه‌ی ارسال
             </h5>
+            @if($chartData['total'] > 0)
             <div class="chart-container" style="position: relative; height:400px; width:100%">
                 <canvas id="deliveryChart"></canvas>
             </div>
+            @else
+            <div class="text-center text-danger fw-bold py-5">
+                سفارش معتبری یافت نشد.
+            </div>
+            @endif
         </div>
     </div>
 
@@ -55,7 +61,7 @@
                             <div class="h5 mb-0 text-gray-800">
                                 {{ number_format($chartData['data'][$index]) }}
                                 سفارش
-                                <small class="text-muted">({{ round(($chartData['data'][$index]/$chartData['total'])*100) }}%)</small>
+                                <small class="text-muted">(%{{ number_format(($chartData['data'][$index]/$chartData['total'])*100, 1) }})</small>
                             </div>
                         </div>
                         <div class="col-auto">
@@ -94,6 +100,8 @@ document.addEventListener('DOMContentLoaded', function() {
         targetTextSelector: '#to',
         selectedDate: toDate
     });
+
+    @if($chartData['total'] > 0)
     const ctx = document.getElementById('deliveryChart').getContext('2d');
     new Chart(ctx, {
         type: 'pie',
@@ -142,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    @endif
 });
 </script>
 @endsection
